@@ -148,7 +148,7 @@ export default function PostPage() {
 
       <footer className="bg-footy-dark-green dark:bg-gray-950 text-white transition-colors duration-300">
         <div className="max-w-4xl mx-auto px-4 py-8 text-center">
-          <p className="text-footy-gold font-bold text-xl">footy limited</p>
+          <p className="text-footy-gold font-bold text-xl">footy limited © 2024-{new Date().getFullYear()}</p>
         </div>
       </footer>
     </div>

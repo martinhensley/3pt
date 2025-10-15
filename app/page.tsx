@@ -142,7 +142,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="text-center">
             <p className="text-footy-gold font-bold text-2xl">
-              footy limited
+              footy limited © 2024-{new Date().getFullYear()}
             </p>
           </div>
         </div>
