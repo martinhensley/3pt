@@ -12,25 +12,18 @@ export interface AdminUser {
   role: string;
 }
 
-let client: Client | null = null;
-
-function getClient() {
-  if (!client) {
-    client = new Client({
-      connectionString: process.env.DATABASE_URL,
-    });
-  }
+async function getClient() {
+  const client = new Client({
+    connectionString: process.env.DATABASE_URL,
+  });
+  await client.connect();
   return client;
 }
 
 export async function findAdminUserByUsername(username: string): Promise<AdminUser | null> {
-  const client = getClient();
+  const client = await getClient();
 
   try {
-    if (!client._connected) {
-      await client.connect();
-    }
-
     const result = await client.query(
       'SELECT * FROM neon_auth.admin_users WHERE username = $1 AND is_active = true',
       [username]
@@ -44,17 +37,15 @@ export async function findAdminUserByUsername(username: string): Promise<AdminUs
   } catch (error) {
     console.error('Error finding admin user:', error);
     throw error;
+  } finally {
+    await client.end();
   }
 }
 
 export async function findAdminUserByEmail(email: string): Promise<AdminUser | null> {
-  const client = getClient();
+  const client = await getClient();
 
   try {
-    if (!client._connected) {
-      await client.connect();
-    }
-
     const result = await client.query(
       'SELECT * FROM neon_auth.admin_users WHERE email = $1 AND is_active = true',
       [email]
@@ -68,17 +59,15 @@ export async function findAdminUserByEmail(email: string): Promise<AdminUser | n
   } catch (error) {
     console.error('Error finding admin user by email:', error);
     throw error;
+  } finally {
+    await client.end();
   }
 }
 
 export async function updateLastLogin(userId: string): Promise<void> {
-  const client = getClient();
+  const client = await getClient();
 
   try {
-    if (!client._connected) {
-      await client.connect();
-    }
-
     await client.query(
       'UPDATE neon_auth.admin_users SET last_login = CURRENT_TIMESTAMP WHERE id = $1',
       [userId]
@@ -86,5 +75,7 @@ export async function updateLastLogin(userId: string): Promise<void> {
   } catch (error) {
     console.error('Error updating last login:', error);
     // Don't throw - this is non-critical
+  } finally {
+    await client.end();
   }
 }
