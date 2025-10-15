@@ -4,12 +4,14 @@ import { compare } from "bcryptjs";
 import { findAdminUserByUsername, updateLastLogin } from "./neon-auth";
 
 export const authOptions: NextAuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",
   },
   pages: {
     signIn: "/fa/login",
   },
+  debug: process.env.NODE_ENV === "development",
   providers: [
     CredentialsProvider({
       name: "Credentials",
