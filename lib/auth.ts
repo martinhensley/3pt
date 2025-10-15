@@ -10,7 +10,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 export const authOptions: NextAuthOptions = {
-  // Don't explicitly set secret - let NextAuth auto-detect from NEXTAUTH_SECRET env var
+  secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",
   },
