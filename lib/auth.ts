@@ -1,7 +1,7 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
-import { prisma } from "./prisma";
+import { findAdminUserByUsername, updateLastLogin } from "./neon-auth";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -22,11 +22,7 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        const user = await prisma.user.findUnique({
-          where: {
-            username: credentials.username,
-          },
-        });
+        const user = await findAdminUserByUsername(credentials.username);
 
         if (!user) {
           return null;
@@ -34,16 +30,20 @@ export const authOptions: NextAuthOptions = {
 
         const isPasswordValid = await compare(
           credentials.password,
-          user.password
+          user.password_hash
         );
 
         if (!isPasswordValid) {
           return null;
         }
 
+        // Update last login time
+        await updateLastLogin(user.id);
+
         return {
           id: user.id,
           username: user.username,
+          email: user.email,
         };
       },
     }),
@@ -53,6 +53,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.username = user.username;
+        token.email = user.email;
       }
       return token;
     },
@@ -61,6 +62,7 @@ export const authOptions: NextAuthOptions = {
         session.user = {
           id: token.id as string,
           username: token.username as string,
+          email: token.email as string,
         };
       }
       return session;
