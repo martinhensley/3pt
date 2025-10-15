@@ -24,8 +24,8 @@ A modern blog platform for soccer card enthusiasts at footylimited.com. Features
 
 ## Color Scheme
 
-- Dark Green: #203731
-- Gold: #FFB612
+- Dark Green: #203732
+- Gold: #FFB613
 - White: #FFFFFF
 
 ## Getting Started
