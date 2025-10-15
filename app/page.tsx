@@ -59,18 +59,12 @@ export default function Home() {
           <div className="text-center py-20">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-12 max-w-2xl mx-auto transition-colors duration-300">
               <h2 className="text-3xl font-bold text-footy-dark-green dark:text-footy-gold mb-4">
-                Welcome to Footy Limited
+                Welcome to footy limited
               </h2>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">
+              <p className="text-gray-600 dark:text-gray-300">
                 No posts yet. Check back soon for the latest soccer card news
                 and reviews!
               </p>
-              <Link
-                href="/fa/login"
-                className="inline-block bg-footy-gold text-footy-dark-green px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity"
-              >
-                Admin Login
-              </Link>
             </div>
           </div>
         ) : (
@@ -147,17 +141,9 @@ export default function Home() {
       <footer className="bg-footy-dark-green dark:bg-gray-950 text-white transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="text-center">
-            <p className="text-footy-gold font-bold text-2xl mb-4">
-              Footy Limited
+            <p className="text-footy-gold font-bold text-2xl">
+              footy limited
             </p>
-            <div className="mt-4">
-              <Link
-                href="/fa/login"
-                className="text-gray-400 hover:text-footy-gold text-sm transition-colors"
-              >
-                Admin
-              </Link>
-            </div>
           </div>
         </div>
       </footer>

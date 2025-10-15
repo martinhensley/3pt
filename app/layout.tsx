@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Footy Limited - football/soccer/footy cards",
+  title: "footy limited - football/soccer/footy cards",
   description: "footy limited the premier source footy cards. share the beautiful game.",
 };
 

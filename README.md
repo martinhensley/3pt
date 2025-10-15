@@ -1,4 +1,4 @@
-# Footy Limited - Soccer Card Syndication Blog
+# footy limited - Soccer Card Syndication Blog
 
 A modern blog platform for soccer card enthusiasts at footylimited.com. Features AI-powered content generation using Claude for card and set analysis.
 
@@ -9,7 +9,7 @@ A modern blog platform for soccer card enthusiasts at footylimited.com. Features
 - **Set Analysis**: Upload checklists and sell sheets for comprehensive set overviews
 - **Image Management**: Automatic image upload and storage with gallery display
 - **User Authentication**: Secure admin login system
-- **Responsive Design**: Mobile-friendly interface with Footy Limited branding
+- **Responsive Design**: Mobile-friendly interface with footy limited branding
 - **SEO-Friendly**: Dynamic metadata and optimized for search engines
 
 ## Tech Stack
@@ -179,4 +179,4 @@ For production deployment:
 
 ## License
 
-Private project for Footy Limited.
+Private project for footy limited.

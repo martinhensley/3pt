@@ -422,7 +422,7 @@ export default function AdminPage() {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-footy-dark-green text-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Footy Limited Admin</h1>
+          <h1 className="text-2xl font-bold">footy limited admin</h1>
           <div className="flex items-center gap-4">
             <span className="text-footy-gold">Welcome, {session.user.username}</span>
             <button
