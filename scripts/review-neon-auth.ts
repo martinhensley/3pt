@@ -61,13 +61,14 @@ async function reviewNeonAuth() {
     if (constraints.rows.length === 0) {
       console.log('No constraints found');
     } else {
-      constraints.rows.forEach(row => {
-        const type = {
+      constraints.rows.forEach((row: any) => {
+        const typeMap: Record<string, string> = {
           'p': 'PRIMARY KEY',
           'u': 'UNIQUE',
           'f': 'FOREIGN KEY',
           'c': 'CHECK'
-        }[row.constraint_type] || row.constraint_type;
+        };
+        const type = typeMap[row.constraint_type] || row.constraint_type;
         console.log(`${row.constraint_name} (${type}): ${row.definition}`);
       });
     }
