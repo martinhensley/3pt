@@ -4,6 +4,25 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+interface Post {
+  id: string;
+  title: string;
+  content: string;
+  excerpt: string;
+  type: string;
+  published: boolean;
+  createdAt: string;
+  images: { id: string; url: string; caption: string | null }[];
+}
+
+interface GeneratedPost {
+  title: string;
+  content: string;
+  excerpt: string;
+  type: string;
+  imageUrls: string[];
+}
+
 export default function AdminPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -14,28 +33,23 @@ export default function AdminPage() {
   // Card form state
   const [cardFrontImage, setCardFrontImage] = useState<File | null>(null);
   const [cardBackImage, setCardBackImage] = useState<File | null>(null);
-  const [cardFrontUrl, setCardFrontUrl] = useState("");
-  const [cardBackUrl, setCardBackUrl] = useState("");
 
   // Set form state
   const [checklistImage, setChecklistImage] = useState<File | null>(null);
   const [sellSheetImage, setSellSheetImage] = useState<File | null>(null);
-  const [checklistUrl, setChecklistUrl] = useState("");
-  const [sellSheetUrl, setSellSheetUrl] = useState("");
 
   // Release form state
   const [releaseImage, setReleaseImage] = useState<File | null>(null);
-  const [releaseUrl, setReleaseUrl] = useState("");
 
   // Generated post state
-  const [generatedPost, setGeneratedPost] = useState<any>(null);
+  const [generatedPost, setGeneratedPost] = useState<GeneratedPost | null>(null);
   const [editedTitle, setEditedTitle] = useState("");
   const [editedContent, setEditedContent] = useState("");
   const [editedExcerpt, setEditedExcerpt] = useState("");
 
   // Manage posts state
-  const [allPosts, setAllPosts] = useState<any[]>([]);
-  const [editingPost, setEditingPost] = useState<any>(null);
+  const [allPosts, setAllPosts] = useState<Post[]>([]);
+  const [editingPost, setEditingPost] = useState<Post | null>(null);
 
   // Create post state
   const [createPrompt, setCreatePrompt] = useState("");
@@ -93,12 +107,10 @@ export default function AdminPage() {
     try {
       // Upload images
       const frontUrl = await uploadFile(cardFrontImage);
-      setCardFrontUrl(frontUrl);
 
       let backUrl = "";
       if (cardBackImage) {
         backUrl = await uploadFile(cardBackImage);
-        setCardBackUrl(backUrl);
       }
 
       // Analyze card
@@ -141,12 +153,10 @@ export default function AdminPage() {
     try {
       // Upload images
       const checkUrl = await uploadFile(checklistImage);
-      setChecklistUrl(checkUrl);
 
       let sellUrl = "";
       if (sellSheetImage) {
         sellUrl = await uploadFile(sellSheetImage);
-        setSellSheetUrl(sellUrl);
       }
 
       // Analyze set
@@ -201,7 +211,7 @@ export default function AdminPage() {
         throw new Error("Failed to create post");
       }
 
-      const post = await response.json();
+      await response.json();
       setMessage({
         type: "success",
         text: `Post ${published ? "published" : "saved as draft"} successfully!`,
@@ -214,10 +224,6 @@ export default function AdminPage() {
         setCardBackImage(null);
         setChecklistImage(null);
         setSellSheetImage(null);
-        setCardFrontUrl("");
-        setCardBackUrl("");
-        setChecklistUrl("");
-        setSellSheetUrl("");
         setEditedTitle("");
         setEditedContent("");
         setEditedExcerpt("");
@@ -289,7 +295,7 @@ export default function AdminPage() {
     }
   };
 
-  const handleTogglePublished = async (post: any) => {
+  const handleTogglePublished = async (post: Post) => {
     setLoading(true);
     setMessage(null);
 
@@ -335,7 +341,6 @@ export default function AdminPage() {
     try {
       // Upload image
       const imageUrl = await uploadFile(releaseImage);
-      setReleaseUrl(imageUrl);
 
       // Analyze release
       const response = await fetch("/api/analyze/release", {

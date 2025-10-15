@@ -5,8 +5,18 @@ import Image from "next/image";
 import Header from "@/components/Header";
 import { useEffect, useState } from "react";
 
+interface Post {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  type: string;
+  createdAt: string;
+  images: { id: string; url: string }[];
+}
+
 export default function Home() {
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

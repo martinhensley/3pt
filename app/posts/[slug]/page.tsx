@@ -6,17 +6,29 @@ import Image from "next/image";
 import Header from "@/components/Header";
 import { useEffect, useState } from "react";
 
+interface Post {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt: string;
+  type: string;
+  createdAt: string;
+  published: boolean;
+  images: { id: string; url: string; caption: string | null }[];
+}
+
 export default function PostPage() {
   const params = useParams();
   const slug = params.slug as string;
-  const [post, setPost] = useState<any>(null);
+  const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch(`/api/posts`)
       .then((res) => res.json())
-      .then((data) => {
-        const foundPost = data.find((p: any) => p.slug === slug && p.published);
+      .then((data: Post[]) => {
+        const foundPost = data.find((p) => p.slug === slug && p.published);
         if (!foundPost) {
           notFound();
         }
