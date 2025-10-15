@@ -3,8 +3,14 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
 import { findAdminUserByUsername, updateLastLogin } from "./neon-auth";
 
+// Log to verify env var is loaded
+if (process.env.NODE_ENV === 'production') {
+  console.log('[NextAuth] NEXTAUTH_SECRET exists:', !!process.env.NEXTAUTH_SECRET);
+  console.log('[NextAuth] NEXTAUTH_SECRET length:', process.env.NEXTAUTH_SECRET?.length);
+}
+
 export const authOptions: NextAuthOptions = {
-  secret: process.env.NEXTAUTH_SECRET,
+  // Don't explicitly set secret - let NextAuth auto-detect from NEXTAUTH_SECRET env var
   session: {
     strategy: "jwt",
   },
