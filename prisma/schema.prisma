@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  posts     Post[]
+}
+
+model Manufacturer {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  releases  Release[]
+}
+
+model Release {
+  id             String       @id @default(cuid())
+  name           String
+  year           String?
+  manufacturerId String
+  manufacturer   Manufacturer @relation(fields: [manufacturerId], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  sets           Set[]
+  posts          Post[]
+}
+
+model Set {
+  id          String   @id @default(cuid())
+  name        String
+  releaseId   String
+  release     Release  @relation(fields: [releaseId], references: [id])
+  totalCards  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  cards       Card[]
+  posts       Post[]
+}
+
+model Card {
+  id         String   @id @default(cuid())
+  playerName String?
+  team       String?
+  cardNumber String?
+  variant    String?
+  setId      String
+  set        Set      @relation(fields: [setId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  posts      Post[]
+}
+
+model Post {
+  id          String      @id @default(cuid())
+  title       String
+  slug        String      @unique
+  content     String
+  excerpt     String?
+  type        PostType
+  published   Boolean     @default(false)
+  releaseId   String?
+  release     Release?    @relation(fields: [releaseId], references: [id])
+  setId       String?
+  set         Set?        @relation(fields: [setId], references: [id])
+  cardId      String?
+  card        Card?       @relation(fields: [cardId], references: [id])
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  authorId    String
+  author      User        @relation(fields: [authorId], references: [id])
+  images      PostImage[]
+}
+
+model PostImage {
+  id        String   @id @default(cuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  url       String
+  caption   String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+enum PostType {
+  CARD
+  SET
+  RELEASE
+  GENERAL
+}

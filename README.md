@@ -1,36 +1,182 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Footy Limited - Soccer Card Syndication Blog
+
+A modern blog platform for soccer card enthusiasts at footylimited.com. Features AI-powered content generation using Claude for card and set analysis.
+
+## Features
+
+- **AI-Powered Content Generation**: Upload card images or set documents and automatically generate engaging blog posts
+- **Card Analysis**: Upload front and back card images for detailed reviews
+- **Set Analysis**: Upload checklists and sell sheets for comprehensive set overviews
+- **Image Management**: Automatic image upload and storage with gallery display
+- **User Authentication**: Secure admin login system
+- **Responsive Design**: Mobile-friendly interface with Footy Limited branding
+- **SEO-Friendly**: Dynamic metadata and optimized for search engines
+
+## Tech Stack
+
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **Database**: SQLite with Prisma ORM
+- **Authentication**: NextAuth.js
+- **AI**: Anthropic Claude API (Claude 3.5 Sonnet)
+- **Image Processing**: Sharp
+
+## Color Scheme
+
+- Dark Green: #203731
+- Gold: #FFB612
+- White: #FFFFFF
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 20+
+- npm or yarn
+
+### Installation
+
+1. The dependencies are already installed in this project.
+
+2. The `.env` file is already configured with:
+   - Database URL (SQLite)
+   - Anthropic API Key
+   - NextAuth configuration
+
+3. The database is already initialized with the admin user:
+   - Username: `footy`
+   - Password: `test2222`
+
+### Running the Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the blog.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Usage
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Admin Access
 
-## Learn More
+1. Navigate to [http://localhost:3000/admin/login](http://localhost:3000/admin/login)
+2. Login with credentials:
+   - Username: `footy`
+   - Password: `test2222`
 
-To learn more about Next.js, take a look at the following resources:
+### Creating a Card Post
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Go to the Admin Dashboard
+2. Select the "Analyze Card" tab
+3. Upload the card front image (required)
+4. Optionally upload the card back image
+5. Click "Analyze Card & Generate Post"
+6. Review and edit the AI-generated content
+7. Click "Publish Post" or "Save as Draft"
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Creating a Set Post
 
-## Deploy on Vercel
+1. Go to the Admin Dashboard
+2. Select the "Analyze Set" tab
+3. Upload the checklist image (required)
+4. Optionally upload the sell sheet image
+5. Click "Analyze Set & Generate Post"
+6. Review and edit the AI-generated content
+7. Click "Publish Post" or "Save as Draft"
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Viewing Posts
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Homepage: [http://localhost:3000](http://localhost:3000)
+- Individual posts: [http://localhost:3000/posts/[slug]](http://localhost:3000/posts/[slug])
+
+## Project Structure
+
+```
+footy-limited-blog/
+├── app/
+│   ├── admin/              # Admin interface
+│   │   ├── login/          # Login page
+│   │   └── page.tsx        # Admin dashboard
+│   ├── api/                # API routes
+│   │   ├── auth/           # NextAuth endpoints
+│   │   ├── upload/         # Image upload
+│   │   ├── analyze/        # AI analysis endpoints
+│   │   └── posts/          # Post CRUD operations
+│   ├── posts/[slug]/       # Individual post pages
+│   ├── globals.css         # Global styles with color scheme
+│   ├── layout.tsx          # Root layout
+│   ├── page.tsx            # Homepage
+│   └── providers.tsx       # Session provider
+├── lib/
+│   ├── prisma.ts           # Prisma client
+│   ├── auth.ts             # NextAuth configuration
+│   └── ai.ts               # Claude AI integration
+├── prisma/
+│   └── schema.prisma       # Database schema
+├── public/
+│   └── uploads/            # Uploaded images
+├── scripts/
+│   └── init-admin.ts       # Admin user initialization
+└── types/
+    └── next-auth.d.ts      # TypeScript definitions
+```
+
+## Database Schema
+
+### User
+- id: String (CUID)
+- username: String (unique)
+- password: String (hashed)
+- createdAt: DateTime
+- updatedAt: DateTime
+
+### Post
+- id: String (CUID)
+- title: String
+- slug: String (unique)
+- content: String (HTML)
+- excerpt: String
+- type: PostType (CARD or SET)
+- published: Boolean
+- createdAt: DateTime
+- updatedAt: DateTime
+- authorId: String
+
+### PostImage
+- id: String (CUID)
+- postId: String
+- url: String
+- caption: String (optional)
+- order: Int
+- createdAt: DateTime
+
+## API Endpoints
+
+- `POST /api/upload` - Upload images
+- `POST /api/analyze/card` - Analyze card images with AI
+- `POST /api/analyze/set` - Analyze set documents with AI
+- `GET /api/posts` - Get all posts
+- `POST /api/posts` - Create a new post
+- `GET/POST /api/auth/[...nextauth]` - NextAuth endpoints
+
+## Deployment
+
+For production deployment:
+
+1. Update `NEXTAUTH_URL` to your production domain
+2. Use a production database (PostgreSQL, MySQL, etc.)
+3. Update `NEXTAUTH_SECRET` with a strong secret
+4. Ensure Anthropic API key is properly secured
+5. Configure your hosting platform for Next.js App Router
+
+## Security Notes
+
+- Change the default admin password after first login
+- Use strong secrets in production
+- Keep API keys secure and never commit them to version control
+- The `.env` file is already in `.gitignore`
+
+## License
+
+Private project for Footy Limited.
