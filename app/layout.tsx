@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Footy Limited - Soccer Card Syndication Blog",
-  description: "Your source for soccer card news, reviews, and collections at footylimited.com",
+  title: "Footy Limited - football/soccer/footy cards",
+  description: "footy limited the premier source footy cards. share the beautiful game.",
 };
 
 export default function RootLayout({
