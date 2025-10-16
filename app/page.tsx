@@ -3,6 +3,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import Header from "@/components/Header";
+import EbayAd from "@/components/EbayAd";
+import EbayAdHorizontal from "@/components/EbayAdHorizontal";
 import { useEffect, useState } from "react";
 
 interface Post {
@@ -44,14 +46,8 @@ export default function Home() {
       <Header />
 
       <div className="flex-grow flex gap-4 max-w-[1400px] mx-auto w-full px-4 py-12">
-        <aside className="hidden lg:block w-48 flex-shrink-0">
-          <div className="bg-gray-700 dark:bg-gray-800 border-2 border-footy-gold rounded p-4 text-center sticky top-4">
-            <p className="text-xs text-white mb-2">Left Ad</p>
-            <p className="text-xs text-gray-400">Placeholder</p>
-            <div className="h-96 flex items-center justify-center text-gray-500 text-xs">
-              Ad Space
-            </div>
-          </div>
+        <aside className="hidden lg:block w-72 flex-shrink-0">
+          <EbayAd query="soccer cards" limit={3} title="Latest Soccer Cards" />
         </aside>
 
         <main className="flex-grow">
@@ -125,23 +121,19 @@ export default function Home() {
             ))}
           </div>
         )}
+
+        <EbayAdHorizontal query="soccer memorabilia" limit={4} title="More Soccer Collectibles" />
         </main>
 
-        <aside className="hidden lg:block w-48 flex-shrink-0">
-          <div className="bg-gray-700 dark:bg-gray-800 border-2 border-footy-gold rounded p-4 text-center sticky top-4">
-            <p className="text-xs text-white mb-2">Right Ad</p>
-            <p className="text-xs text-gray-400">Placeholder</p>
-            <div className="h-96 flex items-center justify-center text-gray-500 text-xs">
-              Ad Space
-            </div>
-          </div>
+        <aside className="hidden lg:block w-72 flex-shrink-0">
+          <EbayAd query="soccer autographs" limit={3} title="Soccer Autographs" />
         </aside>
       </div>
 
       <footer className="bg-footy-dark-green dark:bg-gray-950 text-white transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="text-center">
-            <p className="text-footy-gold font-bold text-2xl">
+            <p className="text-footy-gold text-sm">
               footy limited © 2024-{new Date().getFullYear()}
             </p>
           </div>

@@ -23,8 +23,10 @@ export default function Header({ showBackButton = false }: HeaderProps) {
   return (
     <>
       <header className="bg-footy-dark-green dark:bg-gray-950 text-white shadow-lg relative transition-colors duration-300">
-        <div className="max-w-7xl mx-auto px-4 py-6 flex items-center gap-4">
-          <div className="flex-shrink-0">
+        <div className="max-w-7xl mx-auto px-4 py-6 flex items-center justify-between">
+          <div className="flex-1"></div>
+
+          <div className="text-center">
             {showBackButton && (
               <Link
                 href="/"
@@ -33,24 +35,17 @@ export default function Header({ showBackButton = false }: HeaderProps) {
                 ← Back to Home
               </Link>
             )}
-            <h1 className="text-3xl md:text-4xl font-bold">
+            <h1 className="text-4xl md:text-5xl font-bold">
               <Link href="/">footy limited</Link>
             </h1>
             {!showBackButton && (
               <p className="text-sm md:text-base text-footy-gold font-semibold mt-1">
-                football/soccer/footy cards
+                football-futbol-futebol-fußball-soccer footy cards
               </p>
             )}
           </div>
 
-          <div className="flex-grow flex justify-center">
-            <div className="bg-gray-700 dark:bg-gray-800 border-2 border-footy-gold rounded px-6 py-3 text-center">
-              <p className="text-xs text-gray-300">eBay Ad</p>
-              <p className="text-xs text-gray-400">Placeholder</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 flex-shrink-0">
+          <div className="flex-1 flex items-center gap-3 justify-end">
             <button
               onClick={() => setSearchOpen(!searchOpen)}
               className="p-2 hover:bg-footy-gold hover:text-footy-dark-green rounded transition-colors"

@@ -4,7 +4,10 @@ import { notFound, useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import Header from "@/components/Header";
-import { useEffect, useState } from "react";
+import EbayAd from "@/components/EbayAd";
+import EbayAdHorizontal from "@/components/EbayAdHorizontal";
+import { useEffect, useState, useMemo } from "react";
+import { extractKeywordsFromPost, getAdTitle } from "@/lib/extractKeywords";
 
 interface Post {
   id: string;
@@ -37,6 +40,20 @@ export default function PostPage() {
       });
   }, [slug]);
 
+  // Extract keywords from post for dynamic ad queries (must be before early returns)
+  const adKeywords = useMemo(() => {
+    if (!post) {
+      return {
+        primaryQuery: 'soccer cards',
+        autographQuery: 'soccer autographs',
+        relatedQuery: 'soccer cards',
+        playerName: null,
+        teamName: null,
+      };
+    }
+    return extractKeywordsFromPost(post);
+  }, [post]);
+
   if (loading) {
     return (
       <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900">
@@ -57,14 +74,12 @@ export default function PostPage() {
       <Header showBackButton />
 
       <div className="flex-grow flex gap-4 max-w-[1400px] mx-auto w-full px-4 py-12">
-        <aside className="hidden lg:block w-48 flex-shrink-0">
-          <div className="bg-gray-700 dark:bg-gray-800 border-2 border-footy-gold rounded p-4 text-center sticky top-4">
-            <p className="text-xs text-white mb-2">Left Ad</p>
-            <p className="text-xs text-gray-400">Placeholder</p>
-            <div className="h-96 flex items-center justify-center text-gray-500 text-xs">
-              Ad Space
-            </div>
-          </div>
+        <aside className="hidden lg:block w-72 flex-shrink-0">
+          <EbayAd
+            query={adKeywords.primaryQuery}
+            limit={3}
+            title={getAdTitle(adKeywords.primaryQuery, "Soccer Cards")}
+          />
         </aside>
 
         <main className="flex-grow max-w-4xl mx-auto">
@@ -133,22 +148,26 @@ export default function PostPage() {
             </Link>
           </div>
         </article>
+
+        <EbayAdHorizontal
+          query={adKeywords.relatedQuery}
+          limit={4}
+          title={getAdTitle(adKeywords.relatedQuery, "Related Soccer Cards")}
+        />
         </main>
 
-        <aside className="hidden lg:block w-48 flex-shrink-0">
-          <div className="bg-gray-700 dark:bg-gray-800 border-2 border-footy-gold rounded p-4 text-center sticky top-4">
-            <p className="text-xs text-white mb-2">Right Ad</p>
-            <p className="text-xs text-gray-400">Placeholder</p>
-            <div className="h-96 flex items-center justify-center text-gray-500 text-xs">
-              Ad Space
-            </div>
-          </div>
+        <aside className="hidden lg:block w-72 flex-shrink-0">
+          <EbayAd
+            query={adKeywords.autographQuery}
+            limit={3}
+            title={getAdTitle(adKeywords.autographQuery, "Soccer Autographs")}
+          />
         </aside>
       </div>
 
       <footer className="bg-footy-dark-green dark:bg-gray-950 text-white transition-colors duration-300">
         <div className="max-w-4xl mx-auto px-4 py-8 text-center">
-          <p className="text-footy-gold font-bold text-xl">footy limited © 2024-{new Date().getFullYear()}</p>
+          <p className="text-footy-gold text-sm">footy limited © 2024-{new Date().getFullYear()}</p>
         </div>
       </footer>
     </div>
