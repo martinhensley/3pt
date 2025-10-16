@@ -51,6 +51,11 @@ async function getAccessToken(): Promise<string> {
 
   const data = await response.json();
   accessToken = data.access_token;
+
+  if (!accessToken) {
+    throw new Error("Failed to obtain eBay access token");
+  }
+
   // Set expiry to 5 minutes before actual expiry for safety
   tokenExpiry = Date.now() + (data.expires_in - 300) * 1000;
 
