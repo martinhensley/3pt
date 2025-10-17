@@ -1,6 +1,6 @@
 "use client";
 
-import { StackProvider, StackTheme, StackClientApp } from "@stackframe/stack";
+import { StackProvider, StackClientApp } from "@stackframe/stack";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 
 const stackApp = new StackClientApp({
@@ -16,10 +16,7 @@ const stackApp = new StackClientApp({
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <StackProvider
-      app={stackApp}
-      theme={StackTheme.getDefaultTheme()}
-    >
+    <StackProvider app={stackApp}>
       <ThemeProvider>{children}</ThemeProvider>
     </StackProvider>
   );
