@@ -1,6 +1,6 @@
 "use client";
 
-import { useUser, useStackApp } from "@stackframe/stack";
+import { useUser } from "@stackframe/stack";
 import { useEffect, useState } from "react";
 
 interface Post {
@@ -24,7 +24,6 @@ interface GeneratedPost {
 
 export default function AdminPage() {
   const user = useUser({ or: "redirect" });
-  const stackApp = useStackApp();
   const [activeTab, setActiveTab] = useState<"card" | "set" | "release" | "create" | "manage">("card");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
