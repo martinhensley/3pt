@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
+import { useUser, useStackApp } from "@stackframe/stack";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -24,7 +24,8 @@ interface GeneratedPost {
 }
 
 export default function AdminPage() {
-  const { data: session, status } = useSession();
+  const user = useUser({ or: "redirect" });
+  const stackApp = useStackApp();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"card" | "set" | "release" | "create" | "manage">("card");
   const [loading, setLoading] = useState(false);
@@ -54,11 +55,6 @@ export default function AdminPage() {
   // Create post state
   const [createPrompt, setCreatePrompt] = useState("");
 
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/fa/login");
-    }
-  }, [status, router]);
 
   const fetchAllPosts = async () => {
     try {
@@ -406,17 +402,6 @@ export default function AdminPage() {
     }
   };
 
-  if (status === "loading") {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-footy-dark-green">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!session) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -424,9 +409,9 @@ export default function AdminPage() {
         <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
           <h1 className="text-2xl font-bold">footy limited admin</h1>
           <div className="flex items-center gap-4">
-            <span className="text-footy-gold">Welcome, {session.user.username}</span>
+            <span className="text-footy-gold">Welcome, {user.displayName || user.primaryEmail || "Admin"}</span>
             <button
-              onClick={() => signOut({ callbackUrl: "/" })}
+              onClick={() => stackApp.signOut()}
               className="bg-footy-gold text-footy-dark-green px-4 py-2 rounded-lg font-semibold hover:opacity-90"
             >
               Sign Out

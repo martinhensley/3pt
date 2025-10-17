@@ -1,9 +1,12 @@
 "use client";
 
 import { StackProvider, StackTheme } from "@stackframe/stack";
-import { ThemeProvider } from "@/contexts/ThemeContext";
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export default function StackProviderWrapper({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <StackProvider
       app={{
@@ -17,7 +20,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         afterSignOut: "/",
       }}
     >
-      <ThemeProvider>{children}</ThemeProvider>
+      {children}
     </StackProvider>
   );
 }
