@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { stackServerApp } from "@/stack";
 import { prisma } from "@/lib/prisma";
 
 function generateSlug(title: string): string {
@@ -12,8 +11,8 @@ function generateSlug(title: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    const user = await stackServerApp.getUser();
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -45,7 +44,7 @@ export async function POST(request: NextRequest) {
         excerpt: excerpt || "",
         type,
         published: published || false,
-        authorId: session.user.id,
+        authorId: user.id,
         images: {
           create:
             imageUrls?.map((url: string, index: number) => ({
@@ -105,8 +104,8 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    const user = await stackServerApp.getUser();
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -145,8 +144,8 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    const user = await stackServerApp.getUser();
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

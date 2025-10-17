@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { stackServerApp } from "@/stack";
 
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    const user = await stackServerApp.getUser();
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
