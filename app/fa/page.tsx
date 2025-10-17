@@ -409,7 +409,7 @@ export default function AdminPage() {
           <div className="flex items-center gap-4">
             <span className="text-footy-gold">Welcome, {user.displayName || user.primaryEmail || "Admin"}</span>
             <button
-              onClick={() => stackApp.signOut()}
+              onClick={() => user.signOut()}
               className="bg-footy-gold text-footy-dark-green px-4 py-2 rounded-lg font-semibold hover:opacity-90"
             >
               Sign Out
