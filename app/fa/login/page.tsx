@@ -1,11 +1,11 @@
 "use client";
 
-import { useStackApp, useUser } from "@stackframe/stack";
+import { useUser } from "@stackframe/stack";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { SignIn } from "@stackframe/stack";
 
 export default function LoginPage() {
-  const stackApp = useStackApp();
   const user = useUser();
   const router = useRouter();
 
@@ -25,7 +25,7 @@ export default function LoginPage() {
           <p className="text-gray-800 mt-2 font-medium">Admin Login</p>
         </div>
 
-        <stackApp.SignIn />
+        <SignIn />
       </div>
     </div>
   );
