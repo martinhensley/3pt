@@ -16,12 +16,14 @@ interface DeletionNotification {
 
 // Handle GET requests (for challenge validation)
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
+  const { searchParams, origin, pathname } = new URL(request.url);
   const challengeCode = searchParams.get('challenge_code');
 
   // If challenge_code is present, handle the challenge
   if (challengeCode) {
-    return handleChallenge({ challengeCode });
+    // Construct the endpoint URL from the actual request
+    const actualEndpointUrl = `${origin}${pathname}`;
+    return handleChallenge({ challengeCode }, actualEndpointUrl);
   }
 
   // Otherwise, return status
@@ -52,21 +54,25 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function handleChallenge(challenge: ChallengeRequest): NextResponse {
+function handleChallenge(challenge: ChallengeRequest, endpointUrl?: string): NextResponse {
   const { challengeCode } = challenge;
+
+  // Use the actual endpoint URL from the request, or fall back to env variable
+  const actualEndpoint = endpointUrl || ENDPOINT_URL;
 
   // Create hash: SHA256(challengeCode + verificationToken + endpoint)
   // Using eBay's recommended method: update() called separately for each component
   const hash = crypto.createHash('sha256');
   hash.update(challengeCode);
   hash.update(VERIFICATION_TOKEN);
-  hash.update(ENDPOINT_URL);
+  hash.update(actualEndpoint);
   const challengeResponse = hash.digest('hex');
 
   console.log('eBay Challenge received:', {
     challengeCode,
     verificationToken: VERIFICATION_TOKEN,
-    endpoint: ENDPOINT_URL,
+    endpoint: actualEndpoint,
+    endpointFromEnv: ENDPOINT_URL,
     response: challengeResponse
   });
 
