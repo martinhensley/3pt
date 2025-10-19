@@ -82,11 +82,6 @@ export async function GET(request: NextRequest) {
             order: "asc",
           },
         },
-        author: {
-          select: {
-            username: true,
-          },
-        },
       },
       orderBy: {
         createdAt: "desc",
