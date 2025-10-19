@@ -56,14 +56,16 @@ function handleChallenge(challenge: ChallengeRequest): NextResponse {
   const { challengeCode } = challenge;
 
   // Create hash: SHA256(challengeCode + verificationToken + endpoint)
-  const hashString = challengeCode + VERIFICATION_TOKEN + ENDPOINT_URL;
-  const challengeResponse = crypto
-    .createHash('sha256')
-    .update(hashString)
-    .digest('hex');
+  // Using eBay's recommended method: update() called separately for each component
+  const hash = crypto.createHash('sha256');
+  hash.update(challengeCode);
+  hash.update(VERIFICATION_TOKEN);
+  hash.update(ENDPOINT_URL);
+  const challengeResponse = hash.digest('hex');
 
   console.log('eBay Challenge received:', {
     challengeCode,
+    verificationToken: VERIFICATION_TOKEN,
     endpoint: ENDPOINT_URL,
     response: challengeResponse
   });
