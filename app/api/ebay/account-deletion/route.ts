@@ -14,8 +14,17 @@ interface DeletionNotification {
   eiasToken?: string;
 }
 
-// Handle GET requests (for initial setup/verification)
+// Handle GET requests (for challenge validation)
 export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const challengeCode = searchParams.get('challenge_code');
+
+  // If challenge_code is present, handle the challenge
+  if (challengeCode) {
+    return handleChallenge({ challengeCode });
+  }
+
+  // Otherwise, return status
   return NextResponse.json({
     status: 'ready',
     message: 'eBay Marketplace Account Deletion endpoint is configured'
