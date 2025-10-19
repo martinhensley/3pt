@@ -1,6 +1,7 @@
 "use client";
 
-import { useUser } from "@stackframe/stack";
+import { useSession, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface Post {
@@ -23,7 +24,8 @@ interface GeneratedPost {
 }
 
 export default function AdminPage() {
-  const user = useUser({ or: "redirect" });
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<"card" | "set" | "release" | "create" | "manage">("card");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -399,6 +401,24 @@ export default function AdminPage() {
     }
   };
 
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/fa/login");
+    }
+  }, [status, router]);
+
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-xl">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -406,9 +426,9 @@ export default function AdminPage() {
         <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
           <h1 className="text-2xl font-bold">footy limited admin</h1>
           <div className="flex items-center gap-4">
-            <span className="text-footy-gold">Welcome, {user.displayName || user.primaryEmail || "Admin"}</span>
+            <span className="text-footy-gold">Welcome, {session.user?.name || "Admin"}</span>
             <button
-              onClick={() => user.signOut()}
+              onClick={() => signOut({ callbackUrl: "/" })}
               className="bg-footy-gold text-footy-dark-green px-4 py-2 rounded-lg font-semibold hover:opacity-90"
             >
               Sign Out

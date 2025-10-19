@@ -10,13 +10,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Note: This User model is no longer used for authentication.
+// Authentication is handled by neon_auth.admin_users table.
+// This model is kept for potential future use or historical data.
 model User {
   id        String   @id @default(cuid())
   username  String   @unique
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  posts     Post[]
 }
 
 model Manufacturer {
@@ -80,8 +82,7 @@ model Post {
   card        Card?       @relation(fields: [cardId], references: [id])
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
-  authorId    String
-  author      User        @relation(fields: [authorId], references: [id])
+  authorId    String      // References neon_auth.admin_users.id (not enforced by FK)
   images      PostImage[]
 }
 

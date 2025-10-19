@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { stackServerApp } from "@/stack";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { generateObject } from "ai";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { z } from "zod";
@@ -16,8 +17,8 @@ const postSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await stackServerApp.getUser();
-    if (!user) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
