@@ -46,6 +46,14 @@ async function getAccessToken(): Promise<string> {
   });
 
   if (!response.ok) {
+    const errorText = await response.text();
+    console.error('eBay auth error:', {
+      status: response.status,
+      statusText: response.statusText,
+      error: errorText,
+      appIdPresent: !!appId,
+      secretPresent: !!clientSecret
+    });
     throw new Error(`eBay authentication failed: ${response.statusText}`);
   }
 
