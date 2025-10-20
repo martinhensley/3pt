@@ -50,6 +50,8 @@ export default function AdminPage() {
   // Manage posts state
   const [allPosts, setAllPosts] = useState<Post[]>([]);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
+  const [newImages, setNewImages] = useState<File[]>([]);
+  const [imagesToRemove, setImagesToRemove] = useState<string[]>([]);
 
   // Create post state
   const [createPrompt, setCreatePrompt] = useState("");
@@ -238,6 +240,13 @@ export default function AdminPage() {
     setMessage(null);
 
     try {
+      // Upload new images
+      const uploadedImageUrls: string[] = [];
+      for (const file of newImages) {
+        const url = await uploadFile(file);
+        uploadedImageUrls.push(url);
+      }
+
       const response = await fetch("/api/posts", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -247,6 +256,8 @@ export default function AdminPage() {
           content: editingPost.content,
           excerpt: editingPost.excerpt,
           published: editingPost.published,
+          newImageUrls: uploadedImageUrls,
+          removeImageIds: imagesToRemove,
         }),
       });
 
@@ -256,6 +267,8 @@ export default function AdminPage() {
 
       setMessage({ type: "success", text: "Post updated successfully!" });
       setEditingPost(null);
+      setNewImages([]);
+      setImagesToRemove([]);
       fetchAllPosts();
     } catch (error) {
       setMessage({ type: "error", text: "Failed to update post. Please try again." });
@@ -362,6 +375,24 @@ export default function AdminPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRemoveImage = (imageId: string) => {
+    setImagesToRemove([...imagesToRemove, imageId]);
+  };
+
+  const handleUndoRemoveImage = (imageId: string) => {
+    setImagesToRemove(imagesToRemove.filter((id) => id !== imageId));
+  };
+
+  const handleAddNewImages = (files: FileList | null) => {
+    if (files) {
+      setNewImages([...newImages, ...Array.from(files)]);
+    }
+  };
+
+  const handleRemoveNewImage = (index: number) => {
+    setNewImages(newImages.filter((_, i) => i !== index));
   };
 
   const handleGeneratePost = async () => {
@@ -713,7 +744,11 @@ export default function AdminPage() {
                         </div>
                         <div className="flex flex-col gap-2">
                           <button
-                            onClick={() => setEditingPost(post)}
+                            onClick={() => {
+                              setEditingPost(post);
+                              setNewImages([]);
+                              setImagesToRemove([]);
+                            }}
                             className="px-4 py-2 bg-footy-dark-green text-white rounded hover:opacity-90 text-sm font-semibold"
                           >
                             Edit
@@ -812,7 +847,11 @@ export default function AdminPage() {
                 Edit Post
               </h2>
               <button
-                onClick={() => setEditingPost(null)}
+                onClick={() => {
+                  setEditingPost(null);
+                  setNewImages([]);
+                  setImagesToRemove([]);
+                }}
                 className="text-gray-600 hover:text-gray-900 text-2xl"
               >
                 ✕
@@ -862,6 +901,106 @@ export default function AdminPage() {
                 />
               </div>
 
+              <div>
+                <label className="block text-sm font-semibold text-gray-900 mb-4">
+                  Images
+                </label>
+
+                {/* Existing Images */}
+                {editingPost.images && editingPost.images.length > 0 && (
+                  <div className="mb-4">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Existing Images</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {editingPost.images.map((image) => (
+                        <div
+                          key={image.id}
+                          className={`relative border rounded-lg overflow-hidden ${
+                            imagesToRemove.includes(image.id)
+                              ? "opacity-50 border-red-500"
+                              : "border-gray-300"
+                          }`}
+                        >
+                          <img
+                            src={image.url}
+                            alt={image.caption || "Post image"}
+                            className="w-full h-32 object-cover"
+                          />
+                          {image.caption && (
+                            <p className="text-xs text-gray-600 p-2 bg-gray-50">
+                              {image.caption}
+                            </p>
+                          )}
+                          <div className="absolute top-2 right-2">
+                            {imagesToRemove.includes(image.id) ? (
+                              <button
+                                type="button"
+                                onClick={() => handleUndoRemoveImage(image.id)}
+                                className="bg-green-600 text-white px-2 py-1 rounded text-xs font-semibold hover:bg-green-700"
+                              >
+                                Undo
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveImage(image.id)}
+                                className="bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold hover:bg-red-700"
+                              >
+                                Remove
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* New Images */}
+                {newImages.length > 0 && (
+                  <div className="mb-4">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">New Images to Add</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {newImages.map((file, index) => (
+                        <div
+                          key={index}
+                          className="relative border border-green-300 rounded-lg overflow-hidden"
+                        >
+                          <div className="w-full h-32 bg-gray-100 flex items-center justify-center">
+                            <p className="text-sm text-gray-600 p-2 text-center break-all">
+                              {file.name}
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveNewImage(index)}
+                            className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold hover:bg-red-700"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Add New Images */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Add New Images
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => handleAddNewImages(e.target.files)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-gold text-gray-900"
+                  />
+                  <p className="mt-1 text-xs text-gray-600">
+                    You can select multiple images at once
+                  </p>
+                </div>
+              </div>
+
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2">
                   <input
@@ -883,7 +1022,11 @@ export default function AdminPage() {
 
               <div className="flex gap-4">
                 <button
-                  onClick={() => setEditingPost(null)}
+                  onClick={() => {
+                    setEditingPost(null);
+                    setNewImages([]);
+                    setImagesToRemove([]);
+                  }}
                   className="flex-1 bg-gray-600 text-white font-bold py-3 rounded-lg hover:opacity-90 transition-opacity"
                 >
                   Cancel

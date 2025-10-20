@@ -106,13 +106,34 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, title, content, excerpt, published } = body;
+    const { id, title, content, excerpt, published, newImageUrls, removeImageIds } = body;
 
     if (!id) {
       return NextResponse.json(
         { error: "Post ID is required" },
         { status: 400 }
       );
+    }
+
+    // Handle image removals
+    if (removeImageIds && removeImageIds.length > 0) {
+      await prisma.postImage.deleteMany({
+        where: {
+          id: { in: removeImageIds },
+          postId: id,
+        },
+      });
+    }
+
+    // Get current max order for new images
+    let maxOrder = 0;
+    if (newImageUrls && newImageUrls.length > 0) {
+      const existingImages = await prisma.postImage.findMany({
+        where: { postId: id },
+        orderBy: { order: "desc" },
+        take: 1,
+      });
+      maxOrder = existingImages.length > 0 ? existingImages[0].order + 1 : 0;
     }
 
     const post = await prisma.post.update({
@@ -122,9 +143,19 @@ export async function PUT(request: NextRequest) {
         content,
         excerpt,
         published,
+        images: newImageUrls && newImageUrls.length > 0 ? {
+          create: newImageUrls.map((url: string, index: number) => ({
+            url,
+            order: maxOrder + index,
+          })),
+        } : undefined,
       },
       include: {
-        images: true,
+        images: {
+          orderBy: {
+            order: "asc",
+          },
+        },
       },
     });
 
