@@ -14,8 +14,75 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "footy limited - football/soccer/footy cards",
-  description: "footy limited the premier source footy cards. share the beautiful game.",
+  title: {
+    default: "Footy Limited - Soccer Card Information & Trading Card Database",
+    template: "%s | Footy Limited"
+  },
+  description: "Comprehensive repository of football trading card information featuring player cards, sets, and releases from Panini, Topps, and more. Your ultimate soccer card database and collector's guide.",
+  keywords: [
+    "soccer cards",
+    "football cards",
+    "trading cards",
+    "panini soccer cards",
+    "topps soccer",
+    "soccer card database",
+    "football trading cards",
+    "soccer collectibles",
+    "player cards",
+    "soccer card information",
+    "card collecting",
+    "sports cards"
+  ],
+  authors: [{ name: "Footy Limited" }],
+  creator: "Footy Limited",
+  publisher: "Footy Limited",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL("https://www.footylimited.com"),
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Footy Limited - Soccer Card Information & Trading Card Database",
+    description: "Comprehensive repository of football trading card information featuring player cards, sets, and releases. Your ultimate soccer card database.",
+    url: "https://www.footylimited.com",
+    siteName: "Footy Limited",
+    locale: "en_US",
+    type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Footy Limited - Soccer Card Database",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Footy Limited - Soccer Card Information & Trading Card Database",
+    description: "Comprehensive repository of football trading card information. Your ultimate soccer card database and collector's guide.",
+    images: ["/twitter-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    // google: "your-google-verification-code",
+    // yandex: "your-yandex-verification-code",
+    // bing: "your-bing-verification-code",
+  },
 };
 
 export default function RootLayout({

@@ -69,8 +69,42 @@ export default function PostPage() {
     notFound();
   }
 
+  // Structured data for SEO
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.excerpt,
+    image: post.images.map(img => `https://www.footylimited.com${img.url}`),
+    datePublished: post.createdAt,
+    dateModified: post.createdAt,
+    author: {
+      "@type": "Organization",
+      name: "Footy Limited",
+      url: "https://www.footylimited.com"
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Footy Limited",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://www.footylimited.com/logo.png"
+      }
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `https://www.footylimited.com/posts/${post.slug}`
+    },
+    articleSection: post.type === "CARD" ? "Trading Cards" : post.type === "SET" ? "Card Sets" : post.type === "RELEASE" ? "New Releases" : "General",
+    keywords: "soccer cards, football cards, trading cards, collectibles"
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       <Header showBackButton />
 
       <div className="flex-grow flex gap-4 max-w-[1400px] mx-auto w-full px-4 py-12">

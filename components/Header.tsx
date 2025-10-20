@@ -38,11 +38,6 @@ export default function Header({ showBackButton = false }: HeaderProps) {
             <h1 className="text-4xl md:text-5xl font-bold">
               <Link href="/">footy limited</Link>
             </h1>
-            {!showBackButton && (
-              <p className="text-sm md:text-base text-footy-gold font-semibold mt-1">
-                football-futbol-futebol-fußball-soccer footy cards
-              </p>
-            )}
           </div>
 
           <div className="flex-1 flex items-center gap-3 justify-end">
