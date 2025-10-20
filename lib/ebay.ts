@@ -34,15 +34,24 @@ async function getAccessToken(): Promise<string> {
     throw new Error("eBay API credentials not configured");
   }
 
+  // Detect if using sandbox credentials
+  const isSandbox = appId.includes('-SBX-') || clientSecret.startsWith('SBX-');
+  const authUrl = isSandbox
+    ? "https://api.sandbox.ebay.com/identity/v1/oauth2/token"
+    : "https://api.ebay.com/identity/v1/oauth2/token";
+  const scope = isSandbox
+    ? "https://api.ebay.com/oauth/api_scope"
+    : "https://api.ebay.com/oauth/api_scope";
+
   const credentials = Buffer.from(`${appId}:${clientSecret}`).toString("base64");
 
-  const response = await fetch("https://api.ebay.com/identity/v1/oauth2/token", {
+  const response = await fetch(authUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
       Authorization: `Basic ${credentials}`,
     },
-    body: "grant_type=client_credentials&scope=https://api.ebay.com/oauth/api_scope",
+    body: `grant_type=client_credentials&scope=${scope}`,
   });
 
   if (!response.ok) {
@@ -52,7 +61,9 @@ async function getAccessToken(): Promise<string> {
       statusText: response.statusText,
       error: errorText,
       appIdPresent: !!appId,
-      secretPresent: !!clientSecret
+      secretPresent: !!clientSecret,
+      isSandbox,
+      authUrl
     });
     throw new Error(`eBay authentication failed: ${response.statusText}`);
   }
@@ -76,10 +87,17 @@ export async function searchSoccerCards(
 ): Promise<EbayProduct[]> {
   const token = await getAccessToken();
   const campaignId = process.env.EBAY_CAMPAIGN_ID;
+  const appId = process.env.EBAY_APP_ID;
 
   if (!campaignId) {
     throw new Error("eBay Campaign ID not configured");
   }
+
+  // Detect if using sandbox credentials
+  const isSandbox = appId?.includes('-SBX-') || false;
+  const apiBaseUrl = isSandbox
+    ? "https://api.sandbox.ebay.com"
+    : "https://api.ebay.com";
 
   // Build search URL with filters for soccer cards
   const searchParams = new URLSearchParams({
@@ -91,7 +109,7 @@ export async function searchSoccerCards(
   });
 
   const response = await fetch(
-    `https://api.ebay.com/buy/browse/v1/item_summary/search?${searchParams}`,
+    `${apiBaseUrl}/buy/browse/v1/item_summary/search?${searchParams}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
