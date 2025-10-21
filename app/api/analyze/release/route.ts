@@ -80,10 +80,21 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Release analysis error:", error);
+
+    // Provide detailed error information for debugging
+    const errorDetails = {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : undefined,
+    };
+
+    console.error("Full error details:", errorDetails);
+
     return NextResponse.json(
       {
         error: "Failed to analyze release",
-        details: error instanceof Error ? error.message : String(error),
+        details: errorDetails.message,
+        debugInfo: process.env.NODE_ENV === 'development' ? errorDetails : undefined,
       },
       { status: 500 }
     );
