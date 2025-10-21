@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { enhancedCardAnalysis } from "@/lib/enhancedCardAnalysis";
-import { readFile } from "fs/promises";
-import path from "path";
-import { createCard, getSet } from "@/lib/database";
+import { getSet } from "@/lib/database";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {

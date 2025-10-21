@@ -191,6 +191,8 @@ const releaseAnalysisSchema = z.object({
   excerpt: z.string().optional().describe("Brief summary for preview"),
 });
 
+// Card checklist schema for extracting lists of cards
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const cardChecklistSchema = z.array(
   z.object({
     playerName: z.string().describe("Player name on the card"),
@@ -275,6 +277,7 @@ export async function analyzeReleaseDocuments(
     messages: [
       {
         role: "user",
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         content: contentParts as any,
       },
     ],
@@ -339,6 +342,7 @@ export async function analyzeSetDocumentsWithCards(
     messages: [
       {
         role: "user",
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         content: contentParts as any,
       },
     ],

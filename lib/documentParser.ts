@@ -12,6 +12,7 @@ export interface ParsedDocument {
     filename?: string;
     pageCount?: number;
     rowCount?: number;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any;
   };
 }

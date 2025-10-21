@@ -3,6 +3,7 @@
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { ReleaseSelect, SetSelect } from "@/components/EntitySelectors";
 
 interface Post {
@@ -24,6 +25,33 @@ interface GeneratedPost {
   imageUrls: string[];
 }
 
+interface SetInfo {
+  name: string;
+  totalCards?: string;
+}
+
+interface SetAnalysisWithCards {
+  setName: string;
+  totalCards?: string;
+  title?: string;
+  content?: string;
+  excerpt?: string;
+  createdRecords?: {
+    cardsCreated: number;
+  };
+  sets?: SetInfo[];
+}
+
+interface ReleaseAnalysisResult {
+  manufacturer: string;
+  releaseName: string;
+  year: string;
+  sets?: SetInfo[];
+  title?: string;
+  content?: string;
+  excerpt?: string;
+}
+
 export default function AdminPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -40,12 +68,12 @@ export default function AdminPage() {
   // Set form state
   const [setFiles, setSetFiles] = useState<File[]>([]);
   const [selectedSetRelease, setSelectedSetRelease] = useState<string>("");
-  const [setAnalysisResult, setSetAnalysisResult] = useState<any>(null);
+  const [setAnalysisResult, setSetAnalysisResult] = useState<SetAnalysisWithCards | null>(null);
 
   // Release form state
   const [releaseUrls, setReleaseUrls] = useState<string[]>([""]);
   const [releaseFiles, setReleaseFiles] = useState<File[]>([]);
-  const [releaseAnalysisResult, setReleaseAnalysisResult] = useState<any>(null);
+  const [releaseAnalysisResult, setReleaseAnalysisResult] = useState<ReleaseAnalysisResult | null>(null);
 
   // Generated post state
   const [generatedPost, setGeneratedPost] = useState<GeneratedPost | null>(null);
@@ -1185,7 +1213,7 @@ export default function AdminPage() {
                       <div className="mt-3 pt-3 border-t border-yellow-300">
                         <p className="font-semibold text-gray-800 mb-2">Sets:</p>
                         <ul className="list-disc list-inside space-y-1 text-gray-700">
-                          {releaseAnalysisResult.sets.map((set: any, idx: number) => (
+                          {releaseAnalysisResult.sets.map((set: SetInfo, idx: number) => (
                             <li key={idx}>
                               {set.name} {set.totalCards ? `(${set.totalCards} cards)` : ""}
                             </li>
@@ -1478,11 +1506,15 @@ export default function AdminPage() {
                               : "border-gray-300"
                           }`}
                         >
-                          <img
-                            src={image.url}
-                            alt={image.caption || "Post image"}
-                            className="w-full h-32 object-cover"
-                          />
+                          <div className="relative w-full h-32">
+                            <Image
+                              src={image.url}
+                              alt={image.caption || "Post image"}
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 768px) 50vw, 33vw"
+                            />
+                          </div>
                           {image.caption && (
                             <p className="text-xs text-gray-600 p-2 bg-gray-50">
                               {image.caption}

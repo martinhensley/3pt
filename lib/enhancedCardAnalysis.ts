@@ -133,6 +133,7 @@ Look for:
 5. Special finishes or coatings`;
 
     // Prepare image content
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const imageContent: any[] = [
       {
         type: 'image',
