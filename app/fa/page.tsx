@@ -314,8 +314,8 @@ export default function AdminPage() {
         setGeneratedPost(null);
         setCardFrontImage(null);
         setCardBackImage(null);
-        setChecklistImage(null);
-        setSellSheetImage(null);
+        setSetFiles([]);
+        setReleaseFiles([]);
         setEditedTitle("");
         setEditedContent("");
         setEditedExcerpt("");
