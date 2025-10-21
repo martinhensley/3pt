@@ -1,6 +1,5 @@
 import { readFile } from "fs/promises";
 import path from "path";
-import * as pdfParse from "pdf-parse";
 import { parse as csvParse } from "csv-parse/sync";
 import { writeFile, mkdir } from "fs/promises";
 import { tmpdir } from "os";
@@ -25,7 +24,8 @@ export interface ParsedDocument {
 export async function parsePDF(filePath: string): Promise<string> {
   try {
     const dataBuffer = await readFile(filePath);
-    // @ts-expect-error - pdf-parse has inconsistent type definitions between CommonJS and ESM
+    // Dynamic import to avoid ESM/CommonJS conflicts in Next.js/Vercel
+    const pdfParse = (await import('pdf-parse')).default;
     const pdfData = await pdfParse(dataBuffer);
     return pdfData.text;
   } catch (error) {
