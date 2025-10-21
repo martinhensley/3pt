@@ -77,10 +77,15 @@ export async function POST(request: NextRequest) {
     const filename = `${timestamp}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
 
     // Upload to Vercel Blob
+    console.log("Uploading to Vercel Blob:", filename);
+    console.log("Token configured:", !!process.env.BLOB_READ_WRITE_TOKEN);
+
     const blob = await put(filename, file, {
       access: "public",
       token: process.env.BLOB_READ_WRITE_TOKEN,
     });
+
+    console.log("Upload successful, blob URL:", blob.url);
 
     // Detect file type for categorization
     const fileType: FileType = detectFileType(filename);
@@ -96,7 +101,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Upload error:", error);
     return NextResponse.json(
-      { error: "Failed to upload file" },
+      {
+        error: "Failed to upload file",
+        details: error instanceof Error ? error.message : String(error)
+      },
       { status: 500 }
     );
   }
