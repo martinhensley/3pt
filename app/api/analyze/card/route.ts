@@ -5,8 +5,8 @@ import { enhancedCardAnalysis } from "@/lib/enhancedCardAnalysis";
 import { getSet } from "@/lib/database";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
-export const maxDuration = 300; // 5 minutes for AI processing
 
 export async function POST(request: NextRequest) {
   try {
