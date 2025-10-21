@@ -25,8 +25,10 @@ export async function parsePDF(filePath: string): Promise<string> {
   try {
     const dataBuffer = await readFile(filePath);
     // Dynamic import to avoid ESM/CommonJS conflicts in Next.js/Vercel
-    const pdfParse = (await import('pdf-parse')).default;
-    const pdfData = await pdfParse(dataBuffer);
+    const pdfParse = await import('pdf-parse');
+    // @ts-expect-error - pdf-parse module structure varies between environments
+    const parseFunc = pdfParse.default || pdfParse;
+    const pdfData = await parseFunc(dataBuffer);
     return pdfData.text;
   } catch (error) {
     console.error("PDF parsing error:", error);
