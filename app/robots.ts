@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/fa/', '/api/'],
       },
     ],
-    sitemap: 'https://www.footylimited.com/sitemap.xml',
+    sitemap: 'https://www.footy.bot/sitemap.xml',
   }
 }

@@ -54,8 +54,8 @@ export default function Home() {
         {posts.length === 0 ? (
           <div className="text-center py-20">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-12 max-w-2xl mx-auto transition-colors duration-300">
-              <h2 className="text-3xl font-bold text-footy-dark-green dark:text-footy-gold mb-4">
-                Welcome to footy limited
+              <h2 className="text-3xl font-bold text-footy-green dark:text-footy-orange mb-4">
+                Welcome to footy bot
               </h2>
               <p className="text-gray-600 dark:text-gray-300">
                 No posts yet. Check back soon for the latest soccer card news
@@ -85,7 +85,7 @@ export default function Home() {
 
                 <div className={`p-6 flex-grow flex flex-col ${!post.images[0] ? "min-h-[400px]" : ""}`}>
                   <div className="flex items-center gap-2 text-sm mb-3">
-                    <span className="bg-footy-gold text-footy-dark-green px-2 py-1 rounded-full font-semibold text-xs">
+                    <span className="bg-footy-orange text-white px-2 py-1 rounded-full font-semibold text-xs">
                       {post.type === "CARD" ? "Card" : post.type === "SET" ? "Set" : post.type === "RELEASE" ? "Release" : "General"}
                     </span>
                     <span className="text-gray-500">•</span>
@@ -101,7 +101,7 @@ export default function Home() {
                     </time>
                   </div>
 
-                  <h2 className={`font-bold text-footy-dark-green dark:text-footy-gold mb-3 ${
+                  <h2 className={`font-bold text-footy-green dark:text-footy-orange mb-3 ${
                     post.images[0] ? "text-xl line-clamp-2" : "text-2xl line-clamp-4"
                   }`}>
                     {post.title}
@@ -113,7 +113,7 @@ export default function Home() {
                     }`}>{post.excerpt}</p>
                   )}
 
-                  <div className="mt-auto text-footy-gold dark:text-footy-gold font-semibold">
+                  <div className="mt-auto text-footy-orange dark:text-footy-orange font-semibold">
                     Read more →
                   </div>
                 </div>
@@ -130,11 +130,11 @@ export default function Home() {
         </aside>
       </div>
 
-      <footer className="bg-footy-dark-green dark:bg-gray-950 text-white transition-colors duration-300">
+      <footer className="bg-footy-green dark:bg-gray-950 text-white transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="text-center">
-            <p className="text-footy-gold text-sm">
-              footy limited © 2024-{new Date().getFullYear()}
+            <p className="text-sm">
+              <span className="text-white">footy</span><span className="text-footy-orange">.bot</span> © 2024-{new Date().getFullYear()}
             </p>
           </div>
         </div>

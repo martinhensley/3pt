@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next'
 import { prisma } from '@/lib/prisma'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://www.footylimited.com'
+  const baseUrl = 'https://www.footy.bot'
 
   // Get all published posts
   const posts = await prisma.post.findMany({

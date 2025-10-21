@@ -582,14 +582,14 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-footy-dark-green text-white shadow-lg">
+      <header className="bg-footy-green text-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">footy limited admin</h1>
+          <h1 className="text-2xl font-bold">footy<span className="text-footy-orange">.bot</span> admin</h1>
           <div className="flex items-center gap-4">
-            <span className="text-footy-gold">Welcome, {session.user?.name || "Admin"}</span>
+            <span className="text-footy-orange">Welcome, {session.user?.name || "Admin"}</span>
             <button
               onClick={() => signOut({ callbackUrl: "/" })}
-              className="bg-footy-gold text-footy-dark-green px-4 py-2 rounded-lg font-semibold hover:opacity-90"
+              className="bg-footy-orange text-white px-4 py-2 rounded-lg font-semibold hover:opacity-90"
             >
               Sign Out
             </button>
@@ -616,8 +616,8 @@ export default function AdminPage() {
               onClick={() => setActiveTab("card")}
               className={`px-6 py-3 font-semibold transition-colors ${
                 activeTab === "card"
-                  ? "text-footy-gold border-b-2 border-footy-gold"
-                  : "text-gray-800 hover:text-footy-dark-green"
+                  ? "text-footy-orange border-b-2 border-footy-orange"
+                  : "text-gray-800 hover:text-footy-green"
               }`}
             >
               Analyze Card
@@ -626,8 +626,8 @@ export default function AdminPage() {
               onClick={() => setActiveTab("set")}
               className={`px-6 py-3 font-semibold transition-colors ${
                 activeTab === "set"
-                  ? "text-footy-gold border-b-2 border-footy-gold"
-                  : "text-gray-800 hover:text-footy-dark-green"
+                  ? "text-footy-orange border-b-2 border-footy-orange"
+                  : "text-gray-800 hover:text-footy-green"
               }`}
             >
               Analyze Set
@@ -636,8 +636,8 @@ export default function AdminPage() {
               onClick={() => setActiveTab("release")}
               className={`px-6 py-3 font-semibold transition-colors ${
                 activeTab === "release"
-                  ? "text-footy-gold border-b-2 border-footy-gold"
-                  : "text-gray-800 hover:text-footy-dark-green"
+                  ? "text-footy-orange border-b-2 border-footy-orange"
+                  : "text-gray-800 hover:text-footy-green"
               }`}
             >
               Analyze Release
@@ -646,8 +646,8 @@ export default function AdminPage() {
               onClick={() => setActiveTab("create")}
               className={`px-6 py-3 font-semibold transition-colors ${
                 activeTab === "create"
-                  ? "text-footy-gold border-b-2 border-footy-gold"
-                  : "text-gray-800 hover:text-footy-dark-green"
+                  ? "text-footy-orange border-b-2 border-footy-orange"
+                  : "text-gray-800 hover:text-footy-green"
               }`}
             >
               Create Post
@@ -656,8 +656,8 @@ export default function AdminPage() {
               onClick={() => setActiveTab("manage")}
               className={`px-6 py-3 font-semibold transition-colors ${
                 activeTab === "manage"
-                  ? "text-footy-gold border-b-2 border-footy-gold"
-                  : "text-gray-800 hover:text-footy-dark-green"
+                  ? "text-footy-orange border-b-2 border-footy-orange"
+                  : "text-gray-800 hover:text-footy-green"
               }`}
             >
               Manage Posts
@@ -667,7 +667,7 @@ export default function AdminPage() {
           {activeTab === "card" && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-xl font-bold text-footy-dark-green">
+                <h2 className="text-xl font-bold text-footy-green">
                   Analyze Card
                 </h2>
                 <p className="text-gray-700 mt-2">
@@ -821,7 +821,7 @@ export default function AdminPage() {
               <button
                 onClick={handleCardAnalysis}
                 disabled={loading || !cardFrontImage || !selectedCardSet}
-                className="w-full bg-gradient-to-r from-footy-dark-green to-green-700 text-white font-bold py-4 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-r from-footy-green to-green-700 text-white font-bold py-4 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
@@ -846,7 +846,7 @@ export default function AdminPage() {
           {activeTab === "set" && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-xl font-bold text-footy-dark-green">
+                <h2 className="text-xl font-bold text-footy-green">
                   Analyze Set
                 </h2>
                 <p className="text-gray-700 mt-2">
@@ -992,7 +992,7 @@ export default function AdminPage() {
               <button
                 onClick={handleSetAnalysis}
                 disabled={loading || setFiles.length === 0 || !selectedSetRelease}
-                className="w-full bg-gradient-to-r from-footy-dark-green to-green-700 text-white font-bold py-4 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-r from-footy-green to-green-700 text-white font-bold py-4 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
@@ -1017,7 +1017,7 @@ export default function AdminPage() {
           {activeTab === "release" && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-xl font-bold text-footy-dark-green">
+                <h2 className="text-xl font-bold text-footy-green">
                   Analyze Release
                 </h2>
                 <p className="text-gray-700 mt-2">
@@ -1201,7 +1201,7 @@ export default function AdminPage() {
               <button
                 onClick={handleReleaseAnalysis}
                 disabled={loading || (releaseUrls.filter(u => u.trim()).length === 0 && releaseFiles.length === 0)}
-                className="w-full bg-gradient-to-r from-footy-dark-green to-green-700 text-white font-bold py-4 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-r from-footy-green to-green-700 text-white font-bold py-4 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
@@ -1225,7 +1225,7 @@ export default function AdminPage() {
 
           {activeTab === "create" && (
             <div className="space-y-6">
-              <h2 className="text-xl font-bold text-footy-dark-green">
+              <h2 className="text-xl font-bold text-footy-green">
                 Generate Post with AI
               </h2>
               <p className="text-gray-700">
@@ -1241,7 +1241,7 @@ export default function AdminPage() {
                   onChange={(e) => setCreatePrompt(e.target.value)}
                   placeholder="E.g., '1998 Panini World Cup Ronaldo rookie card', '2022 Topps Chrome UEFA Champions League set', or 'Tips for storing and preserving vintage football cards'"
                   rows={4}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-gold text-gray-900"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange text-gray-900"
                 />
                 <p className="mt-2 text-sm text-gray-600">
                   The more specific you are, the better the AI-generated content will be.
@@ -1251,7 +1251,7 @@ export default function AdminPage() {
               <button
                 onClick={handleGeneratePost}
                 disabled={loading || !createPrompt.trim()}
-                className="w-full bg-footy-dark-green text-white font-bold py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                className="w-full bg-footy-green text-white font-bold py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
               >
                 {loading ? "Generating..." : "Generate Post with AI"}
               </button>
@@ -1260,7 +1260,7 @@ export default function AdminPage() {
 
           {activeTab === "manage" && (
             <div className="space-y-6">
-              <h2 className="text-xl font-bold text-footy-dark-green">
+              <h2 className="text-xl font-bold text-footy-green">
                 All Posts
               </h2>
 
@@ -1276,7 +1276,7 @@ export default function AdminPage() {
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-grow">
                           <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-bold text-footy-dark-green">
+                            <h3 className="text-lg font-bold text-footy-green">
                               {post.title}
                             </h3>
                             <span
@@ -1288,7 +1288,7 @@ export default function AdminPage() {
                             >
                               {post.published ? "Published" : "Draft"}
                             </span>
-                            <span className="px-2 py-1 rounded text-xs font-semibold bg-footy-gold text-footy-dark-green">
+                            <span className="px-2 py-1 rounded text-xs font-semibold bg-footy-orange text-footy-green">
                               {post.type === "CARD" ? "Card" : post.type === "SET" ? "Set" : post.type === "RELEASE" ? "Release" : "General"}
                             </span>
                           </div>
@@ -1307,14 +1307,14 @@ export default function AdminPage() {
                               setNewImages([]);
                               setImagesToRemove([]);
                             }}
-                            className="px-4 py-2 bg-footy-dark-green text-white rounded hover:opacity-90 text-sm font-semibold"
+                            className="px-4 py-2 bg-footy-green text-white rounded hover:opacity-90 text-sm font-semibold"
                           >
                             Edit
                           </button>
                           <button
                             onClick={() => handleTogglePublished(post)}
                             disabled={loading}
-                            className="px-4 py-2 bg-footy-gold text-footy-dark-green rounded hover:opacity-90 text-sm font-semibold disabled:opacity-50"
+                            className="px-4 py-2 bg-footy-orange text-footy-green rounded hover:opacity-90 text-sm font-semibold disabled:opacity-50"
                           >
                             {post.published ? "Unpublish" : "Publish"}
                           </button>
@@ -1337,7 +1337,7 @@ export default function AdminPage() {
 
         {generatedPost && (
           <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-bold text-footy-dark-green mb-6">
+            <h2 className="text-2xl font-bold text-footy-green mb-6">
               Review Generated Post
             </h2>
 
@@ -1350,7 +1350,7 @@ export default function AdminPage() {
                   type="text"
                   value={editedTitle}
                   onChange={(e) => setEditedTitle(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-gold text-gray-900"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange text-gray-900"
                 />
               </div>
 
@@ -1362,7 +1362,7 @@ export default function AdminPage() {
                   value={editedExcerpt}
                   onChange={(e) => setEditedExcerpt(e.target.value)}
                   rows={2}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-gold text-gray-900"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange text-gray-900"
                 />
               </div>
 
@@ -1374,7 +1374,7 @@ export default function AdminPage() {
                   value={editedContent}
                   onChange={(e) => setEditedContent(e.target.value)}
                   rows={15}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-gold font-mono text-sm text-gray-900"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange font-mono text-sm text-gray-900"
                 />
               </div>
 
@@ -1389,7 +1389,7 @@ export default function AdminPage() {
                 <button
                   onClick={() => handlePublishPost(true)}
                   disabled={loading}
-                  className="flex-1 bg-footy-gold text-footy-dark-green font-bold py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                  className="flex-1 bg-footy-orange text-footy-green font-bold py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
                 >
                   Publish Post
                 </button>
@@ -1401,7 +1401,7 @@ export default function AdminPage() {
         {editingPost && (
           <div className="bg-white rounded-lg shadow-lg p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-footy-dark-green">
+              <h2 className="text-2xl font-bold text-footy-green">
                 Edit Post
               </h2>
               <button
@@ -1427,7 +1427,7 @@ export default function AdminPage() {
                   onChange={(e) =>
                     setEditingPost({ ...editingPost, title: e.target.value })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-gold text-gray-900"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange text-gray-900"
                 />
               </div>
 
@@ -1441,7 +1441,7 @@ export default function AdminPage() {
                     setEditingPost({ ...editingPost, excerpt: e.target.value })
                   }
                   rows={2}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-gold text-gray-900"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange text-gray-900"
                 />
               </div>
 
@@ -1455,7 +1455,7 @@ export default function AdminPage() {
                     setEditingPost({ ...editingPost, content: e.target.value })
                   }
                   rows={15}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-gold font-mono text-sm text-gray-900"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange font-mono text-sm text-gray-900"
                 />
               </div>
 
@@ -1551,7 +1551,7 @@ export default function AdminPage() {
                     accept="image/*"
                     multiple
                     onChange={(e) => handleAddNewImages(e.target.files)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-gold text-gray-900"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange text-gray-900"
                   />
                   <p className="mt-1 text-xs text-gray-600">
                     You can select multiple images at once
@@ -1570,7 +1570,7 @@ export default function AdminPage() {
                         published: e.target.checked,
                       })
                     }
-                    className="w-4 h-4 text-footy-gold focus:ring-footy-gold"
+                    className="w-4 h-4 text-footy-orange focus:ring-footy-orange"
                   />
                   <span className="text-sm font-semibold text-gray-900">
                     Published
@@ -1592,7 +1592,7 @@ export default function AdminPage() {
                 <button
                   onClick={handleUpdatePost}
                   disabled={loading}
-                  className="flex-1 bg-footy-dark-green text-white font-bold py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                  className="flex-1 bg-footy-green text-white font-bold py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
                 >
                   {loading ? "Saving..." : "Save Changes"}
                 </button>

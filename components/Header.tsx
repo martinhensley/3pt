@@ -22,7 +22,7 @@ export default function Header({ showBackButton = false }: HeaderProps) {
 
   return (
     <>
-      <header className="bg-footy-dark-green dark:bg-gray-950 text-white shadow-lg relative transition-colors duration-300">
+      <header className="bg-footy-green dark:bg-gray-950 text-white shadow-lg relative transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 py-6 flex items-center justify-between">
           <div className="flex-1"></div>
 
@@ -30,20 +30,20 @@ export default function Header({ showBackButton = false }: HeaderProps) {
             {showBackButton && (
               <Link
                 href="/"
-                className="inline-block text-footy-gold hover:text-white transition-colors text-sm mb-2"
+                className="inline-block text-footy-orange hover:text-white transition-colors text-sm mb-2"
               >
                 ← Back to Home
               </Link>
             )}
             <h1 className="text-4xl md:text-5xl font-bold">
-              <Link href="/">footy limited</Link>
+              <Link href="/">footy<span className="text-footy-orange">.bot</span></Link>
             </h1>
           </div>
 
           <div className="flex-1 flex items-center gap-3 justify-end">
             <button
               onClick={() => setSearchOpen(!searchOpen)}
-              className="p-2 hover:bg-footy-gold hover:text-footy-dark-green rounded transition-colors"
+              className="p-2 hover:bg-footy-orange hover:text-footy-green rounded transition-colors"
               title="Search"
             >
               <svg
@@ -63,7 +63,7 @@ export default function Header({ showBackButton = false }: HeaderProps) {
             </button>
             <button
               onClick={toggleTheme}
-              className="p-2 hover:bg-footy-gold hover:text-footy-dark-green rounded transition-colors"
+              className="p-2 hover:bg-footy-orange hover:text-footy-green rounded transition-colors"
               title="Toggle Dark Mode"
             >
               {theme === "dark" ? (
@@ -103,7 +103,7 @@ export default function Header({ showBackButton = false }: HeaderProps) {
 
         {/* Search Dropdown */}
         {searchOpen && (
-          <div className="absolute top-full left-0 right-0 bg-footy-dark-green dark:bg-gray-950 border-t-2 border-footy-gold shadow-xl z-50 transition-colors duration-300">
+          <div className="absolute top-full left-0 right-0 bg-footy-green dark:bg-gray-950 border-t-2 border-footy-orange shadow-xl z-50 transition-colors duration-300">
             <div className="max-w-7xl mx-auto px-4 py-6">
               <form onSubmit={handleSearch} className="flex gap-2">
                 <input
@@ -111,12 +111,12 @@ export default function Header({ showBackButton = false }: HeaderProps) {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search posts..."
-                  className="flex-grow px-4 py-2 rounded bg-white dark:bg-gray-800 text-footy-dark-green dark:text-white focus:outline-none focus:ring-2 focus:ring-footy-gold"
+                  className="flex-grow px-4 py-2 rounded bg-white dark:bg-gray-800 text-footy-green dark:text-white focus:outline-none focus:ring-2 focus:ring-footy-orange"
                   autoFocus
                 />
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-footy-gold text-footy-dark-green font-semibold rounded hover:opacity-90 transition-opacity"
+                  className="px-6 py-2 bg-footy-orange text-white font-semibold rounded hover:opacity-90 transition-opacity"
                 >
                   Search
                 </button>

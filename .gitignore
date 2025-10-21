@@ -46,3 +46,7 @@ prisma/dev.db-journal
 
 # uploads
 public/uploads/
+
+# archived projects
+fl/
+fl-archive-*/

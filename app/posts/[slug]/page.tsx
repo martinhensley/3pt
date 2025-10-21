@@ -75,25 +75,25 @@ export default function PostPage() {
     "@type": "Article",
     headline: post.title,
     description: post.excerpt,
-    image: post.images.map(img => `https://www.footylimited.com${img.url}`),
+    image: post.images.map(img => `https://www.footy.bot${img.url}`),
     datePublished: post.createdAt,
     dateModified: post.createdAt,
     author: {
       "@type": "Organization",
-      name: "Footy Limited",
-      url: "https://www.footylimited.com"
+      name: "Footy Bot",
+      url: "https://www.footy.bot"
     },
     publisher: {
       "@type": "Organization",
-      name: "Footy Limited",
+      name: "Footy Bot",
       logo: {
         "@type": "ImageObject",
-        url: "https://www.footylimited.com/logo.png"
+        url: "https://www.footy.bot/logo.png"
       }
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `https://www.footylimited.com/posts/${post.slug}`
+      "@id": `https://www.footy.bot/posts/${post.slug}`
     },
     articleSection: post.type === "CARD" ? "Trading Cards" : post.type === "SET" ? "Card Sets" : post.type === "RELEASE" ? "New Releases" : "General",
     keywords: "soccer cards, football cards, trading cards, collectibles"
@@ -120,7 +120,7 @@ export default function PostPage() {
         <article>
           <div className="mb-8">
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-4">
-              <span className="bg-footy-gold text-footy-dark-green px-3 py-1 rounded-full font-semibold">
+              <span className="bg-footy-orange text-white px-3 py-1 rounded-full font-semibold">
                 {post.type === "CARD" ? "Card" : post.type === "SET" ? "Set" : post.type === "RELEASE" ? "Release" : "General"}
               </span>
               <span>•</span>
@@ -133,7 +133,7 @@ export default function PostPage() {
               </time>
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-bold text-footy-dark-green dark:text-footy-gold mb-6">
+            <h1 className="text-4xl md:text-5xl font-bold text-footy-green dark:text-footy-orange mb-6">
               {post.title}
             </h1>
 
@@ -147,7 +147,7 @@ export default function PostPage() {
               {post.images.map((image) => (
                 <div
                   key={image.id}
-                  className="relative bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden border-2 border-footy-dark-green dark:border-footy-gold shadow-lg"
+                  className="relative bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden border-2 border-footy-green dark:border-footy-orange shadow-lg"
                 >
                   <div className="relative w-full" style={{ paddingBottom: "140%" }}>
                     <Image
@@ -169,14 +169,14 @@ export default function PostPage() {
           )}
 
           <div
-            className="prose prose-lg max-w-none prose-headings:text-footy-dark-green dark:prose-headings:text-footy-gold prose-a:text-footy-gold prose-strong:text-footy-dark-green dark:prose-strong:text-footy-gold dark:prose-invert"
+            className="prose prose-lg max-w-none prose-headings:text-footy-green dark:prose-headings:text-footy-orange prose-a:text-footy-orange prose-strong:text-footy-green dark:prose-strong:text-footy-orange dark:prose-invert"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
 
           <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
             <Link
               href="/"
-              className="inline-flex items-center text-footy-dark-green dark:text-footy-gold hover:text-footy-gold font-semibold transition-colors"
+              className="inline-flex items-center text-footy-green dark:text-footy-orange hover:text-footy-orange font-semibold transition-colors"
             >
               ← View All Posts
             </Link>
@@ -199,9 +199,11 @@ export default function PostPage() {
         </aside>
       </div>
 
-      <footer className="bg-footy-dark-green dark:bg-gray-950 text-white transition-colors duration-300">
+      <footer className="bg-footy-green dark:bg-gray-950 text-white transition-colors duration-300">
         <div className="max-w-4xl mx-auto px-4 py-8 text-center">
-          <p className="text-footy-gold text-sm">footy limited © 2024-{new Date().getFullYear()}</p>
+          <p className="text-sm">
+            <span className="text-white">footy</span><span className="text-footy-orange">.bot</span> © 2024-{new Date().getFullYear()}
+          </p>
         </div>
       </footer>
     </div>
