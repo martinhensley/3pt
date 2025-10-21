@@ -8,6 +8,9 @@ import {
   createReleaseWithSets,
 } from "@/lib/database";
 
+export const runtime = 'nodejs';
+export const maxDuration = 300; // 5 minutes for AI processing
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);

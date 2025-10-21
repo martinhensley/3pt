@@ -5,6 +5,9 @@ import { analyzeSetDocumentsWithCards } from "@/lib/ai";
 import { parseDocuments } from "@/lib/documentParser";
 import { addSetToRelease, addCardsToSet, getRelease } from "@/lib/database";
 
+export const runtime = 'nodejs';
+export const maxDuration = 300; // 5 minutes for AI processing
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
