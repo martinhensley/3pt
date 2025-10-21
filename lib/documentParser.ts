@@ -22,6 +22,13 @@ export interface ParsedDocument {
  * Parse a PDF file and extract text content
  */
 export async function parsePDF(filePath: string): Promise<string> {
+  // PDF parsing is disabled in production due to compatibility issues with pdf-parse/pdfjs-dist
+  // in Next.js/Vercel serverless environment
+  if (process.env.NODE_ENV === 'production') {
+    console.warn('PDF parsing skipped in production environment');
+    return '[PDF content - PDF parsing is currently unavailable in production. Please provide HTML, CSV, or text files instead for best results.]';
+  }
+
   try {
     const dataBuffer = await readFile(filePath);
     // Dynamic import to avoid ESM/CommonJS conflicts in Next.js/Vercel
@@ -32,7 +39,7 @@ export async function parsePDF(filePath: string): Promise<string> {
     // Check if parseFunc is actually a function
     if (typeof parseFunc !== 'function') {
       console.warn('PDF parsing not available in this environment');
-      return '[PDF content - parsing not available in production environment. Please use text/HTML documents instead.]';
+      return '[PDF content - parsing not available. Please use text/HTML documents instead.]';
     }
 
     const pdfData = await parseFunc(dataBuffer);
