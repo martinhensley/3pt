@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { del } from "@vercel/blob";
 
 function generateSlug(title: string): string {
   return title
@@ -117,6 +118,25 @@ export async function PUT(request: NextRequest) {
 
     // Handle image removals
     if (removeImageIds && removeImageIds.length > 0) {
+      // First, fetch the images to get their URLs for blob deletion
+      const imagesToDelete = await prisma.postImage.findMany({
+        where: {
+          id: { in: removeImageIds },
+          postId: id,
+        },
+      });
+
+      // Delete from Vercel Blob storage
+      for (const image of imagesToDelete) {
+        try {
+          await del(image.url);
+        } catch (error) {
+          console.error(`Failed to delete blob for image ${image.id}:`, error);
+          // Continue with database deletion even if blob deletion fails
+        }
+      }
+
+      // Delete from database
       await prisma.postImage.deleteMany({
         where: {
           id: { in: removeImageIds },
@@ -186,7 +206,22 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Delete associated images first
+    // Fetch images to delete their blobs
+    const imagesToDelete = await prisma.postImage.findMany({
+      where: { postId: id },
+    });
+
+    // Delete blobs from Vercel Blob storage
+    for (const image of imagesToDelete) {
+      try {
+        await del(image.url);
+      } catch (error) {
+        console.error(`Failed to delete blob for image ${image.id}:`, error);
+        // Continue with deletion even if blob deletion fails
+      }
+    }
+
+    // Delete associated images from database
     await prisma.postImage.deleteMany({
       where: { postId: id },
     });
