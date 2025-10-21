@@ -2,7 +2,36 @@ import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { detectFileType, type FileType } from "@/lib/documentParser";
+import path from "path";
+
+export type FileType = "image" | "pdf" | "csv" | "html" | "text";
+
+/**
+ * Detect file type from file path/extension
+ */
+function detectFileType(filePath: string): FileType {
+  const ext = path.extname(filePath).toLowerCase();
+
+  switch (ext) {
+    case ".pdf":
+      return "pdf";
+    case ".csv":
+      return "csv";
+    case ".html":
+    case ".htm":
+      return "html";
+    case ".txt":
+      return "text";
+    case ".jpg":
+    case ".jpeg":
+    case ".png":
+    case ".webp":
+    case ".gif":
+      return "image";
+    default:
+      return "text"; // Default to text for unknown types
+  }
+}
 
 // Allowed MIME types for upload
 const ALLOWED_MIME_TYPES = [
