@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import Anthropic from "@anthropic-ai/sdk";
-import { readFile } from "fs/promises";
-import path from "path";
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+import { analyzeReleaseDocuments } from "@/lib/ai";
+import { parseDocuments } from "@/lib/documentParser";
+import {
+  getOrCreateManufacturer,
+  createReleaseWithSets,
+} from "@/lib/database";
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,74 +16,72 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { imageUrl } = body;
+    const { files, createDatabaseRecords = true } = body;
+    // files: Array<{ url: string, type?: 'image' | 'pdf' | 'csv' | 'html' }>
+    // createDatabaseRecords: boolean (default true) - whether to create Manufacturer/Release/Set records
 
-    if (!imageUrl) {
+    if (!files || !Array.isArray(files) || files.length === 0) {
       return NextResponse.json(
-        { error: "Image URL is required" },
+        { error: "At least one file is required" },
         { status: 400 }
       );
     }
 
-    // Read image and convert to base64
-    const imagePath = path.join(process.cwd(), "public", imageUrl);
-    const imageBuffer = await readFile(imagePath);
-    const imageBase64 = imageBuffer.toString("base64");
+    // Parse all documents
+    const parsedDocuments = await parseDocuments(files);
 
-    const message = await anthropic.messages.create({
-      model: "claude-3-haiku-20240307",
-      max_tokens: 2000,
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "image",
-              source: {
-                type: "base64",
-                media_type: "image/jpeg",
-                data: imageBase64,
-              },
-            },
-            {
-              type: "text",
-              text: `Analyze this soccer/football card release document (sell sheet, catalog, or promotional material). Extract all visible details and create an engaging blog post about the release.
+    // Analyze with AI
+    const analysis = await analyzeReleaseDocuments(parsedDocuments);
 
-Return a JSON object with:
-{
-  "title": "Engaging title for the blog post",
-  "excerpt": "Brief 1-2 sentence summary",
-  "content": "Detailed 400-600 word blog post with HTML formatting (<p>, <strong>, <h3>, <ul>/<li>). Discuss the release, manufacturer, sets included, notable features, and significance to collectors.",
-  "manufacturer": "Card manufacturer/brand name",
-  "releaseName": "Name of the release",
-  "year": "Year or season",
-  "sets": ["Array of set names in this release"],
-  "features": ["Notable features like autographs, parallels, inserts, etc."]
-}`,
-            },
-          ],
-        },
-      ],
+    // Create database records if requested
+    let createdRecords = null;
+    if (createDatabaseRecords) {
+      try {
+        // Get or create manufacturer
+        const manufacturer = await getOrCreateManufacturer(
+          analysis.manufacturer
+        );
+
+        // Create release with sets
+        const release = await createReleaseWithSets(
+          manufacturer.id,
+          {
+            name: analysis.releaseName,
+            year: analysis.year,
+          },
+          analysis.sets.map((set) => ({
+            name: set.name,
+            totalCards: set.totalCards,
+          }))
+        );
+
+        createdRecords = {
+          manufacturer,
+          release,
+        };
+      } catch (dbError) {
+        console.error("Database creation error:", dbError);
+        // Return analysis even if database creation fails
+        return NextResponse.json({
+          ...analysis,
+          databaseError: "Failed to create database records",
+          databaseErrorDetails:
+            dbError instanceof Error ? dbError.message : String(dbError),
+        });
+      }
+    }
+
+    return NextResponse.json({
+      ...analysis,
+      createdRecords,
     });
-
-    const textContent = message.content.find((block) => block.type === "text");
-    if (!textContent || textContent.type !== "text") {
-      throw new Error("No text content in response");
-    }
-
-    // Parse the JSON response
-    const jsonMatch = textContent.text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error("Could not parse JSON from response");
-    }
-
-    const analysis = JSON.parse(jsonMatch[0]);
-
-    return NextResponse.json(analysis);
   } catch (error) {
     console.error("Release analysis error:", error);
     return NextResponse.json(
-      { error: "Failed to analyze release" },
+      {
+        error: "Failed to analyze release",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 }
     );
   }

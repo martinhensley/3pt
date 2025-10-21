@@ -15,10 +15,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Footy Limited - Soccer Card Information & Trading Card Database",
+    default: "Footy Limited's Compendium of Soccer (Football) Card Information",
     template: "%s | Footy Limited"
   },
-  description: "Comprehensive repository of football trading card information featuring player cards, sets, and releases from Panini, Topps, and more. Your ultimate soccer card database and collector's guide.",
+  description: "Comprehensive compendium of football trading card information featuring player cards, sets, and releases from Panini, Topps, and more. Your ultimate soccer card reference and collector's guide.",
   keywords: [
     "soccer cards",
     "football cards",
@@ -46,8 +46,8 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "Footy Limited - Soccer Card Information & Trading Card Database",
-    description: "Comprehensive repository of football trading card information featuring player cards, sets, and releases. Your ultimate soccer card database.",
+    title: "Footy Limited's Compendium of Soccer (Football) Card Information",
+    description: "Comprehensive compendium of football trading card information featuring player cards, sets, and releases. Your ultimate soccer card reference.",
     url: "https://www.footylimited.com",
     siteName: "Footy Limited",
     locale: "en_US",
@@ -57,14 +57,14 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Footy Limited - Soccer Card Database",
+        alt: "Footy Limited - Soccer Card Compendium",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Footy Limited - Soccer Card Information & Trading Card Database",
-    description: "Comprehensive repository of football trading card information. Your ultimate soccer card database and collector's guide.",
+    title: "Footy Limited's Compendium of Soccer (Football) Card Information",
+    description: "Comprehensive compendium of football trading card information. Your ultimate soccer card reference and collector's guide.",
     images: ["/twitter-image.png"],
   },
   robots: {

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { analyzeSetDocuments } from "@/lib/ai";
-import { readFile } from "fs/promises";
-import path from "path";
+import { analyzeSetDocumentsWithCards } from "@/lib/ai";
+import { parseDocuments } from "@/lib/documentParser";
+import { addSetToRelease, addCardsToSet, getRelease } from "@/lib/database";
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,45 +13,83 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { checklistImageUrl, sellSheetImageUrl } = body;
+    const { files, releaseId, createDatabaseRecords = true } = body;
+    // files: Array<{ url: string, type?: 'image' | 'pdf' | 'csv' | 'html' }>
+    // releaseId: string (optional) - if provided, associate set with this release
+    // createDatabaseRecords: boolean (default true) - whether to create Set/Card records
 
-    if (!checklistImageUrl) {
+    if (!files || !Array.isArray(files) || files.length === 0) {
       return NextResponse.json(
-        { error: "Checklist image URL is required" },
+        { error: "At least one file is required" },
         { status: 400 }
       );
     }
 
-    // Read images and convert to base64
-    const checklistImagePath = path.join(
-      process.cwd(),
-      "public",
-      checklistImageUrl
-    );
-    const checklistImageBuffer = await readFile(checklistImagePath);
-    const checklistImageBase64 = checklistImageBuffer.toString("base64");
-
-    let sellSheetImageBase64: string | undefined;
-    if (sellSheetImageUrl) {
-      const sellSheetImagePath = path.join(
-        process.cwd(),
-        "public",
-        sellSheetImageUrl
-      );
-      const sellSheetImageBuffer = await readFile(sellSheetImagePath);
-      sellSheetImageBase64 = sellSheetImageBuffer.toString("base64");
+    // Get release context if releaseId provided
+    let releaseContext: string | undefined;
+    if (releaseId) {
+      const release = await getRelease(releaseId);
+      if (!release) {
+        return NextResponse.json(
+          { error: "Release not found" },
+          { status: 404 }
+        );
+      }
+      releaseContext = `${release.manufacturer.name} ${release.name} (${release.year})`;
     }
 
-    const analysis = await analyzeSetDocuments(
-      checklistImageBase64,
-      sellSheetImageBase64
+    // Parse all documents
+    const parsedDocuments = await parseDocuments(files);
+
+    // Analyze with AI
+    const analysis = await analyzeSetDocumentsWithCards(
+      parsedDocuments,
+      releaseContext
     );
 
-    return NextResponse.json(analysis);
+    // Create database records if requested
+    let createdRecords = null;
+    if (createDatabaseRecords && releaseId) {
+      try {
+        // Create set
+        const set = await addSetToRelease(releaseId, {
+          name: analysis.setName,
+          totalCards: analysis.totalCards,
+        });
+
+        // Create cards if available
+        let cardsCreated = 0;
+        if (analysis.cards && analysis.cards.length > 0) {
+          const result = await addCardsToSet(set.id, analysis.cards);
+          cardsCreated = result.count;
+        }
+
+        createdRecords = {
+          set,
+          cardsCreated,
+        };
+      } catch (dbError) {
+        console.error("Database creation error:", dbError);
+        return NextResponse.json({
+          ...analysis,
+          databaseError: "Failed to create database records",
+          databaseErrorDetails:
+            dbError instanceof Error ? dbError.message : String(dbError),
+        });
+      }
+    }
+
+    return NextResponse.json({
+      ...analysis,
+      createdRecords,
+    });
   } catch (error) {
     console.error("Set analysis error:", error);
     return NextResponse.json(
-      { error: "Failed to analyze set" },
+      {
+        error: "Failed to analyze set",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 }
     );
   }

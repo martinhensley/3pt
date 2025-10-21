@@ -54,16 +54,38 @@ model Set {
 }
 
 model Card {
-  id         String   @id @default(cuid())
-  playerName String?
-  team       String?
-  cardNumber String?
-  variant    String?
-  setId      String
-  set        Set      @relation(fields: [setId], references: [id])
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  posts      Post[]
+  id                    String   @id @default(cuid())
+  playerName            String?
+  team                  String?
+  cardNumber            String?
+  variant               String?  // Basic variant name (e.g., "Refractor", "Chrome")
+
+  // Enhanced parallel/variation detection fields
+  parallelType          String?  // Specific parallel type (e.g., "Gold Refractor", "Red Wave")
+  serialNumber          String?  // Serial number if numbered (e.g., "123/299")
+  isNumbered            Boolean  @default(false)
+  printRun              Int?     // Total print run (e.g., 299 for /299)
+  rarity                String?  // Rarity level (base, rare, super_rare, ultra_rare, one_of_one)
+  finish                String?  // Card finish (refractor, chrome, matte, glossy, holographic)
+  hasAutograph          Boolean  @default(false)
+  hasMemorabilia        Boolean  @default(false)
+  specialFeatures       String[] // Array of special features (rookie, insert, short_print, etc.)
+  colorVariant          String?  // Color designation (gold, red, blue, green, orange, etc.)
+
+  // OCR and detection metadata
+  detectionConfidence   Int?     // AI confidence score (0-100)
+  detectionMethods      String[] // Methods used (ocr, visual, ai_analysis)
+  detectedText          String?  // Raw OCR text for reference
+
+  // Images
+  imageFront            String?  // Front image URL
+  imageBack             String?  // Back image URL
+
+  setId                 String
+  set                   Set      @relation(fields: [setId], references: [id])
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  posts                 Post[]
 }
 
 model Post {

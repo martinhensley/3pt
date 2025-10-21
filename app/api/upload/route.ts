@@ -3,6 +3,21 @@ import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { detectFileType, type FileType } from "@/lib/documentParser";
+
+// Allowed MIME types for upload
+const ALLOWED_MIME_TYPES = [
+  // Images
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  // Documents
+  "application/pdf",
+  "text/csv",
+  "text/html",
+  "text/plain",
+];
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,6 +32,16 @@ export async function POST(request: NextRequest) {
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
+    }
+
+    // Validate file type
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+      return NextResponse.json(
+        {
+          error: `File type not allowed: ${file.type}. Allowed types: images, PDFs, CSVs, HTML, text files`,
+        },
+        { status: 400 }
+      );
     }
 
     const bytes = await file.arrayBuffer();
@@ -37,9 +62,15 @@ export async function POST(request: NextRequest) {
 
     await writeFile(filepath, buffer);
 
+    // Detect file type for categorization
+    const fileType: FileType = detectFileType(filename);
+
     return NextResponse.json({
       url: `/uploads/${filename}`,
       filename,
+      type: fileType,
+      mimeType: file.type,
+      size: file.size,
     });
   } catch (error) {
     console.error("Upload error:", error);
