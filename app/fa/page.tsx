@@ -1555,8 +1555,15 @@ export default function AdminPage() {
                           key={index}
                           className="relative border border-green-300 rounded-lg overflow-hidden"
                         >
-                          <div className="w-full h-32 bg-gray-100 flex items-center justify-center">
-                            <p className="text-sm text-gray-600 p-2 text-center break-all">
+                          <div className="relative w-full h-32">
+                            <img
+                              src={URL.createObjectURL(file)}
+                              alt={file.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="p-2 bg-green-50">
+                            <p className="text-xs text-gray-700 truncate">
                               {file.name}
                             </p>
                           </div>
