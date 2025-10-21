@@ -28,11 +28,19 @@ export async function parsePDF(filePath: string): Promise<string> {
     const pdfParse = await import('pdf-parse');
     // @ts-expect-error - pdf-parse module structure varies between environments
     const parseFunc = pdfParse.default || pdfParse;
+
+    // Check if parseFunc is actually a function
+    if (typeof parseFunc !== 'function') {
+      console.warn('PDF parsing not available in this environment');
+      return '[PDF content - parsing not available in production environment. Please use text/HTML documents instead.]';
+    }
+
     const pdfData = await parseFunc(dataBuffer);
     return pdfData.text;
   } catch (error) {
     console.error("PDF parsing error:", error);
-    throw new Error(`Failed to parse PDF: ${error}`);
+    // Return placeholder instead of crashing
+    return '[PDF content - parsing failed. Please use text/HTML documents for better results.]';
   }
 }
 
