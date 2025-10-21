@@ -2,6 +2,8 @@ import { readFile } from "fs/promises";
 import path from "path";
 import * as pdfParse from "pdf-parse";
 import { parse as csvParse } from "csv-parse/sync";
+import { writeFile, mkdir } from "fs/promises";
+import { tmpdir } from "os";
 
 export type FileType = "image" | "pdf" | "csv" | "html" | "text";
 
@@ -177,6 +179,42 @@ export async function parseDocument(
 }
 
 /**
+ * Download a file from a URL to a temporary location
+ */
+async function downloadFile(url: string): Promise<string> {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to download file: ${response.statusText}`);
+  }
+
+  const buffer = Buffer.from(await response.arrayBuffer());
+
+  // Create temp directory
+  const tempDir = path.join(tmpdir(), "footy-temp");
+  await mkdir(tempDir, { recursive: true });
+
+  // Extract filename from URL or generate one
+  const urlPath = new URL(url).pathname;
+  const filename = path.basename(urlPath) || `temp-${Date.now()}`;
+  const tempPath = path.join(tempDir, filename);
+
+  await writeFile(tempPath, buffer);
+  return tempPath;
+}
+
+/**
+ * Check if a string is a URL
+ */
+function isUrl(str: string): boolean {
+  try {
+    const url = new URL(str);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Parse multiple documents
  */
 export async function parseDocuments(
@@ -187,7 +225,17 @@ export async function parseDocuments(
 
   for (const file of files) {
     try {
-      const filePath = path.join(process.cwd(), "public", file.url);
+      let filePath: string;
+
+      // Check if URL is a blob URL or external URL
+      if (isUrl(file.url)) {
+        // Download the file to a temporary location
+        filePath = await downloadFile(file.url);
+      } else {
+        // Local file path (legacy support)
+        filePath = path.join(process.cwd(), "public", file.url);
+      }
+
       const parsed = await parseDocument(filePath, file.type);
       parsedDocs.push(parsed);
     } catch (error) {

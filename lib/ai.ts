@@ -239,7 +239,14 @@ export async function analyzeReleaseDocuments(
     if (doc.type === "image") {
       // Read image and convert to base64
       try {
-        const imagePath = path.join(process.cwd(), "public", doc.content as string);
+        // doc.content contains either a temp file path or a relative path
+        let imagePath = doc.content as string;
+
+        // If it's a relative path (starts with /), join with public directory
+        if (imagePath.startsWith("/")) {
+          imagePath = path.join(process.cwd(), "public", imagePath);
+        }
+
         const imageBuffer = await readFile(imagePath);
         const imageBase64 = imageBuffer.toString("base64");
         contentParts.push({
@@ -299,7 +306,14 @@ export async function analyzeSetDocumentsWithCards(
   for (const doc of documents) {
     if (doc.type === "image") {
       try {
-        const imagePath = path.join(process.cwd(), "public", doc.content as string);
+        // doc.content contains either a temp file path or a relative path
+        let imagePath = doc.content as string;
+
+        // If it's a relative path (starts with /), join with public directory
+        if (imagePath.startsWith("/")) {
+          imagePath = path.join(process.cwd(), "public", imagePath);
+        }
+
         const imageBuffer = await readFile(imagePath);
         const imageBase64 = imageBuffer.toString("base64");
         contentParts.push({

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { put } from "@vercel/blob";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { detectFileType, type FileType } from "@/lib/documentParser";
@@ -44,33 +43,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = path.join(process.cwd(), "public", "uploads");
-    try {
-      await mkdir(uploadsDir, { recursive: true });
-    } catch {
-      // Directory might already exist
-    }
-
     // Generate unique filename
     const timestamp = Date.now();
     const filename = `${timestamp}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
-    const filepath = path.join(uploadsDir, filename);
 
-    await writeFile(filepath, buffer);
+    // Upload to Vercel Blob
+    const blob = await put(filename, file, {
+      access: "public",
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    });
 
     // Detect file type for categorization
     const fileType: FileType = detectFileType(filename);
 
     return NextResponse.json({
-      url: `/uploads/${filename}`,
+      url: blob.url,
       filename,
       type: fileType,
       mimeType: file.type,
       size: file.size,
+      blobUrl: blob.url,
     });
   } catch (error) {
     console.error("Upload error:", error);
