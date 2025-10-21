@@ -1,34 +1,35 @@
-# footy limited - Soccer Card Syndication Blog
+# footy.bot - Soccer Card Information Platform
 
-A modern blog platform for soccer card enthusiasts at footylimited.com. Features AI-powered content generation using Claude for card and set analysis.
+A modern platform for soccer card enthusiasts at footy.bot. Features AI-powered content generation using Claude for card and set analysis, with comprehensive database management for manufacturers, releases, sets, and individual cards.
 
 ## Features
 
 - **AI-Powered Content Generation**: Upload card images or set documents and automatically generate engaging blog posts
-- **Card Analysis**: Upload front and back card images for detailed reviews
-- **Set Analysis**: Upload checklists and sell sheets for comprehensive set overviews
-- **Image Management**: Automatic image upload and storage with gallery display
-- **User Authentication**: Secure admin login system
-- **Responsive Design**: Mobile-friendly interface with footy limited branding
-- **SEO-Friendly**: Dynamic metadata and optimized for search engines
+- **Hierarchical Data Model**: Manufacturers → Releases → Sets → Cards
+- **Multi-Document Analysis**: Upload PDFs, CSVs, images, and HTML files for comprehensive release analysis
+- **Card Library Management**: Build and manage a complete soccer card database
+- **Admin Portal**: Secure interface for content and data management
+- **SEO Optimized**: Dynamic metadata, sitemap, structured data, and Open Graph tags
+- **Responsive Design**: Mobile-friendly interface with footy.bot branding (Green #005031 & Orange #F47322)
 
 ## Tech Stack
 
 - **Framework**: Next.js 15 with App Router
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS v4
-- **Database**: SQLite with Prisma ORM
+- **Database**: PostgreSQL (Neon) with Prisma ORM
 - **Authentication**: NextAuth.js
 - **AI**: Anthropic Claude API (Claude 3.5 Sonnet)
 - **Image Processing**: Sharp
+- **Document Parsing**: pdf-parse, csv-parse
 
 ## Color Scheme
 
-- Dark Green: #203732
-- Gold: #FFB613
+- Footy Green: #005031
+- Footy Orange: #F47322
 - White: #FFFFFF
 
-## Getting Started
+## Quick Start
 
 ### Prerequisites
 
@@ -37,146 +38,234 @@ A modern blog platform for soccer card enthusiasts at footylimited.com. Features
 
 ### Installation
 
-1. The dependencies are already installed in this project.
-
-2. The `.env` file is already configured with:
-   - Database URL (SQLite)
-   - Anthropic API Key
-   - NextAuth configuration
-
-3. The database is already initialized with the admin user:
-   - Username: `footy`
-   - Password: `test2222`
-
-### Running the Development Server
-
 ```bash
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the blog.
-
-## Usage
+Open [http://localhost:3000](http://localhost:3000) to view the site.
 
 ### Admin Access
 
-1. Navigate to [http://localhost:3000/admin/login](http://localhost:3000/admin/login)
-2. Login with credentials:
-   - Username: `footy`
-   - Password: `test2222`
+Navigate to [http://localhost:3000/fa/login](http://localhost:3000/fa/login)
 
-### Creating a Card Post
+Login credentials are configured in your environment variables.
 
-1. Go to the Admin Dashboard
-2. Select the "Analyze Card" tab
-3. Upload the card front image (required)
-4. Optionally upload the card back image
-5. Click "Analyze Card & Generate Post"
-6. Review and edit the AI-generated content
-7. Click "Publish Post" or "Save as Draft"
+## Database Schema
 
-### Creating a Set Post
+### Hierarchical Structure
+```
+Manufacturer
+  └── Release (year, name)
+       └── Set (name, totalCards)
+            └── Card (playerName, team, cardNumber, variant)
+```
 
-1. Go to the Admin Dashboard
-2. Select the "Analyze Set" tab
-3. Upload the checklist image (required)
-4. Optionally upload the sell sheet image
-5. Click "Analyze Set & Generate Post"
-6. Review and edit the AI-generated content
-7. Click "Publish Post" or "Save as Draft"
+### Additional Models
+- **User**: Admin authentication
+- **Post**: Blog posts (can reference Release, Set, or Card)
+- **PostImage**: Images associated with posts
 
-### Viewing Posts
+## Key Features
 
-- Homepage: [http://localhost:3000](http://localhost:3000)
-- Individual posts: [http://localhost:3000/posts/[slug]](http://localhost:3000/posts/[slug])
+### 1. Analyze Release
+Upload multiple documents (PDFs, CSVs, images, URLs) about a release:
+- Extracts manufacturer, release name, year
+- Identifies all sets within the release
+- Optionally extracts card checklists
+- Creates hierarchical database records
+- Generates blog post (optional)
+
+### 2. Analyze Set
+Add sets to existing releases:
+- Select parent release from dropdown
+- Upload set documents (checklists, sell sheets)
+- Extracts individual cards from checklists
+- Creates set and card records
+- Generates blog post (optional)
+
+### 3. Analyze Card
+Add individual cards to sets:
+- Select release → set from dropdowns
+- Upload card images (front/back)
+- AI analyzes with context from set/release
+- Creates card database record
+- Generates blog post (optional)
+
+### 4. Manage Posts
+- View all posts (published and drafts)
+- Edit post content, title, excerpt
+- Manage images
+- Publish/unpublish posts
+- Delete posts
+
+### 5. Generate Posts
+Create general content using AI:
+- Enter topic or idea
+- AI generates full blog post
+- Review and edit before publishing
+
+## API Endpoints
+
+### Analysis
+- `POST /api/analyze/release` - Analyze release documents
+- `POST /api/analyze/set` - Analyze set documents
+- `POST /api/analyze/card` - Analyze card images
+
+### Library
+- `GET /api/library/manufacturers` - Get all manufacturers
+- `GET /api/library/releases` - Get all releases
+- `GET /api/library/sets?releaseId=` - Get sets for a release
+
+### Content
+- `GET /api/posts` - Get all posts
+- `POST /api/posts` - Create new post
+- `PUT /api/posts` - Update post
+- `DELETE /api/posts?id=` - Delete post
+- `POST /api/upload` - Upload files (images, PDFs, CSVs)
+
+### SEO
+- `GET /sitemap.xml` - Dynamic sitemap
+- `GET /robots.txt` - Search engine directives
 
 ## Project Structure
 
 ```
-footy-limited-blog/
+footy/
 ├── app/
-│   ├── admin/              # Admin interface
-│   │   ├── login/          # Login page
-│   │   └── page.tsx        # Admin dashboard
+│   ├── fa/                 # Admin portal
 │   ├── api/                # API routes
-│   │   ├── auth/           # NextAuth endpoints
-│   │   ├── upload/         # Image upload
 │   │   ├── analyze/        # AI analysis endpoints
-│   │   └── posts/          # Post CRUD operations
-│   ├── posts/[slug]/       # Individual post pages
-│   ├── globals.css         # Global styles with color scheme
-│   ├── layout.tsx          # Root layout
+│   │   ├── library/        # Data retrieval endpoints
+│   │   ├── auth/           # NextAuth
+│   │   ├── posts/          # Post CRUD
+│   │   └── upload/         # File upload
+│   ├── posts/[slug]/       # Post pages
+│   ├── globals.css         # Global styles
+│   ├── layout.tsx          # Root layout with metadata
 │   ├── page.tsx            # Homepage
-│   └── providers.tsx       # Session provider
+│   ├── sitemap.ts          # Dynamic sitemap
+│   └── robots.ts           # Robots.txt
+├── components/
+│   ├── Header.tsx          # Site header
+│   ├── EbayAd.tsx          # eBay affiliate ads
+│   ├── EntitySelectors.tsx # Release/Set dropdowns
+│   └── MultiFileUpload.tsx # Multi-file upload component
 ├── lib/
-│   ├── prisma.ts           # Prisma client
-│   ├── auth.ts             # NextAuth configuration
-│   └── ai.ts               # Claude AI integration
+│   ├── prisma.ts           # Database client
+│   ├── auth.ts             # NextAuth config
+│   ├── ai.ts               # Claude AI integration
+│   ├── database.ts         # Database helpers
+│   └── documentParser.ts   # PDF/CSV parsing
 ├── prisma/
 │   └── schema.prisma       # Database schema
-├── public/
-│   └── uploads/            # Uploaded images
-├── scripts/
-│   └── init-admin.ts       # Admin user initialization
-└── types/
-    └── next-auth.d.ts      # TypeScript definitions
+└── public/
+    └── uploads/            # Uploaded files
 ```
 
-## Database Schema
+## Environment Variables
 
-### User
-- id: String (CUID)
-- username: String (unique)
-- password: String (hashed)
-- createdAt: DateTime
-- updatedAt: DateTime
+Required environment variables (see `.env` file):
 
-### Post
-- id: String (CUID)
-- title: String
-- slug: String (unique)
-- content: String (HTML)
-- excerpt: String
-- type: PostType (CARD or SET)
-- published: Boolean
-- createdAt: DateTime
-- updatedAt: DateTime
-- authorId: String
+```env
+# Database
+DATABASE_URL=
 
-### PostImage
-- id: String (CUID)
-- postId: String
-- url: String
-- caption: String (optional)
-- order: Int
-- createdAt: DateTime
+# API Keys
+ANTHROPIC_API_KEY=
 
-## API Endpoints
+# NextAuth
+NEXTAUTH_URL=
+NEXTAUTH_SECRET=
 
-- `POST /api/upload` - Upload images
-- `POST /api/analyze/card` - Analyze card images with AI
-- `POST /api/analyze/set` - Analyze set documents with AI
-- `GET /api/posts` - Get all posts
-- `POST /api/posts` - Create a new post
-- `GET/POST /api/auth/[...nextauth]` - NextAuth endpoints
+# eBay Partner Network
+EBAY_APP_ID=
+EBAY_CLIENT_SECRET=
+EBAY_CAMPAIGN_ID=
+EBAY_VERIFICATION_TOKEN=
+EBAY_DELETION_ENDPOINT_URL=
+```
+
+## SEO Strategy
+
+### Current Implementation
+- Enhanced metadata (title, description, keywords)
+- Open Graph tags for social sharing
+- Twitter Cards
+- Dynamic sitemap generation
+- Robots.txt configuration
+- Schema.org structured data (Article, Organization)
+- Canonical URLs
+- Mobile optimization
+- Image optimization with Next.js Image component
+
+### Target Keywords
+- Primary: soccer card database, football trading cards, soccer card information
+- Secondary: panini soccer cards, topps soccer cards, soccer card sets
+- Long-tail: soccer card collector guide, new soccer card releases
 
 ## Deployment
 
-For production deployment:
+### Vercel (Recommended)
+1. Connect GitHub repository to Vercel
+2. Configure environment variables
+3. Update `NEXTAUTH_URL` to production domain
+4. Deploy
 
-1. Update `NEXTAUTH_URL` to your production domain
-2. Use a production database (PostgreSQL, MySQL, etc.)
-3. Update `NEXTAUTH_SECRET` with a strong secret
-4. Ensure Anthropic API key is properly secured
-5. Configure your hosting platform for Next.js App Router
+### Environment Setup
+- Use PostgreSQL database in production (Neon recommended)
+- Ensure all API keys are securely configured
+- Update domain references to production URL
+
+## Development
+
+### Adding New Features
+1. Update Prisma schema if needed
+2. Run `npx prisma generate` to update client
+3. Create/update API routes
+4. Update admin portal UI
+5. Test thoroughly
+
+### Database Migrations
+```bash
+npx prisma migrate dev --name migration_name
+npx prisma generate
+```
 
 ## Security Notes
 
-- Change the default admin password after first login
+- Change default admin credentials
 - Use strong secrets in production
-- Keep API keys secure and never commit them to version control
-- The `.env` file is already in `.gitignore`
+- Keep API keys secure
+- Never commit .env files
+- Implement rate limiting for APIs
+- Validate all user inputs
 
 ## License
 
-Private project for footy limited.
+Private project for footy.bot
+
+---
+
+## Technical Notes
+
+### Multi-Document Analysis
+The system can analyze multiple document types simultaneously:
+- PDFs: Extracted text is analyzed for release/set/card information
+- CSVs: Parsed and used for card checklists
+- Images: Analyzed using Claude Vision
+- HTML: Web pages fetched and parsed for product information
+
+### AI Integration
+Uses Claude 3.5 Sonnet with structured output (Zod schemas) to ensure consistent data extraction from diverse document types.
+
+### Database Design
+Hierarchical structure allows for:
+- Complete card library organization
+- Context-aware AI analysis
+- Efficient querying and relationships
+- Future expansion (price tracking, collection management)
+
