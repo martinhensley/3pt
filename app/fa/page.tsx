@@ -73,6 +73,7 @@ export default function AdminPage() {
   // Release form state
   const [releaseUrls, setReleaseUrls] = useState<string[]>([""]);
   const [releaseFiles, setReleaseFiles] = useState<File[]>([]);
+  const [releaseImage, setReleaseImage] = useState<File | null>(null);
   const [releaseAnalysisResult, setReleaseAnalysisResult] = useState<ReleaseAnalysisResult | null>(null);
 
   // Generated post state
@@ -1195,6 +1196,71 @@ export default function AdminPage() {
                           </button>
                         </div>
                       ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Release Image Upload */}
+              <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  Release Image
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  Upload an image for this release. If you upload a PDF above, the first page will be used automatically.
+                </p>
+
+                {/* Image Input */}
+                <div className="mb-4">
+                  <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-purple-300 border-dashed rounded-lg cursor-pointer bg-white hover:bg-purple-50 transition-colors">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <svg className="w-12 h-12 mb-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <p className="mb-1 text-sm font-semibold text-gray-700">
+                        <span className="text-purple-600">Click to upload</span> release image
+                      </p>
+                      <p className="text-xs text-gray-500">PNG, JPG, WEBP up to 10MB</p>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) setReleaseImage(file);
+                      }}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+
+                {/* Preview Release Image */}
+                {releaseImage && (
+                  <div className="border-2 border-purple-300 rounded-lg p-4 bg-white">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-16 h-16 bg-purple-100 rounded flex items-center justify-center overflow-hidden">
+                          <img
+                            src={URL.createObjectURL(releaseImage)}
+                            alt="Release preview"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">{releaseImage.name}</p>
+                          <p className="text-xs text-gray-500">{(releaseImage.size / 1024).toFixed(1)} KB</p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setReleaseImage(null)}
+                        className="px-3 py-1.5 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors font-medium text-xs"
+                      >
+                        Remove
+                      </button>
                     </div>
                   </div>
                 )}
