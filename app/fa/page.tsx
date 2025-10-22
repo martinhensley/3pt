@@ -510,7 +510,9 @@ export default function AdminPage() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to analyze release");
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Release analysis failed:", response.status, errorData);
+        throw new Error(errorData.details || errorData.error || "Failed to analyze release");
       }
 
       const analysis = await response.json();
