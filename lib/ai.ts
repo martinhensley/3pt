@@ -279,7 +279,7 @@ export async function analyzeReleaseDocuments(
   });
 
   const result = await generateObject({
-    model: anthropic("claude-3-5-sonnet-20240620"),
+    model: anthropic("claude-3-haiku-20240307"),
     schema: releaseAnalysisSchema,
     messages: [
       {
@@ -351,7 +351,7 @@ export async function analyzeSetDocumentsWithCards(
   });
 
   const result = await generateObject({
-    model: anthropic("claude-3-5-sonnet-20240620"),
+    model: anthropic("claude-3-haiku-20240307"),
     schema: setAnalysisWithCardsSchema,
     messages: [
       {
