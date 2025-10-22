@@ -72,12 +72,13 @@ export default function Home() {
                 className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col"
               >
                 {post.images[0] && (
-                  <div className="relative w-full h-64 bg-gray-100 dark:bg-gray-700">
+                  <div className="relative w-full bg-gray-100 dark:bg-gray-700">
                     <Image
                       src={post.images[0].url}
                       alt={post.title}
-                      fill
-                      className="object-cover"
+                      width={800}
+                      height={600}
+                      className="w-full h-auto"
                       sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                   </div>

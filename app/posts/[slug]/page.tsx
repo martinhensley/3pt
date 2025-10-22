@@ -149,15 +149,14 @@ export default function PostPage() {
                   key={image.id}
                   className="relative bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden border-2 border-footy-green dark:border-footy-orange shadow-lg"
                 >
-                  <div className="relative w-full" style={{ paddingBottom: "140%" }}>
-                    <Image
-                      src={image.url}
-                      alt={image.caption || post.title}
-                      fill
-                      className="object-contain"
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                    />
-                  </div>
+                  <Image
+                    src={image.url}
+                    alt={image.caption || post.title}
+                    width={800}
+                    height={600}
+                    className="w-full h-auto object-contain"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
                   {image.caption && (
                     <p className="p-2 text-sm text-gray-600 dark:text-gray-300 text-center bg-white dark:bg-gray-800">
                       {image.caption}
