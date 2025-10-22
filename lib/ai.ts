@@ -114,7 +114,7 @@ export async function analyzeCardImages(
   }
 
   const result = await generateObject({
-    model: anthropic("claude-3-5-sonnet-20241022"),
+    model: anthropic("claude-3-5-sonnet-20240620"),
     schema: cardAnalysisSchema,
     messages: [
       {
@@ -152,7 +152,7 @@ export async function analyzeSetDocuments(
   }
 
   const result = await generateObject({
-    model: anthropic("claude-3-5-sonnet-20241022"),
+    model: anthropic("claude-3-5-sonnet-20240620"),
     schema: setAnalysisSchema,
     messages: [
       {
@@ -279,7 +279,7 @@ export async function analyzeReleaseDocuments(
   });
 
   const result = await generateObject({
-    model: anthropic("claude-3-5-sonnet-20241022"),
+    model: anthropic("claude-3-5-sonnet-20240620"),
     schema: releaseAnalysisSchema,
     messages: [
       {
@@ -351,7 +351,7 @@ export async function analyzeSetDocumentsWithCards(
   });
 
   const result = await generateObject({
-    model: anthropic("claude-3-5-sonnet-20241022"),
+    model: anthropic("claude-3-5-sonnet-20240620"),
     schema: setAnalysisWithCardsSchema,
     messages: [
       {
@@ -399,7 +399,7 @@ export async function analyzeCardWithContext(
   instruction += ` Focus on what makes this card special for collectors and fans.`;
 
   const result = await generateObject({
-    model: anthropic("claude-3-5-sonnet-20241022"),
+    model: anthropic("claude-3-5-sonnet-20240620"),
     schema: cardAnalysisSchema,
     messages: [
       {
