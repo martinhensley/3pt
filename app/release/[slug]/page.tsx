@@ -396,20 +396,33 @@ export default function ReleasePage() {
               <p className="text-xl text-white/90 leading-relaxed">{post.excerpt}</p>
             )}
 
-            {/* Quick Stats */}
-            <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-white/20">
-              <div className="text-center">
-                <div className="text-3xl font-black">{release.sets?.length || 0}</div>
-                <div className="text-sm text-white/80 uppercase tracking-wide">Sets</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-black">{totalCards.toLocaleString()}</div>
-                <div className="text-sm text-white/80 uppercase tracking-wide">Cards</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-black">{totalParallels}</div>
-                <div className="text-sm text-white/80 uppercase tracking-wide">Parallels</div>
-              </div>
+            {/* Set Breakdown Summary */}
+            <div className="mt-6 pt-6 border-t border-white/20 space-y-2">
+              {release.sets?.map((set, idx) => {
+                const setCardCount = set.cards?.length || (set.totalCards ? parseInt(set.totalCards) : 0);
+                const setParallelCount = Array.isArray(set.parallels) ? set.parallels.length : 0;
+
+                return (
+                  <div
+                    key={set.id}
+                    className="flex items-center justify-between bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 hover:bg-white/20 transition-colors"
+                  >
+                    <span className="font-bold text-lg">{set.name}</span>
+                    <div className="flex gap-4 text-sm">
+                      {setParallelCount > 0 && (
+                        <span className="text-white/90">
+                          <span className="font-semibold">{setParallelCount}</span> parallels
+                        </span>
+                      )}
+                      {setCardCount > 0 && (
+                        <span className="text-white/90">
+                          <span className="font-semibold">{setCardCount}</span> cards
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
