@@ -217,9 +217,25 @@ export default function EditReleasePage() {
 
   const handleChecklistUpload = async (index: number, file: File) => {
     try {
-      const text = await file.text();
+      setLoading(true);
+      let text = "";
+
+      // Handle PDF files differently
+      if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
+        setMessage({ type: "error", text: "PDF parsing for checklists is not yet implemented. Please use TXT or CSV files, or paste the text directly." });
+        return;
+      }
+
+      // Read TXT and CSV files
+      text = await file.text();
+
       const setName = editedSets[index].name || `Set ${index + 1}`;
       const cards = parseChecklistText(text, setName);
+
+      if (cards.length === 0) {
+        setMessage({ type: "error", text: "No cards found in the file. Please check the format (e.g., '1 Player Name, Team')" });
+        return;
+      }
 
       const updatedSets = [...editedSets];
       updatedSets[index] = {
@@ -228,23 +244,44 @@ export default function EditReleasePage() {
         totalCards: String(cards.length),
       };
       setEditedSets(updatedSets);
+
+      setMessage({ type: "success", text: `Successfully added ${cards.length} cards to ${setName}` });
+      setTimeout(() => setMessage(null), 3000);
     } catch (error) {
       console.error("Failed to parse checklist file:", error);
-      alert("Failed to parse checklist file. Please check the format.");
+      setMessage({ type: "error", text: "Failed to parse checklist file. Please check the format." });
+      setTimeout(() => setMessage(null), 5000);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleChecklistPaste = (index: number, text: string) => {
-    const setName = editedSets[index].name || `Set ${index + 1}`;
-    const cards = parseChecklistText(text, setName);
+    try {
+      const setName = editedSets[index].name || `Set ${index + 1}`;
+      const cards = parseChecklistText(text, setName);
 
-    const updatedSets = [...editedSets];
-    updatedSets[index] = {
-      ...updatedSets[index],
-      cards: cards,
-      totalCards: String(cards.length),
-    };
-    setEditedSets(updatedSets);
+      if (cards.length === 0) {
+        setMessage({ type: "error", text: "No cards found in the pasted text. Please check the format (e.g., '1 Player Name, Team')" });
+        setTimeout(() => setMessage(null), 5000);
+        return;
+      }
+
+      const updatedSets = [...editedSets];
+      updatedSets[index] = {
+        ...updatedSets[index],
+        cards: cards,
+        totalCards: String(cards.length),
+      };
+      setEditedSets(updatedSets);
+
+      setMessage({ type: "success", text: `Successfully added ${cards.length} cards to ${setName}` });
+      setTimeout(() => setMessage(null), 3000);
+    } catch (error) {
+      console.error("Failed to parse pasted checklist:", error);
+      setMessage({ type: "error", text: "Failed to parse pasted text. Please check the format." });
+      setTimeout(() => setMessage(null), 5000);
+    }
   };
 
   const handleClearChecklist = (index: number) => {
@@ -680,15 +717,15 @@ export default function EditReleasePage() {
                           <label className="flex-1">
                             <input
                               type="file"
-                              accept=".txt,.csv,.pdf"
+                              accept=".txt,.csv"
                               onChange={(e) => {
                                 const file = e.target.files?.[0];
                                 if (file) handleChecklistUpload(idx, file);
                               }}
                               className="hidden"
                             />
-                            <div className="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-gray-600 cursor-pointer text-center transition-colors">
-                              Upload File (TXT, CSV, PDF)
+                            <div className="px-3 py-2 text-sm bg-blue-100 hover:bg-blue-200 dark:bg-blue-600 dark:hover:bg-blue-500 text-blue-700 dark:text-blue-100 rounded-lg border border-blue-300 dark:border-blue-600 cursor-pointer text-center transition-colors font-medium">
+                              📄 Upload Checklist (TXT, CSV)
                             </div>
                           </label>
                         </div>
