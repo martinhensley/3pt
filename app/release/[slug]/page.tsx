@@ -88,7 +88,7 @@ export default function ReleasePage() {
       .then((releaseData: Release) => {
         setRelease(releaseData);
         // Set first set as active by default
-        if (releaseData.sets.length > 0) {
+        if (releaseData?.sets?.length > 0) {
           setActiveSetId(releaseData.sets[0].id);
         }
         setLoading(false);
@@ -121,16 +121,20 @@ export default function ReleasePage() {
 
     // Add release images first
     post.images.forEach(img => {
+      const defaultCaption = release?.manufacturer?.name && release?.name
+        ? `${release.manufacturer.name} ${release.name} ${release.year || ''} - Official release image showcasing the product design and packaging.`
+        : 'Official release image showcasing the product design and packaging.';
+
       images.push({
         url: img.url,
-        caption: img.caption || `${release.manufacturer.name} ${release.name} ${release.year || ''} - Official release image showcasing the product design and packaging.`,
+        caption: img.caption || defaultCaption,
         type: 'release'
       });
     });
 
     // Add card images from all sets
-    release.sets.forEach(set => {
-      set.cards.forEach(card => {
+    release.sets?.forEach(set => {
+      set.cards?.forEach(card => {
         if (card.imageFront) {
           // Generate detailed caption for the card
           let caption = '';
