@@ -54,6 +54,7 @@ export default function CreateReleasePage() {
   const [editedTitle, setEditedTitle] = useState("");
   const [editedExcerpt, setEditedExcerpt] = useState("");
   const [editedContent, setEditedContent] = useState("");
+  const [contentViewMode, setContentViewMode] = useState<'edit' | 'preview'>('edit');
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -162,7 +163,11 @@ export default function CreateReleasePage() {
       setEditedSets(analysis.sets || []);
 
       // Populate editable post fields with AI-generated content
-      setEditedTitle(analysis.title);
+      // Format title as "Year Release Name" (e.g., "2024-25 Donruss Soccer")
+      const formattedTitle = analysis.year
+        ? `${analysis.year} ${analysis.releaseName}`
+        : analysis.releaseName;
+      setEditedTitle(formattedTitle);
       setEditedExcerpt(analysis.excerpt);
       setEditedContent(analysis.content);
 
@@ -890,51 +895,141 @@ export default function CreateReleasePage() {
             </div>
 
             {/* Editable Post Content */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 space-y-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                Review & Edit Post Content
-              </h3>
-
-              {/* Title */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
-                  Post Title
-                </label>
-                <input
-                  type="text"
-                  value={editedTitle}
-                  onChange={(e) => setEditedTitle(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="e.g., Panini Select Premier League 2023-24"
-                />
+            <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-footy-green to-green-700 dark:from-footy-orange dark:to-orange-700 px-8 py-6">
+                <h3 className="text-2xl font-black text-white flex items-center gap-3">
+                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  Review & Edit Post Content
+                </h3>
+                <p className="text-white/90 text-sm mt-2">
+                  AI-generated content ready for your review. Edit as needed before publishing.
+                </p>
               </div>
 
-              {/* Excerpt */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
-                  Excerpt (1-2 sentences)
-                </label>
-                <textarea
-                  value={editedExcerpt}
-                  onChange={(e) => setEditedExcerpt(e.target.value)}
-                  rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="A brief, concise summary..."
-                />
-              </div>
+              <div className="p-8 space-y-8">
+                {/* Title */}
+                <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border-2 border-gray-200 dark:border-gray-700 shadow-sm">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-lg">
+                      T
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-900 dark:text-white">
+                        Post Title
+                      </label>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Format: Year Release Name (e.g., "2024-25 Donruss Soccer")
+                      </p>
+                    </div>
+                  </div>
+                  <input
+                    type="text"
+                    value={editedTitle}
+                    onChange={(e) => setEditedTitle(e.target.value)}
+                    className="w-full px-4 py-3 text-lg font-semibold border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-footy-orange focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all"
+                    placeholder="e.g., 2024-25 Donruss Soccer"
+                  />
+                </div>
 
-              {/* Content */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
-                  Content (HTML)
-                </label>
-                <textarea
-                  value={editedContent}
-                  onChange={(e) => setEditedContent(e.target.value)}
-                  rows={20}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono text-sm"
-                  placeholder="HTML content..."
-                />
+                {/* Excerpt */}
+                <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border-2 border-gray-200 dark:border-gray-700 shadow-sm">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-lg">
+                      E
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-900 dark:text-white">
+                        Excerpt
+                      </label>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        1-2 sentence summary displayed in previews
+                      </p>
+                    </div>
+                  </div>
+                  <textarea
+                    value={editedExcerpt}
+                    onChange={(e) => setEditedExcerpt(e.target.value)}
+                    rows={3}
+                    className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-footy-orange focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all"
+                    placeholder="A concise summary that captures the essence of this release..."
+                  />
+                  <div className="mt-2 flex justify-end">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {editedExcerpt.length} characters
+                    </span>
+                  </div>
+                </div>
+
+                {/* Content with Preview */}
+                <div className="bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                  <div className="flex items-center gap-3 px-6 pt-6 pb-4">
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white font-bold text-lg">
+                      C
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-900 dark:text-white">
+                        Post Content (HTML)
+                      </label>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Full article content with HTML formatting
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Tabs for Edit/Preview */}
+                  <div className="border-b border-gray-200 dark:border-gray-700 px-6">
+                    <div className="flex gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setContentViewMode('edit')}
+                        className={`px-4 py-2 font-semibold text-sm transition-all ${
+                          contentViewMode === 'edit'
+                            ? 'border-b-2 border-footy-orange text-footy-orange'
+                            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                        }`}
+                      >
+                        📝 Edit HTML
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setContentViewMode('preview')}
+                        className={`px-4 py-2 font-semibold text-sm transition-all ${
+                          contentViewMode === 'preview'
+                            ? 'border-b-2 border-footy-orange text-footy-orange'
+                            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                        }`}
+                      >
+                        👁️ Preview
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="p-6">
+                    {contentViewMode === 'edit' ? (
+                      <textarea
+                        value={editedContent}
+                        onChange={(e) => setEditedContent(e.target.value)}
+                        rows={20}
+                        className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-footy-orange focus:border-transparent bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white font-mono text-sm leading-relaxed transition-all"
+                        placeholder="<p>Your HTML content here...</p>"
+                      />
+                    ) : (
+                      <div
+                        className="prose prose-lg max-w-none prose-headings:text-footy-green dark:prose-headings:text-footy-orange prose-a:text-footy-orange prose-strong:text-footy-green dark:prose-strong:text-footy-orange dark:prose-invert min-h-[400px] p-6 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700"
+                        dangerouslySetInnerHTML={{ __html: editedContent }}
+                      />
+                    )}
+                  </div>
+
+                  <div className="px-6 pb-4 flex justify-end">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {editedContent.length} characters
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
 
