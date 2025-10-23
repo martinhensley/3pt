@@ -388,7 +388,7 @@ export default function ReleasePage() {
             </div>
 
             <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
-              {release.manufacturer.name} {release.name}
+              {release.manufacturer?.name} {release.name}
               {release.year && <span className="block text-3xl md:text-4xl mt-2 text-white/90">{release.year}</span>}
             </h1>
 
