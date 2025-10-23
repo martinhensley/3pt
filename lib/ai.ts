@@ -1,4 +1,4 @@
-import { generateObject } from "ai";
+import { generateObject, generateText } from "ai";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { z } from "zod";
 import type { ParsedDocument } from "./documentParser";
@@ -50,6 +50,7 @@ export interface SetInfo {
   description?: string;
   totalCards?: string;
   features?: string[];
+  cards?: CardInfo[]; // Optional: extracted card checklist
 }
 
 export interface ReleaseAnalysis {
@@ -58,10 +59,10 @@ export interface ReleaseAnalysis {
   year: string;
   sets: SetInfo[];
   features: string[];
-  // Optional blog post fields
-  title?: string;
-  content?: string;
-  excerpt?: string;
+  // Required blog post fields
+  title: string;
+  content: string;
+  excerpt: string;
 }
 
 export interface SetAnalysisWithCards extends SetAnalysis {
@@ -181,14 +182,26 @@ const releaseAnalysisSchema = z.object({
     z.object({
       name: z.string().describe("Name of the set within this release"),
       description: z.string().optional().describe("Brief description of this set"),
-      totalCards: z.string().optional().describe("Total number of cards in this set"),
+      totalCards: z.preprocess(
+        (val) => (val === null || val === undefined ? undefined : String(val)),
+        z.string().optional()
+      ).describe("Total number of cards in this set"),
       features: z.array(z.string()).optional().describe("Notable features like parallels, autographs, etc."),
+      cards: z.array(
+        z.object({
+          playerName: z.string().describe("Player name on the card"),
+          team: z.string().optional().describe("Team name"),
+          cardNumber: z.string().describe("Card number or identifier"),
+          variant: z.string().optional().describe("Variant info (parallel, refractor, serial #, etc.)"),
+          setName: z.string().optional().describe("Which set this card belongs to (usually same as parent set)"),
+        })
+      ).optional().describe("Optional: Individual cards in this set if checklist is provided"),
     })
   ).describe("Array of sets included in this release"),
   features: z.array(z.string()).describe("Notable features of the overall release"),
-  title: z.string().optional().describe("Engaging blog post title"),
-  content: z.string().optional().describe("Blog post content with HTML formatting"),
-  excerpt: z.string().optional().describe("Brief summary for preview"),
+  title: z.string().describe("Blog post title in format: {Manufacturer} {ReleaseName} {Year}"),
+  content: z.string().describe("Quality HTML blog post (400-600 words) written as soccer fan and card expert"),
+  excerpt: z.string().describe("Concise 1-2 sentence summary for preview"),
 });
 
 // Card checklist schema for extracting lists of cards
@@ -275,7 +288,64 @@ export async function analyzeReleaseDocuments(
   // Add instruction text
   contentParts.push({
     type: "text",
-    text: `Analyze these documents about a soccer/football card release. Extract structured information about the manufacturer, release name, year, sets included, and features. If checklists or card lists are provided, extract the sets they belong to. Generate an optional blog post if sufficient information is available.`,
+    text: `Analyze these documents about a soccer/football card release. Extract structured information about the manufacturer, release name, year, sets included, and features.
+
+CRITICAL - MANUFACTURER IDENTIFICATION:
+- The MANUFACTURER is the parent company that produces the cards (e.g., Panini, Topps, Upper Deck, Leaf)
+- Product lines like "Donruss", "Select", "Prizm", "Chrome" are NOT manufacturers - they are PRODUCT LINES
+- Examples:
+  * "Donruss Soccer" → Manufacturer: "Panini", Release: "Donruss Soccer"
+  * "Topps Chrome" → Manufacturer: "Topps", Release: "Chrome"
+  * "Upper Deck SP Authentic" → Manufacturer: "Upper Deck", Release: "SP Authentic"
+  * "Leaf Metal" → Manufacturer: "Leaf", Release: "Metal"
+- If uncertain, common soccer card manufacturers are: Panini, Topps, Upper Deck, Leaf, Futera
+
+IMPORTANT - YEAR FORMAT:
+- Use YYYY-YY format (e.g., "2024-25") for seasons spanning two calendar years
+- Use YYYY format (e.g., "2024") for single calendar year releases
+- The year represents the SEASON, not necessarily when the product was released
+- Examples: "2024-25" for the 2024-2025 season, "2024" for releases covering only 2024
+
+IMPORTANT - CARD EXTRACTION:
+- For EACH set where a checklist or card list is provided in the documents, extract the individual cards
+- Include player names, card numbers, teams, and variant information
+- If a set has no checklist in the documents, just provide the set info (name, totalCards if known)
+- This works for both vintage releases (1 base set with checklist) and modern releases (multiple sets, some with checklists)
+
+You MUST also generate blog post content with the following requirements:
+- **Title**: Use the exact format "{Manufacturer} {ReleaseName} {Year}" (e.g., "Panini Select Premier League 2023-24")
+- **Excerpt**: Write a concise 1-2 sentence summary that captures the essence of this release for collectors
+- **Content**: Write as a passionate soccer fan and experienced sports card expert. Your content should:
+  * Be 400-600 words
+  * Use proper HTML formatting with <p> tags for paragraphs
+  * Use <strong> or <em> for emphasis on key features
+  * Use <h3> for section headings if discussing multiple sets
+  * Use <ul> and <li> for listing features, parallels, or notable cards
+  * Include enthusiasm and knowledge about the sport and the hobby
+  * Explain WHY this release matters to collectors
+  * Discuss notable sets, parallels, autographs, memorabilia cards, or chase cards
+  * Reference player significance or historical context when relevant
+  * Sound authentic - like you're talking to fellow collectors
+
+Extract the data in this structure:
+- manufacturer: The parent company (e.g., Panini, Topps, Upper Deck, Leaf) - NOT the product line
+- releaseName: Name of the release/product line (e.g., "Donruss Soccer", "Select", "Prizm")
+- year: Year or season in YYYY or YYYY-YY format (e.g., "2024" or "2024-25")
+- sets: Array of sets, each with:
+  - name: Set name
+  - description: Optional description
+  - totalCards: Optional total (as string)
+  - features: Optional array of features
+  - cards: Optional array of cards (ONLY if checklist provided), each with:
+    - playerName: Player name
+    - team: Optional team
+    - cardNumber: Card number
+    - variant: Optional variant (parallel, etc.)
+    - setName: Optional - which set this belongs to
+- features: Array of notable features for the overall release
+- title: REQUIRED - Use exact format: {Manufacturer} {ReleaseName} {Year}
+- content: REQUIRED - Quality HTML blog post (400-600 words) in soccer fan + card expert persona
+- excerpt: REQUIRED - Concise 1-2 sentence summary`,
   });
 
   const result = await generateObject({
