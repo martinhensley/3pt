@@ -226,19 +226,19 @@ export default function ReleasePage() {
     notFound();
   }
 
-  const activeSet = release.sets.find(s => s.id === activeSetId);
+  const activeSet = release.sets?.find(s => s.id === activeSetId);
 
   // Calculate statistics
-  const totalCards = release.sets.reduce((sum, set) => {
-    if (set.cards.length > 0) return sum + set.cards.length;
+  const totalCards = release.sets?.reduce((sum, set) => {
+    if (set.cards?.length > 0) return sum + set.cards.length;
     if (set.totalCards) return sum + parseInt(set.totalCards);
     return sum;
-  }, 0);
+  }, 0) || 0;
 
-  const totalParallels = release.sets.reduce((sum, set) => {
+  const totalParallels = release.sets?.reduce((sum, set) => {
     if (Array.isArray(set.parallels)) return sum + set.parallels.length;
     return sum;
-  }, 0);
+  }, 0) || 0;
 
   // Structured data for SEO
   const structuredData = {
@@ -399,7 +399,7 @@ export default function ReleasePage() {
             {/* Quick Stats */}
             <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-white/20">
               <div className="text-center">
-                <div className="text-3xl font-black">{release.sets.length}</div>
+                <div className="text-3xl font-black">{release.sets?.length || 0}</div>
                 <div className="text-sm text-white/80 uppercase tracking-wide">Sets</div>
               </div>
               <div className="text-center">
@@ -432,7 +432,7 @@ export default function ReleasePage() {
 
             {/* Set Navigation */}
             <div className="flex flex-wrap gap-2 mb-6">
-              {release.sets.map((set) => (
+              {release.sets?.map((set) => (
                 <button
                   key={set.id}
                   onClick={() => setActiveSetId(set.id)}
@@ -488,17 +488,17 @@ export default function ReleasePage() {
                 )}
 
                 {/* Card Checklist */}
-                {activeSet.cards.length > 0 && (
+                {activeSet.cards && activeSet.cards.length > 0 && (
                   <div>
                     <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                       <svg className="w-6 h-6 text-footy-green dark:text-footy-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                       </svg>
-                      Complete Checklist ({activeSet.cards.length} cards)
+                      Complete Checklist ({activeSet.cards?.length || 0} cards)
                     </h4>
                     <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 max-h-96 overflow-y-auto">
                       <div className="grid gap-2">
-                        {activeSet.cards.map((card) => (
+                        {activeSet.cards?.map((card) => (
                           <div
                             key={card.id}
                             className="flex items-center gap-4 p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-footy-green dark:hover:border-footy-orange transition-colors"
@@ -543,7 +543,7 @@ export default function ReleasePage() {
                   </div>
                 )}
 
-                {activeSet.cards.length === 0 && !activeSet.totalCards && (
+                {(!activeSet.cards || activeSet.cards.length === 0) && !activeSet.totalCards && (
                   <div className="text-center py-8 text-gray-500 dark:text-gray-400 italic">
                     Checklist information not yet available for this set
                   </div>
