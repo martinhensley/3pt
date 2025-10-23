@@ -198,15 +198,51 @@ export default function EditReleasePage() {
     const cards: CardInfo[] = [];
     const lines = text.split('\n').filter(line => line.trim());
 
-    for (const line of lines) {
-      // Match pattern: "1 Kylian Mbappe, France" or "1. Kylian Mbappe, France"
+    // Check if first line is a header (contains common header keywords)
+    let startIndex = 0;
+    if (lines.length > 0) {
+      const firstLine = lines[0].toLowerCase();
+      if (firstLine.includes('card_number') || firstLine.includes('player') ||
+          firstLine.includes('subject') || firstLine.includes('number') ||
+          firstLine.includes('name')) {
+        startIndex = 1; // Skip header row
+      }
+    }
+
+    for (let i = startIndex; i < lines.length; i++) {
+      const line = lines[i];
+      let cardNumber = '';
+      let playerName = '';
+      let team = '';
+
+      // Try CSV format first: "1,Player Name,Team"
+      if (line.includes(',')) {
+        const parts = line.split(',').map(p => p.trim());
+        if (parts.length >= 2 && /^\d+$/.test(parts[0])) {
+          cardNumber = parts[0];
+          playerName = parts[1];
+          team = parts[2] || '';
+
+          if (cardNumber && playerName) {
+            cards.push({
+              cardNumber,
+              playerName,
+              team: team || undefined,
+              setName: setName,
+            });
+            continue;
+          }
+        }
+      }
+
+      // Try space-separated format: "1 Player Name, Team" or "1. Player Name, Team"
       const match = line.match(/^(\d+)\.?\s+([^,]+)(?:,\s*(.+))?/);
       if (match) {
-        const [, cardNumber, playerName, team] = match;
+        const [, num, name, tm] = match;
         cards.push({
-          cardNumber: cardNumber.trim(),
-          playerName: playerName.trim(),
-          team: team?.trim(),
+          cardNumber: num.trim(),
+          playerName: name.trim(),
+          team: tm?.trim(),
           setName: setName,
         });
       }
@@ -734,7 +770,7 @@ export default function EditReleasePage() {
                             Or paste checklist text
                           </summary>
                           <textarea
-                            placeholder="Paste checklist here (e.g., '1 Player Name, Team')"
+                            placeholder="Paste checklist here (supports both formats)"
                             rows={4}
                             onChange={(e) => {
                               if (e.target.value.trim()) {
@@ -745,7 +781,7 @@ export default function EditReleasePage() {
                             className="w-full px-3 py-2 mt-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
                           />
                           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            Format: &quot;1 Kylian Mbappe, France&quot; (one per line)
+                            Supports: &quot;1,Player Name,Team&quot; or &quot;1 Player Name, Team&quot; (one per line, optional header row)
                           </p>
                         </details>
                       </div>
