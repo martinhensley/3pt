@@ -33,6 +33,8 @@ interface Card {
   printRun: number | null;
   hasAutograph: boolean;
   hasMemorabilia: boolean;
+  imageFront: string | null;
+  imageBack: string | null;
 }
 
 interface Set {
@@ -53,6 +55,12 @@ interface Release {
   sets: Set[];
 }
 
+interface CarouselImage {
+  url: string;
+  caption: string;
+  type: 'release' | 'card';
+}
+
 export default function ReleasePage() {
   const params = useParams();
   const slug = params.slug as string;
@@ -60,6 +68,7 @@ export default function ReleasePage() {
   const [release, setRelease] = useState<Release | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeSetId, setActiveSetId] = useState<string | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     // Fetch post
@@ -103,6 +112,100 @@ export default function ReleasePage() {
     }
     return extractKeywordsFromPost(post);
   }, [post]);
+
+  // Generate carousel images with AI-style captions
+  const carouselImages = useMemo<CarouselImage[]>(() => {
+    if (!post || !release) return [];
+
+    const images: CarouselImage[] = [];
+
+    // Add release images first
+    post.images.forEach(img => {
+      images.push({
+        url: img.url,
+        caption: img.caption || `${release.manufacturer.name} ${release.name} ${release.year || ''} - Official release image showcasing the product design and packaging.`,
+        type: 'release'
+      });
+    });
+
+    // Add card images from all sets
+    release.sets.forEach(set => {
+      set.cards.forEach(card => {
+        if (card.imageFront) {
+          // Generate detailed caption for the card
+          let caption = '';
+
+          if (card.playerName) {
+            caption += card.playerName;
+            if (card.team) caption += ` (${card.team})`;
+          } else {
+            caption += 'Card';
+          }
+
+          caption += ` from the ${set.name} set`;
+
+          if (card.cardNumber) {
+            caption += ` #${card.cardNumber}`;
+          }
+
+          const details: string[] = [];
+
+          if (card.variant) {
+            details.push(card.variant);
+          }
+
+          if (card.parallelType) {
+            details.push(card.parallelType);
+          }
+
+          if (card.isNumbered && card.serialNumber) {
+            details.push(`Serial: ${card.serialNumber}`);
+          } else if (card.isNumbered && card.printRun) {
+            details.push(`Limited to ${card.printRun} copies`);
+          }
+
+          if (card.hasAutograph) {
+            details.push('Autographed');
+          }
+
+          if (card.hasMemorabilia) {
+            details.push('Game-Used Memorabilia');
+          }
+
+          if (details.length > 0) {
+            caption += `. Features: ${details.join(', ')}.`;
+          }
+
+          images.push({
+            url: card.imageFront,
+            caption: caption,
+            type: 'card'
+          });
+        }
+      });
+    });
+
+    return images;
+  }, [post, release]);
+
+  // Auto-rotate carousel
+  useEffect(() => {
+    if (carouselImages.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % carouselImages.length);
+    }, 5000); // Change image every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [carouselImages.length]);
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % carouselImages.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + carouselImages.length) % carouselImages.length);
+  };
 
   if (loading) {
     return (
@@ -181,6 +284,89 @@ export default function ReleasePage() {
         </aside>
 
         <main className="flex-grow max-w-5xl">
+          {/* Image Carousel */}
+          {carouselImages.length > 0 && (
+            <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden mb-8 border border-gray-200 dark:border-gray-700">
+              <div className="relative aspect-[16/9] bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800">
+                <Image
+                  src={carouselImages[currentImageIndex].url}
+                  alt={carouselImages[currentImageIndex].caption}
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 768px) 100vw, 80vw"
+                  priority
+                />
+
+                {/* Navigation Arrows */}
+                {carouselImages.length > 1 && (
+                  <>
+                    <button
+                      onClick={prevImage}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 backdrop-blur-sm"
+                      aria-label="Previous image"
+                    >
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={nextImage}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 backdrop-blur-sm"
+                      aria-label="Next image"
+                    >
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </>
+                )}
+
+                {/* Image Type Badge */}
+                <div className="absolute top-4 left-4">
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
+                    carouselImages[currentImageIndex].type === 'release'
+                      ? 'bg-footy-green text-white'
+                      : 'bg-footy-orange text-white'
+                  }`}>
+                    {carouselImages[currentImageIndex].type === 'release' ? 'Release' : 'Card'}
+                  </span>
+                </div>
+
+                {/* Image Counter */}
+                {carouselImages.length > 1 && (
+                  <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-semibold">
+                    {currentImageIndex + 1} / {carouselImages.length}
+                  </div>
+                )}
+              </div>
+
+              {/* Caption */}
+              <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 p-6">
+                <p className="text-sm md:text-base text-gray-800 dark:text-gray-200 leading-relaxed">
+                  {carouselImages[currentImageIndex].caption}
+                </p>
+              </div>
+
+              {/* Dot Indicators */}
+              {carouselImages.length > 1 && (
+                <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex gap-2">
+                  {carouselImages.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentImageIndex(idx)}
+                      className={`transition-all duration-200 ${
+                        idx === currentImageIndex
+                          ? 'w-8 h-2 bg-footy-orange'
+                          : 'w-2 h-2 bg-white/50 hover:bg-white/80'
+                      } rounded-full`}
+                      aria-label={`Go to image ${idx + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Hero Header */}
           <div className="bg-gradient-to-r from-footy-green to-green-700 dark:from-footy-orange dark:to-orange-700 rounded-2xl shadow-2xl p-8 mb-8 text-white">
             <div className="flex items-center gap-3 mb-4">
@@ -222,32 +408,6 @@ export default function ReleasePage() {
               </div>
             </div>
           </div>
-
-          {/* Release Images */}
-          {post.images.length > 0 && (
-            <div className="mb-8 grid gap-4 md:grid-cols-2">
-              {post.images.map((image) => (
-                <div
-                  key={image.id}
-                  className="relative bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 border border-gray-200 dark:border-gray-700"
-                >
-                  <Image
-                    src={image.url}
-                    alt={image.caption || post.title}
-                    width={800}
-                    height={600}
-                    className="w-full h-auto object-contain"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
-                  {image.caption && (
-                    <p className="p-3 text-sm text-gray-700 dark:text-gray-300 text-center bg-gray-50 dark:bg-gray-900/50">
-                      {image.caption}
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
 
           {/* Release Content */}
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8 border border-gray-200 dark:border-gray-700">
