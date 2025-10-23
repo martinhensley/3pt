@@ -397,32 +397,54 @@ export default function ReleasePage() {
             )}
 
             {/* Set Breakdown Summary */}
-            <div className="mt-6 pt-6 border-t border-white/20 space-y-2">
-              {release.sets?.map((set, idx) => {
-                const setCardCount = set.cards?.length || (set.totalCards ? parseInt(set.totalCards) : 0);
-                const setParallelCount = Array.isArray(set.parallels) ? set.parallels.length : 0;
+            <div className="mt-6 pt-6 border-t border-white/20">
+              <div className="bg-white/5 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10">
+                {/* Table Header */}
+                <div className="grid grid-cols-3 gap-4 px-4 py-3 bg-white/10 border-b border-white/20">
+                  <div className="font-bold text-sm uppercase tracking-wide text-white/90">Set Name</div>
+                  <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Parallels</div>
+                  <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Cards</div>
+                </div>
 
-                return (
-                  <div
-                    key={set.id}
-                    className="flex items-center justify-between bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 hover:bg-white/20 transition-colors"
-                  >
-                    <span className="font-bold text-lg">{set.name}</span>
-                    <div className="flex gap-4 text-sm">
-                      {setParallelCount > 0 && (
-                        <span className="text-white/90">
-                          <span className="font-semibold">{setParallelCount}</span> parallels
-                        </span>
-                      )}
-                      {setCardCount > 0 && (
-                        <span className="text-white/90">
-                          <span className="font-semibold">{setCardCount}</span> cards
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+                {/* Table Rows - Alphabetically Sorted */}
+                {release.sets
+                  ?.slice()
+                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .map((set, idx) => {
+                    const setCardCount = set.cards?.length || (set.totalCards ? parseInt(set.totalCards) : 0);
+                    const setParallelCount = Array.isArray(set.parallels) ? set.parallels.length : 0;
+
+                    // Gradient colors - cycle through different gradients
+                    const gradients = [
+                      'from-purple-500/20 to-pink-500/20',
+                      'from-blue-500/20 to-cyan-500/20',
+                      'from-green-500/20 to-emerald-500/20',
+                      'from-orange-500/20 to-red-500/20',
+                      'from-indigo-500/20 to-purple-500/20',
+                      'from-teal-500/20 to-green-500/20',
+                    ];
+                    const gradient = gradients[idx % gradients.length];
+
+                    return (
+                      <div
+                        key={set.id}
+                        className={`grid grid-cols-3 gap-4 px-4 py-3 bg-gradient-to-r ${gradient} hover:from-white/20 hover:to-white/10 transition-all duration-200 border-b border-white/10 last:border-b-0`}
+                      >
+                        <div className="font-semibold text-white">{set.name}</div>
+                        <div className="text-center">
+                          <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-white font-bold text-sm">
+                            {setParallelCount > 0 ? setParallelCount : '—'}
+                          </span>
+                        </div>
+                        <div className="text-center">
+                          <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-white font-bold text-sm">
+                            {setCardCount > 0 ? setCardCount.toLocaleString() : '—'}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
             </div>
           </div>
 
