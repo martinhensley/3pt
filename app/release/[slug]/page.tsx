@@ -425,6 +425,11 @@ export default function ReleasePage() {
                     const setCardCount = set.cards?.length || (set.totalCards ? parseInt(set.totalCards) : 0);
                     const setParallelCount = Array.isArray(set.parallels) ? set.parallels.length : 0;
 
+                    // Rename "Base Optic" to "Optic Base" for clarity
+                    const displayName = set.name.toLowerCase() === 'base optic'
+                      ? 'Optic Base'
+                      : set.name;
+
                     // Gradient colors - cycle through different gradients
                     const gradients = [
                       'from-purple-500/20 to-pink-500/20',
@@ -441,7 +446,7 @@ export default function ReleasePage() {
                         key={set.id}
                         className={`grid grid-cols-3 gap-4 px-4 py-3 bg-gradient-to-r ${gradient} hover:from-white/20 hover:to-white/10 transition-all duration-200 border-b border-white/10 last:border-b-0`}
                       >
-                        <div className="font-semibold text-white">{set.name}</div>
+                        <div className="font-semibold text-white">{displayName}</div>
                         <div className="text-center">
                           <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-white font-bold text-sm">
                             {setParallelCount > 0 ? setParallelCount : '—'}
