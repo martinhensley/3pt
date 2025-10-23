@@ -406,10 +406,21 @@ export default function ReleasePage() {
                   <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Cards</div>
                 </div>
 
-                {/* Table Rows - Alphabetically Sorted */}
+                {/* Table Rows - Base sets first, then alphabetically sorted */}
                 {release.sets
                   ?.slice()
-                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .sort((a, b) => {
+                    // Check if either name starts with "Base"
+                    const aIsBase = a.name.toLowerCase().startsWith('base');
+                    const bIsBase = b.name.toLowerCase().startsWith('base');
+
+                    // If one is Base and the other isn't, Base comes first
+                    if (aIsBase && !bIsBase) return -1;
+                    if (!aIsBase && bIsBase) return 1;
+
+                    // Both are Base or both are not Base, sort alphabetically
+                    return a.name.localeCompare(b.name);
+                  })
                   .map((set, idx) => {
                     const setCardCount = set.cards?.length || (set.totalCards ? parseInt(set.totalCards) : 0);
                     const setParallelCount = Array.isArray(set.parallels) ? set.parallels.length : 0;
