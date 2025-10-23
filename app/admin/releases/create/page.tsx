@@ -755,7 +755,7 @@ export default function CreateReleasePage() {
                                   className="w-full px-2 py-1 mt-2 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-1 focus:ring-blue-500"
                                 />
                                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                  Format: "1 Kylian Mbappe, France" (one per line)
+                                  Format: &quot;1 Kylian Mbappe, France&quot; (one per line)
                                 </p>
                               </details>
                             </div>
@@ -835,7 +835,7 @@ export default function CreateReleasePage() {
                                   className="w-full px-2 py-1 mt-2 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-1 focus:ring-blue-500"
                                 />
                                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                  Format: "Gold – /10" or "Black – 1/1" (one per line)
+                                  Format: &quot;Gold – /10&quot; or &quot;Black – 1/1&quot; (one per line)
                                 </p>
                               </details>
                             </div>
@@ -882,7 +882,7 @@ export default function CreateReleasePage() {
                     </ul>
                   ) : (
                     <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-                      No sets detected. Click "Add Set" to manually add sets.
+                      No sets detected. Click &quot;Add Set&quot; to manually add sets.
                     </p>
                   )}
                 </div>
