@@ -316,16 +316,41 @@ You MUST also generate blog post content with the following requirements:
 - **Title**: Use the exact format "{Manufacturer} {ReleaseName} {Year}" (e.g., "Panini Select Premier League 2023-24")
 - **Excerpt**: Write a concise 1-2 sentence summary that captures the essence of this release for collectors
 - **Content**: Write as a passionate soccer fan and experienced sports card expert. Your content should:
-  * Be 400-600 words
+  * Be 600-1000 words (comprehensive and detailed)
   * Use proper HTML formatting with <p> tags for paragraphs
   * Use <strong> or <em> for emphasis on key features
-  * Use <h3> for section headings if discussing multiple sets
+  * Use <h3> for section headings for EACH set included in the release
   * Use <ul> and <li> for listing features, parallels, or notable cards
   * Include enthusiasm and knowledge about the sport and the hobby
+
+  **CRITICAL - SET INFORMATION REQUIREMENTS**:
+  * You MUST include a dedicated section for EVERY set in the release
+  * For each set, include:
+    - Set name as an <h3> heading
+    - Description of the set's theme, design, or focus
+    - Total cards in the set (if known)
+    - List of parallels/variations using <ul> and <li> tags
+    - Notable features or chase cards
+    - Rarity information (print runs, numbered cards, etc.)
+  * Present set data in creative, engaging ways:
+    - Use comparisons ("twice as rare as last year's Gold parallel")
+    - Add context ("only 99 copies exist worldwide")
+    - Highlight scarcity ("limited to just 10 copies")
+    - Compare across sets ("the Base set anchors the release with 200 cards, while the Kaboom! insert offers just 20")
+  * Include statistics and numbers that collectors care about:
+    - Card counts per set
+    - Parallel print runs
+    - Number of autograph variations
+    - Insert odds or rarity levels
+
+  **STRUCTURE YOUR CONTENT**:
+  * Opening paragraph: Overview of the release and why it matters
+  * Set-by-set breakdown: Dedicated section for each set with full details
+  * Closing paragraph: Overall significance and collectability
+
   * Explain WHY this release matters to collectors
-  * Discuss notable sets, parallels, autographs, memorabilia cards, or chase cards
   * Reference player significance or historical context when relevant
-  * Sound authentic - like you're talking to fellow collectors
+  * Sound authentic - like you're talking to fellow collectors who want ALL the details
 
 Extract the data in this structure:
 - manufacturer: The parent company (e.g., Panini, Topps, Upper Deck, Leaf) - NOT the product line
