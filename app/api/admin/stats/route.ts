@@ -106,11 +106,22 @@ export async function GET() {
         },
       }),
 
-      // Recent cards
+      // Recent cards with images only
       prisma.card.findMany({
         take: 10,
+        where: {
+          OR: [
+            { imageFront: { not: null } },
+            { imageBack: { not: null } },
+            {
+              images: {
+                some: {},
+              },
+            },
+          ],
+        },
         orderBy: {
-          createdAt: "desc",
+          updatedAt: "desc",
         },
         select: {
           id: true,
