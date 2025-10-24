@@ -10,6 +10,7 @@ export const maxDuration = 300; // Allow up to 5 minutes for bulk operations
 
 interface CardData {
   setId: string;
+  cardId?: string; // Optional: ID of existing card to update
   parallelType?: string; // Parallel type name (e.g., "Gold", "Diamond")
   playerName: string;
   cardNumber: string;
@@ -44,8 +45,12 @@ interface SaveResult {
  * This endpoint:
  * 1. Compresses images for storage
  * 2. Uploads images to Vercel Blob
- * 3. Saves cards to database
+ * 3. Updates existing cards with images OR creates new cards if they don't exist
  * 4. Returns success/failure for each card
+ *
+ * Mode:
+ * - If cardId is provided: UPDATE existing card with images
+ * - If cardId is not provided: CREATE new card (legacy behavior)
  */
 export async function POST(request: NextRequest) {
   try {
@@ -88,23 +93,43 @@ export async function POST(request: NextRequest) {
           continue;
         }
 
-        // Check if card already exists
-        const existingCard = await prisma.card.findFirst({
-          where: {
-            setId: cardData.setId,
-            cardNumber: cardData.cardNumber,
-            parallelType: cardData.parallelType || null,
-          },
-        });
+        // Determine if this is an UPDATE or CREATE operation
+        let existingCard = null;
 
-        if (existingCard) {
-          results.push({
-            success: false,
-            cardNumber: cardData.cardNumber,
-            playerName: cardData.playerName,
-            error: 'Card already exists in database',
+        if (cardData.cardId) {
+          // UPDATE mode: Find card by ID
+          existingCard = await prisma.card.findUnique({
+            where: { id: cardData.cardId },
           });
-          continue;
+
+          if (!existingCard) {
+            results.push({
+              success: false,
+              cardNumber: cardData.cardNumber,
+              playerName: cardData.playerName,
+              error: `Card with ID ${cardData.cardId} not found`,
+            });
+            continue;
+          }
+        } else {
+          // CREATE mode: Check if card already exists to prevent duplicates
+          existingCard = await prisma.card.findFirst({
+            where: {
+              setId: cardData.setId,
+              cardNumber: cardData.cardNumber,
+              parallelType: cardData.parallelType || null,
+            },
+          });
+
+          if (existingCard) {
+            results.push({
+              success: false,
+              cardNumber: cardData.cardNumber,
+              playerName: cardData.playerName,
+              error: 'Card already exists in database (use cardId to update existing card)',
+            });
+            continue;
+          }
         }
 
         // Compress images
@@ -124,24 +149,46 @@ export async function POST(request: NextRequest) {
           compressed.back
         );
 
-        // Save card to database
-        console.log(`Saving card ${cardData.cardNumber} to database...`);
-        const savedCard = await prisma.card.create({
-          data: {
-            setId: cardData.setId,
-            playerName: cardData.playerName,
-            cardNumber: cardData.cardNumber,
-            team: cardData.team || null,
-            hasAutograph: cardData.hasAutograph,
-            hasMemorabilia: cardData.hasMemorabilia,
-            isNumbered: cardData.isNumbered,
-            serialNumber: cardData.serialNumber || null,
-            printRun: cardData.printRun || null,
-            imageFront: imageUrls.front,
-            imageBack: imageUrls.back || null,
-            parallelType: cardData.parallelType || null,
-          },
-        });
+        // Save or update card in database
+        let savedCard;
+
+        if (cardData.cardId && existingCard) {
+          // UPDATE mode: Update existing card with images
+          console.log(`Updating existing card ${cardData.cardNumber} with images...`);
+          savedCard = await prisma.card.update({
+            where: { id: cardData.cardId },
+            data: {
+              imageFront: imageUrls.front,
+              imageBack: imageUrls.back || null,
+              // Optionally update other fields if they've changed
+              ...(cardData.team && { team: cardData.team }),
+              ...(cardData.hasAutograph && { hasAutograph: cardData.hasAutograph }),
+              ...(cardData.hasMemorabilia && { hasMemorabilia: cardData.hasMemorabilia }),
+              ...(cardData.isNumbered && { isNumbered: cardData.isNumbered }),
+              ...(cardData.serialNumber && { serialNumber: cardData.serialNumber }),
+              ...(cardData.printRun && { printRun: cardData.printRun }),
+            },
+          });
+        } else {
+          // CREATE mode: Create new card
+          console.log(`Creating new card ${cardData.cardNumber}...`);
+          savedCard = await prisma.card.create({
+            data: {
+              setId: cardData.setId,
+              playerName: cardData.playerName,
+              cardNumber: cardData.cardNumber,
+              team: cardData.team || null,
+              hasAutograph: cardData.hasAutograph,
+              hasMemorabilia: cardData.hasMemorabilia,
+              isNumbered: cardData.isNumbered,
+              serialNumber: cardData.serialNumber || null,
+              printRun: cardData.printRun || null,
+              imageFront: imageUrls.front,
+              imageBack: imageUrls.back || null,
+              parallelType: cardData.parallelType || null,
+            },
+          });
+        }
 
         results.push({
           success: true,

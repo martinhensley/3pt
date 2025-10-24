@@ -42,7 +42,12 @@ interface ScannedCard {
   parallelId?: string | null;
   parallelName?: string | null;
   identifyConfidence?: number;
-  status: 'pending' | 'identifying' | 'scanning' | 'scanned' | 'saved' | 'error';
+  // Smart matching results
+  matchedCardId?: string; // ID of existing card in checklist
+  matchScore?: number; // Match confidence score (0-175)
+  matchPercentage?: number; // Match percentage (0-100)
+  matchConfidence?: 'high' | 'medium' | 'low';
+  status: 'pending' | 'identifying' | 'scanning' | 'matching' | 'scanned' | 'saved' | 'error';
   error?: string;
 }
 
@@ -233,6 +238,42 @@ export default function CreateCardPage() {
         const scanResult = await scanResponse.json();
 
         if (scanResult.success) {
+          // Step 4: Smart match against existing cards in checklist
+          setProgress({ current: i * 2 + 2, total: frontImages.length * 2, step: `Matching card ${i + 1} to checklist...` });
+
+          let matchedCardId: string | undefined;
+          let matchScore: number | undefined;
+          let matchPercentage: number | undefined;
+          let matchConfidence: 'high' | 'medium' | 'low' | undefined;
+
+          try {
+            const matchResponse = await fetch('/api/admin/smart-match', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                setId: matchedSet.id,
+                scannedData: {
+                  playerName: scanResult.data.playerName,
+                  cardNumber: scanResult.data.cardNumber,
+                  team: scanResult.data.team,
+                  parallelType: scanResult.data.parallelType || matchedParallel?.name || identification.parallelName,
+                },
+              }),
+            });
+
+            const matchResult = await matchResponse.json();
+
+            if (matchResult.success && matchResult.bestMatch) {
+              matchedCardId = matchResult.bestMatch.cardId;
+              matchScore = matchResult.bestMatch.score;
+              matchPercentage = matchResult.bestMatch.percentage;
+              matchConfidence = matchResult.bestMatch.confidence;
+              console.log(`Matched to existing card: ${matchResult.bestMatch.card.playerName} (${matchPercentage}% confidence)`);
+            }
+          } catch (matchError) {
+            console.warn('Smart match failed, will create new card:', matchError);
+          }
+
           processed.push({
             frontImage,
             backImage,
@@ -242,6 +283,10 @@ export default function CreateCardPage() {
             parallelId: matchedParallel?.id || null,
             parallelName: matchedParallel?.name || identification.parallelName,
             identifyConfidence: identification.confidence,
+            matchedCardId,
+            matchScore,
+            matchPercentage,
+            matchConfidence,
             status: 'scanned',
           });
         } else {
@@ -313,8 +358,10 @@ export default function CreateCardPage() {
 
     try {
       const cardsToSave = scannedCards.map((card) => ({
+        cardId: card.matchedCardId, // If matched, this will update existing card
         setId: card.setId!,
         parallelId: card.parallelId || undefined,
+        parallelType: card.parallelName || undefined,
         playerName: card.playerName,
         cardNumber: card.cardNumber,
         team: card.team,
@@ -534,6 +581,7 @@ export default function CreateCardPage() {
                     <th className="text-center p-2 text-gray-900 dark:text-white">Auto</th>
                     <th className="text-center p-2 text-gray-900 dark:text-white">Mem</th>
                     <th className="text-left p-2 text-gray-900 dark:text-white">Serial</th>
+                    <th className="text-center p-2 text-gray-900 dark:text-white">Match</th>
                     <th className="text-center p-2 text-gray-900 dark:text-white">Conf</th>
                   </tr>
                 </thead>
@@ -605,6 +653,26 @@ export default function CreateCardPage() {
                           placeholder="e.g., 15/99"
                           className="w-20 p-1 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm"
                         />
+                      </td>
+                      <td className="p-2 text-center">
+                        {card.matchedCardId ? (
+                          <span
+                            className={`text-xs font-bold px-2 py-1 rounded ${
+                              card.matchConfidence === 'high'
+                                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                                : card.matchConfidence === 'medium'
+                                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                                : 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'
+                            }`}
+                            title={`Matched to existing card in checklist (${card.matchPercentage}%)`}
+                          >
+                            ✓ {card.matchPercentage}%
+                          </span>
+                        ) : (
+                          <span className="text-xs text-gray-500" title="Will create new card">
+                            NEW
+                          </span>
+                        )}
                       </td>
                       <td className="p-2 text-center">
                         <span
