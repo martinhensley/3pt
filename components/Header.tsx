@@ -22,7 +22,7 @@ export default function Header({ showBackButton = false }: HeaderProps) {
 
   return (
     <>
-      <header className="bg-footy-green dark:bg-gray-950 text-white shadow-lg relative transition-colors duration-300">
+      <header className="bg-gradient-to-r from-footy-green to-green-700 dark:from-footy-orange dark:to-orange-700 text-white shadow-lg relative transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 py-6 flex items-center justify-between">
           <div className="flex-1"></div>
 
@@ -103,7 +103,7 @@ export default function Header({ showBackButton = false }: HeaderProps) {
 
         {/* Search Dropdown */}
         {searchOpen && (
-          <div className="absolute top-full left-0 right-0 bg-footy-green dark:bg-gray-950 border-t-2 border-footy-orange shadow-xl z-50 transition-colors duration-300">
+          <div className="absolute top-full left-0 right-0 bg-gradient-to-r from-footy-green to-green-700 dark:from-footy-orange dark:to-orange-700 border-t-2 border-footy-orange shadow-xl z-50 transition-colors duration-300">
             <div className="max-w-7xl mx-auto px-4 py-6">
               <form onSubmit={handleSearch} className="flex gap-2">
                 <input

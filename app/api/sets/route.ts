@@ -6,16 +6,59 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-// GET - Fetch sets by releaseId
+// GET - Fetch sets by releaseId or slug
 export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const releaseId = searchParams.get("releaseId");
+    const slug = searchParams.get("slug");
+
+    // If slug is provided, this is a public request for a set page
+    if (slug) {
+      // Parse slug: year-manufacturer-release-setname
+      // Example: 2024-25-panini-donruss-soccer-base-optic
+      const parts = slug.split('-');
+
+      // Need at least 4 parts (year parts might be split like 2024-25)
+      if (parts.length < 4) {
+        return NextResponse.json({ error: "Invalid slug format" }, { status: 400 });
+      }
+
+      // Find all releases and sets to match against the slug
+      const sets = await prisma.set.findMany({
+        include: {
+          cards: {
+            orderBy: [{ cardNumber: 'asc' }],
+          },
+          release: {
+            include: {
+              manufacturer: true,
+            },
+          },
+        },
+      });
+
+      // Find the set that matches this slug
+      const matchedSet = sets.find(set => {
+        const setSlug = `${set.release.year || ''}-${set.release.name}-${set.name}`
+          .toLowerCase()
+          .replace(/\s+/g, '-')
+          .replace(/[^a-z0-9-]/g, '');
+        return setSlug === slug;
+      });
+
+      if (!matchedSet) {
+        return NextResponse.json({ error: "Set not found" }, { status: 404 });
+      }
+
+      return NextResponse.json(matchedSet);
+    }
+
+    // Otherwise, this is an authenticated request for sets by releaseId
     const session = await getServerSession(authOptions);
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const { searchParams } = new URL(request.url);
-    const releaseId = searchParams.get("releaseId");
 
     if (!releaseId) {
       return NextResponse.json(
@@ -27,6 +70,9 @@ export async function GET(request: NextRequest) {
     const sets = await prisma.set.findMany({
       where: { releaseId },
       orderBy: { createdAt: "desc" },
+      include: {
+        cards: true,
+      },
     });
 
     return NextResponse.json(sets);
@@ -94,13 +140,19 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    // Build update data object
+    const updateFields: Record<string, unknown> = {
+      totalCards: totalCards || null,
+      parallels: parallels && parallels.length > 0 ? parallels : null,
+    };
+
+    if (name) {
+      updateFields.name = name;
+    }
+
     const set = await prisma.set.update({
       where: { id },
-      data: {
-        name,
-        totalCards: totalCards || null,
-        parallels: parallels && parallels.length > 0 ? parallels : null,
-      },
+      data: updateFields,
     });
 
     return NextResponse.json(set);

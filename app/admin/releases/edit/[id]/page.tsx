@@ -29,6 +29,7 @@ interface Release {
   id: string;
   name: string;
   year: string;
+  excerpt: string | null;
   manufacturerId: string;
   manufacturer: {
     id: string;
@@ -58,6 +59,9 @@ export default function EditReleasePage() {
   const [loading, setLoading] = useState(false);
   const [fetchingRelease, setFetchingRelease] = useState(true);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [generatingExcerpt, setGeneratingExcerpt] = useState(false);
+  const [excerptFile, setExcerptFile] = useState<File | null>(null);
+  const [generatingSetDescription, setGeneratingSetDescription] = useState<number | null>(null);
 
   // Release data
   const [release, setRelease] = useState<Release | null>(null);
@@ -66,6 +70,7 @@ export default function EditReleasePage() {
   const [editedManufacturer, setEditedManufacturer] = useState("");
   const [editedReleaseName, setEditedReleaseName] = useState("");
   const [editedYear, setEditedYear] = useState("");
+  const [editedExcerpt, setEditedExcerpt] = useState("");
   const [editedSets, setEditedSets] = useState<SetInfo[]>([]);
 
   useEffect(() => {
@@ -94,14 +99,15 @@ export default function EditReleasePage() {
         setEditedManufacturer(data.manufacturer.name);
         setEditedReleaseName(data.name);
         setEditedYear(data.year);
+        setEditedExcerpt(data.excerpt || "");
 
         // Transform sets data
-        const transformedSets: SetInfo[] = data.sets.map(set => ({
+        const transformedSets: SetInfo[] = data.sets.map((set: { id: string; name: string; totalCards: string | null; parallels: string[] | null; cards: { id: string; playerName: string | null; team: string | null; cardNumber: string | null; variant: string | null }[] }) => ({
           id: set.id,
           name: set.name,
           totalCards: set.totalCards || "",
           parallels: set.parallels || [],
-          cards: set.cards.map(card => ({
+          cards: set.cards.map((card: { id: string; playerName: string | null; team: string | null; cardNumber: string | null; variant: string | null }) => ({
             id: card.id,
             playerName: card.playerName || "",
             team: card.team || "",
@@ -148,6 +154,60 @@ export default function EditReleasePage() {
     if (field === "name" || field === "description" || field === "totalCards") {
       updatedSets[index] = { ...updatedSets[index], [field]: value };
       setEditedSets(updatedSets);
+    }
+  };
+
+  const handleGenerateSetDescription = async (index: number) => {
+    const set = editedSets[index];
+
+    // Can only generate for saved sets (not new ones)
+    if (!set.id || set.isNew) {
+      setMessage({
+        type: "error",
+        text: "Please save the set first before generating a description"
+      });
+      return;
+    }
+
+    try {
+      setGeneratingSetDescription(index);
+      setMessage(null);
+
+      const response = await fetch("/api/sets/generate-description", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          setId: set.id,
+          sellSheetText: "", // Could be populated from a form field if needed
+          additionalContext: "",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Update the local state with the generated description
+        const updatedSets = [...editedSets];
+        updatedSets[index] = { ...updatedSets[index], description: data.description };
+        setEditedSets(updatedSets);
+
+        setMessage({
+          type: "success",
+          text: `Generated description for ${set.name}`,
+        });
+      } else {
+        setMessage({
+          type: "error",
+          text: data.error || "Failed to generate description",
+        });
+      }
+    } catch (error) {
+      setMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Failed to generate description",
+      });
+    } finally {
+      setGeneratingSetDescription(null);
     }
   };
 
@@ -381,6 +441,58 @@ export default function EditReleasePage() {
     setEditedSets(updatedSets);
   };
 
+  const handleGenerateExcerpt = async () => {
+    if (!excerptFile) {
+      setMessage({ type: "error", text: "Please upload a sell sheet or info document first" });
+      setTimeout(() => setMessage(null), 3000);
+      return;
+    }
+
+    try {
+      setGeneratingExcerpt(true);
+      setMessage({ type: "success", text: "Generating excerpt from document..." });
+
+      // Upload file to blob storage first
+      const formData = new FormData();
+      formData.append('file', excerptFile);
+
+      const uploadResponse = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error('Failed to upload file');
+      }
+
+      const { url: fileUrl } = await uploadResponse.json();
+
+      // Generate excerpt using AI
+      const prompt = `Based on this ${editedYear} ${editedManufacturer} ${editedReleaseName} sell sheet, write a compelling 1-5 sentence excerpt that highlights the key features and appeal of this release for soccer card collectors. Focus on what makes this release special and exciting.`;
+
+      const response = await fetch('/api/generate/post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate excerpt');
+      }
+
+      const data = await response.json();
+      setEditedExcerpt(data.excerpt || '');
+      setMessage({ type: "success", text: "Excerpt generated successfully!" });
+      setTimeout(() => setMessage(null), 3000);
+    } catch (error) {
+      console.error('Failed to generate excerpt:', error);
+      setMessage({ type: "error", text: "Failed to generate excerpt. Please try again." });
+      setTimeout(() => setMessage(null), 5000);
+    } finally {
+      setGeneratingExcerpt(false);
+    }
+  };
+
   const handleSaveChanges = async () => {
     if (!release) return;
 
@@ -389,6 +501,27 @@ export default function EditReleasePage() {
       setMessage(null);
 
       const errors: string[] = [];
+
+      // Update release metadata (name, year, excerpt)
+      try {
+        const updateReleaseResponse = await fetch("/api/releases", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: release.id,
+            name: editedReleaseName,
+            year: editedYear,
+            excerpt: editedExcerpt || null,
+          }),
+        });
+
+        if (!updateReleaseResponse.ok) {
+          throw new Error("Failed to update release metadata");
+        }
+      } catch (error) {
+        console.error("Error updating release:", error);
+        errors.push(error instanceof Error ? error.message : "Failed to update release metadata");
+      }
 
       // Process each set
       for (const set of editedSets) {
@@ -412,7 +545,7 @@ export default function EditReleasePage() {
               throw new Error(`Failed to create set "${set.name}"`);
             }
 
-            const createdSet = await createResponse.json();
+            await createResponse.json();
 
             // Add cards to the new set if any
             if (set.cards && set.cards.length > 0) {
@@ -462,58 +595,30 @@ export default function EditReleasePage() {
               throw new Error(`Failed to update set "${set.name}"`);
             }
 
-            // If cards were modified, we need to delete existing cards and recreate them
-            // This is a simplified approach - for production you might want more granular updates
+            // If cards were modified, delete existing cards and add new ones
             if (set.cards && set.cards.length > 0) {
-              // Delete existing cards
-              await fetch(`/api/sets?id=${set.id}`, {
+              // Delete existing cards from the set
+              await fetch(`/api/cards?setId=${set.id}`, {
                 method: "DELETE",
               });
 
-              // Recreate the set with new cards
-              const recreateResponse = await fetch("/api/sets", {
+              // Add new cards to the set
+              const cardsResponse = await fetch("/api/cards", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                  name: set.name,
-                  totalCards: set.totalCards || null,
-                  releaseId: release.id,
-                  parallels: set.parallels || [],
+                  setId: set.id,
+                  cards: set.cards.map(card => ({
+                    playerName: card.playerName,
+                    team: card.team || undefined,
+                    cardNumber: card.cardNumber,
+                    variant: card.variant || undefined,
+                  })),
                 }),
               });
 
-              if (recreateResponse.ok) {
-                const recreatedSet = await recreateResponse.json();
-
-                // Add cards
-                const cardsResponse = await fetch("/api/analyze/release", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    files: [],
-                    createDatabaseRecords: true,
-                    analysisData: {
-                      manufacturer: editedManufacturer,
-                      releaseName: editedReleaseName,
-                      year: editedYear,
-                      sets: [{
-                        name: set.name,
-                        totalCards: set.totalCards,
-                        features: set.parallels || [],
-                        cards: set.cards.map(card => ({
-                          playerName: card.playerName,
-                          team: card.team || undefined,
-                          cardNumber: card.cardNumber,
-                          variant: card.variant || undefined,
-                        })),
-                      }],
-                    },
-                  }),
-                });
-
-                if (!cardsResponse.ok) {
-                  console.warn(`Failed to add cards to set "${set.name}"`);
-                }
+              if (!cardsResponse.ok) {
+                console.warn(`Failed to add cards to set "${set.name}"`);
               }
             }
           }
@@ -677,6 +782,76 @@ export default function EditReleasePage() {
           </div>
         </div>
 
+        {/* Release Content Section */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            Release Content
+          </h3>
+
+          <div className="space-y-4">
+            {/* GenAI Excerpt Generator */}
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
+              <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                <svg className="w-5 h-5 text-footy-green dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+                GenAI: Generate Excerpt from Sell Sheet
+              </h4>
+              <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
+                Upload a sell sheet or info document to automatically generate a compelling excerpt
+              </p>
+              <div className="flex items-center gap-3">
+                <input
+                  type="file"
+                  accept=".pdf,.png,.jpg,.jpeg,.webp"
+                  onChange={(e) => setExcerptFile(e.target.files?.[0] || null)}
+                  className="text-sm text-gray-600 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-footy-green hover:file:bg-green-200 dark:file:bg-green-900 dark:file:text-green-300"
+                />
+                <button
+                  type="button"
+                  onClick={handleGenerateExcerpt}
+                  disabled={!excerptFile || generatingExcerpt}
+                  className="px-4 py-2 bg-gradient-to-r from-footy-green to-green-600 hover:from-green-700 hover:to-green-700 text-white rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {generatingExcerpt ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      Generate Excerpt
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Manual Excerpt Input */}
+            <div>
+              <label className="block font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                Excerpt:
+              </label>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                1-5 sentence summary displayed in previews and on the release page
+              </p>
+              <textarea
+                value={editedExcerpt}
+                onChange={(e) => setEditedExcerpt(e.target.value)}
+                rows={4}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="A brief summary of this release for collectors..."
+              />
+            </div>
+          </div>
+        </div>
+
         {/* Sets Management */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
           <div className="flex items-center justify-between mb-6">
@@ -697,8 +872,11 @@ export default function EditReleasePage() {
 
           {editedSets.length > 0 ? (
             <div className="space-y-4">
-              {editedSets.map((set, idx) => (
-                !set.isDeleted && (
+              {editedSets
+                .map((set, idx) => ({ set, originalIdx: idx }))
+                .filter(({ set }) => !set.isDeleted)
+                .map(({ set, originalIdx: idx }) => {
+                return (
                   <div key={idx} className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
                     <div className="flex items-start justify-between gap-2 mb-3">
                       <div className="flex-1">
@@ -734,13 +912,58 @@ export default function EditReleasePage() {
                     </div>
 
                     <div className="mb-3">
-                      <textarea
-                        value={set.description || ""}
-                        onChange={(e) => handleUpdateSet(idx, "description", e.target.value)}
-                        placeholder="Description (optional)"
-                        rows={2}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
-                      />
+                      <div className="flex items-start gap-2">
+                        <textarea
+                          value={set.description || ""}
+                          onChange={(e) => handleUpdateSet(idx, "description", e.target.value)}
+                          placeholder="Description (optional) - Click the AI button to generate"
+                          rows={2}
+                          className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleGenerateSetDescription(idx)}
+                          disabled={generatingSetDescription === idx || set.isNew || !set.id}
+                          className="px-3 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 text-white rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap text-sm font-medium disabled:cursor-not-allowed"
+                          title={set.isNew ? "Save the set first to generate description" : "Generate AI description"}
+                        >
+                          {generatingSetDescription === idx ? (
+                            <>
+                              <svg
+                                className="animate-spin h-4 w-4"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                              >
+                                <circle
+                                  className="opacity-25"
+                                  cx="12"
+                                  cy="12"
+                                  r="10"
+                                  stroke="currentColor"
+                                  strokeWidth="4"
+                                ></circle>
+                                <path
+                                  className="opacity-75"
+                                  fill="currentColor"
+                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
+                              </svg>
+                              <span>AI</span>
+                            </>
+                          ) : (
+                            <>
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                              </svg>
+                              <span>AI</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        AI generates 1-5 sentence descriptions from a soccer card expert perspective
+                      </p>
                     </div>
 
                     {/* Checklist Upload/Paste Section */}
@@ -904,8 +1127,8 @@ export default function EditReleasePage() {
                       </div>
                     )}
                   </div>
-                )
-              ))}
+                );
+              })}
             </div>
           ) : (
             <p className="text-sm text-gray-500 dark:text-gray-400 italic text-center py-8">

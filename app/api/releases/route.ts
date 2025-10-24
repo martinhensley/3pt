@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export const dynamic = 'force-dynamic';
 
@@ -10,44 +12,46 @@ export async function GET(request: NextRequest) {
     const id = searchParams.get("id");
 
     if (slug) {
-      // Fetch release by post slug
-      const post = await prisma.post.findUnique({
+      // Fetch release by slug directly from Release model
+      const release = await prisma.release.findUnique({
         where: { slug },
         include: {
-          release: {
+          manufacturer: true,
+          images: {
+            orderBy: { order: 'asc' }
+          },
+          sets: {
             include: {
-              manufacturer: true,
-              sets: {
-                include: {
-                  cards: {
-                    orderBy: [
-                      { cardNumber: 'asc' }
-                    ]
-                  },
-                },
-                orderBy: {
-                  createdAt: 'asc'
-                }
+              cards: {
+                orderBy: [
+                  { cardNumber: 'asc' }
+                ]
               },
             },
+            orderBy: {
+              createdAt: 'asc'
+            }
           },
         },
       });
 
-      if (!post?.release) {
+      if (!release) {
         return NextResponse.json(
           { error: "Release not found" },
           { status: 404 }
         );
       }
 
-      return NextResponse.json(post.release);
+      return NextResponse.json(release);
     } else if (id) {
       // Fetch release by ID
       const release = await prisma.release.findUnique({
         where: { id },
         include: {
           manufacturer: true,
+          images: {
+            orderBy: { order: 'asc' }
+          },
           sets: {
             include: {
               cards: {
@@ -76,6 +80,9 @@ export async function GET(request: NextRequest) {
       const releases = await prisma.release.findMany({
         include: {
           manufacturer: true,
+          images: {
+            orderBy: { order: 'asc' }
+          },
           sets: {
             include: {
               _count: {
@@ -95,6 +102,60 @@ export async function GET(request: NextRequest) {
     console.error("Failed to fetch release:", error);
     return NextResponse.json(
       { error: "Failed to fetch release" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { id, name, year, description } = body;
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Release ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const release = await prisma.release.update({
+      where: { id },
+      data: {
+        name,
+        year,
+        description: description || null,
+      },
+      include: {
+        manufacturer: true,
+        images: {
+          orderBy: { order: 'asc' }
+        },
+        sets: {
+          include: {
+            cards: {
+              orderBy: [
+                { cardNumber: 'asc' }
+              ]
+            },
+          },
+          orderBy: {
+            createdAt: 'asc'
+          }
+        },
+      },
+    });
+
+    return NextResponse.json(release);
+  } catch (error) {
+    console.error("Failed to update release:", error);
+    return NextResponse.json(
+      { error: "Failed to update release" },
       { status: 500 }
     );
   }

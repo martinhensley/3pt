@@ -1,3 +1,13 @@
+/**
+ * @deprecated This endpoint is deprecated. Use /api/analyze/release instead.
+ *
+ * The unified Create Release workflow now handles both:
+ * - Vintage releases (single base set with or without checklist)
+ * - Modern releases (multiple sets with optional checklists)
+ *
+ * This endpoint remains for backward compatibility but may be removed in future versions.
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";

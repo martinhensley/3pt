@@ -6,8 +6,7 @@ import { del } from "@vercel/blob";
 
 function generateSlug(title: string): string {
   return title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/[^a-zA-Z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 }
 
@@ -19,7 +18,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, content, excerpt, type, imageUrls, published } = body;
+    const { title, content, excerpt, type, imageUrls, published, releaseId, setId, cardId } = body;
 
     if (!title || !content || !type) {
       return NextResponse.json(
@@ -28,7 +27,61 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const slug = generateSlug(title);
+    // Generate hierarchical slug based on type and relationships
+    let slug = "";
+
+    if (type === "RELEASE" && releaseId) {
+      // For releases: just use the release name
+      const release = await prisma.release.findUnique({
+        where: { id: releaseId },
+        include: { manufacturer: true },
+      });
+      if (release) {
+        slug = generateSlug(`${release.manufacturer.name} ${release.name} ${release.year || ''}`).trim().replace(/-+$/, '');
+      } else {
+        slug = generateSlug(title);
+      }
+    } else if (type === "SET" && setId) {
+      // For sets: Release-Name-Set-Name
+      const set = await prisma.set.findUnique({
+        where: { id: setId },
+        include: {
+          release: {
+            include: { manufacturer: true },
+          },
+        },
+      });
+      if (set?.release) {
+        const releaseName = `${set.release.manufacturer.name} ${set.release.name} ${set.release.year || ''}`.trim();
+        slug = generateSlug(`${releaseName} ${set.name}`);
+      } else {
+        slug = generateSlug(title);
+      }
+    } else if (type === "CARD" && cardId) {
+      // For cards: Release-Name-Set-Name-Card-Name
+      const card = await prisma.card.findUnique({
+        where: { id: cardId },
+        include: {
+          set: {
+            include: {
+              release: {
+                include: { manufacturer: true },
+              },
+            },
+          },
+        },
+      });
+      if (card?.set?.release) {
+        const releaseName = `${card.set.release.manufacturer.name} ${card.set.release.name} ${card.set.release.year || ''}`.trim();
+        const cardName = `${card.playerName || ''} ${card.team || ''} ${card.cardNumber || ''} ${card.variant || ''}`.trim();
+        slug = generateSlug(`${releaseName} ${card.set.name} ${cardName}`);
+      } else {
+        slug = generateSlug(title);
+      }
+    } else {
+      // Fallback to title-based slug
+      slug = generateSlug(title);
+    }
 
     // Check if slug already exists
     let finalSlug = slug;
@@ -47,6 +100,9 @@ export async function POST(request: NextRequest) {
         type,
         published: published || false,
         authorId: session.user.id,
+        releaseId: releaseId || null,
+        setId: setId || null,
+        cardId: cardId || null,
         images: {
           create:
             imageUrls?.map((url: string, index: number) => ({
@@ -119,7 +175,7 @@ export async function PUT(request: NextRequest) {
     // Handle image removals
     if (removeImageIds && removeImageIds.length > 0) {
       // First, fetch the images to get their URLs for blob deletion
-      const imagesToDelete = await prisma.postImage.findMany({
+      const imagesToDelete = await prisma.image.findMany({
         where: {
           id: { in: removeImageIds },
           postId: id,
@@ -137,7 +193,7 @@ export async function PUT(request: NextRequest) {
       }
 
       // Delete from database
-      await prisma.postImage.deleteMany({
+      await prisma.image.deleteMany({
         where: {
           id: { in: removeImageIds },
           postId: id,
@@ -148,7 +204,7 @@ export async function PUT(request: NextRequest) {
     // Get current max order for new images
     let maxOrder = 0;
     if (newImageUrls && newImageUrls.length > 0) {
-      const existingImages = await prisma.postImage.findMany({
+      const existingImages = await prisma.image.findMany({
         where: { postId: id },
         orderBy: { order: "desc" },
         take: 1,
@@ -206,13 +262,23 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Fetch images to delete their blobs
-    const imagesToDelete = await prisma.postImage.findMany({
-      where: { postId: id },
+    // Fetch the post to determine type and relationships
+    const post = await prisma.post.findUnique({
+      where: { id },
+      include: {
+        images: true,
+      },
     });
 
+    if (!post) {
+      return NextResponse.json(
+        { error: "Post not found" },
+        { status: 404 }
+      );
+    }
+
     // Delete blobs from Vercel Blob storage
-    for (const image of imagesToDelete) {
+    for (const image of post.images) {
       try {
         await del(image.url);
       } catch (error) {
@@ -222,7 +288,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Delete associated images from database
-    await prisma.postImage.deleteMany({
+    await prisma.image.deleteMany({
       where: { postId: id },
     });
 
@@ -230,6 +296,84 @@ export async function DELETE(request: NextRequest) {
     await prisma.post.delete({
       where: { id },
     });
+
+    // If this is a RELEASE post, delete the associated Release and its Sets
+    if (post.type === "RELEASE" && post.releaseId) {
+      // Check if there are any other posts referencing this release
+      const otherReleasePosts = await prisma.post.count({
+        where: {
+          releaseId: post.releaseId,
+          id: { not: id },
+        },
+      });
+
+      // Only delete the release if no other posts reference it
+      if (otherReleasePosts === 0) {
+        // First delete all cards in sets belonging to this release
+        const sets = await prisma.set.findMany({
+          where: { releaseId: post.releaseId },
+          select: { id: true },
+        });
+
+        for (const set of sets) {
+          await prisma.card.deleteMany({
+            where: { setId: set.id },
+          });
+        }
+
+        // Then delete all sets
+        await prisma.set.deleteMany({
+          where: { releaseId: post.releaseId },
+        });
+
+        // Finally delete the release
+        await prisma.release.delete({
+          where: { id: post.releaseId },
+        });
+      }
+    }
+
+    // If this is a SET post, delete the associated Set
+    if (post.type === "SET" && post.setId) {
+      // Check if there are any other posts referencing this set
+      const otherSetPosts = await prisma.post.count({
+        where: {
+          setId: post.setId,
+          id: { not: id },
+        },
+      });
+
+      // Only delete the set if no other posts reference it
+      if (otherSetPosts === 0) {
+        // First delete all cards in this set
+        await prisma.card.deleteMany({
+          where: { setId: post.setId },
+        });
+
+        // Then delete the set
+        await prisma.set.delete({
+          where: { id: post.setId },
+        });
+      }
+    }
+
+    // If this is a CARD post, delete the associated Card
+    if (post.type === "CARD" && post.cardId) {
+      // Check if there are any other posts referencing this card
+      const otherCardPosts = await prisma.post.count({
+        where: {
+          cardId: post.cardId,
+          id: { not: id },
+        },
+      });
+
+      // Only delete the card if no other posts reference it
+      if (otherCardPosts === 0) {
+        await prisma.card.delete({
+          where: { id: post.cardId },
+        });
+      }
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

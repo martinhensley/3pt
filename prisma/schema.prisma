@@ -30,27 +30,39 @@ model Manufacturer {
 }
 
 model Release {
-  id             String       @id @default(cuid())
+  id             String          @id @default(cuid())
   name           String
   year           String?
+  slug           String          @unique
+  description    String?         // Brief summary displayed in previews and on release page
+  releaseDate    DateTime?       // Official release date for display (nullable for backwards compatibility)
+
+  // Source files used for AI analysis
+  sellSheetText  String?         @db.Text // Extracted text from sell sheets for AI description generation
+  sourceFiles    Json?           // Array of {url: string, type: string, filename: string} for uploaded PDFs/images
+
   manufacturerId String
-  manufacturer   Manufacturer @relation(fields: [manufacturerId], references: [id])
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  manufacturer   Manufacturer    @relation(fields: [manufacturerId], references: [id], onDelete: Cascade)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
   sets           Set[]
-  posts          Post[]
+  posts          Post[]          // Posts that reference this release
+  images         Image[]
 }
 
 model Set {
   id          String   @id @default(cuid())
   name        String
+  description String?  // AI-generated description from sell sheets (1-5 sentences)
   releaseId   String
-  release     Release  @relation(fields: [releaseId], references: [id])
+  release     Release  @relation(fields: [releaseId], references: [id], onDelete: Cascade)
   totalCards  String?
+  parallels   Json?    // Array of {name: string, printRun: string}
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   cards       Card[]
-  posts       Post[]
+  posts       Post[]   // Posts that reference this set
+  images      Image[]
 }
 
 model Card {
@@ -82,10 +94,11 @@ model Card {
   imageBack             String?  // Back image URL
 
   setId                 String
-  set                   Set      @relation(fields: [setId], references: [id])
+  set                   Set      @relation(fields: [setId], references: [id], onDelete: Cascade)
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
-  posts                 Post[]
+  posts                 Post[]   // Posts that reference this card
+  images                Image[]
 }
 
 model Post {
@@ -105,22 +118,35 @@ model Post {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   authorId    String      // References neon_auth.admin_users.id (not enforced by FK)
-  images      PostImage[]
+  images      Image[]
 }
 
-model PostImage {
+// Unified image model for all entities (Release, Set, Card, Post)
+model Image {
   id        String   @id @default(cuid())
-  postId    String
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   url       String
   caption   String?
   order     Int      @default(0)
   createdAt DateTime @default(now())
+
+  // Optional foreign keys - one of these will be set
+  releaseId String?
+  release   Release? @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+
+  setId     String?
+  set       Set?     @relation(fields: [setId], references: [id], onDelete: Cascade)
+
+  cardId    String?
+  card      Card?    @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  postId    String?
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
 enum PostType {
-  CARD
-  SET
-  RELEASE
-  GENERAL
+  NEWS       // News article
+  REVIEW     // Product review
+  GUIDE      // How-to or buying guide
+  ANALYSIS   // Market analysis or trends
+  GENERAL    // General content
 }

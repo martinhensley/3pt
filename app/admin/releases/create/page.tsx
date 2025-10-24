@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
+import { generateReleaseSlug } from "@/lib/slugGenerator";
 
 interface CardInfo {
   playerName: string;
@@ -29,7 +30,7 @@ interface ReleaseAnalysisResult {
   features: string[];
   title: string;
   content: string;
-  excerpt: string;
+  description: string;
 }
 
 export default function CreateReleasePage() {
@@ -41,20 +42,18 @@ export default function CreateReleasePage() {
   // Form state
   const [releaseFiles, setReleaseFiles] = useState<File[]>([]);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [releaseUrls, setReleaseUrls] = useState<string[]>([""]);
   const [analysisResult, setAnalysisResult] = useState<ReleaseAnalysisResult | null>(null);
 
   // Editable release fields
   const [editedManufacturer, setEditedManufacturer] = useState("");
   const [editedReleaseName, setEditedReleaseName] = useState("");
   const [editedYear, setEditedYear] = useState("");
+  const [editedReleaseDate, setEditedReleaseDate] = useState("");
   const [editedSets, setEditedSets] = useState<SetInfo[]>([]);
 
   // Editable post fields
   const [editedTitle, setEditedTitle] = useState("");
-  const [editedExcerpt, setEditedExcerpt] = useState("");
-  const [editedContent, setEditedContent] = useState("");
-  const [contentViewMode, setContentViewMode] = useState<'edit' | 'preview'>('edit');
+  const [editedDescription, setEditedDescription] = useState("");
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -82,29 +81,14 @@ export default function CreateReleasePage() {
     setImageFiles(imageFiles.filter((_, i) => i !== index));
   };
 
-  const handleUrlChange = (index: number, value: string) => {
-    const newUrls = [...releaseUrls];
-    newUrls[index] = value;
-    setReleaseUrls(newUrls);
-  };
-
-  const addUrlField = () => {
-    setReleaseUrls([...releaseUrls, ""]);
-  };
-
-  const removeUrlField = (index: number) => {
-    setReleaseUrls(releaseUrls.filter((_, i) => i !== index));
-  };
-
   const handleAnalyze = async () => {
     try {
       setLoading(true);
       setMessage(null);
 
       // Validate inputs
-      const validUrls = releaseUrls.filter(url => url.trim());
-      if (releaseFiles.length === 0 && validUrls.length === 0) {
-        setMessage({ type: "error", text: "Please provide at least one file or URL" });
+      if (releaseFiles.length === 0) {
+        setMessage({ type: "error", text: "Please provide at least one file" });
         return;
       }
 
@@ -132,11 +116,7 @@ export default function CreateReleasePage() {
         }
       }
 
-      // Combine URLs and uploaded files
-      const allFiles = [
-        ...validUrls.map(url => ({ url, type: "html" })),
-        ...uploadedFileData
-      ];
+      const allFiles = uploadedFileData;
 
       // Analyze
       const response = await fetch("/api/analyze/release", {
@@ -168,8 +148,7 @@ export default function CreateReleasePage() {
         ? `${analysis.year} ${analysis.releaseName}`
         : analysis.releaseName;
       setEditedTitle(formattedTitle);
-      setEditedExcerpt(analysis.excerpt);
-      setEditedContent(analysis.content);
+      setEditedDescription(analysis.description);
 
       setMessage({
         type: "success",
@@ -212,15 +191,57 @@ export default function CreateReleasePage() {
     const cards: CardInfo[] = [];
     const lines = text.split('\n').filter(line => line.trim());
 
-    for (const line of lines) {
-      // Match pattern: "1 Kylian Mbappe, France" or "1. Kylian Mbappe, France"
+    // Check if first line is a header (contains common header keywords)
+    let startIndex = 0;
+    if (lines.length > 0) {
+      const firstLine = lines[0].toLowerCase();
+      if (firstLine.includes('card_number') || firstLine.includes('player') ||
+          firstLine.includes('subject') || firstLine.includes('number') ||
+          firstLine.includes('name')) {
+        startIndex = 1; // Skip header row
+      }
+    }
+
+    for (let i = startIndex; i < lines.length; i++) {
+      const line = lines[i];
+
+      // Skip lines that don't start with a number or are section headers
+      if (!/^\d/.test(line.trim())) {
+        continue;
+      }
+
+      let cardNumber = '';
+      let playerName = '';
+      let team = '';
+
+      // Try CSV format first: "1,Player Name,Team"
+      if (line.includes(',')) {
+        const parts = line.split(',').map(p => p.trim());
+        if (parts.length >= 2 && /^\d+$/.test(parts[0])) {
+          cardNumber = parts[0];
+          playerName = parts[1];
+          team = parts[2] || '';
+
+          if (cardNumber && playerName) {
+            cards.push({
+              cardNumber,
+              playerName,
+              team: team || undefined,
+              setName,
+            });
+            continue;
+          }
+        }
+      }
+
+      // Try space-separated format: "1 Player Name, Team"
       const match = line.match(/^(\d+)\.?\s+([^,]+)(?:,\s*(.+))?/);
       if (match) {
-        const [, cardNumber, playerName, team] = match;
+        const [, num, name, tm] = match;
         cards.push({
-          cardNumber: cardNumber.trim(),
-          playerName: playerName.trim(),
-          team: team?.trim(),
+          cardNumber: num.trim(),
+          playerName: name.trim(),
+          team: tm?.trim(),
           setName: setName,
         });
       }
@@ -328,7 +349,10 @@ export default function CreateReleasePage() {
     try {
       setLoading(true);
 
-      // Create database records with edited values
+      // Generate slug from manufacturer + name + year
+      const slug = generateReleaseSlug(editedManufacturer, editedReleaseName, editedYear);
+
+      // Create database records with edited values including excerpt, content, and slug
       const dbResponse = await fetch("/api/analyze/release", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -340,25 +364,32 @@ export default function CreateReleasePage() {
             manufacturer: editedManufacturer,
             releaseName: editedReleaseName,
             year: editedYear,
+            releaseDate: editedReleaseDate || null,
             sets: editedSets,
+            slug,
+            description: editedDescription,
           },
         }),
       });
 
       if (!dbResponse.ok) {
+        const errorText = await dbResponse.text();
+        console.error("Database creation failed:", errorText);
         throw new Error("Failed to create database records");
       }
 
       const dbResult = await dbResponse.json();
+      console.log("Database result:", dbResult);
       const releaseId = dbResult.createdRecords?.release?.id;
 
       if (!releaseId) {
-        throw new Error("No release ID returned");
+        console.error("No release ID in response. Full result:", JSON.stringify(dbResult, null, 2));
+        throw new Error(`No release ID returned. Response: ${JSON.stringify(dbResult)}`);
       }
 
-      // Upload images (from dedicated image upload field)
-      const imageUrls: string[] = [];
-      for (const file of imageFiles) {
+      // Upload images to ReleaseImage (from dedicated image upload field)
+      for (let i = 0; i < imageFiles.length; i++) {
+        const file = imageFiles[i];
         const formData = new FormData();
         formData.append("file", file);
 
@@ -369,48 +400,37 @@ export default function CreateReleasePage() {
 
         if (uploadResponse.ok) {
           const { url } = await uploadResponse.json();
-          imageUrls.push(url);
+
+          // Create ReleaseImage record
+          await fetch("/api/release-images", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              releaseId,
+              url,
+              order: i,
+              caption: null,
+            }),
+          });
         }
       }
 
-      // Create post using edited values
-      const postResponse = await fetch("/api/posts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: editedTitle,
-          content: editedContent,
-          excerpt: editedExcerpt,
-          type: "RELEASE",
-          imageUrls,
-          published: false,
-          releaseId,
-        }),
-      });
-
-      if (!postResponse.ok) {
-        throw new Error("Failed to create post");
-      }
-
-      const post = await postResponse.json();
-
       setMessage({
         type: "success",
-        text: `Release created successfully with ${analysisResult.sets?.length || 0} sets! Post ID: ${post.id}`,
+        text: `Release created successfully with ${analysisResult.sets?.length || 0} sets! Slug: ${slug}`,
       });
 
       // Clear form
       setAnalysisResult(null);
       setReleaseFiles([]);
       setImageFiles([]);
-      setReleaseUrls([""]);
       setEditedManufacturer("");
       setEditedReleaseName("");
       setEditedYear("");
+      setEditedReleaseDate("");
       setEditedSets([]);
       setEditedTitle("");
-      setEditedExcerpt("");
-      setEditedContent("");
+      setEditedDescription("");
 
       setTimeout(() => {
         router.push("/admin");
@@ -452,7 +472,7 @@ export default function CreateReleasePage() {
             ← Back to Dashboard
           </button>
           <h1 className="text-3xl font-bold text-footy-green dark:text-footy-orange mb-2">
-            Create Release
+            Create Release & Set(s)
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
             Upload documents to analyze and create a new release with sets
@@ -567,43 +587,11 @@ export default function CreateReleasePage() {
             )}
           </div>
 
-          {/* URL Inputs */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
-              Or Enter URLs
-            </label>
-            {releaseUrls.map((url, index) => (
-              <div key={index} className="flex gap-2 mb-2">
-                <input
-                  type="url"
-                  value={url}
-                  onChange={(e) => handleUrlChange(index, e.target.value)}
-                  placeholder="https://example.com/release-info"
-                  className="flex-grow px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-                {releaseUrls.length > 1 && (
-                  <button
-                    onClick={() => removeUrlField(index)}
-                    className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
-            ))}
-            <button
-              onClick={addUrlField}
-              className="text-footy-orange hover:underline text-sm"
-            >
-              + Add another URL
-            </button>
-          </div>
-
           {/* Analyze Button */}
           {!analysisResult && (
             <button
               onClick={handleAnalyze}
-              disabled={loading || (releaseFiles.length === 0 && releaseUrls.filter(u => u.trim()).length === 0)}
+              disabled={loading || releaseFiles.length === 0}
               className="w-full bg-gradient-to-r from-footy-green to-green-700 text-white font-bold py-4 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {loading ? "Analyzing..." : "Analyze Documents"}
@@ -658,6 +646,20 @@ export default function CreateReleasePage() {
                     />
                   </div>
                 </div>
+                <div>
+                  <label className="block font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                    Release Date (Optional):
+                  </label>
+                  <input
+                    type="date"
+                    value={editedReleaseDate}
+                    onChange={(e) => setEditedReleaseDate(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Official release date for display on homepage (leave empty if unknown)
+                  </p>
+                </div>
                 <div className="pt-2 border-t border-blue-300 dark:border-blue-700">
                   <p className="text-gray-800 dark:text-gray-200">
                     <span className="font-semibold">Full Release:</span> {editedYear} {editedReleaseName}
@@ -686,7 +688,8 @@ export default function CreateReleasePage() {
                   </div>
                   {editedSets.length > 0 ? (
                     <ul className="list-none space-y-3">
-                      {editedSets.map((set, idx) => (
+                      {editedSets.map((set, idx) => {
+                        return (
                         <li key={idx} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3">
                           <div className="flex items-start justify-between gap-2 mb-2">
                             <input
@@ -707,6 +710,7 @@ export default function CreateReleasePage() {
                               </svg>
                             </button>
                           </div>
+
                           <input
                             type="text"
                             value={set.totalCards || ""}
@@ -749,7 +753,7 @@ export default function CreateReleasePage() {
                                   Or paste checklist text
                                 </summary>
                                 <textarea
-                                  placeholder="Paste checklist here (e.g., '1 Player Name, Team')"
+                                  placeholder="Paste checklist here (e.g., &apos;1 Player Name, Team&apos;)"
                                   rows={4}
                                   onChange={(e) => {
                                     if (e.target.value.trim()) {
@@ -883,7 +887,8 @@ export default function CreateReleasePage() {
                             </div>
                           )}
                         </li>
-                      ))}
+                      );
+                      })}
                     </ul>
                   ) : (
                     <p className="text-sm text-gray-500 dark:text-gray-400 italic">
@@ -894,7 +899,7 @@ export default function CreateReleasePage() {
               </div>
             </div>
 
-            {/* Editable Post Content */}
+            {/* Editable Release Content */}
             <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
               {/* Header */}
               <div className="bg-gradient-to-r from-footy-green to-green-700 dark:from-footy-orange dark:to-orange-700 px-8 py-6">
@@ -902,7 +907,7 @@ export default function CreateReleasePage() {
                   <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
-                  Review & Edit Post Content
+                  Release Content
                 </h3>
                 <p className="text-white/90 text-sm mt-2">
                   AI-generated content ready for your review. Edit as needed before publishing.
@@ -918,10 +923,10 @@ export default function CreateReleasePage() {
                     </div>
                     <div>
                       <label className="block text-sm font-bold text-gray-900 dark:text-white">
-                        Post Title
+                        Release Title
                       </label>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Format: Year Release Name (e.g., "2024-25 Donruss Soccer")
+                        Format: Year Release Name (e.g., &quot;2024-25 Donruss Soccer&quot;)
                       </p>
                     </div>
                   </div>
@@ -934,112 +939,45 @@ export default function CreateReleasePage() {
                   />
                 </div>
 
-                {/* Excerpt */}
+                {/* Description */}
                 <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border-2 border-gray-200 dark:border-gray-700 shadow-sm">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-lg">
-                      E
+                      D
                     </div>
                     <div>
                       <label className="block text-sm font-bold text-gray-900 dark:text-white">
-                        Excerpt
+                        Description
                       </label>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        1-2 sentence summary displayed in previews
+                        1-5 sentence summary displayed in previews
                       </p>
                     </div>
                   </div>
                   <textarea
-                    value={editedExcerpt}
-                    onChange={(e) => setEditedExcerpt(e.target.value)}
+                    value={editedDescription}
+                    onChange={(e) => setEditedDescription(e.target.value)}
                     rows={3}
                     className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-footy-orange focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all"
                     placeholder="A concise summary that captures the essence of this release..."
                   />
                   <div className="mt-2 flex justify-end">
                     <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {editedExcerpt.length} characters
+                      {editedDescription.length} characters
                     </span>
                   </div>
                 </div>
 
-                {/* Content with Preview */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-                  <div className="flex items-center gap-3 px-6 pt-6 pb-4">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white font-bold text-lg">
-                      C
-                    </div>
-                    <div>
-                      <label className="block text-sm font-bold text-gray-900 dark:text-white">
-                        Post Content (HTML)
-                      </label>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Full article content with HTML formatting
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Tabs for Edit/Preview */}
-                  <div className="border-b border-gray-200 dark:border-gray-700 px-6">
-                    <div className="flex gap-1">
-                      <button
-                        type="button"
-                        onClick={() => setContentViewMode('edit')}
-                        className={`px-4 py-2 font-semibold text-sm transition-all ${
-                          contentViewMode === 'edit'
-                            ? 'border-b-2 border-footy-orange text-footy-orange'
-                            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-                        }`}
-                      >
-                        📝 Edit HTML
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setContentViewMode('preview')}
-                        className={`px-4 py-2 font-semibold text-sm transition-all ${
-                          contentViewMode === 'preview'
-                            ? 'border-b-2 border-footy-orange text-footy-orange'
-                            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-                        }`}
-                      >
-                        👁️ Preview
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="p-6">
-                    {contentViewMode === 'edit' ? (
-                      <textarea
-                        value={editedContent}
-                        onChange={(e) => setEditedContent(e.target.value)}
-                        rows={20}
-                        className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-footy-orange focus:border-transparent bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white font-mono text-sm leading-relaxed transition-all"
-                        placeholder="<p>Your HTML content here...</p>"
-                      />
-                    ) : (
-                      <div
-                        className="prose prose-lg max-w-none prose-headings:text-footy-green dark:prose-headings:text-footy-orange prose-a:text-footy-orange prose-strong:text-footy-green dark:prose-strong:text-footy-orange dark:prose-invert min-h-[400px] p-6 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700"
-                        dangerouslySetInnerHTML={{ __html: editedContent }}
-                      />
-                    )}
-                  </div>
-
-                  <div className="px-6 pb-4 flex justify-end">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {editedContent.length} characters
-                    </span>
-                  </div>
-                </div>
               </div>
             </div>
 
             {/* Create Release Button */}
             <button
               onClick={handleCreateRelease}
-              disabled={loading || !editedTitle.trim() || !editedExcerpt.trim() || !editedContent.trim()}
+              disabled={loading || !editedTitle.trim() || !editedDescription.trim()}
               className="w-full bg-gradient-to-r from-footy-orange to-orange-600 text-white font-bold py-4 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              {loading ? "Creating Release..." : "Create Release & Post"}
+              {loading ? "Creating Release..." : "Create Release"}
             </button>
           </div>
         )}

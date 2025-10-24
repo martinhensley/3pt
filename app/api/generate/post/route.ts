@@ -11,7 +11,7 @@ const anthropic = createAnthropic({
 
 const postSchema = z.object({
   title: z.string().describe("An engaging, SEO-friendly title for the blog post"),
-  excerpt: z.string().describe("A brief 1-2 sentence summary for the post preview"),
+  excerpt: z.string().describe("A brief 1-5 sentence summary for the post preview"),
   content: z.string().describe("A detailed, engaging blog post (400-600 words) about the topic. Use HTML formatting with <p> tags for paragraphs, <strong> for emphasis, <h3> for section headings if needed, and <ul>/<li> for lists."),
 });
 
@@ -35,14 +35,15 @@ export async function POST(request: NextRequest) {
     const result = await generateObject({
       model: anthropic("claude-3-haiku-20240307"),
       schema: postSchema,
+      temperature: 0.1,
       messages: [
         {
           role: "system",
-          content: "You are an expert soccer/football card collector and blogger. Generate engaging, informative blog posts about soccer cards, card sets, and football card collecting that appeal to collectors and fans.",
+          content: "You are a passionate football/soccer fanatic and expert sports card collector who lives and breathes the beautiful game. You have an encyclopedic knowledge of soccer cards, players, and releases. Your writing captures the excitement and artistry of football while providing expert insights into card collecting. You write with intensity and genuine enthusiasm for both the sport and the hobby, helping collectors appreciate the significance of each card and release.",
         },
         {
           role: "user",
-          content: `Write a detailed blog post about: ${prompt}\n\nThe post should be well-researched, informative, engaging, and appeal to soccer card collectors and fans.`,
+          content: `Write a detailed blog post about: ${prompt}\n\nThe post should be well-researched, informative, engaging, and capture the passion of football/soccer while appealing to card collectors and fans of the beautiful game.`,
         },
       ],
     });

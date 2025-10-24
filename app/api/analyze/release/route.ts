@@ -27,9 +27,16 @@ export async function POST(request: NextRequest) {
 
     let analysis;
 
+    // Store original files and parsed content for database storage
+    let sellSheetText: string | undefined;
+    let sourceFiles: Array<{ url: string; type: string; filename?: string }> | undefined;
+
     // If analysisData is provided, use it directly (for creating DB records after analysis)
     if (analysisData) {
       analysis = analysisData;
+      // Get sell sheet data if it was passed through
+      sellSheetText = analysisData.sellSheetText;
+      sourceFiles = analysisData.sourceFiles;
     } else {
       // Otherwise, perform analysis
       if (!files || !Array.isArray(files) || files.length === 0) {
@@ -42,8 +49,32 @@ export async function POST(request: NextRequest) {
       // Parse all documents
       const parsedDocuments = await parseDocuments(files);
 
+      // Combine all parsed text for sell sheet storage
+      sellSheetText = parsedDocuments
+        .map(doc => {
+          if (typeof doc.content === 'string') {
+            return doc.content;
+          } else if (Array.isArray(doc.content)) {
+            // For CSV/table data, convert to readable text
+            return doc.content.map(row => row.join(' | ')).join('\n');
+          }
+          return '';
+        })
+        .join('\n\n---\n\n');
+
+      // Store source file references
+      sourceFiles = files.map((file: { url: string; type?: string }, index: number) => ({
+        url: file.url,
+        type: file.type || parsedDocuments[index]?.type || 'unknown',
+        filename: parsedDocuments[index]?.metadata?.filename,
+      }));
+
       // Analyze with AI
       analysis = await analyzeReleaseDocuments(parsedDocuments);
+
+      // Attach sell sheet data to analysis for potential later use
+      analysis.sellSheetText = sellSheetText;
+      analysis.sourceFiles = sourceFiles;
     }
 
     // Create database records if requested
@@ -61,8 +92,13 @@ export async function POST(request: NextRequest) {
           {
             name: analysis.releaseName,
             year: analysis.year,
+            slug: analysis.slug,
+            description: analysis.description,
+            releaseDate: analysis.releaseDate ? new Date(analysis.releaseDate) : null,
+            sellSheetText,
+            sourceFiles,
           },
-          analysis.sets.map((set) => ({
+          analysis.sets.map((set: { name: string; totalCards?: string; features?: string[] }) => ({
             name: set.name,
             totalCards: set.totalCards,
             parallels: set.features || [],
@@ -78,7 +114,7 @@ export async function POST(request: NextRequest) {
           if (setInfo.cards && setInfo.cards.length > 0) {
             const result = await addCardsToSet(
               createdSet.id,
-              setInfo.cards.map((card) => ({
+              setInfo.cards.map((card: { playerName?: string; team?: string; cardNumber?: string; variant?: string }) => ({
                 playerName: card.playerName,
                 team: card.team,
                 cardNumber: card.cardNumber,

@@ -1,0 +1,338 @@
+"use client";
+
+import { useParams } from "next/navigation";
+import Link from "next/link";
+import Header from "@/components/Header";
+import EbayAd from "@/components/EbayAd";
+import EbayAdHorizontal from "@/components/EbayAdHorizontal";
+import { useEffect, useState, useMemo } from "react";
+import { extractKeywordsFromPost, getAdTitle } from "@/lib/extractKeywords";
+
+interface Card {
+  id: string;
+  playerName: string | null;
+  team: string | null;
+  cardNumber: string | null;
+  variant: string | null;
+  parallelType: string | null;
+  serialNumber: string | null;
+  isNumbered: boolean;
+  printRun: number | null;
+  hasAutograph: boolean;
+  hasMemorabilia: boolean;
+  imageFront: string | null;
+  imageBack: string | null;
+}
+
+interface Set {
+  id: string;
+  name: string;
+  description: string | null;
+  totalCards: string | null;
+  parallels: string[] | null;
+  cards: Card[];
+  release: {
+    id: string;
+    name: string;
+    year: string | null;
+    slug: string;
+    manufacturer: {
+      name: string;
+    };
+  };
+}
+
+export default function SetPage() {
+  const params = useParams();
+  const slug = params.slug as string;
+  const [set, setSet] = useState<Set | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Fetch set data by slug
+    fetch(`/api/sets?slug=${slug}`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Set not found');
+        }
+        return res.json();
+      })
+      .then((setData: Set) => {
+        setSet(setData);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch set:", error);
+        setLoading(false);
+      });
+  }, [slug]);
+
+  // Normalize "Base Optic" to "Optic Base" - moved before conditional returns
+  const displayName = set?.name.toLowerCase() === 'base optic' ? 'Optic Base' : (set?.name || '');
+
+  // Extract keywords from set for dynamic ad queries - MUST be before conditional returns
+  const adKeywords = useMemo(() => {
+    if (!set) {
+      return {
+        primaryQuery: 'soccer cards',
+        autographQuery: 'soccer autographs',
+        relatedQuery: 'soccer cards',
+      };
+    }
+
+    // Create a post-like object for keyword extraction
+    const postLike = {
+      title: `${set.release.year} ${set.release.name} ${displayName}`,
+      content: `${set.release.manufacturer.name} ${set.release.name} ${displayName} ${set.release.year || ''} trading cards checklist`,
+      excerpt: `${set.release.manufacturer.name} ${set.release.name} ${displayName} ${set.release.year || ''} soccer card set`,
+      type: 'NEWS',
+    };
+    return extractKeywordsFromPost(postLike as any);
+  }, [set, displayName]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-gray-900">
+        <Header />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!set) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-gray-900">
+        <Header />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Set Not Found</h1>
+            <p className="text-gray-600 dark:text-gray-300 mb-8">The set you're looking for doesn't exist.</p>
+            <Link href="/" className="text-footy-green dark:text-footy-orange hover:underline">
+              ← Back to Home
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const setCardCount = set.cards?.length || (set.totalCards ? parseInt(set.totalCards) : 0);
+  const setParallelCount = Array.isArray(set.parallels) ? set.parallels.length : 0;
+
+  // Sort cards numerically by cardNumber
+  const sortedCards = set.cards ? [...set.cards].sort((a, b) => {
+    const numA = parseInt(a.cardNumber || '0');
+    const numB = parseInt(b.cardNumber || '0');
+    return numA - numB;
+  }) : [];
+
+  return (
+    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
+      <Header />
+
+      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 py-8">
+        <aside className="hidden lg:block w-72 flex-shrink-0">
+          <EbayAd
+            query={adKeywords.primaryQuery}
+            limit={3}
+            title={getAdTitle(adKeywords.primaryQuery, "Soccer Cards")}
+          />
+        </aside>
+
+        <main className="flex-grow max-w-5xl">
+          {/* Breadcrumb */}
+          <div className="mb-6">
+            <Link
+              href={`/releases/${set.release.slug}`}
+              className="text-footy-green dark:text-footy-orange hover:underline"
+            >
+              ← Back to {set.release.year} {set.release.name}
+            </Link>
+          </div>
+
+        {/* Set Header */}
+        <div className="bg-gradient-to-r from-footy-green to-green-700 dark:from-footy-orange dark:to-orange-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
+          <h1 className="text-2xl md:text-3xl font-black leading-tight mb-6 flex items-center gap-3 flex-wrap">
+            <span className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full font-bold text-sm">
+              SET
+            </span>
+            <span>
+              {set.release.year && <span className="text-white/90">{set.release.year} </span>}
+              {set.release.name} {displayName}
+            </span>
+          </h1>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+              <div className="text-sm text-white/70 uppercase tracking-wide mb-1">Total Cards</div>
+              <div className="text-3xl font-black">{setCardCount > 0 ? setCardCount.toLocaleString() : '—'}</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+              <div className="text-sm text-white/70 uppercase tracking-wide mb-1">Parallels</div>
+              <div className="text-3xl font-black">{setParallelCount > 0 ? setParallelCount : '—'}</div>
+            </div>
+          </div>
+
+          {/* Set Description */}
+          {set.description && (
+            <div className="mt-6 pt-6 border-t border-white/20">
+              <p className="text-lg text-white/90 leading-relaxed">
+                {set.description}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Parallels Section */}
+        {Array.isArray(set.parallels) && set.parallels.length > 0 && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8 border border-gray-200 dark:border-gray-700">
+            <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+              <svg className="w-6 h-6 text-footy-green dark:text-footy-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
+              Parallels & Variations
+            </h3>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {set.parallels.map((parallel: string, idx: number) => {
+                // Create detailed slug for the parallel: year-releasename-setname-parallel
+                // e.g., "2024-25-donruss-soccer-base-set-gold-prizm"
+                const parallelSlug = `${set.release.year || ''}-${set.release.name}-${set.name}-${parallel}`
+                  .toLowerCase()
+                  .replace(/\s+/g, '-')
+                  .replace(/[^a-z0-9-]/g, '');
+
+                return (
+                  <Link
+                    key={idx}
+                    href={`/parallel/${parallelSlug}`}
+                    className="bg-gradient-to-r from-footy-green to-green-700 dark:from-footy-orange dark:to-orange-700 rounded-lg p-4 border-2 border-footy-green dark:border-footy-orange hover:border-footy-orange hover:shadow-lg hover:scale-105 transition-all cursor-pointer"
+                  >
+                    <div className="font-bold text-white">
+                      {parallel}
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Card Checklist */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8 border border-gray-200 dark:border-gray-700">
+          <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+            <svg className="w-6 h-6 text-footy-green dark:text-footy-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+            </svg>
+            Set Checklist ({setCardCount > 0 ? setCardCount.toLocaleString() : '—'} cards)
+          </h3>
+
+          {sortedCards && sortedCards.length > 0 ? (
+            <div className="grid gap-3">
+              {sortedCards.map((card) => {
+                // Generate slug: year-set-name-card#-player-parallel
+                const slugParts = [
+                  set.release.year,
+                  set.name,
+                  card.cardNumber ? `card-${card.cardNumber}` : '',
+                  card.playerName || 'unknown',
+                ];
+
+                // Only add parallel/variation if it's not base
+                if (card.parallelType && card.parallelType.toLowerCase() !== 'base') {
+                  slugParts.push(card.parallelType);
+                } else if (card.variant && card.variant.toLowerCase() !== 'base') {
+                  slugParts.push(card.variant);
+                }
+
+                const cardSlug = slugParts
+                  .filter(Boolean)
+                  .join('-')
+                  .toLowerCase()
+                  .replace(/\s+/g, '-')
+                  .replace(/[^a-z0-9-]/g, '');
+
+                return (
+                  <Link
+                    key={card.id}
+                    href={`/card/${cardSlug}`}
+                    className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-footy-orange hover:shadow-lg transition-all cursor-pointer"
+                  >
+                  {card.cardNumber && (
+                    <div className="flex-shrink-0 w-16 h-16 bg-footy-green dark:bg-footy-orange text-white rounded-lg flex items-center justify-center font-black text-lg">
+                      {card.cardNumber}
+                    </div>
+                  )}
+                  <div className="flex-grow">
+                    <div className="font-bold text-lg text-gray-900 dark:text-white">
+                      {card.playerName || 'Unknown Player'}
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                      {card.team && <span>{card.team}</span>}
+                      {card.variant && <span className="ml-2 text-purple-600 dark:text-purple-400">• {card.variant}</span>}
+                    </div>
+                  </div>
+                  {(card.hasAutograph || card.hasMemorabilia || card.isNumbered) && (
+                    <div className="flex gap-2 flex-wrap">
+                      {card.hasAutograph && (
+                        <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-full font-semibold">
+                          AUTO
+                        </span>
+                      )}
+                      {card.hasMemorabilia && (
+                        <span className="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded-full font-semibold">
+                          MEM
+                        </span>
+                      )}
+                      {card.isNumbered && card.printRun && (
+                        <span className="px-3 py-1 bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 text-xs rounded-full font-semibold">
+                          /{card.printRun}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </Link>
+              );
+            })}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-500 dark:text-gray-400 text-lg italic">
+                Detailed checklist not yet available for this set
+              </p>
+              {set.totalCards && (
+                <p className="text-gray-600 dark:text-gray-300 mt-2">
+                  This set contains {set.totalCards} cards
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+
+        <EbayAdHorizontal
+          query={adKeywords.relatedQuery}
+          limit={4}
+          title={getAdTitle(adKeywords.relatedQuery, "Related Soccer Cards")}
+        />
+      </main>
+
+      <aside className="hidden lg:block w-72 flex-shrink-0">
+        <EbayAd
+          query={adKeywords.autographQuery}
+          limit={3}
+          title={getAdTitle(adKeywords.autographQuery, "Soccer Autographs")}
+        />
+      </aside>
+    </div>
+
+    <footer className="bg-gradient-to-r from-footy-green to-green-700 dark:from-footy-orange dark:to-orange-700 text-white transition-colors duration-300 mt-12">
+      <div className="max-w-4xl mx-auto px-4 py-8 text-center">
+        <p className="text-sm">
+          <span className="text-white">footy</span><span className="text-white">.bot</span> © 2024-{new Date().getFullYear()}
+        </p>
+      </div>
+    </footer>
+  </div>
+  );
+}

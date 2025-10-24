@@ -35,6 +35,11 @@ export async function createReleaseWithSets(
   releaseData: {
     name: string;
     year?: string;
+    slug: string;
+    description?: string;
+    releaseDate?: Date | null;
+    sellSheetText?: string;
+    sourceFiles?: Array<{ url: string; type: string; filename?: string }>;
   },
   sets?: Array<{
     name: string;
@@ -46,6 +51,11 @@ export async function createReleaseWithSets(
     data: {
       name: releaseData.name,
       year: releaseData.year,
+      slug: releaseData.slug,
+      description: releaseData.description,
+      releaseDate: releaseData.releaseDate,
+      sellSheetText: releaseData.sellSheetText,
+      sourceFiles: releaseData.sourceFiles,
       manufacturerId,
       sets: sets
         ? {

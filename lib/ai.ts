@@ -80,7 +80,7 @@ const cardAnalysisSchema = z.object({
   variant: z.string().optional().describe("Any variant info (parallel, refractor, etc.)"),
   features: z.array(z.string()).optional().describe("Notable features like autograph, jersey piece, serial numbering, etc."),
   content: z.string().describe("A detailed, engaging blog post (300-500 words) discussing the card, player significance, set details, and collectibility. Use HTML formatting with <p> tags, <strong> for emphasis, and <ul>/<li> for lists."),
-  excerpt: z.string().describe("A brief 1-2 sentence summary for the post preview"),
+  excerpt: z.string().describe("A brief 1-5 sentence summary for the post preview"),
 });
 
 const setAnalysisSchema = z.object({
@@ -93,7 +93,7 @@ const setAnalysisSchema = z.object({
   features: z.array(z.string()).optional().describe("Notable features like autographs, memorabilia cards, parallels, etc."),
   notableCards: z.array(z.string()).optional().describe("Notable players or chase cards in the set"),
   content: z.string().describe("A comprehensive, engaging blog post (400-600 words) discussing the set, its place in the hobby, key subsets, notable cards, and why collectors should be interested. Use HTML formatting with <p> tags, <strong> for emphasis, <h3> for subset headings, and <ul>/<li> for lists."),
-  excerpt: z.string().describe("A brief 1-2 sentence summary for the post preview"),
+  excerpt: z.string().describe("A brief 1-5 sentence summary for the post preview"),
 });
 
 export async function analyzeCardImages(
@@ -178,6 +178,7 @@ const releaseAnalysisSchema = z.object({
   manufacturer: z.string().describe("Card manufacturer/brand name (e.g., Panini, Topps, Upper Deck)"),
   releaseName: z.string().describe("Name of the release/product line"),
   year: z.string().describe("Year or season of the release"),
+  slug: z.string().describe("URL-friendly slug in format: year-manufacturer-release (lowercase, hyphenated)"),
   sets: z.array(
     z.object({
       name: z.string().describe("Name of the set within this release"),
@@ -200,8 +201,8 @@ const releaseAnalysisSchema = z.object({
   ).describe("Array of sets included in this release"),
   features: z.array(z.string()).describe("Notable features of the overall release"),
   title: z.string().describe("Blog post title in format: {Manufacturer} {ReleaseName} {Year}"),
-  content: z.string().describe("Quality HTML blog post (400-600 words) written as soccer fan and card expert"),
-  excerpt: z.string().describe("Concise 1-2 sentence summary for preview"),
+  content: z.string().optional().describe("Optional HTML blog post content"),
+  excerpt: z.string().describe("Concise 1-5 sentence summary for preview"),
 });
 
 // Card checklist schema for extracting lists of cards
@@ -314,7 +315,7 @@ IMPORTANT - CARD EXTRACTION:
 
 You MUST also generate blog post content with the following requirements:
 - **Title**: Use the exact format "{Manufacturer} {ReleaseName} {Year}" (e.g., "Panini Select Premier League 2023-24")
-- **Excerpt**: Write a concise 1-2 sentence summary that captures the essence of this release for collectors
+- **Description**: Write a concise 1-5 sentence summary that captures the essence of this release for collectors
 - **Content**: Write as a passionate soccer fan and experienced sports card expert. Your content should:
   * Be 600-1000 words (comprehensive and detailed)
   * Use proper HTML formatting with <p> tags for paragraphs
@@ -356,6 +357,7 @@ Extract the data in this structure:
 - manufacturer: The parent company (e.g., Panini, Topps, Upper Deck, Leaf) - NOT the product line
 - releaseName: Name of the release/product line (e.g., "Donruss Soccer", "Select", "Prizm")
 - year: Year or season in YYYY or YYYY-YY format (e.g., "2024" or "2024-25")
+- slug: URL-friendly slug in format: year-manufacturer-release (lowercase, hyphenated, e.g., "2024-25-panini-donruss-soccer")
 - sets: Array of sets, each with:
   - name: Set name
   - description: Optional description
@@ -369,13 +371,15 @@ Extract the data in this structure:
     - setName: Optional - which set this belongs to
 - features: Array of notable features for the overall release
 - title: REQUIRED - Use exact format: {Manufacturer} {ReleaseName} {Year}
-- content: REQUIRED - Quality HTML blog post (400-600 words) in soccer fan + card expert persona
-- excerpt: REQUIRED - Concise 1-2 sentence summary`,
+- content: OPTIONAL - Quality HTML blog post content if needed
+- excerpt: REQUIRED - Concise 1-5 sentence summary`,
   });
 
   const result = await generateObject({
     model: anthropic("claude-3-haiku-20240307"),
     schema: releaseAnalysisSchema,
+    mode: 'json',
+    maxTokens: 8000,
     messages: [
       {
         role: "user",
