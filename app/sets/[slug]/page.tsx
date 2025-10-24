@@ -197,10 +197,13 @@ export default function SetPage() {
             </h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
               {set.parallels.map((parallel: string, idx: number) => {
-                // Create detailed slug for the parallel: year-releasename-parallel
-                // e.g., "2024-25-donruss-soccer-optic-base-gold"
-                // Remove "set" or "sets" from set name to avoid redundancy
-                const cleanSetName = set.name.replace(/\bsets?\b/gi, '').trim();
+                // Create detailed slug for the parallel: year-releasename-setname-parallel
+                // e.g., "2024-25-donruss-soccer-optic-gold"
+                // Remove "set/sets" and "base" from set name to avoid redundancy
+                const cleanSetName = set.name
+                  .replace(/\bsets?\b/gi, '')
+                  .replace(/\bbase\b/gi, '')
+                  .trim();
                 const parallelSlug = `${set.release.year || ''}-${set.release.name}-${cleanSetName}-${parallel}`
                   .toLowerCase()
                   .replace(/\s+/g, '-')
