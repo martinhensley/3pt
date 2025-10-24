@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Header from "@/components/Header";
 
 interface ActivityItem {
@@ -13,7 +13,7 @@ interface ActivityItem {
   link?: string;
 }
 
-export default function ActivityHistory() {
+function ActivityContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -324,5 +324,20 @@ export default function ActivityHistory() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ActivityHistory() {
+  return (
+    <Suspense fallback={
+      <div className="flex flex-col min-h-screen bg-gray-50">
+        <Header />
+        <div className="flex-grow flex items-center justify-center">
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    }>
+      <ActivityContent />
+    </Suspense>
   );
 }
