@@ -45,13 +45,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Only allow regeneration for RELEASE posts
-    if (post.type !== "RELEASE") {
-      return NextResponse.json(
-        { error: "Content regeneration is only available for RELEASE posts" },
-        { status: 400 }
-      );
-    }
+    // Note: Content regeneration is available for all post types
 
     if (!post.release) {
       return NextResponse.json(

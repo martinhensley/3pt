@@ -1,4 +1,4 @@
-import { generateObject, generateText } from "ai";
+import { generateObject } from "ai";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { z } from "zod";
 import type { ParsedDocument } from "./documentParser";
@@ -59,9 +59,9 @@ export interface ReleaseAnalysis {
   year: string;
   sets: SetInfo[];
   features: string[];
-  // Required blog post fields
+  // Blog post fields
   title: string;
-  content: string;
+  content?: string; // Optional
   excerpt: string;
 }
 
@@ -379,7 +379,6 @@ Extract the data in this structure:
     model: anthropic("claude-3-haiku-20240307"),
     schema: releaseAnalysisSchema,
     mode: 'json',
-    maxTokens: 8000,
     messages: [
       {
         role: "user",

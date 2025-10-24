@@ -72,7 +72,7 @@ export default function ParallelPage() {
       excerpt: `${parallelName} ${firstCard.set.release.year || ''} ${firstCard.set.release.name}`,
       type: 'NEWS',
     };
-    return extractKeywordsFromPost(postLike as any);
+    return extractKeywordsFromPost(postLike as { title: string; content: string; excerpt: string; type: string });
   }, [cards, parallelName]);
 
   useEffect(() => {
@@ -83,8 +83,6 @@ export default function ParallelPage() {
 
     // Try to extract components from slug
     let year = '';
-    let releaseName = '';
-    let setName = '';
     let parallelName = '';
 
     // Find year pattern (e.g., "2024" or "2024-25")

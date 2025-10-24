@@ -165,7 +165,7 @@ export default function CreatePostPage() {
             </label>
             <select
               value={type}
-              onChange={(e) => setType(e.target.value as any)}
+              onChange={(e) => setType(e.target.value as "NEWS" | "REVIEW" | "GUIDE" | "ANALYSIS" | "GENERAL")}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
               <option value="NEWS">News</option>

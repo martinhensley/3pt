@@ -297,8 +297,8 @@ export async function DELETE(request: NextRequest) {
       where: { id },
     });
 
-    // If this is a RELEASE post, delete the associated Release and its Sets
-    if (post.type === "RELEASE" && post.releaseId) {
+    // If this post has a releaseId, check if we should delete the associated Release and its Sets
+    if (post.releaseId) {
       // Check if there are any other posts referencing this release
       const otherReleasePosts = await prisma.post.count({
         where: {
@@ -333,8 +333,8 @@ export async function DELETE(request: NextRequest) {
       }
     }
 
-    // If this is a SET post, delete the associated Set
-    if (post.type === "SET" && post.setId) {
+    // If this post has a setId, check if we should delete the associated Set
+    if (post.setId) {
       // Check if there are any other posts referencing this set
       const otherSetPosts = await prisma.post.count({
         where: {
@@ -357,8 +357,8 @@ export async function DELETE(request: NextRequest) {
       }
     }
 
-    // If this is a CARD post, delete the associated Card
-    if (post.type === "CARD" && post.cardId) {
+    // If this post has a cardId, check if we should delete the associated Card
+    if (post.cardId) {
       // Check if there are any other posts referencing this card
       const otherCardPosts = await prisma.post.count({
         where: {

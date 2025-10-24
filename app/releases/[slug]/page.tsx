@@ -103,10 +103,10 @@ export default function ReleasePage() {
     const postLike = {
       title: `${release.year} ${release.name}`,
       content: `${release.manufacturer.name} ${release.name} ${release.year || ''} trading cards`,
-      description: `${release.manufacturer.name} ${release.name} ${release.year || ''} soccer card release`,
+      excerpt: `${release.manufacturer.name} ${release.name} ${release.year || ''} soccer card release`,
       type: 'NEWS',
     };
-    return extractKeywordsFromPost(postLike as any);
+    return extractKeywordsFromPost(postLike as { title: string; content: string; excerpt: string; type: string });
   }, [release]);
 
   // Generate carousel images with AI-style captions
@@ -288,13 +288,13 @@ export default function ReleasePage() {
 
             {/* Image Carousel */}
             {carouselImages.length > 0 && (
-              <div className="relative">
-                <div className="relative aspect-[16/9] bg-gradient-to-br from-black/20 to-black/40">
+              <div className="relative bg-white">
+                <div className="relative aspect-[16/9] bg-white">
                   <Image
                     src={carouselImages[currentImageIndex].url}
                     alt={carouselImages[currentImageIndex].caption}
                     fill
-                    className="object-contain"
+                    className="object-contain p-4"
                     sizes="(max-width: 768px) 100vw, 80vw"
                     priority
                   />

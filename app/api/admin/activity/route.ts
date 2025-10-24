@@ -20,7 +20,13 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * pageSize;
 
     // Build activity items from different sources
-    const activities: any[] = [];
+    const activities: Array<{
+      id: string;
+      type: string;
+      title: string;
+      date: string;
+      link: string;
+    }> = [];
 
     // Fetch Releases
     if (!type || type === "RELEASE") {

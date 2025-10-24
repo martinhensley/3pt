@@ -87,7 +87,7 @@ export default function SetPage() {
       excerpt: `${set.release.manufacturer.name} ${set.release.name} ${displayName} ${set.release.year || ''} soccer card set`,
       type: 'NEWS',
     };
-    return extractKeywordsFromPost(postLike as any);
+    return extractKeywordsFromPost(postLike as { title: string; content: string; excerpt: string; type: string });
   }, [set, displayName]);
 
   if (loading) {
@@ -108,7 +108,7 @@ export default function SetPage() {
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Set Not Found</h1>
-            <p className="text-gray-600 dark:text-gray-300 mb-8">The set you're looking for doesn't exist.</p>
+            <p className="text-gray-600 dark:text-gray-300 mb-8">The set you&apos;re looking for doesn&apos;t exist.</p>
             <Link href="/" className="text-footy-green dark:text-footy-orange hover:underline">
               ← Back to Home
             </Link>

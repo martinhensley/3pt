@@ -83,7 +83,7 @@ export default function ManageReleasesPage() {
       } else {
         throw new Error("Failed to delete release");
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: "error", text: "Failed to delete release" });
       setTimeout(() => setMessage(null), 3000);
     }

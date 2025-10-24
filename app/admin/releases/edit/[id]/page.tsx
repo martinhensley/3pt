@@ -465,7 +465,7 @@ export default function EditReleasePage() {
         throw new Error('Failed to upload file');
       }
 
-      const { url: fileUrl } = await uploadResponse.json();
+      await uploadResponse.json();
 
       // Generate excerpt using AI
       const prompt = `Based on this ${editedYear} ${editedManufacturer} ${editedReleaseName} sell sheet, write a compelling 1-5 sentence excerpt that highlights the key features and appeal of this release for soccer card collectors. Focus on what makes this release special and exciting.`;

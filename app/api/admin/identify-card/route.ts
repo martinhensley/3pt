@@ -99,7 +99,13 @@ export async function POST(request: NextRequest) {
 async function identifyCardSet(
   frontImage: string,
   backImage: string | undefined,
-  release: any
+  release: {
+    id: string;
+    name: string;
+    year: string | null;
+    manufacturer: { name: string };
+    sets: Array<{ id: string; name: string; parallels: unknown }>;
+  }
 ): Promise<IdentificationResult> {
   const anthropic = new Anthropic({
     apiKey: process.env.ANTHROPIC_API_KEY,
@@ -111,10 +117,10 @@ async function identifyCardSet(
 
   // Build list of sets and parallels for context
   const setList = release.sets
-    .map((set: any) => {
-      const parallels = set.parallels as any[];
+    .map((set) => {
+      const parallels = set.parallels as Array<{ name: string }> | null;
       const parallelNames = parallels && Array.isArray(parallels)
-        ? parallels.map((p: any) => p.name).join(', ')
+        ? parallels.map((p) => p.name).join(', ')
         : '';
       return `- ${set.name}${parallelNames ? ` (Parallels: ${parallelNames})` : ''}`;
     })
@@ -159,8 +165,11 @@ Return ONLY valid JSON with no additional text:
 }`;
 
   try {
-    // Build message content
-    const messageContent: any[] = [
+    // Build message content using proper Anthropic types
+    const messageContent: Array<
+      | { type: 'image'; source: { type: 'base64'; media_type: 'image/jpeg'; data: string } }
+      | { type: 'text'; text: string }
+    > = [
       {
         type: 'image',
         source: {
@@ -212,7 +221,7 @@ Return ONLY valid JSON with no additional text:
 
     // Try to match against existing sets and parallels
     const matchedSet = release.sets.find(
-      (set: any) =>
+      (set) =>
         set.name.toLowerCase() === parsed.setName.toLowerCase() ||
         set.name.toLowerCase().includes(parsed.setName.toLowerCase()) ||
         parsed.setName.toLowerCase().includes(set.name.toLowerCase())
@@ -220,10 +229,10 @@ Return ONLY valid JSON with no additional text:
 
     let matchedParallelType = null;
     if (matchedSet && parsed.parallelName) {
-      const parallels = matchedSet.parallels as any[];
+      const parallels = matchedSet.parallels as Array<{ name: string }> | null;
       if (parallels && Array.isArray(parallels)) {
         const foundParallel = parallels.find(
-          (parallel: any) =>
+          (parallel) =>
             parallel.name.toLowerCase() === parsed.parallelName?.toLowerCase() ||
             parallel.name.toLowerCase().includes(parsed.parallelName?.toLowerCase() || '') ||
             parsed.parallelName?.toLowerCase().includes(parallel.name.toLowerCase())
@@ -238,7 +247,7 @@ Return ONLY valid JSON with no additional text:
       confidence: parsed.confidence,
       matchedSetId: matchedSet?.id,
       matchedParallelId: undefined, // No longer used - we use parallelType string instead
-      suggestedSetNames: release.sets.map((s: any) => s.name),
+      suggestedSetNames: release.sets.map((s) => s.name),
     };
 
     console.log('AI Identification Result:', result);

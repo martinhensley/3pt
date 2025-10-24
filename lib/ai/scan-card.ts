@@ -59,8 +59,11 @@ export async function scanCardImage(
   const prompt = buildScanPrompt(context);
 
   try {
-    // Build message content
-    const messageContent: any[] = [
+    // Build message content using proper Anthropic types
+    const messageContent: Array<
+      | { type: 'image'; source: { type: 'base64'; media_type: 'image/jpeg'; data: string } }
+      | { type: 'text'; text: string }
+    > = [
       {
         type: 'image',
         source: {

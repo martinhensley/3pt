@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { analyzeReleaseDocuments } from "@/lib/ai";
+import { analyzeReleaseDocuments, type ReleaseAnalysis } from "@/lib/ai";
 import { parseDocuments } from "@/lib/documentParser";
 import {
   getOrCreateManufacturer,
@@ -73,8 +73,8 @@ export async function POST(request: NextRequest) {
       analysis = await analyzeReleaseDocuments(parsedDocuments);
 
       // Attach sell sheet data to analysis for potential later use
-      analysis.sellSheetText = sellSheetText;
-      analysis.sourceFiles = sourceFiles;
+      (analysis as ReleaseAnalysis & { sellSheetText?: string; sourceFiles?: Array<{ url: string; type: string; filename?: string }> }).sellSheetText = sellSheetText;
+      (analysis as ReleaseAnalysis & { sellSheetText?: string; sourceFiles?: Array<{ url: string; type: string; filename?: string }> }).sourceFiles = sourceFiles;
     }
 
     // Create database records if requested

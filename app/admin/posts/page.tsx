@@ -84,7 +84,7 @@ export default function ManagePostsPage() {
       } else {
         throw new Error("Failed to update post");
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: "error", text: "Failed to update post status" });
       setTimeout(() => setMessage(null), 3000);
     }
@@ -107,7 +107,7 @@ export default function ManagePostsPage() {
       } else {
         throw new Error("Failed to delete post");
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: "error", text: "Failed to delete post" });
       setTimeout(() => setMessage(null), 3000);
     }
