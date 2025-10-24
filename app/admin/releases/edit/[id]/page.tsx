@@ -38,6 +38,7 @@ interface Release {
   sets: Array<{
     id: string;
     name: string;
+    description: string | null;
     totalCards: string | null;
     parallels: string[] | null;
     cards: Array<{
