@@ -222,7 +222,7 @@ export default function ParallelPage() {
             {setInfo && (
               <>
                 <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
-                  {setInfo.year} {firstCard.set.release.name} {setInfo.name.replace(/\bsets?\b/gi, '').trim()} {parallelName}
+                  {setInfo.year} {firstCard.set.release.name} {setInfo.name.replace(/\bsets?\b/gi, '').trim()} {parallelName.replace(/\bbase\b/gi, '').trim()}
                 </h1>
                 <div className="text-xl">
                   {cards.length} Card{cards.length !== 1 ? 's' : ''} in the Parallel Set
