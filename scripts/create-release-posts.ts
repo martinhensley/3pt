@@ -47,11 +47,11 @@ async function createReleasePosts() {
         const title = `${release.year || ''} ${release.manufacturer.name} ${release.name}`.trim();
         const postSlug = release.slug; // Use same slug as release
 
-        // Generate content if no excerpt
-        const content = release.excerpt ||
+        // Generate content and excerpt
+        const content = release.description ||
           `Discover the ${title} release featuring extensive card sets, parallels, and special inserts. Explore the complete checklist and card details.`;
 
-        const excerpt = release.excerpt ||
+        const excerpt = release.description ||
           `${title} features multiple card sets with parallels and special inserts.`;
 
         console.log(`Creating post for: ${title}`);
