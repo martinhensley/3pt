@@ -236,11 +236,14 @@ export default function SetPage() {
           {sortedCards && sortedCards.length > 0 ? (
             <div className="grid gap-3">
               {sortedCards.map((card) => {
-                // Generate slug: year-set-name-card#-player-parallel
+                // Generate slug: year-releasename-setname-card#-player-parallel
+                // Remove "set/sets" from set name to avoid redundancy
+                const cleanSetName = set.name.replace(/\bsets?\b/gi, '').trim();
                 const slugParts = [
                   set.release.year,
-                  set.name,
-                  card.cardNumber ? `card-${card.cardNumber}` : '',
+                  set.release.name,
+                  cleanSetName,
+                  card.cardNumber || '',
                   card.playerName || 'unknown',
                 ];
 
@@ -256,7 +259,9 @@ export default function SetPage() {
                   .join('-')
                   .toLowerCase()
                   .replace(/\s+/g, '-')
-                  .replace(/[^a-z0-9-]/g, '');
+                  .replace(/[^a-z0-9-]/g, '')
+                  .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+                  .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
 
                 return (
                   <Link
