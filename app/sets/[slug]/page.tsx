@@ -92,9 +92,9 @@ export default function SetPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-900">
+      <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
         <Header />
-        <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="flex-grow flex items-center justify-center">
           <p className="text-gray-600 dark:text-gray-300">Loading...</p>
         </div>
       </div>
@@ -103,13 +103,13 @@ export default function SetPage() {
 
   if (!set) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-900">
+      <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
         <Header />
-        <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="flex-grow flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Set Not Found</h1>
+            <h1 className="text-2xl font-bold text-footy-green dark:text-footy-orange mb-4">Set Not Found</h1>
             <p className="text-gray-600 dark:text-gray-300 mb-8">The set you&apos;re looking for doesn&apos;t exist.</p>
-            <Link href="/" className="text-footy-green dark:text-footy-orange hover:underline">
+            <Link href="/" className="text-footy-orange dark:text-footy-orange hover:underline font-semibold">
               ← Back to Home
             </Link>
           </div>
@@ -129,10 +129,10 @@ export default function SetPage() {
   }) : [];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
+    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <Header />
 
-      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 py-8">
+      <div className="flex-grow flex gap-4 max-w-[1400px] mx-auto w-full px-4 py-12">
         <aside className="hidden lg:block w-72 flex-shrink-0">
           <EbayAd
             query={adKeywords.primaryQuery}
@@ -153,32 +153,33 @@ export default function SetPage() {
           </div>
 
         {/* Set Header */}
-        <div className="bg-gradient-to-r from-footy-green to-green-700 dark:from-footy-orange dark:to-orange-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
-          <h1 className="text-2xl md:text-3xl font-black leading-tight mb-6 flex items-center gap-3 flex-wrap">
-            <span className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full font-bold text-sm">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-8 transition-colors duration-300">
+          <div className="flex items-center gap-2 text-sm mb-4">
+            <span className="bg-footy-green text-white px-2 py-1 rounded-full font-semibold text-xs">
               SET
             </span>
-            <span>
-              {set.release.year && <span className="text-white/90">{set.release.year} </span>}
-              {set.release.name} {displayName}
-            </span>
+          </div>
+
+          <h1 className="text-2xl md:text-3xl font-bold text-footy-green dark:text-footy-orange mb-6">
+            {set.release.year && <span>{set.release.year} </span>}
+            {set.release.name} {displayName}
           </h1>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-              <div className="text-sm text-white/70 uppercase tracking-wide mb-1">Total Cards</div>
-              <div className="text-3xl font-black">{setCardCount > 0 ? setCardCount.toLocaleString() : '—'}</div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <div className="text-sm text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1">Total Cards</div>
+              <div className="text-3xl font-bold text-footy-green dark:text-footy-orange">{setCardCount > 0 ? setCardCount.toLocaleString() : '—'}</div>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-              <div className="text-sm text-white/70 uppercase tracking-wide mb-1">Parallels</div>
-              <div className="text-3xl font-black">{setParallelCount > 0 ? setParallelCount : '—'}</div>
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <div className="text-sm text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1">Parallels</div>
+              <div className="text-3xl font-bold text-footy-green dark:text-footy-orange">{setParallelCount > 0 ? setParallelCount : '—'}</div>
             </div>
           </div>
 
           {/* Set Description */}
           {set.description && (
-            <div className="mt-6 pt-6 border-t border-white/20">
-              <p className="text-lg text-white/90 leading-relaxed">
+            <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                 {set.description}
               </p>
             </div>
@@ -187,8 +188,8 @@ export default function SetPage() {
 
         {/* Parallels Section */}
         {Array.isArray(set.parallels) && set.parallels.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8 border border-gray-200 dark:border-gray-700">
-            <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-8 transition-colors duration-300">
+            <h3 className="text-2xl font-bold text-footy-green dark:text-footy-orange mb-6 flex items-center gap-2">
               <svg className="w-6 h-6 text-footy-green dark:text-footy-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
               </svg>
@@ -196,20 +197,24 @@ export default function SetPage() {
             </h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
               {set.parallels.map((parallel: string, idx: number) => {
-                // Create detailed slug for the parallel: year-releasename-setname-parallel
-                // e.g., "2024-25-donruss-soccer-base-set-gold-prizm"
-                const parallelSlug = `${set.release.year || ''}-${set.release.name}-${set.name}-${parallel}`
+                // Create detailed slug for the parallel: year-releasename-parallel
+                // e.g., "2024-25-donruss-soccer-optic-base-gold"
+                // Remove "set" or "sets" from set name to avoid redundancy
+                const cleanSetName = set.name.replace(/\bsets?\b/gi, '').trim();
+                const parallelSlug = `${set.release.year || ''}-${set.release.name}-${cleanSetName}-${parallel}`
                   .toLowerCase()
                   .replace(/\s+/g, '-')
-                  .replace(/[^a-z0-9-]/g, '');
+                  .replace(/[^a-z0-9-]/g, '')
+                  .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+                  .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
 
                 return (
                   <Link
                     key={idx}
                     href={`/parallel/${parallelSlug}`}
-                    className="bg-gradient-to-r from-footy-green to-green-700 dark:from-footy-orange dark:to-orange-700 rounded-lg p-4 border-2 border-footy-green dark:border-footy-orange hover:border-footy-orange hover:shadow-lg hover:scale-105 transition-all cursor-pointer"
+                    className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border-2 border-gray-200 dark:border-gray-600 hover:border-footy-orange hover:shadow-lg transition-all"
                   >
-                    <div className="font-bold text-white">
+                    <div className="font-bold text-footy-green dark:text-footy-orange">
                       {parallel}
                     </div>
                   </Link>
@@ -220,8 +225,8 @@ export default function SetPage() {
         )}
 
         {/* Card Checklist */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8 border border-gray-200 dark:border-gray-700">
-          <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-8 transition-colors duration-300">
+          <h3 className="text-2xl font-bold text-footy-green dark:text-footy-orange mb-6 flex items-center gap-2">
             <svg className="w-6 h-6 text-footy-green dark:text-footy-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
             </svg>
@@ -257,15 +262,15 @@ export default function SetPage() {
                   <Link
                     key={card.id}
                     href={`/card/${cardSlug}`}
-                    className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-footy-orange hover:shadow-lg transition-all cursor-pointer"
+                    className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-footy-orange hover:shadow-lg transition-all"
                   >
                   {card.cardNumber && (
-                    <div className="flex-shrink-0 w-16 h-16 bg-footy-green dark:bg-footy-orange text-white rounded-lg flex items-center justify-center font-black text-lg">
+                    <div className="flex-shrink-0 w-16 h-16 bg-footy-green dark:bg-footy-orange text-white rounded-lg flex items-center justify-center font-bold text-lg">
                       {card.cardNumber}
                     </div>
                   )}
                   <div className="flex-grow">
-                    <div className="font-bold text-lg text-gray-900 dark:text-white">
+                    <div className="font-bold text-lg text-footy-green dark:text-footy-orange">
                       {card.playerName || 'Unknown Player'}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -326,11 +331,13 @@ export default function SetPage() {
       </aside>
     </div>
 
-    <footer className="bg-gradient-to-r from-footy-green to-green-700 dark:from-footy-orange dark:to-orange-700 text-white transition-colors duration-300 mt-12">
-      <div className="max-w-4xl mx-auto px-4 py-8 text-center">
-        <p className="text-sm">
-          <span className="text-white">footy</span><span className="text-white">.bot</span> © 2024-{new Date().getFullYear()}
-        </p>
+    <footer className="bg-footy-green dark:bg-gray-950 text-white transition-colors duration-300">
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="text-center">
+          <p className="text-sm">
+            <span className="text-white">footy</span><span className="text-footy-orange">.bot</span> © 2024-{new Date().getFullYear()}
+          </p>
+        </div>
       </div>
     </footer>
   </div>
