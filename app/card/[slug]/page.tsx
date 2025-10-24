@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import Header from "@/components/Header";
@@ -52,6 +52,7 @@ interface Card {
 
 export default function CardDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const slug = params.slug as string;
   const [card, setCard] = useState<Card | null>(null);
   const [loading, setLoading] = useState(true);
@@ -139,12 +140,12 @@ export default function CardDetailPage() {
         <main className="flex-grow max-w-5xl">
           {/* Breadcrumb */}
           <div className="mb-6">
-            <Link
-              href={`/sets/${card.set.release.year}-${card.set.release.name}-${card.set.name}`.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}
-              className="text-footy-green dark:text-footy-orange hover:underline"
+            <button
+              onClick={() => router.back()}
+              className="text-footy-green dark:text-footy-orange hover:underline flex items-center gap-1"
             >
-              ← Back to {card.set.name}
-            </Link>
+              ← Back
+            </button>
           </div>
 
           {/* Card Header */}

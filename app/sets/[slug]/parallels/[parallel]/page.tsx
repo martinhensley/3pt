@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import Header from "@/components/Header";
@@ -44,6 +44,7 @@ interface Card {
 
 export default function ParallelPage() {
   const params = useParams();
+  const router = useRouter();
   const setSlug = params.slug as string;
   const parallelSlug = params.parallel as string;
   const [cards, setCards] = useState<Card[]>([]);
@@ -179,16 +180,14 @@ export default function ParallelPage() {
 
         <main className="flex-grow max-w-5xl">
           {/* Breadcrumb */}
-          {setInfo && (
-            <div className="mb-6">
-              <Link
-                href={`/sets/${setSlug}`}
-                className="text-footy-green dark:text-footy-orange hover:underline"
-              >
-                ← Back to {setInfo.name}
-              </Link>
-            </div>
-          )}
+          <div className="mb-6">
+            <button
+              onClick={() => router.back()}
+              className="text-footy-green dark:text-footy-orange hover:underline flex items-center gap-1"
+            >
+              ← Back to {setInfo?.name || 'Set'}
+            </button>
+          </div>
 
           {/* Header */}
           <div className="bg-gradient-to-r from-footy-green to-green-700 dark:from-footy-orange dark:to-orange-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
@@ -208,7 +207,11 @@ export default function ParallelPage() {
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8 border border-gray-200 dark:border-gray-700">
             <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-6">Cards</h2>
             <div className="grid gap-4">
-              {cards.map((card) => {
+              {[...cards].sort((a, b) => {
+                const numA = parseInt(a.cardNumber || '0');
+                const numB = parseInt(b.cardNumber || '0');
+                return numA - numB;
+              }).map((card) => {
                 // Generate individual card slug: year-releasename-setname-card#-player-parallel
                 // Remove "set/sets" from set name to avoid redundancy
                 const cleanSetName = card.set.name.replace(/\bsets?\b/gi, '').trim();
@@ -220,10 +223,10 @@ export default function ParallelPage() {
                   card.playerName || 'unknown',
                 ];
 
-                if (card.parallelType && card.parallelType.toLowerCase() !== 'base') {
-                  slugParts.push(card.parallelType);
-                } else if (card.variant && card.variant.toLowerCase() !== 'base') {
-                  slugParts.push(card.variant);
+                // Always add the parallel name from the URL since we're on a parallel page
+                // Use parallelName which is derived from the URL slug
+                if (parallelName && parallelName.toLowerCase() !== 'base') {
+                  slugParts.push(parallelName);
                 }
 
                 const cardSlug = slugParts

@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
 import EbayAd from "@/components/EbayAd";
@@ -44,6 +44,7 @@ interface Set {
 
 export default function SetPage() {
   const params = useParams();
+  const router = useRouter();
   const slug = params.slug as string;
   const [set, setSet] = useState<Set | null>(null);
   const [loading, setLoading] = useState(true);
@@ -144,12 +145,12 @@ export default function SetPage() {
         <main className="flex-grow max-w-5xl">
           {/* Breadcrumb */}
           <div className="mb-6">
-            <Link
-              href={`/releases/${set.release.slug}`}
-              className="text-footy-green dark:text-footy-orange hover:underline"
+            <button
+              onClick={() => router.back()}
+              className="text-footy-green dark:text-footy-orange hover:underline flex items-center gap-1"
             >
-              ← Back to {set.release.year} {set.release.name}
-            </Link>
+              ← Back
+            </button>
           </div>
 
         {/* Set Header */}
