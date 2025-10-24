@@ -39,7 +39,7 @@ async function checkBaseOpticCards() {
   console.log(`   Set ID: ${baseOpticSet.id}`);
   console.log(`   Total Cards (metadata): ${baseOpticSet.totalCards || 'not set'}`);
   console.log(`   Actual Cards in DB: ${baseOpticSet.cards.length}`);
-  console.log(`   Parallels: ${baseOpticSet.parallels?.length || 0}\n`);
+  console.log(`   Parallels: ${Array.isArray(baseOpticSet.parallels) ? baseOpticSet.parallels.length : 0}\n`);
 
   if (baseOpticSet.cards.length > 0) {
     console.log(`📋 Sample cards (first 5):`);
