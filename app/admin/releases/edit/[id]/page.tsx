@@ -29,7 +29,7 @@ interface Release {
   id: string;
   name: string;
   year: string;
-  excerpt: string | null;
+  description: string | null;
   manufacturerId: string;
   manufacturer: {
     id: string;
@@ -59,8 +59,8 @@ export default function EditReleasePage() {
   const [loading, setLoading] = useState(false);
   const [fetchingRelease, setFetchingRelease] = useState(true);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
-  const [generatingExcerpt, setGeneratingExcerpt] = useState(false);
-  const [excerptFile, setExcerptFile] = useState<File | null>(null);
+  const [generatingDescription, setGeneratingDescription] = useState(false);
+  const [descriptionFile, setDescriptionFile] = useState<File | null>(null);
   const [generatingSetDescription, setGeneratingSetDescription] = useState<number | null>(null);
 
   // Release data
@@ -70,7 +70,7 @@ export default function EditReleasePage() {
   const [editedManufacturer, setEditedManufacturer] = useState("");
   const [editedReleaseName, setEditedReleaseName] = useState("");
   const [editedYear, setEditedYear] = useState("");
-  const [editedExcerpt, setEditedExcerpt] = useState("");
+  const [editedDescription, setEditedDescription] = useState("");
   const [editedSets, setEditedSets] = useState<SetInfo[]>([]);
 
   useEffect(() => {
@@ -99,7 +99,7 @@ export default function EditReleasePage() {
         setEditedManufacturer(data.manufacturer.name);
         setEditedReleaseName(data.name);
         setEditedYear(data.year);
-        setEditedExcerpt(data.excerpt || "");
+        setEditedDescription(data.description || "");
 
         // Transform sets data
         const transformedSets: SetInfo[] = data.sets.map((set: { id: string; name: string; totalCards: string | null; parallels: string[] | null; cards: { id: string; playerName: string | null; team: string | null; cardNumber: string | null; variant: string | null }[] }) => ({
@@ -441,20 +441,20 @@ export default function EditReleasePage() {
     setEditedSets(updatedSets);
   };
 
-  const handleGenerateExcerpt = async () => {
-    if (!excerptFile) {
+  const handleGenerateDescription = async () => {
+    if (!descriptionFile) {
       setMessage({ type: "error", text: "Please upload a sell sheet or info document first" });
       setTimeout(() => setMessage(null), 3000);
       return;
     }
 
     try {
-      setGeneratingExcerpt(true);
-      setMessage({ type: "success", text: "Generating excerpt from document..." });
+      setGeneratingDescription(true);
+      setMessage({ type: "success", text: "Generating description from document..." });
 
       // Upload file to blob storage first
       const formData = new FormData();
-      formData.append('file', excerptFile);
+      formData.append('file', descriptionFile);
 
       const uploadResponse = await fetch('/api/upload', {
         method: 'POST',
@@ -467,8 +467,8 @@ export default function EditReleasePage() {
 
       await uploadResponse.json();
 
-      // Generate excerpt using AI
-      const prompt = `Based on this ${editedYear} ${editedManufacturer} ${editedReleaseName} sell sheet, write a compelling 1-5 sentence excerpt that highlights the key features and appeal of this release for soccer card collectors. Focus on what makes this release special and exciting.`;
+      // Generate description using AI
+      const prompt = `Based on this ${editedYear} ${editedManufacturer} ${editedReleaseName} sell sheet, write a compelling 1-5 sentence description that highlights the key features and appeal of this release for soccer card collectors. Focus on what makes this release special and exciting.`;
 
       const response = await fetch('/api/generate/post', {
         method: 'POST',
@@ -477,19 +477,19 @@ export default function EditReleasePage() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to generate excerpt');
+        throw new Error('Failed to generate description');
       }
 
       const data = await response.json();
-      setEditedExcerpt(data.excerpt || '');
-      setMessage({ type: "success", text: "Excerpt generated successfully!" });
+      setEditedDescription(data.excerpt || '');
+      setMessage({ type: "success", text: "Description generated successfully!" });
       setTimeout(() => setMessage(null), 3000);
     } catch (error) {
-      console.error('Failed to generate excerpt:', error);
-      setMessage({ type: "error", text: "Failed to generate excerpt. Please try again." });
+      console.error('Failed to generate description:', error);
+      setMessage({ type: "error", text: "Failed to generate description. Please try again." });
       setTimeout(() => setMessage(null), 5000);
     } finally {
-      setGeneratingExcerpt(false);
+      setGeneratingDescription(false);
     }
   };
 
@@ -502,7 +502,7 @@ export default function EditReleasePage() {
 
       const errors: string[] = [];
 
-      // Update release metadata (name, year, excerpt)
+      // Update release metadata (name, year, description)
       try {
         const updateReleaseResponse = await fetch("/api/releases", {
           method: "PUT",
@@ -511,7 +511,7 @@ export default function EditReleasePage() {
             id: release.id,
             name: editedReleaseName,
             year: editedYear,
-            excerpt: editedExcerpt || null,
+            description: editedDescription || null,
           }),
         });
 
@@ -789,31 +789,31 @@ export default function EditReleasePage() {
           </h3>
 
           <div className="space-y-4">
-            {/* GenAI Excerpt Generator */}
+            {/* GenAI Description Generator */}
             <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
               <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
                 <svg className="w-5 h-5 text-footy-green dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
-                GenAI: Generate Excerpt from Sell Sheet
+                GenAI: Generate Description from Sell Sheet
               </h4>
               <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
-                Upload a sell sheet or info document to automatically generate a compelling excerpt
+                Upload a sell sheet or info document to automatically generate a compelling description
               </p>
               <div className="flex items-center gap-3">
                 <input
                   type="file"
                   accept=".pdf,.png,.jpg,.jpeg,.webp"
-                  onChange={(e) => setExcerptFile(e.target.files?.[0] || null)}
+                  onChange={(e) => setDescriptionFile(e.target.files?.[0] || null)}
                   className="text-sm text-gray-600 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-footy-green hover:file:bg-green-200 dark:file:bg-green-900 dark:file:text-green-300"
                 />
                 <button
                   type="button"
-                  onClick={handleGenerateExcerpt}
-                  disabled={!excerptFile || generatingExcerpt}
+                  onClick={handleGenerateDescription}
+                  disabled={!descriptionFile || generatingDescription}
                   className="px-4 py-2 bg-gradient-to-r from-footy-green to-green-600 hover:from-green-700 hover:to-green-700 text-white rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {generatingExcerpt ? (
+                  {generatingDescription ? (
                     <>
                       <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -826,24 +826,24 @@ export default function EditReleasePage() {
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
-                      Generate Excerpt
+                      Generate Description
                     </>
                   )}
                 </button>
               </div>
             </div>
 
-            {/* Manual Excerpt Input */}
+            {/* Manual Description Input */}
             <div>
               <label className="block font-semibold text-gray-900 dark:text-gray-100 mb-1">
-                Excerpt:
+                Description:
               </label>
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                 1-5 sentence summary displayed in previews and on the release page
               </p>
               <textarea
-                value={editedExcerpt}
-                onChange={(e) => setEditedExcerpt(e.target.value)}
+                value={editedDescription}
+                onChange={(e) => setEditedDescription(e.target.value)}
                 rows={4}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="A brief summary of this release for collectors..."

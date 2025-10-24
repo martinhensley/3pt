@@ -40,10 +40,21 @@ export async function GET(request: NextRequest) {
 
       // Find the set that matches this slug
       const matchedSet = sets.find(set => {
-        const setSlug = `${set.release.year || ''}-${set.release.name}-${set.name}`
+        // Clean set name: remove "Base" from Optic sets, keep it for others
+        const cleanSetName = set.name
+          .replace(/\boptic\s+base\s+set\b/gi, 'Optic') // Optic Base Set -> Optic
+          .replace(/\boptic\s+base\b/gi, 'Optic') // Optic Base -> Optic
+          .replace(/\bbase\s+optic\b/gi, 'Optic') // Base Optic -> Optic
+          .replace(/\bbase\s+set\b/gi, '') // Remove generic "base set"
+          .replace(/\bsets?\b/gi, '') // Remove "set/sets"
+          .trim();
+
+        const setSlug = `${set.release.year || ''}-${set.release.name}-${cleanSetName}`
           .toLowerCase()
           .replace(/\s+/g, '-')
-          .replace(/[^a-z0-9-]/g, '');
+          .replace(/[^a-z0-9-]/g, '')
+          .replace(/-+/g, '-')
+          .replace(/^-|-$/g, '');
         return setSlug === slug;
       });
 

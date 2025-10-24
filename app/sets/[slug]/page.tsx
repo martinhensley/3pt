@@ -45,6 +45,7 @@ interface Set {
 export default function SetPage() {
   const params = useParams();
   const router = useRouter();
+  // Use the slug as-is - it's already been cleaned by the release page link generation
   const slug = params.slug as string;
   const [set, setSet] = useState<Set | null>(null);
   const [loading, setLoading] = useState(true);
@@ -68,8 +69,15 @@ export default function SetPage() {
       });
   }, [slug]);
 
-  // Normalize "Base Optic" to "Optic Base" - moved before conditional returns
-  const displayName = set?.name.toLowerCase() === 'base optic' ? 'Optic Base' : (set?.name || '');
+  // Clean display name: remove "Base" from Optic sets, keep it for others
+  const displayName = set?.name
+    ? set.name
+        .replace(/\boptic\s+base\s+set\b/gi, 'Optic') // Optic Base Set -> Optic
+        .replace(/\boptic\s+base\b/gi, 'Optic') // Optic Base -> Optic
+        .replace(/\bbase\s+optic\b/gi, 'Optic') // Base Optic -> Optic
+        .replace(/\bsets?\b/gi, '') // Remove "set/sets"
+        .trim()
+    : '';
 
   // Extract keywords from set for dynamic ad queries - MUST be before conditional returns
   const adKeywords = useMemo(() => {
@@ -236,8 +244,11 @@ export default function SetPage() {
             <div className="grid gap-3">
               {sortedCards.map((card) => {
                 // Generate slug: year-releasename-setname-card#-player-parallel
-                // Remove "set/sets" from set name to avoid redundancy
-                const cleanSetName = set.name.replace(/\bsets?\b/gi, '').trim();
+                // Remove "base set" and "set/sets" patterns from set name
+                const cleanSetName = set.name
+                  .replace(/\bbase\s+set\b/gi, '') // Remove "base set" pattern
+                  .replace(/\bsets?\b/gi, '') // Remove remaining "set/sets"
+                  .trim();
                 const slugParts = [
                   set.release.year,
                   set.release.name,

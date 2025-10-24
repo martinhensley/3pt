@@ -45,6 +45,7 @@ interface Card {
 export default function ParallelPage() {
   const params = useParams();
   const router = useRouter();
+  // Use the slug as-is - it's already been cleaned by the release page link generation
   const setSlug = params.slug as string;
   const parallelSlug = params.parallel as string;
   const [cards, setCards] = useState<Card[]>([]);
@@ -94,7 +95,14 @@ export default function ParallelPage() {
         // Filter cards based on set slug and parallel matching
         const matchingCards = data.filter((card: Card) => {
           // Generate the card's set slug to match against URL
-          const cardSetSlug = `${card.set.release.year}-${card.set.release.name}-${card.set.name}`
+          // Remove "base set" and "set/sets" patterns from set name, Optic-specific handling
+          const cleanSetName = card.set.name
+            .replace(/\boptic\s+base\s+set\b/gi, 'Optic') // Optic Base Set -> Optic
+            .replace(/\boptic\s+base\b/gi, 'Optic') // Optic Base -> Optic
+            .replace(/\bbase\s+set\b/gi, '') // Remove generic "base set"
+            .replace(/\bsets?\b/gi, '') // Remove remaining "set/sets"
+            .trim();
+          const cardSetSlug = `${card.set.release.year}-${card.set.release.name}-${cleanSetName}`
             .toLowerCase()
             .replace(/\s+/g, '-')
             .replace(/[^a-z0-9-]/g, '')
@@ -194,7 +202,13 @@ export default function ParallelPage() {
             {setInfo && (
               <>
                 <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
-                  {setInfo.year} {firstCard.set.release.name} {setInfo.name.replace(/\bsets?\b/gi, '').trim()} {parallelName.replace(/\bbase\b/gi, '').trim()}
+                  {setInfo.year} {firstCard.set.release.name} {setInfo.name
+                    .replace(/\boptic\s+base\s+set\b/gi, 'Optic')
+                    .replace(/\boptic\s+base\b/gi, 'Optic')
+                    .replace(/\bbase\s+optic\b/gi, 'Optic')
+                    .replace(/\bbase\s+set\b/gi, '')
+                    .replace(/\bsets?\b/gi, '')
+                    .trim()} {parallelName.replace(/\bbase\b/gi, '').trim()}
                 </h1>
                 <div className="text-xl">
                   {cards.length} Card{cards.length !== 1 ? 's' : ''} in the Parallel Set
@@ -213,8 +227,13 @@ export default function ParallelPage() {
                 return numA - numB;
               }).map((card) => {
                 // Generate individual card slug: year-releasename-setname-card#-player-parallel
-                // Remove "set/sets" from set name to avoid redundancy
-                const cleanSetName = card.set.name.replace(/\bsets?\b/gi, '').trim();
+                // Remove "set/sets" from set name, Optic-specific handling
+                const cleanSetName = card.set.name
+                  .replace(/\boptic\s+base\s+set\b/gi, 'Optic') // Optic Base Set -> Optic
+                  .replace(/\boptic\s+base\b/gi, 'Optic') // Optic Base -> Optic
+                  .replace(/\bbase\s+set\b/gi, '') // Remove generic "base set"
+                  .replace(/\bsets?\b/gi, '') // Remove remaining "set/sets"
+                  .trim();
                 const slugParts = [
                   card.set.release.year,
                   card.set.release.name,

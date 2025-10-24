@@ -381,10 +381,13 @@ export default function ReleasePage() {
                     const setCardCount = set.cards?.length || (set.totalCards ? parseInt(set.totalCards) : 0);
                     const setParallelCount = Array.isArray(set.parallels) ? set.parallels.length : 0;
 
-                    // Rename "Base Optic" to "Optic Base" for clarity
-                    const displayName = set.name.toLowerCase() === 'base optic'
-                      ? 'Optic Base'
-                      : set.name;
+                    // Clean display name: remove "Base" from Optic sets, keep it for others
+                    const displayName = set.name
+                      .replace(/\boptic\s+base\s+set\b/gi, 'Optic') // Optic Base Set -> Optic
+                      .replace(/\boptic\s+base\b/gi, 'Optic') // Optic Base -> Optic
+                      .replace(/\bbase\s+optic\b/gi, 'Optic') // Base Optic -> Optic
+                      .replace(/\bsets?\b/gi, '') // Remove "set/sets"
+                      .trim();
 
                     // Gradient colors - cycle through different gradients
                     const gradients = [
@@ -397,10 +400,19 @@ export default function ReleasePage() {
                     const gradient = gradients[idx % gradients.length];
 
                     // Generate set slug: year-release-set
-                    const setSlug = `${release.year || ''}-${release.name}-${set.name}`
+                    // Remove "set/sets" and "base" from Optic specifically
+                    const cleanSetName = set.name
+                      .replace(/\boptic\s+base\s+set\b/gi, 'Optic') // Optic Base Set -> Optic
+                      .replace(/\boptic\s+base\b/gi, 'Optic') // Optic Base -> Optic
+                      .replace(/\bbase\s+set\b/gi, '') // Remove generic "base set"
+                      .replace(/\bsets?\b/gi, '') // Remove remaining "set/sets"
+                      .trim();
+                    const setSlug = `${release.year || ''}-${release.name}-${cleanSetName}`
                       .toLowerCase()
                       .replace(/\s+/g, '-')
-                      .replace(/[^a-z0-9-]/g, '');
+                      .replace(/[^a-z0-9-]/g, '')
+                      .replace(/-+/g, '-')
+                      .replace(/^-|-$/g, '');
 
                     return (
                       <Link

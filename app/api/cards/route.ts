@@ -44,21 +44,11 @@ export async function GET(request: NextRequest) {
       });
     } else if (slug) {
       // Parse slug to extract card info
-      // Format: year-set-name-card-#-player-parallel
-      const slugParts = slug.split('-');
+      // Format: year-releasename-setname-cardnumber-playername-parallel
+      // Example: 2024-25-donruss-soccer-base-4-folarin-balogun
 
-      // Try to find card number in slug (look for "card-#" pattern)
-      let cardNumber = '';
-      const cardIndex = slugParts.findIndex(part => part === 'card');
-      if (cardIndex !== -1 && cardIndex + 1 < slugParts.length) {
-        cardNumber = slugParts[cardIndex + 1];
-      }
-
-      // Fetch all cards and filter based on slug components
+      // Fetch all cards with their relationships
       const cards = await prisma.card.findMany({
-        where: {
-          cardNumber: cardNumber || undefined,
-        },
         include: {
           set: {
             include: {
@@ -75,15 +65,25 @@ export async function GET(request: NextRequest) {
         },
       });
 
-      // Find the best matching card
+      // Find the best matching card by generating slugs for each card
       card = cards.find(c => {
+        // Remove "base set" and "set/sets" patterns from set name, Optic-specific handling
+        const cleanSetName = c.set.name
+          .replace(/\boptic\s+base\s+set\b/gi, 'Optic') // Optic Base Set -> Optic
+          .replace(/\boptic\s+base\b/gi, 'Optic') // Optic Base -> Optic
+          .replace(/\bbase\s+set\b/gi, '') // Remove generic "base set"
+          .replace(/\bsets?\b/gi, '') // Remove remaining "set/sets"
+          .trim();
+
         const cardSlugParts = [
           c.set.release.year,
-          c.set.name,
-          c.cardNumber ? `card-${c.cardNumber}` : '',
+          c.set.release.name,
+          cleanSetName,
+          c.cardNumber || '',
           c.playerName || 'unknown',
         ];
 
+        // Add parallel/variant if not base
         if (c.parallelType && c.parallelType.toLowerCase() !== 'base') {
           cardSlugParts.push(c.parallelType);
         } else if (c.variant && c.variant.toLowerCase() !== 'base') {
@@ -95,15 +95,12 @@ export async function GET(request: NextRequest) {
           .join('-')
           .toLowerCase()
           .replace(/\s+/g, '-')
-          .replace(/[^a-z0-9-]/g, '');
+          .replace(/[^a-z0-9-]/g, '')
+          .replace(/-+/g, '-')
+          .replace(/^-|-$/g, '');
 
         return generatedSlug === slug;
       });
-
-      // If no exact match, return first card with matching card number
-      if (!card && cards.length > 0) {
-        card = cards[0];
-      }
     }
 
     if (!card) {
