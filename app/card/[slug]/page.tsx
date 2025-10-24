@@ -229,6 +229,61 @@ export default function CardDetailPage() {
             )}
           </div>
 
+          {/* Card Details */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8 border border-gray-200 dark:border-gray-700">
+            <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-6">Card Details</h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Player</div>
+                <div className="text-lg font-bold text-gray-900 dark:text-white">{card.playerName || '—'}</div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Team</div>
+                <div className="text-lg font-bold text-gray-900 dark:text-white">{card.team || '—'}</div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Card Number</div>
+                <div className="text-lg font-bold text-gray-900 dark:text-white">{card.cardNumber || '—'}</div>
+              </div>
+              {card.variant && (
+                <div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Variant</div>
+                  <div className="text-lg font-bold text-gray-900 dark:text-white">{card.variant}</div>
+                </div>
+              )}
+              {card.parallelType && (
+                <div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Parallel</div>
+                  <div className="text-lg font-bold text-gray-900 dark:text-white">{card.parallelType}</div>
+                </div>
+              )}
+              {card.serialNumber && (
+                <div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Serial Number</div>
+                  <div className="text-lg font-bold text-gray-900 dark:text-white">{card.serialNumber}</div>
+                </div>
+              )}
+              {card.rarity && (
+                <div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Rarity</div>
+                  <div className="text-lg font-bold text-gray-900 dark:text-white capitalize">{card.rarity.replace(/_/g, ' ')}</div>
+                </div>
+              )}
+              {card.finish && (
+                <div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Finish</div>
+                  <div className="text-lg font-bold text-gray-900 dark:text-white capitalize">{card.finish}</div>
+                </div>
+              )}
+              {card.colorVariant && (
+                <div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Color</div>
+                  <div className="text-lg font-bold text-gray-900 dark:text-white capitalize">{card.colorVariant}</div>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Card Images */}
           {(card.imageFront || card.imageBack || card.images.length > 0) && (
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8 border border-gray-200 dark:border-gray-700">
