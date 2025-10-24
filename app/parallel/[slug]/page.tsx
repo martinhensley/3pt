@@ -219,20 +219,16 @@ export default function ParallelPage() {
 
           {/* Header */}
           <div className="bg-gradient-to-r from-footy-green to-green-700 dark:from-footy-orange dark:to-orange-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
-            <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
-              {parallelName}
-            </h1>
             {setInfo && (
-              <div className="text-xl">
-                {setInfo.year && <span className="text-white/90">{setInfo.year} </span>}
-                {setInfo.manufacturer} {firstCard.set.release.name} - {setInfo.name}
-              </div>
+              <>
+                <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
+                  {setInfo.year} {firstCard.set.release.name} {setInfo.name.replace(/\bsets?\b/gi, '').trim()} {parallelName}
+                </h1>
+                <div className="text-xl">
+                  {cards.length} Card{cards.length !== 1 ? 's' : ''} in the Parallel Set
+                </div>
+              </>
             )}
-            <div className="mt-4">
-              <span className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg">
-                {cards.length} card{cards.length !== 1 ? 's' : ''} found
-              </span>
-            </div>
           </div>
 
           {/* Cards Grid */}
