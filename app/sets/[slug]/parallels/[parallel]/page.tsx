@@ -264,7 +264,7 @@ export default function ParallelPage() {
                 return (
                   <Link
                     key={card.id}
-                    href={`/card/${cardSlug}`}
+                    href={`/cards/${cardSlug}`}
                     className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-footy-orange hover:shadow-lg transition-all cursor-pointer"
                   >
                     {/* Card Image Preview */}
