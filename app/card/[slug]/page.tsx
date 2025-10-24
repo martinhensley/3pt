@@ -150,57 +150,83 @@ export default function CardDetailPage() {
 
           {/* Card Header */}
           <div className="bg-gradient-to-r from-footy-green to-green-700 dark:from-footy-orange dark:to-orange-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
-            <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4 flex items-center gap-3 flex-wrap">
-              <span className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full font-bold text-sm">
-                CARD
-              </span>
-              <span>
-                {card.cardNumber && <span className="text-white/90">#{card.cardNumber} </span>}
-                {card.playerName || 'Unknown Player'}
-              </span>
+            <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
+              {card.cardNumber && <span className="text-white/90">#{card.cardNumber} </span>}
+              {card.playerName || 'Unknown Player'}
             </h1>
 
-            <div className="text-xl mb-6">
+            <div className="text-xl mb-2">
               {card.set.release.year && <span className="text-white/90">{card.set.release.year} </span>}
-              {card.set.release.manufacturer.name} {card.set.release.name} - {card.set.name}
+              {card.set.release.manufacturer.name} {card.set.release.name}
+              {card.set.name && card.set.name.toLowerCase() !== 'base set' && ` - ${card.set.name}`}
             </div>
 
             {card.team && (
-              <div className="text-lg mb-4">
-                <span className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg">
-                  {card.team}
-                </span>
+              <div className="text-lg mb-6">
+                {card.team}
               </div>
             )}
 
             {/* Card Features */}
-            <div className="flex gap-2 flex-wrap mt-4">
-              {card.hasAutograph && (
-                <span className="px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full font-semibold">
-                  Autograph
-                </span>
-              )}
-              {card.hasMemorabilia && (
-                <span className="px-4 py-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full font-semibold">
-                  Memorabilia
-                </span>
-              )}
-              {card.isNumbered && card.printRun && (
-                <span className="px-4 py-2 bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 rounded-full font-semibold">
-                  Numbered /{card.printRun}
-                </span>
-              )}
-              {card.variant && (
-                <span className="px-4 py-2 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded-full font-semibold">
-                  {card.variant}
-                </span>
-              )}
-              {card.parallelType && (
-                <span className="px-4 py-2 bg-pink-100 dark:bg-pink-900 text-pink-800 dark:text-pink-200 rounded-full font-semibold">
-                  {card.parallelType}
-                </span>
-              )}
-            </div>
+            {(card.hasAutograph || card.hasMemorabilia || card.isNumbered || card.variant || card.parallelType || card.rarity || card.finish || card.colorVariant || (card.specialFeatures && card.specialFeatures.length > 0)) && (
+              <div className="pt-6 border-t border-white/20">
+                <div className="flex gap-2 flex-wrap">
+                  {card.hasAutograph && (
+                    <span className="px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full font-semibold">
+                      Autograph
+                    </span>
+                  )}
+                  {card.hasMemorabilia && (
+                    <span className="px-4 py-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full font-semibold">
+                      Memorabilia
+                    </span>
+                  )}
+                  {card.isNumbered && card.printRun && (
+                    <span className="px-4 py-2 bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 rounded-full font-semibold">
+                      /{card.printRun}
+                    </span>
+                  )}
+                  {card.variant && card.variant !== '—' && (
+                    <span className="px-4 py-2 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded-full font-semibold">
+                      {card.variant}
+                    </span>
+                  )}
+                  {card.parallelType && (
+                    <span className="px-4 py-2 bg-pink-100 dark:bg-pink-900 text-pink-800 dark:text-pink-200 rounded-full font-semibold">
+                      {card.parallelType}
+                    </span>
+                  )}
+                  {card.rarity && (
+                    <span className="px-4 py-2 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-full font-semibold capitalize">
+                      {card.rarity.replace(/_/g, ' ')}
+                    </span>
+                  )}
+                  {card.finish && (
+                    <span className="px-4 py-2 bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 rounded-full font-semibold capitalize">
+                      {card.finish}
+                    </span>
+                  )}
+                  {card.colorVariant && (
+                    <span className="px-4 py-2 bg-cyan-100 dark:bg-cyan-900 text-cyan-800 dark:text-cyan-200 rounded-full font-semibold capitalize">
+                      {card.colorVariant}
+                    </span>
+                  )}
+                  {card.specialFeatures && card.specialFeatures.map((feature, idx) => (
+                    <span
+                      key={idx}
+                      className="px-4 py-2 bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-200 rounded-full font-semibold capitalize"
+                    >
+                      {feature.replace(/_/g, ' ')}
+                    </span>
+                  ))}
+                  {card.serialNumber && (
+                    <span className="px-4 py-2 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded-full font-semibold">
+                      Serial: {card.serialNumber}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Card Images */}
@@ -259,74 +285,6 @@ export default function CardDetailPage() {
             </div>
           )}
 
-          {/* Card Details */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8 border border-gray-200 dark:border-gray-700">
-            <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-6">Card Details</h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Player</div>
-                <div className="text-lg font-bold text-gray-900 dark:text-white">{card.playerName || '—'}</div>
-              </div>
-              <div>
-                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Team</div>
-                <div className="text-lg font-bold text-gray-900 dark:text-white">{card.team || '—'}</div>
-              </div>
-              <div>
-                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Card Number</div>
-                <div className="text-lg font-bold text-gray-900 dark:text-white">{card.cardNumber || '—'}</div>
-              </div>
-              <div>
-                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Variant</div>
-                <div className="text-lg font-bold text-gray-900 dark:text-white">{card.variant || '—'}</div>
-              </div>
-              {card.parallelType && (
-                <div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Parallel Type</div>
-                  <div className="text-lg font-bold text-gray-900 dark:text-white">{card.parallelType}</div>
-                </div>
-              )}
-              {card.serialNumber && (
-                <div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Serial Number</div>
-                  <div className="text-lg font-bold text-gray-900 dark:text-white">{card.serialNumber}</div>
-                </div>
-              )}
-              {card.rarity && (
-                <div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Rarity</div>
-                  <div className="text-lg font-bold text-gray-900 dark:text-white capitalize">{card.rarity.replace(/_/g, ' ')}</div>
-                </div>
-              )}
-              {card.finish && (
-                <div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Finish</div>
-                  <div className="text-lg font-bold text-gray-900 dark:text-white capitalize">{card.finish}</div>
-                </div>
-              )}
-              {card.colorVariant && (
-                <div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Color</div>
-                  <div className="text-lg font-bold text-gray-900 dark:text-white capitalize">{card.colorVariant}</div>
-                </div>
-              )}
-            </div>
-
-            {card.specialFeatures && card.specialFeatures.length > 0 && (
-              <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <div className="text-sm text-gray-600 dark:text-gray-400 mb-3">Special Features</div>
-                <div className="flex gap-2 flex-wrap">
-                  {card.specialFeatures.map((feature, idx) => (
-                    <span
-                      key={idx}
-                      className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-full text-sm font-semibold capitalize"
-                    >
-                      {feature.replace(/_/g, ' ')}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
 
           <EbayAdHorizontal
             query={adKeywords.relatedQuery}
