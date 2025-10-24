@@ -102,9 +102,10 @@ export default function EditReleasePage() {
         setEditedDescription(data.description || "");
 
         // Transform sets data
-        const transformedSets: SetInfo[] = data.sets.map((set: { id: string; name: string; totalCards: string | null; parallels: string[] | null; cards: { id: string; playerName: string | null; team: string | null; cardNumber: string | null; variant: string | null }[] }) => ({
+        const transformedSets: SetInfo[] = data.sets.map((set: { id: string; name: string; description: string | null; totalCards: string | null; parallels: string[] | null; cards: { id: string; playerName: string | null; team: string | null; cardNumber: string | null; variant: string | null }[] }) => ({
           id: set.id,
           name: set.name,
+          description: set.description || "",
           totalCards: set.totalCards || "",
           parallels: set.parallels || [],
           cards: set.cards.map((card: { id: string; playerName: string | null; team: string | null; cardNumber: string | null; variant: string | null }) => ({
