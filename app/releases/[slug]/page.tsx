@@ -209,10 +209,10 @@ export default function ReleasePage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900">
+      <div className="flex flex-col min-h-screen bg-white">
         <Header showBackButton />
         <div className="flex-grow flex items-center justify-center">
-          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
@@ -253,7 +253,7 @@ export default function ReleasePage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
@@ -271,11 +271,11 @@ export default function ReleasePage() {
 
         <main className="flex-grow max-w-5xl">
           {/* Combined Hero with Carousel */}
-          <div className="bg-gradient-to-r from-footy-green to-green-700 dark:from-slate-800 dark:to-slate-900 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white dark:shadow-green-500/10">
+          <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white">
             {/* Hero Header */}
             <div className="p-8 pb-6">
               <div className="flex items-center gap-3 flex-wrap">
-                <span className="bg-white/20 dark:bg-green-500/30 dark:border dark:border-green-400/50 backdrop-blur-sm px-4 py-2 rounded-full font-bold text-sm">
+                <span className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full font-bold text-sm">
                   RELEASE
                 </span>
                 <span className="text-white/80">•</span>
@@ -288,8 +288,8 @@ export default function ReleasePage() {
 
             {/* Image Carousel */}
             {carouselImages.length > 0 && (
-              <div className="relative bg-white dark:bg-slate-950">
-                <div className="relative aspect-[16/9] bg-white dark:bg-slate-950">
+              <div className="relative bg-white">
+                <div className="relative aspect-[16/9] bg-white">
                   <Image
                     src={carouselImages[currentImageIndex].url}
                     alt={carouselImages[currentImageIndex].caption}
@@ -304,7 +304,7 @@ export default function ReleasePage() {
                     <>
                       <button
                         onClick={prevImage}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 dark:bg-green-600/40 dark:hover:bg-green-500/60 dark:border dark:border-green-400/30 text-white p-3 rounded-full transition-all duration-200 backdrop-blur-sm"
+                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 backdrop-blur-sm"
                         aria-label="Previous image"
                       >
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -313,7 +313,7 @@ export default function ReleasePage() {
                       </button>
                       <button
                         onClick={nextImage}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 dark:bg-green-600/40 dark:hover:bg-green-500/60 dark:border dark:border-green-400/30 text-white p-3 rounded-full transition-all duration-200 backdrop-blur-sm"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 backdrop-blur-sm"
                         aria-label="Next image"
                       >
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -325,7 +325,7 @@ export default function ReleasePage() {
 
                   {/* Image Counter */}
                   {carouselImages.length > 1 && (
-                    <div className="absolute top-4 right-4 bg-black/50 dark:bg-green-600/40 dark:border dark:border-green-400/30 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-semibold">
+                    <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-semibold">
                       {currentImageIndex + 1} / {carouselImages.length}
                     </div>
                   )}
@@ -339,8 +339,8 @@ export default function ReleasePage() {
                           onClick={() => setCurrentImageIndex(idx)}
                           className={`transition-all duration-200 ${
                             idx === currentImageIndex
-                              ? 'w-8 h-2 bg-white dark:bg-green-400'
-                              : 'w-2 h-2 bg-white/50 hover:bg-white/80 dark:bg-green-400/30 dark:hover:bg-green-400/60'
+                              ? 'w-8 h-2 bg-white'
+                              : 'w-2 h-2 bg-white/50 hover:bg-white/80'
                           } rounded-full`}
                           aria-label={`Go to image ${idx + 1}`}
                         />
@@ -361,8 +361,8 @@ export default function ReleasePage() {
             )}
 
             {/* All Sets List */}
-            <div className="p-8 pt-6 border-t border-white/20 dark:border-green-500/20">
-              <div className="bg-white/5 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10 dark:border-green-500/20">
+            <div className="p-8 pt-6 border-t border-white/20">
+              <div className="bg-white/5 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10">
                 {/* Header Row */}
                 <div className="grid grid-cols-3 gap-4 px-4 py-3 bg-white/10 border-b border-white/20">
                   <div className="font-bold text-sm uppercase tracking-wide text-white/90">Set Name</div>
@@ -427,10 +427,10 @@ export default function ReleasePage() {
             </div>
           </div>
 
-          <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
+          <div className="mt-8 pt-8 border-t border-gray-200">
             <Link
               href="/"
-              className="inline-flex items-center text-footy-green dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 font-semibold transition-colors text-lg"
+              className="inline-flex items-center text-footy-green hover:text-green-700 font-semibold transition-colors text-lg"
             >
               ← View All Posts
             </Link>
@@ -452,7 +452,7 @@ export default function ReleasePage() {
         </aside>
       </div>
 
-      <footer className="bg-footy-green dark:bg-gray-950 text-white transition-colors duration-300">
+      <footer className="bg-footy-green text-white">
         <div className="max-w-4xl mx-auto px-4 py-8 text-center">
           <p className="text-sm">
             <span className="text-white">footy</span><span className="text-footy-orange">.bot</span> © 2024-{new Date().getFullYear()}
