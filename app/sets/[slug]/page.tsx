@@ -197,24 +197,19 @@ export default function SetPage() {
             </h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
               {set.parallels.map((parallel: string, idx: number) => {
-                // Create detailed slug for the parallel: year-releasename-setname-parallel
-                // e.g., "2024-25-donruss-soccer-optic-gold"
-                // Remove "set/sets" and "base" from set name to avoid redundancy
-                const cleanSetName = set.name
-                  .replace(/\bsets?\b/gi, '')
-                  .replace(/\bbase\b/gi, '')
-                  .trim();
-                const parallelSlug = `${set.release.year || ''}-${set.release.name}-${cleanSetName}-${parallel}`
+                // Create simple parallel slug from parallel name
+                // e.g., "Argyle" -> "argyle", "Gold Prizm" -> "gold-prizm"
+                const parallelSlug = parallel
                   .toLowerCase()
                   .replace(/\s+/g, '-')
                   .replace(/[^a-z0-9-]/g, '')
-                  .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
-                  .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+                  .replace(/-+/g, '-')
+                  .replace(/^-|-$/g, '');
 
                 return (
                   <Link
                     key={idx}
-                    href={`/parallel/${parallelSlug}`}
+                    href={`/sets/${slug}/parallels/${parallelSlug}`}
                     className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border-2 border-gray-200 dark:border-gray-600 hover:border-footy-orange hover:shadow-lg transition-all"
                   >
                     <div className="font-bold text-footy-green dark:text-footy-orange">
