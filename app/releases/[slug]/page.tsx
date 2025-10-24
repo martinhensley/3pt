@@ -271,7 +271,7 @@ export default function ReleasePage() {
 
         <main className="flex-grow max-w-5xl">
           {/* Combined Hero with Carousel */}
-          <div className="bg-gradient-to-r from-footy-green to-green-700 dark:from-footy-orange dark:to-orange-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white">
+          <div className="bg-gradient-to-r from-footy-green to-green-700 dark:from-green-700 dark:to-footy-green rounded-2xl shadow-2xl overflow-hidden mb-8 text-white">
             {/* Hero Header */}
             <div className="p-8 pb-6">
               <div className="flex items-center gap-3 flex-wrap">
@@ -430,7 +430,7 @@ export default function ReleasePage() {
           <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
             <Link
               href="/"
-              className="inline-flex items-center text-footy-green dark:text-footy-orange hover:text-footy-orange font-semibold transition-colors text-lg"
+              className="inline-flex items-center text-footy-green dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 font-semibold transition-colors text-lg"
             >
               ← View All Posts
             </Link>
