@@ -93,6 +93,9 @@ model Card {
   imageFront            String?  // Front image URL
   imageBack             String?  // Back image URL
 
+  // Admin notes
+  footyNotes            String?  @db.Text // Internal notes about this card
+
   setId                 String
   set                   Set      @relation(fields: [setId], references: [id], onDelete: Cascade)
   createdAt             DateTime @default(now())
