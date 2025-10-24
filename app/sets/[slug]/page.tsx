@@ -153,33 +153,33 @@ export default function SetPage() {
           </div>
 
         {/* Set Header */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-8 transition-colors duration-300">
-          <div className="flex items-center gap-2 text-sm mb-4">
-            <span className="bg-footy-green text-white px-2 py-1 rounded-full font-semibold text-xs">
+        <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
+          <div className="flex items-center gap-3 flex-wrap mb-4">
+            <span className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full font-bold text-sm">
               SET
             </span>
+            <span className="text-white/80">•</span>
+            <h1 className="text-3xl md:text-4xl font-black leading-tight">
+              {set.release.year && <span className="text-white/90">{set.release.year} </span>}
+              {set.release.name} {displayName}
+            </h1>
           </div>
 
-          <h1 className="text-2xl md:text-3xl font-bold text-footy-green dark:text-footy-orange mb-6">
-            {set.release.year && <span>{set.release.year} </span>}
-            {set.release.name} {displayName}
-          </h1>
-
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-              <div className="text-sm text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1">Total Cards</div>
-              <div className="text-3xl font-bold text-footy-green dark:text-footy-orange">{setCardCount > 0 ? setCardCount.toLocaleString() : '—'}</div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+              <div className="text-sm text-white/80 uppercase tracking-wide mb-1">Total Cards</div>
+              <div className="text-3xl font-bold text-white">{setCardCount > 0 ? setCardCount.toLocaleString() : '—'}</div>
             </div>
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-              <div className="text-sm text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1">Parallels</div>
-              <div className="text-3xl font-bold text-footy-green dark:text-footy-orange">{setParallelCount > 0 ? setParallelCount : '—'}</div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+              <div className="text-sm text-white/80 uppercase tracking-wide mb-1">Parallels</div>
+              <div className="text-3xl font-bold text-white">{setParallelCount > 0 ? setParallelCount : '—'}</div>
             </div>
           </div>
 
           {/* Set Description */}
           {set.description && (
-            <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
-              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+            <div className="pt-6 border-t border-white/20">
+              <p className="text-lg text-white/90 leading-relaxed">
                 {set.description}
               </p>
             </div>
@@ -188,12 +188,12 @@ export default function SetPage() {
 
         {/* Parallels Section */}
         {Array.isArray(set.parallels) && set.parallels.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-8 transition-colors duration-300">
-            <h3 className="text-2xl font-bold text-footy-green dark:text-footy-orange mb-6 flex items-center gap-2">
-              <svg className="w-6 h-6 text-footy-green dark:text-footy-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
+            <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
               </svg>
-              Parallels & Variations
+              Parallels
             </h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
               {set.parallels.map((parallel: string, idx: number) => {
@@ -210,9 +210,9 @@ export default function SetPage() {
                   <Link
                     key={idx}
                     href={`/sets/${slug}/parallels/${parallelSlug}`}
-                    className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border-2 border-gray-200 dark:border-gray-600 hover:border-footy-orange hover:shadow-lg transition-all"
+                    className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border-2 border-white/20 hover:border-footy-orange hover:bg-footy-orange/20 hover:shadow-lg transition-all"
                   >
-                    <div className="font-bold text-footy-green dark:text-footy-orange">
+                    <div className="font-bold text-white">
                       {parallel}
                     </div>
                   </Link>

@@ -1,10 +1,10 @@
 # footy.bot - Soccer Card Information Platform
 
-A modern platform for soccer card enthusiasts at footy.bot. Features AI-powered content generation using Claude for card and set analysis, with comprehensive database management for manufacturers, releases, sets, and individual cards.
+A modern platform for soccer card enthusiasts at footy.bot. Features AI-powered data curation and analysis using Claude to deliver world-class insights, comprehensive card databases, and expert-level content for collectors and investors.
 
 ## Features
 
-- **AI-Powered Content Generation**: Upload card images or set documents and automatically generate engaging blog posts
+- **AI-Curated Data & Analysis**: Advanced AI assists in curating structured card data, analyzing market trends, and creating world-class content that elevates collector knowledge
 - **Hierarchical Data Model**: Manufacturers → Releases → Sets → Cards
 - **Multi-Document Analysis**: Upload PDFs, CSVs, images, and HTML files for comprehensive release analysis
 - **Card Library Management**: Build and manage a complete soccer card database
@@ -136,14 +136,27 @@ Create general content using AI:
 ```
 footy/
 ├── app/
-│   ├── fa/                 # Admin portal
+│   ├── admin/              # Admin portal
+│   │   ├── releases/       # Release management
+│   │   ├── posts/          # Post management
+│   │   ├── cards/          # Card creation
+│   │   ├── bulk-scan/      # Bulk card scanning
+│   │   └── activity/       # Activity history
 │   ├── api/                # API routes
 │   │   ├── analyze/        # AI analysis endpoints
 │   │   ├── library/        # Data retrieval endpoints
 │   │   ├── auth/           # NextAuth
 │   │   ├── posts/          # Post CRUD
+│   │   ├── cards/          # Card API
+│   │   ├── sets/           # Set API
+│   │   ├── releases/       # Release API
 │   │   └── upload/         # File upload
+│   ├── releases/[slug]/    # Release pages
+│   ├── sets/[slug]/        # Set pages
+│   │   └── parallels/[parallel]/ # Parallel/variation pages
+│   ├── card/[slug]/        # Card detail pages
 │   ├── posts/[slug]/       # Post pages
+│   ├── fa/                 # Legacy admin redirect
 │   ├── globals.css         # Global styles
 │   ├── layout.tsx          # Root layout with metadata
 │   ├── page.tsx            # Homepage
@@ -260,7 +273,11 @@ The system can analyze multiple document types simultaneously:
 - HTML: Web pages fetched and parsed for product information
 
 ### AI Integration
-Uses Claude 3.5 Sonnet with structured output (Zod schemas) to ensure consistent data extraction from diverse document types.
+Uses Claude 3.5 Sonnet with structured output (Zod schemas) to curate and analyze data from diverse sources. The AI assists in:
+- Extracting and structuring card data with professional accuracy
+- Analyzing market trends and card variations
+- Creating expert-level content that provides genuine value to collectors
+- Ensuring data consistency and completeness across the platform
 
 ### Database Design
 Hierarchical structure allows for:
