@@ -400,11 +400,13 @@ export default function ReleasePage() {
                     const gradient = gradients[idx % gradients.length];
 
                     // Generate set slug: year-release-set
-                    // Remove "set/sets" and "base" from Optic specifically
+                    // Special handling: Only remove "Base" from Optic sets
+                    // For regular Base Set, keep "Base" in the slug
                     const cleanSetName = set.name
                       .replace(/\boptic\s+base\s+set\b/gi, 'Optic') // Optic Base Set -> Optic
                       .replace(/\boptic\s+base\b/gi, 'Optic') // Optic Base -> Optic
-                      .replace(/\bbase\s+set\b/gi, '') // Remove generic "base set"
+                      .replace(/\bbase\s+optic\b/gi, 'Optic') // Base Optic -> Optic
+                      .replace(/\bbase\s+set\b/gi, 'Base') // Base Set -> Base (keep "Base")
                       .replace(/\bsets?\b/gi, '') // Remove remaining "set/sets"
                       .trim();
                     const setSlug = `${release.year || ''}-${release.name}-${cleanSetName}`

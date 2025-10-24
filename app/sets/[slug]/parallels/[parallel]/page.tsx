@@ -95,11 +95,13 @@ export default function ParallelPage() {
         // Filter cards based on set slug and parallel matching
         const matchingCards = data.filter((card: Card) => {
           // Generate the card's set slug to match against URL
-          // Remove "base set" and "set/sets" patterns from set name, Optic-specific handling
+          // Special handling: Only remove "Base" from Optic sets
+          // For regular Base Set, keep "Base" in the slug
           const cleanSetName = card.set.name
             .replace(/\boptic\s+base\s+set\b/gi, 'Optic') // Optic Base Set -> Optic
             .replace(/\boptic\s+base\b/gi, 'Optic') // Optic Base -> Optic
-            .replace(/\bbase\s+set\b/gi, '') // Remove generic "base set"
+            .replace(/\bbase\s+optic\b/gi, 'Optic') // Base Optic -> Optic
+            .replace(/\bbase\s+set\b/gi, 'Base') // Base Set -> Base (keep "Base")
             .replace(/\bsets?\b/gi, '') // Remove remaining "set/sets"
             .trim();
           const cardSetSlug = `${card.set.release.year}-${card.set.release.name}-${cleanSetName}`
@@ -227,11 +229,13 @@ export default function ParallelPage() {
                 return numA - numB;
               }).map((card) => {
                 // Generate individual card slug: year-releasename-setname-card#-player-parallel
-                // Remove "set/sets" from set name, Optic-specific handling
+                // Special handling: Only remove "Base" from Optic sets
+                // For regular Base Set, keep "Base" in the slug
                 const cleanSetName = card.set.name
                   .replace(/\boptic\s+base\s+set\b/gi, 'Optic') // Optic Base Set -> Optic
                   .replace(/\boptic\s+base\b/gi, 'Optic') // Optic Base -> Optic
-                  .replace(/\bbase\s+set\b/gi, '') // Remove generic "base set"
+                  .replace(/\bbase\s+optic\b/gi, 'Optic') // Base Optic -> Optic
+                  .replace(/\bbase\s+set\b/gi, 'Base') // Base Set -> Base (keep "Base")
                   .replace(/\bsets?\b/gi, '') // Remove remaining "set/sets"
                   .trim();
                 const slugParts = [
