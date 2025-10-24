@@ -15,7 +15,7 @@ async function fixReleaseSlug() {
       where: { id: release.id },
       data: {
         slug: newSlug,
-        excerpt: 'Panini Donruss Soccer 2024-25 features a 200-card base set with extensive parallel variations including numbered editions down to 1/1. The release includes Base Optic parallels, Rated Rookies showcasing the season\'s top newcomers, plus autograph and memorabilia inserts celebrating the biggest stars in world football.'
+        description: 'Panini Donruss Soccer 2024-25 features a 200-card base set with extensive parallel variations including numbered editions down to 1/1. The release includes Base Optic parallels, Rated Rookies showcasing the season\'s top newcomers, plus autograph and memorabilia inserts celebrating the biggest stars in world football.'
       },
     });
 
