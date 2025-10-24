@@ -209,10 +209,10 @@ export default function ParallelPage() {
           {setInfo && (
             <div className="mb-6">
               <Link
-                href={`/releases/${setInfo.releaseSlug}`}
+                href={`/sets/${setInfo.year}-${firstCard.set.release.name}-${setInfo.name}`.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}
                 className="text-footy-green dark:text-footy-orange hover:underline"
               >
-                ← Back to {setInfo.year} {firstCard.set.release.name}
+                ← Back to {setInfo.name}
               </Link>
             </div>
           )}

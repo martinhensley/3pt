@@ -140,10 +140,10 @@ export default function CardDetailPage() {
           {/* Breadcrumb */}
           <div className="mb-6">
             <Link
-              href={`/releases/${card.set.release.slug}`}
+              href={`/sets/${card.set.release.year}-${card.set.release.name}-${card.set.name}`.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}
               className="text-footy-green dark:text-footy-orange hover:underline"
             >
-              ← Back to {card.set.release.year} {card.set.release.name}
+              ← Back to {card.set.name}
             </Link>
           </div>
 
