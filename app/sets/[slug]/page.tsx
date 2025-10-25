@@ -219,12 +219,14 @@ export default function SetPage() {
               {set.parallels.map((parallel: string, idx: number) => {
                 // Create simple parallel slug from parallel name
                 // e.g., "Argyle" -> "argyle", "Gold Prizm" -> "gold-prizm"
+                // Special case: "1 of 1" -> "1of1"
                 const parallelSlug = parallel
                   .toLowerCase()
                   .replace(/\s+/g, '-')
                   .replace(/[^a-z0-9-]/g, '')
                   .replace(/-+/g, '-')
-                  .replace(/^-|-$/g, '');
+                  .replace(/^-|-$/g, '')
+                  .replace(/1-of-1/g, '1of1'); // Convert "1-of-1" to "1of1"
 
                 return (
                   <Link
@@ -286,7 +288,8 @@ export default function SetPage() {
                   .replace(/\s+/g, '-')
                   .replace(/[^a-z0-9-]/g, '')
                   .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
-                  .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+                  .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
+                  .replace(/1-of-1/g, '1of1'); // Convert "1-of-1" to "1of1"
 
                 return (
                   <Link

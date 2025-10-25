@@ -244,7 +244,8 @@ export default function ParallelPage() {
                   .replace(/\s+/g, '-')
                   .replace(/[^a-z0-9-]/g, '')
                   .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
-                  .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+                  .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
+                  .replace(/1-of-1/g, '1of1'); // Convert "1-of-1" to "1of1"
 
                 return (
                   <Link
