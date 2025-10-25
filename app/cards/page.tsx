@@ -224,7 +224,7 @@ export default function CardsIndexPage() {
   };
 
   // Filter cards based on release, set, and parallel filters
-  const filteredCards = cards
+  let filteredCards = cards
     .filter((card) => {
       const matchesRelease = !filterRelease || card.set.release.slug === filterRelease;
       const matchesSet = !filterSet || card.set.id === filterSet;
@@ -234,7 +234,21 @@ export default function CardsIndexPage() {
         (filterParallel === "Base" ? (!card.parallelType || card.parallelType === "" || card.parallelType === "Base") : card.parallelType === filterParallel);
 
       return matchesRelease && matchesSet && matchesParallel;
-    })
+    });
+
+  // Fallback: If a parallel is selected (not "Base") but no cards match,
+  // show base cards (null parallelType) as a fallback
+  if (filterParallel && filterParallel !== "Base" && filteredCards.length === 0 && filterSet) {
+    filteredCards = cards.filter((card) => {
+      const matchesRelease = !filterRelease || card.set.release.slug === filterRelease;
+      const matchesSet = !filterSet || card.set.id === filterSet;
+      const isBase = !card.parallelType || card.parallelType === "" || card.parallelType === "Base";
+      return matchesRelease && matchesSet && isBase;
+    });
+  }
+
+  // Further filter and deduplicate
+  filteredCards = filteredCards
     .sort((a, b) => {
       // First sort by release year (descending)
       const yearA = a.set.release.year || '';
