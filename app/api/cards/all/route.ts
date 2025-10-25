@@ -25,6 +25,9 @@ export async function GET() {
       ],
     });
 
+    // The set.parallels field is automatically included in the response
+    // since we're including the full set relation
+
     return NextResponse.json(cards);
   } catch (error) {
     console.error("Get all cards error:", error);

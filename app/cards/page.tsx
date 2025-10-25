@@ -24,6 +24,7 @@ interface Card {
   set: {
     id: string;
     name: string;
+    parallels: string[] | null;
     release: {
       id: string;
       name: string;
@@ -39,9 +40,18 @@ interface Card {
 export default function CardsIndexPage() {
   const [cards, setCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
   const [filterRelease, setFilterRelease] = useState("");
+  const [filterSet, setFilterSet] = useState("");
+  const [filterParallel, setFilterParallel] = useState("");
+  const [releaseSearchTerm, setReleaseSearchTerm] = useState("");
+  const [setSearchTerm, setSetSearchTerm] = useState("");
+  const [parallelSearchTerm, setParallelSearchTerm] = useState("");
+  const [showReleaseSuggestions, setShowReleaseSuggestions] = useState(false);
+  const [showSetSuggestions, setShowSetSuggestions] = useState(false);
+  const [showParallelSuggestions, setShowParallelSuggestions] = useState(false);
   const [releases, setReleases] = useState<Array<{ slug: string; name: string; year: string | null }>>([]);
+  const [sets, setSets] = useState<Array<{ id: string; name: string }>>([]);
+  const [parallels, setParallels] = useState<Array<string>>([]);
 
   useEffect(() => {
     // Fetch all cards
@@ -79,18 +89,151 @@ export default function CardsIndexPage() {
       });
   }, []);
 
-  // Filter cards based on search and release filter
+  // Update sets when release filter changes
+  useEffect(() => {
+    if (filterRelease) {
+      const releaseCards = cards.filter((card) => card.set.release.slug === filterRelease);
+
+      // Get unique sets for the selected release
+      const releaseSets = Array.from(
+        new Map(
+          releaseCards.map((card) => [card.set.id, { id: card.set.id, name: card.set.name }])
+        ).values()
+      ).sort((a, b) => a.name.localeCompare(b.name));
+
+      setSets(releaseSets);
+    } else {
+      setSets([]);
+      setParallels([]);
+      setFilterSet("");
+      setFilterParallel("");
+      setSetSearchTerm("");
+      setParallelSearchTerm("");
+    }
+  }, [filterRelease, cards]);
+
+  // Update parallels when set filter changes
+  useEffect(() => {
+    if (filterRelease && filterSet) {
+      // Find the first card from the selected set to get the set's parallels array
+      const selectedSetCard = cards.find(
+        (card) => card.set.release.slug === filterRelease && card.set.id === filterSet
+      );
+
+      if (selectedSetCard && selectedSetCard.set.parallels && Array.isArray(selectedSetCard.set.parallels)) {
+        // Use the set's parallels array and add "Base" at the beginning
+        const setParallels = ["Base", ...selectedSetCard.set.parallels].sort((a, b) => {
+          if (a === "Base") return -1;
+          if (b === "Base") return 1;
+          return a.localeCompare(b);
+        });
+        setParallels(setParallels);
+      } else {
+        // Fallback: get unique parallels from actual cards
+        const setCards = cards.filter(
+          (card) => card.set.release.slug === filterRelease && card.set.id === filterSet
+        );
+
+        const uniqueSetParallels = Array.from(
+          new Set(
+            setCards.map((card) => card.parallelType || "Base")
+          )
+        ).sort((a, b) => {
+          if (a === "Base") return -1;
+          if (b === "Base") return 1;
+          return a.localeCompare(b);
+        });
+
+        setParallels(uniqueSetParallels);
+      }
+    } else {
+      setParallels([]);
+      setFilterParallel("");
+      setParallelSearchTerm("");
+    }
+  }, [filterSet, filterRelease, cards]);
+
+  // Filter releases based on search term
+  const filteredReleases = releases.filter((release) => {
+    if (!releaseSearchTerm) return true; // Show all when empty or clicking dropdown
+    const searchLower = releaseSearchTerm.toLowerCase();
+    const year = release.year || "";
+    const name = release.name.toLowerCase();
+    return year.includes(searchLower) || name.includes(searchLower);
+  }).slice(0, 20); // Limit to 20 suggestions
+
+  // Filter sets based on search term
+  const filteredSets = sets.filter((set) => {
+    if (!setSearchTerm) return true;
+    return set.name.toLowerCase().includes(setSearchTerm.toLowerCase());
+  }).slice(0, 20);
+
+  // Filter parallels based on search term
+  const filteredParallels = parallels.filter((parallel) => {
+    if (!parallelSearchTerm) return true;
+    return parallel.toLowerCase().includes(parallelSearchTerm.toLowerCase());
+  }).slice(0, 20);
+
+  // Handle release selection
+  const handleReleaseSelect = (release: { slug: string; name: string; year: string | null }) => {
+    setFilterRelease(release.slug);
+    setReleaseSearchTerm(`${release.year} ${release.name}`);
+    setShowReleaseSuggestions(false);
+    setFilterSet("");
+    setSetSearchTerm("");
+  };
+
+  // Handle set selection
+  const handleSetSelect = (set: { id: string; name: string }) => {
+    setFilterSet(set.id);
+    setSetSearchTerm(set.name);
+    setShowSetSuggestions(false);
+  };
+
+  // Handle parallel selection
+  const handleParallelSelect = (parallel: string) => {
+    setFilterParallel(parallel);
+    setParallelSearchTerm(parallel);
+    setShowParallelSuggestions(false);
+  };
+
+  // Handle release search input change
+  const handleReleaseSearchChange = (value: string) => {
+    setReleaseSearchTerm(value);
+    if (value.length === 0) {
+      setFilterRelease("");
+      setFilterSet("");
+      setSetSearchTerm("");
+    }
+  };
+
+  // Handle set search input change
+  const handleSetSearchChange = (value: string) => {
+    setSetSearchTerm(value);
+    if (value.length === 0) {
+      setFilterSet("");
+    }
+  };
+
+  // Handle parallel search input change
+  const handleParallelSearchChange = (value: string) => {
+    setParallelSearchTerm(value);
+    if (value.length === 0) {
+      setFilterParallel("");
+    }
+  };
+
+  // Filter cards based on release, set, and parallel filters
   const filteredCards = cards
     .filter((card) => {
-      const matchesSearch =
-        !searchTerm ||
-        (card.playerName?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
-        (card.team?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
-        (card.cardNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
-
       const matchesRelease = !filterRelease || card.set.release.slug === filterRelease;
+      const matchesSet = !filterSet || card.set.id === filterSet;
 
-      return matchesSearch && matchesRelease;
+      // Handle parallel filter - "Base" matches null/empty parallelType
+      const matchesParallel = !filterParallel ||
+        (filterParallel === "Base" ? (!card.parallelType || card.parallelType === "" || card.parallelType === "Base") : card.parallelType === filterParallel);
+
+      return matchesRelease && matchesSet && matchesParallel;
     })
     .sort((a, b) => {
       // First sort by release year (descending)
@@ -188,36 +331,127 @@ export default function CardsIndexPage() {
 
           {/* Filters */}
           <div className="bg-white rounded-xl shadow-lg p-6 mb-8 border border-gray-200">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Search Cards
-                </label>
-                <input
-                  type="text"
-                  placeholder="Player name, team, or card number..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900"
-                />
-              </div>
-              <div>
+            <div className="grid md:grid-cols-3 gap-4">
+              {/* Release Filter */}
+              <div className="relative">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Filter by Release
                 </label>
-                <select
-                  value={filterRelease}
-                  onChange={(e) => setFilterRelease(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900"
-                >
-                  <option value="">All Releases</option>
-                  {releases.map((release) => (
-                    <option key={release.slug} value={release.slug}>
-                      {release.year} {release.name}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Type year or release name..."
+                    value={releaseSearchTerm}
+                    onChange={(e) => handleReleaseSearchChange(e.target.value)}
+                    onFocus={() => setShowReleaseSuggestions(true)}
+                    onBlur={() => setTimeout(() => setShowReleaseSuggestions(false), 200)}
+                    className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowReleaseSuggestions(!showReleaseSuggestions)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    ▼
+                  </button>
+                </div>
+                {showReleaseSuggestions && filteredReleases.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {filteredReleases.map((release) => (
+                      <button
+                        key={release.slug}
+                        type="button"
+                        onClick={() => handleReleaseSelect(release)}
+                        className="w-full text-left px-4 py-2 hover:bg-footy-green hover:text-white transition-colors"
+                      >
+                        <span className="font-semibold">{release.year}</span> {release.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
+
+              {/* Set Filter - Only show when release is selected */}
+              {filterRelease && sets.length > 0 && (
+                <div className="relative">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Filter by Set
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Type set name..."
+                      value={setSearchTerm}
+                      onChange={(e) => handleSetSearchChange(e.target.value)}
+                      onFocus={() => setShowSetSuggestions(true)}
+                      onBlur={() => setTimeout(() => setShowSetSuggestions(false), 200)}
+                      className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowSetSuggestions(!showSetSuggestions)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    >
+                      ▼
+                    </button>
+                  </div>
+                  {showSetSuggestions && filteredSets.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      {filteredSets.map((set) => (
+                        <button
+                          key={set.id}
+                          type="button"
+                          onClick={() => handleSetSelect(set)}
+                          className="w-full text-left px-4 py-2 hover:bg-footy-green hover:text-white transition-colors"
+                        >
+                          {set.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Parallel Filter - Only show when set is selected */}
+              {filterSet && parallels.length > 0 && (
+                <div className="relative">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Filter by Parallel
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Type parallel type..."
+                      value={parallelSearchTerm}
+                      onChange={(e) => handleParallelSearchChange(e.target.value)}
+                      onFocus={() => setShowParallelSuggestions(true)}
+                      onBlur={() => setTimeout(() => setShowParallelSuggestions(false), 200)}
+                      className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowParallelSuggestions(!showParallelSuggestions)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    >
+                      ▼
+                    </button>
+                  </div>
+                  {showParallelSuggestions && filteredParallels.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      {filteredParallels.map((parallel) => (
+                        <button
+                          key={parallel}
+                          type="button"
+                          onClick={() => handleParallelSelect(parallel)}
+                          className="w-full text-left px-4 py-2 hover:bg-footy-green hover:text-white transition-colors"
+                        >
+                          {parallel}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
