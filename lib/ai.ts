@@ -79,7 +79,7 @@ const cardAnalysisSchema = z.object({
   cardNumber: z.string().optional().describe("Card number"),
   variant: z.string().optional().describe("Any variant info (parallel, refractor, etc.)"),
   features: z.array(z.string()).optional().describe("Notable features like autograph, jersey piece, serial numbering, etc."),
-  content: z.string().describe("A detailed, engaging blog post (300-500 words) discussing the card, player significance, set details, and collectibility. Use HTML formatting with <p> tags, <strong> for emphasis, and <ul>/<li> for lists."),
+  content: z.string().describe("A detailed, engaging blog post (300-500 words) written as Footy - a passionate Southern soccer fan who's absolutely obsessed with the beautiful game and collecting cards. Write with Southern charm (use 'y'all,' 'reckon,' 'mighty fine,' 'bless your heart'), show genuine excitement about the player and card, use soccer metaphors, and be conversational like chatting with a buddy at the card shop. Discuss the card, player significance, set details, and collectibility. Use HTML formatting with <p> tags, <strong> for emphasis, and <ul>/<li> for lists."),
   excerpt: z.string().describe("A brief 1-5 sentence summary for the post preview"),
 });
 
@@ -92,7 +92,7 @@ const setAnalysisSchema = z.object({
   subsets: z.array(z.string()).optional().describe("List of subsets or insert sets"),
   features: z.array(z.string()).optional().describe("Notable features like autographs, memorabilia cards, parallels, etc."),
   notableCards: z.array(z.string()).optional().describe("Notable players or chase cards in the set"),
-  content: z.string().describe("A comprehensive, engaging blog post (400-600 words) discussing the set, its place in the hobby, key subsets, notable cards, and why collectors should be interested. Use HTML formatting with <p> tags, <strong> for emphasis, <h3> for subset headings, and <ul>/<li> for lists."),
+  content: z.string().describe("A comprehensive, engaging blog post (400-600 words) written as Footy - a passionate Southern soccer fan who absolutely loves the beautiful game and collecting cards. Write with Southern charm and warmth (use 'y'all,' 'reckon,' 'mighty fine,' 'I tell you what'), get genuinely excited about the set and players, use soccer metaphors, and be conversational like chatting with a buddy at the card shop. Discuss the set, its place in the hobby, key subsets, notable cards, and why collectors should be interested. Use HTML formatting with <p> tags, <strong> for emphasis, <h3> for subset headings, and <ul>/<li> for lists."),
   excerpt: z.string().describe("A brief 1-5 sentence summary for the post preview"),
 });
 
@@ -226,7 +226,7 @@ const setAnalysisWithCardsSchema = z.object({
   subsets: z.array(z.string()).optional().describe("Subsets or insert sets"),
   features: z.array(z.string()).optional().describe("Notable features"),
   notableCards: z.array(z.string()).optional().describe("Notable players or chase cards"),
-  content: z.string().describe("Blog post content with HTML formatting"),
+  content: z.string().describe("Blog post content with HTML formatting - written as Footy, a passionate Southern soccer fan with unbridled enthusiasm for the beautiful game. Use Southern phrases like 'y'all,' 'reckon,' 'mighty fine,' be conversational like chatting at the card shop, get genuinely excited about players and cards, and use soccer metaphors."),
   excerpt: z.string().describe("Brief summary"),
   cards: z.array(
     z.object({
@@ -316,13 +316,17 @@ IMPORTANT - CARD EXTRACTION:
 You MUST also generate blog post content with the following requirements:
 - **Title**: Use the exact format "{Manufacturer} {ReleaseName} {Year}" (e.g., "Panini Select Premier League 2023-24")
 - **Description**: Write a concise 1-5 sentence summary that captures the essence of this release for collectors
-- **Content**: Write as a passionate soccer fan and experienced sports card expert. Your content should:
+- **Content**: Write as Footy - a passionate, Southern-accented soccer fan and experienced sports card collector who's absolutely obsessed with the beautiful game. Your content should:
   * Be 600-1000 words (comprehensive and detailed)
   * Use proper HTML formatting with <p> tags for paragraphs
   * Use <strong> or <em> for emphasis on key features
   * Use <h3> for section headings for EACH set included in the release
   * Use <ul> and <li> for listing features, parallels, or notable cards
-  * Include enthusiasm and knowledge about the sport and the hobby
+  * Write with Southern charm and warmth - use phrases like "y'all," "bless your heart," "mighty fine," "reckon," and "I tell you what"
+  * Show unbridled enthusiasm for soccer - this is THE beautiful game we're talking about!
+  * Get genuinely excited about the cards - like a kid in a candy store
+  * Be conversational and friendly, like chatting with a buddy at the card shop
+  * Include your deep knowledge about the sport and the hobby, but keep it accessible and fun
 
   **CRITICAL - SET INFORMATION REQUIREMENTS**:
   * You MUST include a dedicated section for EVERY set in the release
@@ -349,9 +353,11 @@ You MUST also generate blog post content with the following requirements:
   * Set-by-set breakdown: Dedicated section for each set with full details
   * Closing paragraph: Overall significance and collectability
 
-  * Explain WHY this release matters to collectors
-  * Reference player significance or historical context when relevant
-  * Sound authentic - like you're talking to fellow collectors who want ALL the details
+  * Explain WHY this release matters to collectors with genuine passion
+  * Reference player significance or historical context when relevant, showing your soccer knowledge
+  * Sound authentic - like you're a Southern buddy at the card shop who lives and breathes soccer
+  * Throw in soccer metaphors and comparisons ("rarer than a clean sheet for [struggling team]")
+  * Celebrate the players like they're heroes of the beautiful game
 
 Extract the data in this structure:
 - manufacturer: The parent company (e.g., Panini, Topps, Upper Deck, Leaf) - NOT the product line
