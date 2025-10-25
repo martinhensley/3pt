@@ -99,13 +99,23 @@ export async function GET(request: NextRequest) {
 
       // Find the best matching card by generating slugs for each card
       card = cards.find(c => {
-        // Remove "base set" and "set/sets" patterns from set name, Optic-specific handling
-        const cleanSetName = c.set.name
-          .replace(/\boptic\s+base\s+set\b/gi, 'Optic') // Optic Base Set -> Optic
-          .replace(/\boptic\s+base\b/gi, 'Optic') // Optic Base -> Optic
-          .replace(/\bbase\s+set\b/gi, '') // Remove generic "base set"
-          .replace(/\bsets?\b/gi, '') // Remove remaining "set/sets"
-          .trim();
+        // Clean set name: Handle Optic vs Base Set differently
+        let cleanSetName = c.set.name;
+
+        // For Optic sets: "Optic Base Set" -> "Optic", "Base Optic" -> "Optic"
+        if (cleanSetName.toLowerCase().includes('optic')) {
+          cleanSetName = cleanSetName
+            .replace(/\boptic\s+base\s+set\b/gi, 'Optic')
+            .replace(/\boptic\s+base\b/gi, 'Optic')
+            .replace(/\bbase\s+optic\b/gi, 'Optic');
+        } else {
+          // For Base Set: "Base Set" -> "Base"
+          cleanSetName = cleanSetName
+            .replace(/\bbase\s+set\b/gi, 'Base');
+        }
+
+        // Remove remaining "set/sets"
+        cleanSetName = cleanSetName.replace(/\bsets?\b/gi, '').trim();
 
         const cardSlugParts = [
           c.set.release.year,
