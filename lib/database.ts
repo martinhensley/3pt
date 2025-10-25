@@ -120,7 +120,9 @@ export async function addCardsToSet(
     select: { parallels: true },
   });
 
-  const parallels = set?.parallels?.filter((p): p is string => p !== null) || [];
+  // Extract parallels array from Json type
+  const parallelsArray = (set?.parallels as string[] | null) || [];
+  const parallels = parallelsArray.filter((p): p is string => p !== null);
 
   // Create base cards
   const baseResult = await prisma.card.createMany({
