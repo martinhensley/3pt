@@ -80,17 +80,43 @@ export default function CardsIndexPage() {
   }, []);
 
   // Filter cards based on search and release filter
-  const filteredCards = cards.filter((card) => {
-    const matchesSearch =
-      !searchTerm ||
-      (card.playerName?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
-      (card.team?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
-      (card.cardNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
+  const filteredCards = cards
+    .filter((card) => {
+      const matchesSearch =
+        !searchTerm ||
+        (card.playerName?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
+        (card.team?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
+        (card.cardNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
 
-    const matchesRelease = !filterRelease || card.set.release.slug === filterRelease;
+      const matchesRelease = !filterRelease || card.set.release.slug === filterRelease;
 
-    return matchesSearch && matchesRelease;
-  });
+      return matchesSearch && matchesRelease;
+    })
+    .sort((a, b) => {
+      // First sort by release year (descending)
+      const yearA = a.set.release.year || '';
+      const yearB = b.set.release.year || '';
+      if (yearA !== yearB) {
+        return yearB.localeCompare(yearA);
+      }
+
+      // Then sort by set name
+      if (a.set.name !== b.set.name) {
+        return a.set.name.localeCompare(b.set.name);
+      }
+
+      // Then sort by card number numerically
+      const numA = parseInt(a.cardNumber || '0') || 0;
+      const numB = parseInt(b.cardNumber || '0') || 0;
+      if (numA !== numB) {
+        return numA - numB;
+      }
+
+      // Finally sort by player name
+      const nameA = a.playerName || '';
+      const nameB = b.playerName || '';
+      return nameA.localeCompare(nameB);
+    });
 
   // Generate card slug
   const getCardSlug = (card: Card) => {
