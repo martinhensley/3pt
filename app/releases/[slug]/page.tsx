@@ -271,10 +271,9 @@ export default function ReleasePage() {
         </aside>
 
         <main className="flex-grow max-w-5xl space-y-6">
-          <Header showBackButton={false} rounded={true} />
-
-          <Breadcrumb
-            items={[
+          <Header
+            rounded={true}
+            breadcrumbItems={[
               { label: "Home", href: "/" },
               {
                 label: `${release.year || ""} ${release.manufacturer.name} ${release.name}`.trim(),
