@@ -260,7 +260,11 @@ export default function ReleasePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
 
-      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
+      <div className="max-w-[1600px] mx-auto w-full px-4 pt-6">
+        <Header showBackButton={true} rounded={true} />
+      </div>
+
+      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pb-12">
         <aside className="hidden lg:block w-72 flex-shrink-0">
           <EbayAd
             query={adKeywords.primaryQuery}
@@ -270,7 +274,6 @@ export default function ReleasePage() {
         </aside>
 
         <main className="flex-grow max-w-5xl space-y-6">
-          <Header showBackButton={true} rounded={true} />
           {/* Combined Hero with Carousel */}
           <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white">
             {/* Hero Header */}

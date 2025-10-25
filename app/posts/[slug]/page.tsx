@@ -107,7 +107,11 @@ export default function PostPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
 
-      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
+      <div className="max-w-[1600px] mx-auto w-full px-4 pt-6">
+        <Header showBackButton={true} rounded={true} />
+      </div>
+
+      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pb-12">
         <aside className="hidden lg:block w-72 flex-shrink-0">
           <EbayAd
             query={adKeywords.primaryQuery}
@@ -117,7 +121,6 @@ export default function PostPage() {
         </aside>
 
         <main className="flex-grow max-w-4xl mx-auto space-y-6">
-          <Header showBackButton={true} rounded={true} />
         <article>
           <div className="mb-8">
             <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">

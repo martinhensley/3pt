@@ -81,13 +81,16 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
-      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
+      <div className="max-w-[1600px] mx-auto w-full px-4 pt-6">
+        <Header rounded={true} />
+      </div>
+
+      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pb-12">
         <aside className="hidden lg:block w-72 flex-shrink-0">
           <EbayAd query="soccer cards" limit={3} title="Latest Soccer Cards" />
         </aside>
 
         <main className="flex-grow space-y-6">
-          <Header rounded={true} />
         {content.length === 0 ? (
           <div className="text-center py-20">
             <div className="bg-white rounded-lg shadow-lg p-12 max-w-2xl mx-auto transition-colors duration-300">
