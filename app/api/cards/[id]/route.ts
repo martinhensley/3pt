@@ -9,11 +9,12 @@ export const runtime = 'nodejs';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const card = await prisma.card.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         set: {
           include: {
