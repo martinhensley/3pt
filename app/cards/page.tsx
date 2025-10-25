@@ -139,11 +139,7 @@ export default function CardsIndexPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-[1600px] mx-auto w-full px-4 pt-6 mb-6">
-        <Header rounded={true} />
-      </div>
-
-      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pb-12">
+      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
         <aside className="hidden lg:block w-72 flex-shrink-0">
           <EbayAd
             query="soccer cards"
@@ -153,6 +149,7 @@ export default function CardsIndexPage() {
         </aside>
 
         <main className="flex-grow max-w-5xl space-y-6">
+          <Header rounded={true} />
           {/* Header */}
           <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
             <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">

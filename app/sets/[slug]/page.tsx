@@ -145,11 +145,7 @@ export default function SetPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-      <div className="max-w-[1600px] mx-auto w-full px-4 pt-6 mb-6">
-        <Header rounded={true} />
-      </div>
-
-      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pb-12">
+      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
         <aside className="hidden lg:block w-72 flex-shrink-0">
           <EbayAd
             query={adKeywords.primaryQuery}
@@ -159,6 +155,7 @@ export default function SetPage() {
         </aside>
 
         <main className="flex-grow max-w-5xl space-y-6">
+          <Header rounded={true} />
 
         {/* Set Header */}
         <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
