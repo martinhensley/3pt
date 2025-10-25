@@ -132,7 +132,22 @@ export async function GET(request: NextRequest) {
           .replace(/^-|-$/g, '')
           .replace(/1-of-1/g, '1of1'); // Convert "1-of-1" to "1of1"
 
-        return generatedSlug === slug;
+        // Try exact match first
+        if (generatedSlug === slug) return true;
+
+        // For Base Set cards with null parallels, try fuzzy match (ignore parallel suffix)
+        // Match: year-release-set-cardnum-playername
+        const baseSlugPattern = cardSlugParts.slice(0, 5)
+          .filter(Boolean)
+          .join('-')
+          .toLowerCase()
+          .replace(/\s+/g, '-')
+          .replace(/[^a-z0-9-]/g, '')
+          .replace(/-+/g, '-')
+          .replace(/^-|-$/g, '');
+
+        // Check if the slug starts with this base pattern
+        return slug.startsWith(baseSlugPattern);
       });
     }
 
