@@ -139,8 +139,6 @@ export default function SetPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-      <Header />
-
       <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
         <aside className="hidden lg:block w-72 flex-shrink-0">
           <EbayAd
@@ -150,16 +148,23 @@ export default function SetPage() {
           />
         </aside>
 
-        <main className="flex-grow max-w-5xl">
-          {/* Breadcrumb */}
-          <div className="mb-6">
-            <button
-              onClick={() => router.back()}
-              className="text-footy-green hover:underline flex items-center gap-1"
-            >
-              ← Back
-            </button>
-          </div>
+        <main className="flex-grow max-w-5xl space-y-6">
+          {/* Header */}
+          <header className="bg-gradient-to-r from-footy-green to-green-700 text-white shadow-lg rounded-xl">
+            <div className="px-6 py-6">
+              <div className="text-center">
+                <button
+                  onClick={() => router.back()}
+                  className="inline-block text-footy-orange hover:text-white transition-colors text-sm mb-2"
+                >
+                  ← Back
+                </button>
+                <h1 className="text-4xl md:text-5xl font-bold">
+                  <Link href="/">footy<span className="text-footy-orange">.bot</span></Link>
+                </h1>
+              </div>
+            </div>
+          </header>
 
         {/* Set Header */}
         <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
@@ -339,24 +344,25 @@ export default function SetPage() {
           limit={4}
           title={getAdTitle(adKeywords.relatedQuery, "Related Soccer Cards")}
         />
-      </main>
 
-      <aside className="hidden lg:block w-72 flex-shrink-0">
-        <EbayAd
-          query={adKeywords.autographQuery}
-          limit={3}
-          title={getAdTitle(adKeywords.autographQuery, "Soccer Autographs")}
-        />
-      </aside>
-    </div>
+          {/* Footer */}
+          <footer className="bg-footy-green text-white shadow-lg rounded-xl">
+            <div className="px-6 py-8 text-center">
+              <p className="text-sm">
+                <span className="text-white">footy</span><span className="text-footy-orange">.bot</span> © 2024-{new Date().getFullYear()}
+              </p>
+            </div>
+          </footer>
+        </main>
 
-    <footer className="bg-footy-green text-white mt-12">
-      <div className="max-w-7xl mx-auto px-4 py-12 text-center">
-        <p className="text-sm">
-          <span className="text-white">footy</span><span className="text-footy-orange">.bot</span> © 2024-{new Date().getFullYear()}
-        </p>
+        <aside className="hidden lg:block w-72 flex-shrink-0">
+          <EbayAd
+            query={adKeywords.autographQuery}
+            limit={3}
+            title={getAdTitle(adKeywords.autographQuery, "Soccer Autographs")}
+          />
+        </aside>
       </div>
-    </footer>
-  </div>
+    </div>
   );
 }

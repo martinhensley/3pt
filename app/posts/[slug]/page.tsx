@@ -105,7 +105,6 @@ export default function PostPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <Header showBackButton />
 
       <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
         <aside className="hidden lg:block w-72 flex-shrink-0">
@@ -116,7 +115,23 @@ export default function PostPage() {
           />
         </aside>
 
-        <main className="flex-grow max-w-4xl mx-auto">
+        <main className="flex-grow max-w-4xl mx-auto space-y-6">
+          {/* Header */}
+          <header className="bg-gradient-to-r from-footy-green to-green-700 text-white shadow-lg rounded-xl">
+            <div className="px-6 py-6">
+              <div className="text-center">
+                <Link
+                  href="/"
+                  className="inline-block text-footy-orange hover:text-white transition-colors text-sm mb-2"
+                >
+                  ← Back to Home
+                </Link>
+                <h1 className="text-4xl md:text-5xl font-bold">
+                  <Link href="/">footy<span className="text-footy-orange">.bot</span></Link>
+                </h1>
+              </div>
+            </div>
+          </header>
         <article>
           <div className="mb-8">
             <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
@@ -187,6 +202,15 @@ export default function PostPage() {
           limit={4}
           title={getAdTitle(adKeywords.relatedQuery, "Related Soccer Cards")}
         />
+
+          {/* Footer */}
+          <footer className="bg-footy-green text-white shadow-lg rounded-xl">
+            <div className="px-6 py-8 text-center">
+              <p className="text-sm">
+                <span className="text-white">footy</span><span className="text-footy-orange">.bot</span> © 2024-{new Date().getFullYear()}
+              </p>
+            </div>
+          </footer>
         </main>
 
         <aside className="hidden lg:block w-72 flex-shrink-0">
@@ -197,14 +221,6 @@ export default function PostPage() {
           />
         </aside>
       </div>
-
-      <footer className="bg-footy-green text-white mt-12">
-        <div className="max-w-7xl mx-auto px-4 py-12 text-center">
-          <p className="text-sm">
-            <span className="text-white">footy</span><span className="text-footy-orange">.bot</span> © 2024-{new Date().getFullYear()}
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }
