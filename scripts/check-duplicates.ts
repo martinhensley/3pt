@@ -56,7 +56,7 @@ async function checkDuplicates() {
     if (group.length > 1) {
       console.log(`DUPLICATE GROUP (${key}):`);
       group.forEach(card => {
-        console.log(`  - ID: ${card.id}, Slug: ${card.slug}`);
+        console.log(`  - ID: ${card.id}`);
       });
       console.log('');
     }
