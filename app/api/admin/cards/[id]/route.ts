@@ -14,7 +14,7 @@ export const maxDuration = 60;
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check authentication
@@ -27,7 +27,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const cardId = params.id;
+    const { id: cardId } = await params;
 
     // Get existing card
     const existingCard = await prisma.card.findUnique({
@@ -119,7 +119,7 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check authentication
@@ -131,7 +131,7 @@ export async function DELETE(
       );
     }
 
-    const cardId = params.id;
+    const { id: cardId } = await params;
 
     // Delete card
     await prisma.card.delete({
