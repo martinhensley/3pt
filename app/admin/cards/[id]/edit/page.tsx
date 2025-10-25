@@ -117,12 +117,12 @@ export default function EditCardPage() {
       if (newFrontImage) {
         const frontReader = new FileReader();
         frontReader.onloadend = async () => {
-          updateData.imageFront = frontReader.result;
+          updateData.imageFront = frontReader.result as string;
 
           if (newBackImage) {
             const backReader = new FileReader();
             backReader.onloadend = async () => {
-              updateData.imageBack = backReader.result;
+              updateData.imageBack = backReader.result as string;
               await submitUpdate(updateData);
             };
             backReader.readAsDataURL(newBackImage);
@@ -134,7 +134,7 @@ export default function EditCardPage() {
       } else if (newBackImage) {
         const backReader = new FileReader();
         backReader.onloadend = async () => {
-          updateData.imageBack = backReader.result;
+          updateData.imageBack = backReader.result as string;
           await submitUpdate(updateData);
         };
         backReader.readAsDataURL(newBackImage);
