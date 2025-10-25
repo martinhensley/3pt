@@ -45,10 +45,40 @@ export async function GET(request: NextRequest) {
     } else if (slug) {
       // Parse slug to extract card info
       // Format: year-releasename-setname-cardnumber-playername-parallel
-      // Example: 2024-25-donruss-soccer-base-4-folarin-balogun
+      // Example: 2024-25-donruss-soccer-optic-200-mikayil-faye-gold-power-1of1
 
-      // Fetch all cards with their relationships
+      // Extract player name from slug for filtering
+      // Player names typically appear after set name and card number
+      // Look for consecutive non-numeric parts that could be a name
+      const slugParts = slug.split('-');
+
+      // Find player name parts (after we skip year, release, set, and card number)
+      // Strategy: Look for first name-like word that's not a known keyword
+      const skipWords = ['base', 'optic', 'donruss', 'soccer', 'panini', 'topps', 'select', 'prizm'];
+      let potentialNameParts: string[] = [];
+
+      for (let i = 0; i < slugParts.length; i++) {
+        const part = slugParts[i];
+        // Skip years (2024, 25), skip known keywords, skip very long parts (likely parallel names)
+        if (!/^\d+$/.test(part) && !skipWords.includes(part.toLowerCase()) && part.length <= 12) {
+          // Could be part of a player name
+          if (potentialNameParts.length < 3) { // Names rarely have more than 3 parts
+            potentialNameParts.push(part);
+          }
+        }
+      }
+
+      // Use first potential name part for searching (usually last name or first name)
+      const searchName = potentialNameParts.length > 0 ? potentialNameParts[0] : '';
+
+      // Fetch cards matching the player name (case insensitive partial match)
       const cards = await prisma.card.findMany({
+        where: searchName ? {
+          playerName: {
+            contains: searchName,
+            mode: 'insensitive'
+          }
+        } : {},
         include: {
           set: {
             include: {
@@ -63,6 +93,8 @@ export async function GET(request: NextRequest) {
             orderBy: { order: 'asc' }
           },
         },
+        // Limit to reasonable number to avoid loading entire database
+        take: 100
       });
 
       // Find the best matching card by generating slugs for each card
