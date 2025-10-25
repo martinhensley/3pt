@@ -27,9 +27,9 @@ export default function Header({ showBackButton = false, rounded = true, showAd 
 
         {/* Logo */}
         <div className="text-center mb-6">
-          <h1 className="text-4xl md:text-5xl font-bold">
+          <h1 className="text-4xl md:text-5xl font-bold font-orbitron">
             <Link href="/" className="hover:opacity-90 transition-opacity">
-              footy<span className="text-footy-orange">.bot</span>
+              <span>footy<span className="text-footy-orange">.bot</span></span>
             </Link>
           </h1>
         </div>

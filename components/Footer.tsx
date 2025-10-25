@@ -13,7 +13,7 @@ export default function Footer({ rounded = true }: FooterProps) {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* About Section */}
           <div>
-            <h3 className="text-lg font-bold mb-4">
+            <h3 className="text-lg font-bold font-orbitron mb-4">
               <span className="text-white">footy</span><span className="text-footy-orange">.bot</span>
             </h3>
             <p className="text-sm text-green-100">
@@ -120,7 +120,7 @@ export default function Footer({ rounded = true }: FooterProps) {
         {/* Bottom Bar */}
         <div className="border-t border-green-600 pt-6 text-center">
           <p className="text-sm text-green-100">
-            <span className="text-white">footy</span><span className="text-footy-orange">.bot</span> © 2024-{new Date().getFullYear()} | All rights reserved
+            <span className="text-white font-orbitron">footy</span><span className="text-footy-orange font-orbitron">.bot</span> © 2024-{new Date().getFullYear()} | All rights reserved
           </p>
         </div>
       </div>
