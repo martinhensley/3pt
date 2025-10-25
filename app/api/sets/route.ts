@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
       }
 
       // Fetch cards for the specified parallel
-      const cards = await prisma.card.findMany({
+      const allCards = await prisma.card.findMany({
         where: {
           setId: matchedSet.id,
           parallelType: parallelType,
@@ -110,6 +110,39 @@ export async function GET(request: NextRequest) {
           },
         },
       });
+
+      // If no cards found with specific parallel type, check if cards have null parallelType
+      // If so, return only unique card numbers (one card per player) as a fallback
+      let cards = allCards;
+      if (cards.length === 0) {
+        const allCardsInSet = await prisma.card.findMany({
+          where: {
+            setId: matchedSet.id,
+            parallelType: null,
+          },
+          orderBy: [{ cardNumber: 'asc' }],
+          include: {
+            set: {
+              include: {
+                release: {
+                  include: {
+                    manufacturer: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        // Group by cardNumber and take first occurrence of each
+        const uniqueCards = new Map();
+        allCardsInSet.forEach(card => {
+          if (!uniqueCards.has(card.cardNumber)) {
+            uniqueCards.set(card.cardNumber, card);
+          }
+        });
+        cards = Array.from(uniqueCards.values());
+      }
 
       // Return the set with cards for the specified parallel
       return NextResponse.json({
