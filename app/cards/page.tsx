@@ -122,12 +122,12 @@ export default function CardsIndexPage() {
 
       if (selectedSetCard && selectedSetCard.set.parallels && Array.isArray(selectedSetCard.set.parallels)) {
         // Use the set's parallels array and add "Base" at the beginning
-        const setParallels = ["Base", ...selectedSetCard.set.parallels].sort((a, b) => {
+        const availableParallels = ["Base", ...selectedSetCard.set.parallels].sort((a, b) => {
           if (a === "Base") return -1;
           if (b === "Base") return 1;
           return a.localeCompare(b);
         });
-        setParallels(setParallels);
+        setParallels(availableParallels);
       } else {
         // Fallback: get unique parallels from actual cards
         const setCards = cards.filter(
