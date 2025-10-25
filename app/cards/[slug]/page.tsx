@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import EbayAd from "@/components/EbayAd";
 import EbayAdHorizontal from "@/components/EbayAdHorizontal";
 import { useEffect, useState, useMemo } from "react";
@@ -125,10 +126,8 @@ export default function CardDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white transition-colors duration-300">
-      <Header />
-
-      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
         <aside className="hidden lg:block w-72 flex-shrink-0">
           <EbayAd
             query={adKeywords.primaryQuery}
@@ -137,16 +136,8 @@ export default function CardDetailPage() {
           />
         </aside>
 
-        <main className="flex-grow max-w-5xl">
-          {/* Breadcrumb */}
-          <div className="mb-6">
-            <button
-              onClick={() => router.back()}
-              className="text-footy-green hover:underline flex items-center gap-1"
-            >
-              ← Back
-            </button>
-          </div>
+        <main className="flex-grow max-w-5xl space-y-6">
+          <Header rounded={true} />
 
           {/* Card Header */}
           <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
@@ -346,6 +337,8 @@ export default function CardDetailPage() {
             limit={4}
             title={getAdTitle(adKeywords.relatedQuery, "Related Soccer Cards")}
           />
+
+          <Footer rounded={true} />
         </main>
 
         <aside className="hidden lg:block w-72 flex-shrink-0">
@@ -356,14 +349,6 @@ export default function CardDetailPage() {
           />
         </aside>
       </div>
-
-      <footer className="bg-footy-green text-white transition-colors duration-300 mt-12">
-        <div className="max-w-4xl mx-auto px-4 py-8 text-center">
-          <p className="text-sm">
-            <span className="text-white">footy</span><span className="text-footy-orange">.bot</span> © 2024-{new Date().getFullYear()}
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }
