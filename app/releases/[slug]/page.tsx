@@ -260,7 +260,7 @@ export default function ReleasePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
 
-      <div className="max-w-[1600px] mx-auto w-full px-4 pt-6">
+      <div className="max-w-[1600px] mx-auto w-full px-4 pt-6 mb-6">
         <Header showBackButton={true} rounded={true} />
       </div>
 

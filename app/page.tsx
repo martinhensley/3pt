@@ -81,7 +81,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
-      <div className="max-w-[1600px] mx-auto w-full px-4 pt-6">
+      <div className="max-w-[1600px] mx-auto w-full px-4 pt-6 mb-6">
         <Header rounded={true} />
       </div>
 
