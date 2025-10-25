@@ -454,38 +454,48 @@ export default function EditReleasePage() {
   };
 
   const handleGenerateDescription = async () => {
-    if (!descriptionFile) {
-      setMessage({ type: "error", text: "Please upload a sell sheet or info document first" });
+    // Check if we have source files first
+    if (sourceFiles.length === 0 && !descriptionFile) {
+      setMessage({ type: "error", text: "Please upload source files first or select a file to upload" });
       setTimeout(() => setMessage(null), 3000);
       return;
     }
 
     try {
       setGeneratingDescription(true);
-      setMessage({ type: "success", text: "Generating description from document..." });
+      setMessage({ type: "success", text: "Generating description from source documents..." });
 
-      // Upload file to blob storage first
-      const formData = new FormData();
-      formData.append('file', descriptionFile);
+      // If a new file is selected, upload it first
+      if (descriptionFile) {
+        const formData = new FormData();
+        formData.append("file", descriptionFile);
+        formData.append("releaseId", release!.id);
 
-      const uploadResponse = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
+        const uploadResponse = await fetch("/api/uploads/release-files", {
+          method: "POST",
+          body: formData,
+        });
 
-      if (!uploadResponse.ok) {
-        throw new Error('Failed to upload file');
+        if (uploadResponse.ok) {
+          const fileData = await uploadResponse.json();
+          setSourceFiles([...sourceFiles, fileData]);
+          setDescriptionFile(null); // Clear the file input
+        }
       }
 
-      await uploadResponse.json();
+      // Use the first source file (PDF or image preferred) for context
+      const sourceFileUrls = sourceFiles.map(f => f.url);
 
-      // Generate description using AI
-      const prompt = `Based on this ${editedYear} ${editedManufacturer} ${editedReleaseName} sell sheet, write a compelling 1-5 sentence description that highlights the key features and appeal of this release for soccer card collectors. Focus on what makes this release special and exciting.`;
+      // Generate description using AI with source file context
+      const prompt = `Based on the source documents for this ${editedYear} ${editedManufacturer} ${editedReleaseName} release, write a compelling 1-5 sentence description that highlights the key features and appeal of this release for soccer card collectors. Focus on what makes this release special and exciting.`;
 
       const response = await fetch('/api/generate/post', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({
+          prompt,
+          sourceFiles: sourceFileUrls
+        }),
       });
 
       if (!response.ok) {
@@ -977,42 +987,75 @@ export default function EditReleasePage() {
                 <svg className="w-5 h-5 text-footy-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
-                GenAI: Generate Description from Sell Sheet
+                GenAI: Generate Description from Source Files
               </h4>
-              <p className="text-xs text-gray-600 mb-3">
-                Upload a sell sheet or info document to automatically generate a compelling description
-              </p>
-              <div className="flex items-center gap-3">
-                <input
-                  type="file"
-                  accept=".pdf,.png,.jpg,.jpeg,.webp"
-                  onChange={(e) => setDescriptionFile(e.target.files?.[0] || null)}
-                  className="text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-footy-green hover:file:bg-green-200"
-                />
-                <button
-                  type="button"
-                  onClick={handleGenerateDescription}
-                  disabled={!descriptionFile || generatingDescription}
-                  className="px-4 py-2 bg-gradient-to-r from-footy-green to-green-600 hover:from-green-700 hover:to-green-700 text-white rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {generatingDescription ? (
-                    <>
-                      <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Generating...
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                      Generate Description
-                    </>
-                  )}
-                </button>
-              </div>
+              {sourceFiles.length > 0 ? (
+                <>
+                  <p className="text-xs text-gray-600 mb-3">
+                    Uses uploaded source files ({sourceFiles.length} file{sourceFiles.length !== 1 ? 's' : ''}) to generate description
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleGenerateDescription}
+                    disabled={generatingDescription}
+                    className="px-4 py-2 bg-gradient-to-r from-footy-green to-green-600 hover:from-green-700 hover:to-green-700 text-white rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {generatingDescription ? (
+                      <>
+                        <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        Generate Description
+                      </>
+                    )}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="text-xs text-gray-600 mb-3">
+                    Upload source files above first, or optionally add a new file here
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="file"
+                      accept=".pdf,.png,.jpg,.jpeg,.webp"
+                      onChange={(e) => setDescriptionFile(e.target.files?.[0] || null)}
+                      className="text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-footy-green hover:file:bg-green-200"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleGenerateDescription}
+                      disabled={!descriptionFile || generatingDescription}
+                      className="px-4 py-2 bg-gradient-to-r from-footy-green to-green-600 hover:from-green-700 hover:to-green-700 text-white rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {generatingDescription ? (
+                        <>
+                          <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                          </svg>
+                          Generate Description
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Manual Description Input */}
@@ -1021,7 +1064,7 @@ export default function EditReleasePage() {
                 Description:
               </label>
               <p className="text-xs text-gray-500 mb-2">
-                1-5 sentence summary displayed in previews and on the release page
+                3-7 sentence summary displayed in previews and on the release page
               </p>
               <textarea
                 value={editedDescription}
