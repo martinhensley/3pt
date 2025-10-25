@@ -115,7 +115,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, name, year, description } = body;
+    const { id, name, year, description, sourceFiles } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -130,6 +130,7 @@ export async function PUT(request: NextRequest) {
         name,
         year,
         description: description || null,
+        sourceFiles: sourceFiles || null,
       },
       include: {
         manufacturer: true,
