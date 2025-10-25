@@ -116,25 +116,21 @@ export default function AdminDashboard() {
                 title="Total Releases"
                 value={stats.totalReleases}
                 icon="📦"
-                color="green"
               />
               <StatCard
                 title="Total Sets"
                 value={stats.totalSets}
                 icon="📚"
-                color="blue"
               />
               <StatCard
                 title="Cards w/ Image/Total"
                 value={`${stats.cardsWithImages}/${stats.totalCards}`}
                 icon="🃏"
-                color="orange"
               />
               <StatCard
                 title="Published Posts"
                 value={`${stats.publishedPosts}/${stats.totalPosts}`}
                 icon="📝"
-                color="purple"
               />
             </div>
 
