@@ -55,25 +55,42 @@ export async function PUT(
     if (body.imageFront || body.imageBack) {
       console.log('Processing new images for card:', cardId);
 
-      // Compress images
-      const compressed = await compressCardImages(
-        body.imageFront || existingCard.imageFront,
-        body.imageBack || existingCard.imageBack,
-        { mode: 'standard' }
-      );
-
-      // Upload to blob storage
-      const imageUrls = await uploadCardFrontBack(
-        cardId,
-        body.imageFront ? compressed.front : null,
-        body.imageBack ? compressed.back : null
-      );
-
-      // Update image URLs
-      if (body.imageFront) {
+      // Compress only the images that are being updated
+      if (body.imageFront && body.imageBack) {
+        const compressed = await compressCardImages(
+          body.imageFront,
+          body.imageBack,
+          { mode: 'standard' }
+        );
+        const imageUrls = await uploadCardFrontBack(
+          cardId,
+          compressed.front,
+          compressed.back
+        );
         updateData.imageFront = imageUrls.front;
-      }
-      if (body.imageBack) {
+        updateData.imageBack = imageUrls.back;
+      } else if (body.imageFront) {
+        const compressed = await compressCardImages(
+          body.imageFront,
+          undefined,
+          { mode: 'standard' }
+        );
+        const imageUrls = await uploadCardFrontBack(
+          cardId,
+          compressed.front
+        );
+        updateData.imageFront = imageUrls.front;
+      } else if (body.imageBack) {
+        const compressed = await compressCardImages(
+          existingCard.imageFront || '',
+          body.imageBack,
+          { mode: 'standard' }
+        );
+        const imageUrls = await uploadCardFrontBack(
+          cardId,
+          existingCard.imageFront || compressed.front,
+          compressed.back
+        );
         updateData.imageBack = imageUrls.back;
       }
     }
