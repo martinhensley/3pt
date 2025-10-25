@@ -127,7 +127,7 @@ export default function CardsIndexPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-gray-50">
         <Header />
         <div className="flex items-center justify-center min-h-[60vh]">
           <p className="text-gray-600">Loading cards...</p>
@@ -137,7 +137,7 @@ export default function CardsIndexPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white transition-colors duration-300">
+    <div className="min-h-screen bg-gray-50">
       <Header />
 
       <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 py-8">
@@ -285,8 +285,8 @@ export default function CardsIndexPage() {
         </aside>
       </div>
 
-      <footer className="bg-footy-green text-white transition-colors duration-300 mt-12">
-        <div className="max-w-4xl mx-auto px-4 py-8 text-center">
+      <footer className="bg-footy-green text-white mt-12">
+        <div className="max-w-7xl mx-auto px-4 py-12 text-center">
           <p className="text-sm">
             <span className="text-white">footy</span><span className="text-footy-orange">.bot</span> © 2024-{new Date().getFullYear()}
           </p>

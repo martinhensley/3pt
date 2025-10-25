@@ -56,7 +56,7 @@ export default function PostPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen bg-white">
+      <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
         <Header showBackButton />
         <div className="flex-grow flex items-center justify-center">
           <p className="text-gray-600">Loading...</p>
@@ -100,7 +100,7 @@ export default function PostPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white transition-colors duration-300">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
@@ -198,7 +198,7 @@ export default function PostPage() {
         </aside>
       </div>
 
-      <footer className="bg-footy-green text-white transition-colors duration-300">
+      <footer className="bg-footy-green text-white">
         <div className="max-w-4xl mx-auto px-4 py-8 text-center">
           <p className="text-sm">
             <span className="text-white">footy</span><span className="text-footy-orange">.bot</span> © 2024-{new Date().getFullYear()}
