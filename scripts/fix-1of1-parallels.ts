@@ -1,13 +1,7 @@
 import { prisma } from '../lib/prisma';
 
 async function main() {
-  const sets = await prisma.set.findMany({
-    where: {
-      parallels: {
-        not: null
-      }
-    }
-  });
+  const sets = await prisma.set.findMany();
 
   for (const set of sets) {
     const parallels = Array.isArray(set.parallels) ? set.parallels : [];

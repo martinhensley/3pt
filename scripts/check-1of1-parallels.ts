@@ -2,11 +2,6 @@ import { prisma } from '../lib/prisma';
 
 async function main() {
   const sets = await prisma.set.findMany({
-    where: {
-      parallels: {
-        not: null
-      }
-    },
     select: {
       id: true,
       name: true,

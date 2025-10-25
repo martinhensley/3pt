@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
       // Find player name parts (after we skip year, release, set, and card number)
       // Strategy: Look for first name-like word that's not a known keyword
       const skipWords = ['base', 'optic', 'donruss', 'soccer', 'panini', 'topps', 'select', 'prizm'];
-      let potentialNameParts: string[] = [];
+      const potentialNameParts: string[] = [];
 
       for (let i = 0; i < slugParts.length; i++) {
         const part = slugParts[i];
