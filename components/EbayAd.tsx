@@ -53,7 +53,7 @@ export default function EbayAd({
 
   if (loading) {
     return (
-      <div className="bg-white border-2 border-footy-gold rounded-lg shadow-lg p-5 sticky top-4">
+      <div className="bg-white border-2 border-footy-gold rounded-lg shadow-lg p-5">
         <p className="text-sm text-footy-dark-green font-bold mb-4 text-center uppercase tracking-wide">
           {title}
         </p>
@@ -66,7 +66,7 @@ export default function EbayAd({
 
   if (error || products.length === 0) {
     return (
-      <div className="bg-white border-2 border-footy-gold rounded-lg shadow-lg p-5 sticky top-4">
+      <div className="bg-white border-2 border-footy-gold rounded-lg shadow-lg p-5">
         <p className="text-sm text-footy-dark-green font-bold mb-4 text-center uppercase tracking-wide">
           {title}
         </p>
@@ -80,7 +80,7 @@ export default function EbayAd({
   }
 
   return (
-    <div className="bg-white border-2 border-footy-gold rounded-lg shadow-lg p-5 sticky top-4">
+    <div className="bg-white border-2 border-footy-gold rounded-lg shadow-lg p-5">
       <p className="text-sm text-footy-dark-green font-bold mb-4 text-center uppercase tracking-wide">
         {title}
       </p>
