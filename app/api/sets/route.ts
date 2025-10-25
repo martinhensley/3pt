@@ -43,8 +43,8 @@ export async function GET(request: NextRequest) {
           .replace(/\boptic\s+base\s+set\b/gi, 'Optic') // Optic Base Set -> Optic
           .replace(/\boptic\s+base\b/gi, 'Optic') // Optic Base -> Optic
           .replace(/\bbase\s+optic\b/gi, 'Optic') // Base Optic -> Optic
-          .replace(/\bbase\s+set\b/gi, '') // Remove generic "base set"
-          .replace(/\bsets?\b/gi, '') // Remove "set/sets"
+          .replace(/\bbase\s+set\b/gi, 'Base') // Base Set -> Base (keep "Base")
+          .replace(/\bsets?\b/gi, '') // Remove remaining "set/sets"
           .trim();
 
         const setSlug = `${set.release.year || ''}-${set.release.name}-${cleanSetName}`
