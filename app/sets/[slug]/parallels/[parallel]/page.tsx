@@ -231,10 +231,12 @@ export default function ParallelPage() {
                   card.playerName || 'unknown',
                 ];
 
-                // Always add the parallel name from the URL since we're on a parallel page
-                // Use parallelName which is derived from the URL slug
-                if (parallelName && parallelName.toLowerCase() !== 'base') {
-                  slugParts.push(parallelName);
+                // Only add parallel name if the card actually has it set
+                // Don't add from URL if card.parallelType is null (cards not yet tagged)
+                if (card.parallelType && card.parallelType.toLowerCase() !== 'base') {
+                  slugParts.push(card.parallelType);
+                } else if (card.variant && card.variant.toLowerCase() !== 'base') {
+                  slugParts.push(card.variant);
                 }
 
                 const cardSlug = slugParts
