@@ -138,9 +138,10 @@ export default function CardDetailPage() {
         </aside>
 
         <main className="flex-grow max-w-5xl space-y-6">
-          <Header
-            rounded={true}
-            breadcrumbItems={[
+          <Header rounded={true} />
+
+          <Breadcrumb
+            items={[
               { label: "Home", href: "/" },
               {
                 label: `${card.set.release.year || ""} ${card.set.release.name}`.trim(),

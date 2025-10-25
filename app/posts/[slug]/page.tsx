@@ -124,9 +124,10 @@ export default function PostPage() {
         </aside>
 
         <main className="flex-grow max-w-4xl mx-auto space-y-6">
-          <Header
-            rounded={true}
-            breadcrumbItems={[
+          <Header showBackButton={false} rounded={true} />
+
+          <Breadcrumb
+            items={[
               { label: "Home", href: "/" },
               {
                 label: post.title,

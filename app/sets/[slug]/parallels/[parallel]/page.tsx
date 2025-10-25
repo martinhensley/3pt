@@ -156,30 +156,33 @@ export default function ParallelPage() {
         </aside>
 
         <main className="flex-grow max-w-5xl space-y-6">
-          <Header
-            rounded={true}
-            breadcrumbItems={setInfo ? [
-              { label: "Home", href: "/" },
-              {
-                label: `${setInfo.year || ""} ${setInfo.manufacturer} ${firstCard.set.release.name}`.trim(),
-                href: `/releases/${setInfo.releaseSlug}`,
-              },
-              {
-                label: setInfo.name
-                  .replace(/\boptic\s+base\s+set\b/gi, "Optic")
-                  .replace(/\boptic\s+base\b/gi, "Optic")
-                  .replace(/\bbase\s+optic\b/gi, "Optic")
-                  .replace(/\bbase\s+set\b/gi, "Base")
-                  .replace(/\bsets?\b/gi, "")
-                  .trim(),
-                href: `/sets/${setSlug}`,
-              },
-              {
-                label: parallelName,
-                href: `/sets/${setSlug}/parallels/${parallelSlug}`,
-              },
-            ] : undefined}
-          />
+          <Header rounded={true} />
+
+          {setInfo && (
+            <Breadcrumb
+              items={[
+                { label: "Home", href: "/" },
+                {
+                  label: `${setInfo.year || ""} ${setInfo.manufacturer} ${firstCard.set.release.name}`.trim(),
+                  href: `/releases/${setInfo.releaseSlug}`,
+                },
+                {
+                  label: setInfo.name
+                    .replace(/\boptic\s+base\s+set\b/gi, "Optic")
+                    .replace(/\boptic\s+base\b/gi, "Optic")
+                    .replace(/\bbase\s+optic\b/gi, "Optic")
+                    .replace(/\bbase\s+set\b/gi, "Base")
+                    .replace(/\bsets?\b/gi, "")
+                    .trim(),
+                  href: `/sets/${setSlug}`,
+                },
+                {
+                  label: parallelName,
+                  href: `/sets/${setSlug}/parallels/${parallelSlug}`,
+                },
+              ]}
+            />
+          )}
 
           {/* Header */}
           <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
