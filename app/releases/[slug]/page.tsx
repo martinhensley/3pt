@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Breadcrumb from "@/components/Breadcrumb";
 import EbayAd from "@/components/EbayAd";
 import EbayAdHorizontal from "@/components/EbayAdHorizontal";
 import { useEffect, useState, useMemo } from "react";
@@ -271,6 +272,17 @@ export default function ReleasePage() {
 
         <main className="flex-grow max-w-5xl space-y-6">
           <Header showBackButton={false} rounded={true} />
+
+          <Breadcrumb
+            items={[
+              { label: "Home", href: "/" },
+              {
+                label: `${release.year || ""} ${release.manufacturer.name} ${release.name}`.trim(),
+                href: `/releases/${release.slug}`,
+              },
+            ]}
+          />
+
           {/* Combined Hero with Carousel */}
           <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white">
             {/* Hero Header */}

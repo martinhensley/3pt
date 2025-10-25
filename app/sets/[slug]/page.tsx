@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Breadcrumb from "@/components/Breadcrumb";
 import EbayAd from "@/components/EbayAd";
 import EbayAdHorizontal from "@/components/EbayAdHorizontal";
 import { useEffect, useState, useMemo } from "react";
@@ -156,6 +157,20 @@ export default function SetPage() {
 
         <main className="flex-grow max-w-5xl space-y-6">
           <Header rounded={true} />
+
+          <Breadcrumb
+            items={[
+              { label: "Home", href: "/" },
+              {
+                label: `${set.release.year || ""} ${set.release.name}`.trim(),
+                href: `/releases/${set.release.slug}`,
+              },
+              {
+                label: displayName,
+                href: `/sets/${slug}`,
+              },
+            ]}
+          />
 
         {/* Set Header */}
         <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">

@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Breadcrumb from "@/components/Breadcrumb";
 import EbayAd from "@/components/EbayAd";
 import EbayAdHorizontal from "@/components/EbayAdHorizontal";
 import { useEffect, useState, useMemo } from "react";
@@ -124,6 +125,17 @@ export default function PostPage() {
 
         <main className="flex-grow max-w-4xl mx-auto space-y-6">
           <Header showBackButton={false} rounded={true} />
+
+          <Breadcrumb
+            items={[
+              { label: "Home", href: "/" },
+              {
+                label: post.title,
+                href: `/posts/${post.slug}`,
+              },
+            ]}
+          />
+
         <article>
           <div className="mb-8">
             <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">

@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Breadcrumb from "@/components/Breadcrumb";
 import EbayAd from "@/components/EbayAd";
 import EbayAdHorizontal from "@/components/EbayAdHorizontal";
 import { useEffect, useState, useMemo } from "react";
@@ -138,6 +139,41 @@ export default function CardDetailPage() {
 
         <main className="flex-grow max-w-5xl space-y-6">
           <Header rounded={true} />
+
+          <Breadcrumb
+            items={[
+              { label: "Home", href: "/" },
+              {
+                label: `${card.set.release.year || ""} ${card.set.release.name}`.trim(),
+                href: `/releases/${card.set.release.slug}`,
+              },
+              {
+                label: card.set.name
+                  .replace(/\boptic\s+base\s+set\b/gi, "Optic")
+                  .replace(/\boptic\s+base\b/gi, "Optic")
+                  .replace(/\bbase\s+optic\b/gi, "Optic")
+                  .replace(/\bbase\s+set\b/gi, "Base")
+                  .replace(/\bsets?\b/gi, "")
+                  .trim(),
+                href: `/sets/${card.set.release.year || ""}-${card.set.release.name}-${card.set.name
+                  .replace(/\boptic\s+base\s+set\b/gi, "Optic")
+                  .replace(/\boptic\s+base\b/gi, "Optic")
+                  .replace(/\bbase\s+optic\b/gi, "Optic")
+                  .replace(/\bbase\s+set\b/gi, "Base")
+                  .replace(/\bsets?\b/gi, "")
+                  .trim()}`
+                  .toLowerCase()
+                  .replace(/\s+/g, "-")
+                  .replace(/[^a-z0-9-]/g, "")
+                  .replace(/-+/g, "-")
+                  .replace(/^-|-$/g, ""),
+              },
+              {
+                label: `${card.cardNumber ? `#${card.cardNumber} ` : ""}${card.playerName || "Unknown Player"}`,
+                href: `/cards/${slug}`,
+              },
+            ]}
+          />
 
           {/* Card Header */}
           <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
