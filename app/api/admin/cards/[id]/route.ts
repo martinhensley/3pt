@@ -59,7 +59,7 @@ export async function PUT(
       const compressed = await compressCardImages(
         body.imageFront || existingCard.imageFront,
         body.imageBack || existingCard.imageBack,
-        { mode: 'single' }
+        { mode: 'standard' }
       );
 
       // Upload to blob storage
