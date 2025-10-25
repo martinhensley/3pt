@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
         // Find the matching parallel from the set's parallels array
         // Convert URL slug to match database format
         // e.g., "ice" -> "Ice", "red-299" -> "Red – /299"
-        const parallels = Array.isArray(matchedSet.parallels) ? matchedSet.parallels : [];
+        const parallels = Array.isArray(matchedSet.parallels) ? matchedSet.parallels.filter((p): p is string => p !== null) : [];
 
         // Try to find exact match first (case-insensitive, slug format)
         const matchedParallel = parallels.find(p => {
