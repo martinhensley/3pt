@@ -270,7 +270,7 @@ export default function ReleasePage() {
         </aside>
 
         <main className="flex-grow max-w-5xl space-y-6">
-          <Header showBackButton={true} rounded={true} />
+          <Header showBackButton={false} rounded={true} />
           {/* Combined Hero with Carousel */}
           <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white">
             {/* Hero Header */}

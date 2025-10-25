@@ -117,7 +117,7 @@ export default function PostPage() {
         </aside>
 
         <main className="flex-grow max-w-4xl mx-auto space-y-6">
-          <Header showBackButton={true} rounded={true} />
+          <Header showBackButton={false} rounded={true} />
         <article>
           <div className="mb-8">
             <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
