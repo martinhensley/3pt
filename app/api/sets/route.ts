@@ -12,6 +12,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const releaseId = searchParams.get("releaseId");
     const slug = searchParams.get("slug");
+    const parallelSlug = searchParams.get("parallel");
 
     // If slug is provided, this is a public request for a set page
     if (slug) {
@@ -27,9 +28,6 @@ export async function GET(request: NextRequest) {
       // Find all releases and sets to match against the slug
       const sets = await prisma.set.findMany({
         include: {
-          cards: {
-            orderBy: [{ cardNumber: 'asc' }],
-          },
           release: {
             include: {
               manufacturer: true,
@@ -62,7 +60,63 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: "Set not found" }, { status: 404 });
       }
 
-      return NextResponse.json(matchedSet);
+      // Determine which parallel to fetch
+      let parallelType: string;
+
+      if (parallelSlug) {
+        // Find the matching parallel from the set's parallels array
+        // Convert URL slug to match database format
+        // e.g., "ice" -> "Ice", "red-299" -> "Red – /299"
+        const parallels = Array.isArray(matchedSet.parallels) ? matchedSet.parallels : [];
+
+        // Try to find exact match first (case-insensitive, slug format)
+        const matchedParallel = parallels.find(p => {
+          const pSlug = p
+            .toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^a-z0-9-]/g, '')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '');
+          return pSlug === parallelSlug;
+        });
+
+        if (!matchedParallel) {
+          return NextResponse.json({ error: "Parallel not found" }, { status: 404 });
+        }
+
+        parallelType = matchedParallel;
+      } else {
+        // No parallel specified, use base parallel
+        const isOpticSet = matchedSet.name.toLowerCase().includes('optic');
+        parallelType = isOpticSet ? 'Optic' : 'Base';
+      }
+
+      // Fetch cards for the specified parallel
+      const cards = await prisma.card.findMany({
+        where: {
+          setId: matchedSet.id,
+          parallelType: parallelType,
+        },
+        orderBy: [{ cardNumber: 'asc' }],
+        include: {
+          set: {
+            include: {
+              release: {
+                include: {
+                  manufacturer: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      // Return the set with cards for the specified parallel
+      return NextResponse.json({
+        ...matchedSet,
+        cards: cards,
+        currentParallel: parallelType, // Include which parallel is being shown
+      });
     }
 
     // Otherwise, this is an authenticated request for sets by releaseId

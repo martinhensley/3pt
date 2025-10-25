@@ -79,66 +79,33 @@ export default function ParallelPage() {
   }, [cards, parallelName]);
 
   useEffect(() => {
-    // Convert URL-friendly parallel slug to readable name
-    // e.g., "argyle" -> "Argyle", "gold-prizm" -> "Gold Prizm"
-    const parallelDisplayName = parallelSlug
-      .split('-')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-
-    setParallelName(parallelDisplayName);
-
-    // Fetch all cards and filter by set slug and parallel name
-    fetch(`/api/cards/all`)
-      .then((res) => res.json())
-      .then((data) => {
-        // Filter cards based on set slug and parallel matching
-        const matchingCards = data.filter((card: Card) => {
-          // Generate the card's set slug to match against URL
-          // Special handling: Only remove "Base" from Optic sets
-          // For regular Base Set, keep "Base" in the slug
-          const cleanSetName = card.set.name
-            .replace(/\boptic\s+base\s+set\b/gi, 'Optic') // Optic Base Set -> Optic
-            .replace(/\boptic\s+base\b/gi, 'Optic') // Optic Base -> Optic
-            .replace(/\bbase\s+optic\b/gi, 'Optic') // Base Optic -> Optic
-            .replace(/\bbase\s+set\b/gi, 'Base') // Base Set -> Base (keep "Base")
-            .replace(/\bsets?\b/gi, '') // Remove remaining "set/sets"
-            .trim();
-          const cardSetSlug = `${card.set.release.year}-${card.set.release.name}-${cleanSetName}`
-            .toLowerCase()
-            .replace(/\s+/g, '-')
-            .replace(/[^a-z0-9-]/g, '')
-            .replace(/-+/g, '-')
-            .replace(/^-|-$/g, '');
-
-          const setMatch = cardSetSlug === setSlug;
-
-          const cardParallel = (card.parallelType || card.variant || '').toLowerCase();
-          const searchParallel = parallelSlug.replace(/-/g, ' ').toLowerCase();
-
-          const parallelMatch = cardParallel.includes(searchParallel) ||
-                                searchParallel.includes(cardParallel);
-
-          return setMatch && parallelMatch;
-        });
-
-        setCards(matchingCards);
-
-        // Extract set info from first card
-        if (matchingCards.length > 0) {
-          const first = matchingCards[0];
-          setSetInfo({
-            name: first.set.name,
-            year: first.set.release.year || '',
-            manufacturer: first.set.release.manufacturer.name,
-            releaseSlug: first.set.release.slug,
-          });
+    // Fetch set data with parallel parameter
+    fetch(`/api/sets?slug=${setSlug}&parallel=${parallelSlug}`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Parallel not found');
         }
+        return res.json();
+      })
+      .then((setData) => {
+        // Set the parallel name from the API response
+        setParallelName(setData.currentParallel || '');
+
+        // Set the cards
+        setCards(setData.cards || []);
+
+        // Extract set info
+        setSetInfo({
+          name: setData.name,
+          year: setData.release.year || '',
+          manufacturer: setData.release.manufacturer.name,
+          releaseSlug: setData.release.slug,
+        });
 
         setLoading(false);
       })
       .catch((error) => {
-        console.error("Failed to fetch cards:", error);
+        console.error("Failed to fetch parallel cards:", error);
         setLoading(false);
       });
   }, [setSlug, parallelSlug]);

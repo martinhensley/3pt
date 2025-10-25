@@ -9,12 +9,12 @@ interface Stats {
   totalReleases: number;
   totalSets: number;
   totalCards: number;
+  cardsWithImages: number;
   totalPosts: number;
   publishedPosts: number;
-  setsWithoutCards: number;
+  parallelSetsWithoutImages: number;
   setsWithoutChecklists: number;
   releasesWithoutPosts: number;
-  cardsWithoutPosts: number;
   recentActivity: {
     type: string;
     title: string;
@@ -105,7 +105,70 @@ export default function AdminDashboard() {
           </h1>
         </div>
 
-        {/* Quick Actions */}
+        {/* Statistics Grid */}
+        {stats && (
+          <>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+              Overview Statistics
+            </h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <StatCard
+                title="Total Releases"
+                value={stats.totalReleases}
+                icon="📦"
+                color="green"
+              />
+              <StatCard
+                title="Total Sets"
+                value={stats.totalSets}
+                icon="📚"
+                color="blue"
+              />
+              <StatCard
+                title="Cards w/ Image/Total"
+                value={`${stats.cardsWithImages}/${stats.totalCards}`}
+                icon="🃏"
+                color="orange"
+              />
+              <StatCard
+                title="Published Posts"
+                value={`${stats.publishedPosts}/${stats.totalPosts}`}
+                icon="📝"
+                color="purple"
+              />
+            </div>
+
+            {/* Data Quality Alerts */}
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+              Data Quality Alerts
+            </h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              <AlertCard
+                title="Sets and Parallel Sets Without Cards"
+                value={stats.parallelSetsWithoutImages}
+                description="Sets that don't have any cards catalogued"
+                link="/admin/sets?filter=no-cards"
+                severity={stats.parallelSetsWithoutImages > 0 ? "warning" : "good"}
+              />
+              <AlertCard
+                title="Sets Without Checklists"
+                value={stats.setsWithoutChecklists}
+                description="Sets missing totalCards or checklist data"
+                link="/admin/sets?filter=no-checklist"
+                severity={stats.setsWithoutChecklists > 0 ? "warning" : "good"}
+              />
+              <AlertCard
+                title="Releases Without Posts"
+                value={stats.releasesWithoutPosts}
+                description="Releases not linked to blog posts"
+                link="/admin/releases?filter=no-posts"
+                severity={stats.releasesWithoutPosts > 0 ? "info" : "good"}
+              />
+            </div>
+          </>
+        )}
+
+        {/* Quick Actions - No heading per user request */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
           <button
             onClick={() => router.push("/admin/releases/create")}
@@ -187,73 +250,9 @@ export default function AdminDashboard() {
           </button>
         </div>
 
-        {/* Statistics Grid */}
+        {/* Recent Activity */}
         {stats && (
           <>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-              Overview Statistics
-            </h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <StatCard
-                title="Total Releases"
-                value={stats.totalReleases}
-                icon="📦"
-                color="green"
-              />
-              <StatCard
-                title="Total Sets"
-                value={stats.totalSets}
-                icon="📚"
-                color="blue"
-              />
-              <StatCard
-                title="Total Cards"
-                value={stats.totalCards}
-                icon="🃏"
-                color="orange"
-              />
-              <StatCard
-                title="Published Posts"
-                value={`${stats.publishedPosts}/${stats.totalPosts}`}
-                icon="📝"
-                color="purple"
-              />
-            </div>
-
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-              Data Quality Alerts
-            </h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              <AlertCard
-                title="Sets Without Cards"
-                value={stats.setsWithoutCards}
-                description="Sets that don't have any cards catalogued"
-                link="/admin/sets?filter=no-cards"
-                severity={stats.setsWithoutCards > 0 ? "warning" : "good"}
-              />
-              <AlertCard
-                title="Sets Without Checklists"
-                value={stats.setsWithoutChecklists}
-                description="Sets missing totalCards or checklist data"
-                link="/admin/sets?filter=no-checklist"
-                severity={stats.setsWithoutChecklists > 0 ? "warning" : "good"}
-              />
-              <AlertCard
-                title="Releases Without Posts"
-                value={stats.releasesWithoutPosts}
-                description="Releases not linked to blog posts"
-                link="/admin/releases?filter=no-posts"
-                severity={stats.releasesWithoutPosts > 0 ? "info" : "good"}
-              />
-              <AlertCard
-                title="Cards Without Posts"
-                value={stats.cardsWithoutPosts}
-                description="Individual cards not featured in posts"
-                link="/admin/cards?filter=no-posts"
-                severity="info"
-              />
-            </div>
-
             {stats.recentActivity && stats.recentActivity.length > 0 && (
               <>
                 <div className="flex items-center justify-between mb-4">
@@ -467,24 +466,15 @@ function StatCard({
   icon: string;
   color: "green" | "blue" | "orange" | "purple";
 }) {
-  const colorClasses = {
-    green: "from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-green-200 dark:border-green-800",
-    blue: "from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200 dark:border-blue-800",
-    orange: "from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 border-orange-200 dark:border-orange-800",
-    purple: "from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border-purple-200 dark:border-purple-800",
-  };
-
   return (
-    <div
-      className={`bg-gradient-to-br ${colorClasses[color]} border rounded-xl p-6 shadow-sm`}
-    >
+    <div className="bg-gradient-to-br from-footy-green to-green-700 dark:from-footy-green dark:to-green-800 rounded-xl p-6 shadow-lg text-white">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-3xl">{icon}</span>
-        <span className="text-3xl font-bold text-gray-900 dark:text-white">
+        <span className="text-3xl opacity-90">{icon}</span>
+        <span className="text-3xl font-bold">
           {value}
         </span>
       </div>
-      <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+      <p className="text-sm font-semibold text-white/90">
         {title}
       </p>
     </div>

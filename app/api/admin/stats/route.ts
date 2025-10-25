@@ -15,9 +15,10 @@ export async function GET() {
       totalReleases,
       totalSets,
       totalCards,
+      cardsWithImages,
       totalPosts,
       publishedPosts,
-      setsWithCards,
+      parallelSetsWithoutImages,
       setsWithTotalCards,
       releasesWithPosts,
       cardsWithPosts,
@@ -28,18 +29,31 @@ export async function GET() {
       prisma.release.count(),
       prisma.set.count(),
       prisma.card.count(),
+      prisma.card.count({
+        where: {
+          OR: [
+            { imageFront: { not: null } },
+            { imageBack: { not: null } },
+          ],
+        },
+      }),
       prisma.post.count(),
       prisma.post.count({ where: { published: true } }),
 
-      // Sets that have at least one card
-      prisma.set.findMany({
-        where: {
-          cards: {
-            some: {},
-          },
-        },
-        select: { id: true },
-      }),
+      // Count parallel set variations without images
+      // This counts distinct (setId, parallelType) combinations where no cards have images
+      prisma.$queryRaw<Array<{ count: bigint }>>`
+        SELECT COUNT(*)::int as count
+        FROM (
+          SELECT
+            c."setId" as set_id,
+            COALESCE(c."parallelType", 'Base') as parallel_type,
+            COUNT(*) FILTER (WHERE c."imageFront" IS NOT NULL OR c."imageBack" IS NOT NULL) as cards_with_images
+          FROM "Card" c
+          GROUP BY c."setId", COALESCE(c."parallelType", 'Base')
+          HAVING COUNT(*) FILTER (WHERE c."imageFront" IS NOT NULL OR c."imageBack" IS NOT NULL) = 0
+        ) subquery
+      `.then(result => result[0]?.count ? Number(result[0].count) : 0),
 
       // Sets that have totalCards defined
       prisma.set.findMany({
@@ -147,10 +161,8 @@ export async function GET() {
       }),
     ]);
 
-    const setsWithoutCards = totalSets - setsWithCards.length;
     const setsWithoutChecklists = totalSets - setsWithTotalCards.length;
     const releasesWithoutPosts = totalReleases - releasesWithPosts.length;
-    const cardsWithoutPosts = totalCards - cardsWithPosts.length;
 
     const recentActivity = recentPosts.map((post) => ({
       type: post.type,
@@ -162,12 +174,12 @@ export async function GET() {
       totalReleases,
       totalSets,
       totalCards,
+      cardsWithImages,
       totalPosts,
       publishedPosts,
-      setsWithoutCards,
+      parallelSetsWithoutImages,
       setsWithoutChecklists,
       releasesWithoutPosts,
-      cardsWithoutPosts,
       recentActivity,
       recentPosts: recentPosts.map((post) => ({
         id: post.id,
