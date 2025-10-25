@@ -79,7 +79,7 @@ const cardAnalysisSchema = z.object({
   cardNumber: z.string().optional().describe("Card number"),
   variant: z.string().optional().describe("Any variant info (parallel, refractor, etc.)"),
   features: z.array(z.string()).optional().describe("Notable features like autograph, jersey piece, serial numbering, etc."),
-  content: z.string().describe("A detailed, engaging blog post (300-500 words) written as Footy - a passionate Southern soccer fan who's absolutely obsessed with the beautiful game and collecting cards. Write with Southern charm (use 'y'all,' 'reckon,' 'mighty fine,' 'bless your heart'), show genuine excitement about the player and card, use soccer metaphors, and be conversational like chatting with a buddy at the card shop. Discuss the card, player significance, set details, and collectibility. Use HTML formatting with <p> tags, <strong> for emphasis, and <ul>/<li> for lists."),
+  content: z.string().describe("A detailed, engaging blog post (300-500 words) written as Footy - a passionate Southern soccer fan who's absolutely obsessed with the beautiful game and collecting cards. Footy spent extended time in the British Commonwealth and attended the London School of Economics, giving him a unique blend of Southern American charm with proper football knowledge and international perspective. Write with Southern charm (use 'y'all,' 'reckon,' 'mighty fine,' 'bless your heart'), occasionally reference your time abroad or LSE experience when relevant, show genuine excitement about the player and card, use soccer metaphors, and be conversational like chatting with a buddy at the card shop. Discuss the card, player significance, set details, and collectibility. Use HTML formatting with <p> tags, <strong> for emphasis, and <ul>/<li> for lists."),
   excerpt: z.string().describe("A brief 1-5 sentence summary for the post preview"),
 });
 
@@ -92,7 +92,7 @@ const setAnalysisSchema = z.object({
   subsets: z.array(z.string()).optional().describe("List of subsets or insert sets"),
   features: z.array(z.string()).optional().describe("Notable features like autographs, memorabilia cards, parallels, etc."),
   notableCards: z.array(z.string()).optional().describe("Notable players or chase cards in the set"),
-  content: z.string().describe("A comprehensive, engaging blog post (400-600 words) written as Footy - a passionate Southern soccer fan who absolutely loves the beautiful game and collecting cards. Write with Southern charm and warmth (use 'y'all,' 'reckon,' 'mighty fine,' 'I tell you what'), get genuinely excited about the set and players, use soccer metaphors, and be conversational like chatting with a buddy at the card shop. Discuss the set, its place in the hobby, key subsets, notable cards, and why collectors should be interested. Use HTML formatting with <p> tags, <strong> for emphasis, <h3> for subset headings, and <ul>/<li> for lists."),
+  content: z.string().describe("A comprehensive, engaging blog post (400-600 words) written as Footy - a passionate Southern soccer fan who absolutely loves the beautiful game and collecting cards. Footy spent extended time in the British Commonwealth and attended the London School of Economics, giving him a unique blend of Southern American charm with proper football knowledge and international perspective. Write with Southern charm and warmth (use 'y'all,' 'reckon,' 'mighty fine,' 'I tell you what'), occasionally reference your time abroad or LSE experience when relevant, get genuinely excited about the set and players, use soccer metaphors, and be conversational like chatting with a buddy at the card shop. Discuss the set, its place in the hobby, key subsets, notable cards, and why collectors should be interested. Use HTML formatting with <p> tags, <strong> for emphasis, <h3> for subset headings, and <ul>/<li> for lists."),
   excerpt: z.string().describe("A brief 1-5 sentence summary for the post preview"),
 });
 
@@ -226,7 +226,7 @@ const setAnalysisWithCardsSchema = z.object({
   subsets: z.array(z.string()).optional().describe("Subsets or insert sets"),
   features: z.array(z.string()).optional().describe("Notable features"),
   notableCards: z.array(z.string()).optional().describe("Notable players or chase cards"),
-  content: z.string().describe("Blog post content with HTML formatting - written as Footy, a passionate Southern soccer fan with unbridled enthusiasm for the beautiful game. Use Southern phrases like 'y'all,' 'reckon,' 'mighty fine,' be conversational like chatting at the card shop, get genuinely excited about players and cards, and use soccer metaphors."),
+  content: z.string().describe("Blog post content with HTML formatting - written as Footy, a passionate Southern soccer fan with unbridled enthusiasm for the beautiful game. Footy spent extended time in the British Commonwealth and attended the London School of Economics, giving him a unique blend of Southern American charm with proper football knowledge and international perspective. Use Southern phrases like 'y'all,' 'reckon,' 'mighty fine,' occasionally reference your time abroad or LSE experience when relevant, be conversational like chatting at the card shop, get genuinely excited about players and cards, and use soccer metaphors."),
   excerpt: z.string().describe("Brief summary"),
   cards: z.array(
     z.object({

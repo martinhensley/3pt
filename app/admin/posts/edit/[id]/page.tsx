@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Image from "next/image";
+import RichTextEditor from "@/components/RichTextEditor";
 
 interface Post {
   id: string;
@@ -303,14 +304,16 @@ export default function EditPostPage() {
           {/* Content */}
           <div>
             <label className="block text-sm font-semibold text-gray-900 mb-2">
-              Content (HTML)
+              Content
             </label>
-            <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              rows={15}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white text-gray-900 font-mono text-sm"
+            <RichTextEditor
+              content={content}
+              onChange={setContent}
+              placeholder="Edit your post content..."
             />
+            <p className="text-xs text-gray-500 mt-2">
+              Use the toolbar to format text, add headings, lists, links, and images.
+            </p>
           </div>
 
           {/* Current Images */}
