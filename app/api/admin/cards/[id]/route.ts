@@ -41,18 +41,13 @@ export async function PUT(
       );
     }
 
-    // Prepare update data
-    const updateData: any = {
-      playerName: body.playerName || null,
-      cardNumber: body.cardNumber || null,
-      team: body.team || null,
-      parallelType: body.parallelType || null,
-      variant: body.variant || null,
-      serialNumber: body.serialNumber || null,
-      isNumbered: body.isNumbered || false,
-      printRun: body.printRun || null,
-      hasAutograph: body.hasAutograph || false,
-      hasMemorabilia: body.hasMemorabilia || false,
+    // Prepare update data - only allow editing images and footyNotes
+    // All other fields are inherited from checklist
+    const updateData: {
+      footyNotes: string | null;
+      imageFront?: string;
+      imageBack?: string;
+    } = {
       footyNotes: body.footyNotes || null,
     };
 

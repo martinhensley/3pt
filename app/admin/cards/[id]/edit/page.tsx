@@ -48,17 +48,7 @@ export default function EditCardPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // Form state
-  const [playerName, setPlayerName] = useState('');
-  const [cardNumber, setCardNumber] = useState('');
-  const [team, setTeam] = useState('');
-  const [parallelType, setParallelType] = useState('');
-  const [variant, setVariant] = useState('');
-  const [serialNumber, setSerialNumber] = useState('');
-  const [isNumbered, setIsNumbered] = useState(false);
-  const [printRun, setPrintRun] = useState('');
-  const [hasAutograph, setHasAutograph] = useState(false);
-  const [hasMemorabilia, setHasMemorabilia] = useState(false);
+  // Only editable fields
   const [footyNotes, setFootyNotes] = useState('');
 
   // Image uploads
@@ -73,16 +63,6 @@ export default function EditCardPage() {
       .then((res) => res.json())
       .then((data) => {
         setCard(data);
-        setPlayerName(data.playerName || '');
-        setCardNumber(data.cardNumber || '');
-        setTeam(data.team || '');
-        setParallelType(data.parallelType || '');
-        setVariant(data.variant || '');
-        setSerialNumber(data.serialNumber || '');
-        setIsNumbered(data.isNumbered || false);
-        setPrintRun(data.printRun?.toString() || '');
-        setHasAutograph(data.hasAutograph || false);
-        setHasMemorabilia(data.hasMemorabilia || false);
         setFootyNotes(data.footyNotes || '');
         setFrontImagePreview(data.imageFront);
         setBackImagePreview(data.imageBack);
@@ -124,18 +104,12 @@ export default function EditCardPage() {
     setSaving(true);
 
     try {
-      // Prepare update data
-      const updateData: any = {
-        playerName: playerName || null,
-        cardNumber: cardNumber || null,
-        team: team || null,
-        parallelType: parallelType || null,
-        variant: variant || null,
-        serialNumber: serialNumber || null,
-        isNumbered,
-        printRun: printRun ? parseInt(printRun) : null,
-        hasAutograph,
-        hasMemorabilia,
+      // Only send editable fields
+      const updateData: {
+        footyNotes: string | null;
+        imageFront?: string;
+        imageBack?: string;
+      } = {
         footyNotes: footyNotes || null,
       };
 
@@ -174,7 +148,11 @@ export default function EditCardPage() {
     }
   };
 
-  const submitUpdate = async (updateData: any) => {
+  const submitUpdate = async (updateData: {
+    footyNotes: string | null;
+    imageFront?: string;
+    imageBack?: string;
+  }) => {
     const response = await fetch(`/api/admin/cards/${cardId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -303,10 +281,13 @@ export default function EditCardPage() {
             </div>
           </div>
 
-          {/* Card Details */}
+          {/* Card Details (Read-only) */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
               Card Details
+              <span className="text-sm font-normal text-gray-500 dark:text-gray-400 ml-2">
+                (inherited from checklist)
+              </span>
             </h2>
 
             <div className="space-y-4">
@@ -315,12 +296,9 @@ export default function EditCardPage() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Player Name
                 </label>
-                <input
-                  type="text"
-                  value={playerName}
-                  onChange={(e) => setPlayerName(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
+                <div className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300">
+                  {card.playerName || '—'}
+                </div>
               </div>
 
               {/* Card Number */}
@@ -328,12 +306,9 @@ export default function EditCardPage() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Card Number
                 </label>
-                <input
-                  type="text"
-                  value={cardNumber}
-                  onChange={(e) => setCardNumber(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
+                <div className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300">
+                  {card.cardNumber || '—'}
+                </div>
               </div>
 
               {/* Team */}
@@ -341,12 +316,9 @@ export default function EditCardPage() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Team
                 </label>
-                <input
-                  type="text"
-                  value={team}
-                  onChange={(e) => setTeam(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
+                <div className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300">
+                  {card.team || '—'}
+                </div>
               </div>
 
               {/* Parallel Type */}
@@ -354,60 +326,9 @@ export default function EditCardPage() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Parallel Type
                 </label>
-                <input
-                  type="text"
-                  value={parallelType}
-                  onChange={(e) => setParallelType(e.target.value)}
-                  placeholder="e.g., Gold, Silver, Base"
-                  className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
-              </div>
-
-              {/* Variant */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Variant
-                </label>
-                <input
-                  type="text"
-                  value={variant}
-                  onChange={(e) => setVariant(e.target.value)}
-                  placeholder="e.g., Refractor, Chrome"
-                  className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
-              </div>
-
-              {/* Checkboxes */}
-              <div className="flex gap-4">
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={hasAutograph}
-                    onChange={(e) => setHasAutograph(e.target.checked)}
-                    className="w-4 h-4"
-                  />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Autograph</span>
-                </label>
-
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={hasMemorabilia}
-                    onChange={(e) => setHasMemorabilia(e.target.checked)}
-                    className="w-4 h-4"
-                  />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Memorabilia</span>
-                </label>
-
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={isNumbered}
-                    onChange={(e) => setIsNumbered(e.target.checked)}
-                    className="w-4 h-4"
-                  />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Numbered</span>
-                </label>
+                <div className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300">
+                  {card.parallelType || 'Base'}
+                </div>
               </div>
 
               {/* Serial Number & Print Run */}
@@ -416,35 +337,54 @@ export default function EditCardPage() {
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Serial Number
                   </label>
-                  <input
-                    type="text"
-                    value={serialNumber}
-                    onChange={(e) => setSerialNumber(e.target.value)}
-                    placeholder="e.g., 15/99"
-                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  />
+                  <div className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300">
+                    {card.serialNumber || '—'}
+                  </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Print Run
                   </label>
-                  <input
-                    type="number"
-                    value={printRun}
-                    onChange={(e) => setPrintRun(e.target.value)}
-                    placeholder="e.g., 99"
-                    className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  />
+                  <div className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300">
+                    {card.printRun ? `/${card.printRun}` : '—'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Special Features */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Special Features
+                </label>
+                <div className="flex gap-2 flex-wrap">
+                  {card.hasAutograph && (
+                    <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-sm rounded-full">
+                      Autograph
+                    </span>
+                  )}
+                  {card.hasMemorabilia && (
+                    <span className="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-sm rounded-full">
+                      Memorabilia
+                    </span>
+                  )}
+                  {card.isNumbered && (
+                    <span className="px-3 py-1 bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 text-sm rounded-full">
+                      Numbered
+                    </span>
+                  )}
+                  {!card.hasAutograph && !card.hasMemorabilia && !card.isNumbered && (
+                    <span className="text-gray-500 dark:text-gray-400 text-sm">None</span>
+                  )}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Footy Notes - Full Width */}
+          {/* footy notes - Full Width */}
           <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              Footy Notes
+              footy notes
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
               Internal notes about this card (not visible to public)

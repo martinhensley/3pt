@@ -101,7 +101,7 @@ export default function AdminDashboard() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-footy-green dark:text-footy-orange">
-            Footy's Dashboard
+            Footy&apos;s Dashboard
           </h1>
         </div>
 
@@ -459,12 +459,10 @@ function StatCard({
   title,
   value,
   icon,
-  color,
 }: {
   title: string;
   value: number | string;
   icon: string;
-  color: "green" | "blue" | "orange" | "purple";
 }) {
   return (
     <div className="bg-gradient-to-br from-footy-green to-green-700 dark:from-footy-green dark:to-green-800 rounded-xl p-6 shadow-lg text-white">

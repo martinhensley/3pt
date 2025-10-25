@@ -21,7 +21,6 @@ export async function GET() {
       parallelSetsWithoutImages,
       setsWithTotalCards,
       releasesWithPosts,
-      cardsWithPosts,
       recentPosts,
       recentReleases,
       recentCards,
@@ -67,16 +66,6 @@ export async function GET() {
 
       // Releases that have posts
       prisma.release.findMany({
-        where: {
-          posts: {
-            some: {},
-          },
-        },
-        select: { id: true },
-      }),
-
-      // Cards that have posts
-      prisma.card.findMany({
         where: {
           posts: {
             some: {},
