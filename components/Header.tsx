@@ -25,16 +25,13 @@ export default function Header({ showBackButton = false, rounded = true, showAd 
           </div>
         )}
 
-        {/* Logo and tagline */}
+        {/* Logo */}
         <div className="text-center mb-6">
-          <h1 className="text-4xl md:text-5xl font-bold mb-2">
+          <h1 className="text-4xl md:text-5xl font-bold">
             <Link href="/" className="hover:opacity-90 transition-opacity">
               footy<span className="text-footy-orange">.bot</span>
             </Link>
           </h1>
-          <p className="text-green-100 text-sm md:text-base">
-            Your Ultimate Soccer Trading Card Compendium
-          </p>
         </div>
 
         {/* Navigation menu */}
