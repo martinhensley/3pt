@@ -58,9 +58,15 @@ export default function PostPage() {
   if (loading) {
     return (
       <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-        <Header showBackButton />
-        <div className="flex-grow flex items-center justify-center">
-          <p className="text-gray-600">Loading...</p>
+        <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
+          <aside className="hidden lg:block w-72 flex-shrink-0"></aside>
+          <main className="flex-grow max-w-4xl mx-auto space-y-6">
+            <Header showBackButton={false} rounded={true} />
+            <div className="flex items-center justify-center min-h-[60vh]">
+              <p className="text-gray-600">Loading...</p>
+            </div>
+          </main>
+          <aside className="hidden lg:block w-72 flex-shrink-0"></aside>
         </div>
       </div>
     );
