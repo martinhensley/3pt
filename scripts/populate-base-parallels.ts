@@ -23,7 +23,11 @@ async function populateBaseParallels() {
   console.log('Found Base Set:', baseSet.name);
   console.log('Parallels:', baseSet.parallels);
 
-  if (!baseSet.parallels || baseSet.parallels.length === 0) {
+  // Extract parallels array from Json type
+  const parallelsArray = (baseSet.parallels as string[] | null) || [];
+  const parallels = parallelsArray.filter((p): p is string => p !== null);
+
+  if (parallels.length === 0) {
     console.log('No parallels defined for Base Set');
     await prisma.$disconnect();
     return;
@@ -39,11 +43,10 @@ async function populateBaseParallels() {
   });
 
   console.log(`\nFound ${baseCards.length} base cards`);
-  console.log(`Will create ${baseCards.length * baseSet.parallels.length} parallel cards\n`);
+  console.log(`Will create ${baseCards.length * parallels.length} parallel cards\n`);
 
   // Create parallel cards for each base card
   let createdCount = 0;
-  const parallels = baseSet.parallels.filter((p): p is string => p !== null);
 
   for (const parallel of parallels) {
     console.log(`Creating ${parallel} parallel cards...`);
