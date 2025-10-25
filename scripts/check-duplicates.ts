@@ -37,7 +37,6 @@ async function checkDuplicates() {
     console.log(`   Release: ${card.set.release.year} ${card.set.release.name}`);
     console.log(`   Parallel: ${card.parallelType || 'Base'}`);
     console.log(`   Variant: ${card.variant || 'N/A'}`);
-    console.log(`   Slug: ${card.slug}`);
     console.log('');
   });
 
