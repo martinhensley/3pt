@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import EbayAd from "@/components/EbayAd";
 import EbayAdHorizontal from "@/components/EbayAdHorizontal";
 
@@ -138,9 +139,7 @@ export default function CardsIndexPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
-
-      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 py-8">
+      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
         <aside className="hidden lg:block w-72 flex-shrink-0">
           <EbayAd
             query="soccer cards"
@@ -149,7 +148,8 @@ export default function CardsIndexPage() {
           />
         </aside>
 
-        <main className="flex-grow max-w-5xl">
+        <main className="flex-grow max-w-5xl space-y-6">
+          <Header rounded={true} />
           {/* Header */}
           <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
             <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
@@ -274,6 +274,8 @@ export default function CardsIndexPage() {
             limit={4}
             title="Related Soccer Cards"
           />
+
+          <Footer rounded={true} />
         </main>
 
         <aside className="hidden lg:block w-72 flex-shrink-0">
@@ -284,14 +286,6 @@ export default function CardsIndexPage() {
           />
         </aside>
       </div>
-
-      <footer className="bg-footy-green text-white mt-12">
-        <div className="max-w-7xl mx-auto px-4 py-12 text-center">
-          <p className="text-sm">
-            <span className="text-white">footy</span><span className="text-footy-orange">.bot</span> © 2024-{new Date().getFullYear()}
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }

@@ -4,12 +4,13 @@ import Link from "next/link";
 
 interface HeaderProps {
   showBackButton?: boolean;
+  rounded?: boolean;
 }
 
-export default function Header({ showBackButton = false }: HeaderProps) {
+export default function Header({ showBackButton = false, rounded = true }: HeaderProps) {
   return (
-    <header className="bg-gradient-to-r from-footy-green to-green-700 text-white shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 py-6">
+    <header className={`bg-gradient-to-r from-footy-green to-green-700 text-white shadow-lg ${rounded ? 'rounded-xl' : ''}`}>
+      <div className="px-6 py-6">
         <div className="text-center">
           {showBackButton && (
             <Link

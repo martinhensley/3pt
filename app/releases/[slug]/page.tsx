@@ -4,6 +4,7 @@ import { notFound, useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import EbayAd from "@/components/EbayAd";
 import EbayAdHorizontal from "@/components/EbayAdHorizontal";
 import { useEffect, useState, useMemo } from "react";
@@ -269,22 +270,7 @@ export default function ReleasePage() {
         </aside>
 
         <main className="flex-grow max-w-5xl space-y-6">
-          {/* Header */}
-          <header className="bg-gradient-to-r from-footy-green to-green-700 text-white shadow-lg rounded-xl">
-            <div className="px-6 py-6">
-              <div className="text-center">
-                <Link
-                  href="/"
-                  className="inline-block text-footy-orange hover:text-white transition-colors text-sm mb-2"
-                >
-                  ← Back to Home
-                </Link>
-                <h1 className="text-4xl md:text-5xl font-bold">
-                  <Link href="/">footy<span className="text-footy-orange">.bot</span></Link>
-                </h1>
-              </div>
-            </div>
-          </header>
+          <Header showBackButton={true} rounded={true} />
           {/* Combined Hero with Carousel */}
           <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white">
             {/* Hero Header */}
@@ -471,14 +457,7 @@ export default function ReleasePage() {
             title={getAdTitle(adKeywords.relatedQuery, "Related Soccer Cards")}
           />
 
-          {/* Footer */}
-          <footer className="bg-footy-green text-white shadow-lg rounded-xl">
-            <div className="px-6 py-8 text-center">
-              <p className="text-sm">
-                <span className="text-white">footy</span><span className="text-footy-orange">.bot</span> © 2024-{new Date().getFullYear()}
-              </p>
-            </div>
-          </footer>
+          <Footer rounded={true} />
         </main>
 
         <aside className="hidden lg:block w-72 flex-shrink-0">
