@@ -98,10 +98,10 @@ export default function CardDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-900">
+      <div className="min-h-screen bg-white">
         <Header />
         <div className="flex items-center justify-center min-h-[60vh]">
-          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
@@ -109,13 +109,13 @@ export default function CardDetailPage() {
 
   if (!card) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-900">
+      <div className="min-h-screen bg-white">
         <Header />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Card Not Found</h1>
-            <p className="text-gray-600 dark:text-gray-300 mb-8">The card you&apos;re looking for doesn&apos;t exist.</p>
-            <Link href="/" className="text-footy-green dark:text-footy-orange hover:underline">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Card Not Found</h1>
+            <p className="text-gray-600 mb-8">The card you&apos;re looking for doesn&apos;t exist.</p>
+            <Link href="/" className="text-footy-green hover:underline">
               ← Back to Home
             </Link>
           </div>
@@ -125,7 +125,7 @@ export default function CardDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
+    <div className="min-h-screen bg-white transition-colors duration-300">
       <Header />
 
       <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 py-8">
@@ -142,14 +142,14 @@ export default function CardDetailPage() {
           <div className="mb-6">
             <button
               onClick={() => router.back()}
-              className="text-footy-green dark:text-footy-orange hover:underline flex items-center gap-1"
+              className="text-footy-green hover:underline flex items-center gap-1"
             >
               ← Back
             </button>
           </div>
 
           {/* Card Header */}
-          <div className="bg-gradient-to-r from-footy-green to-green-700 dark:from-footy-orange dark:to-orange-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
+          <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
             <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
               {card.cardNumber && <span className="text-white/90">#{card.cardNumber} </span>}
               {card.playerName || 'Unknown Player'}
@@ -172,55 +172,55 @@ export default function CardDetailPage() {
               <div className="pt-6 border-t border-white/20">
                 <div className="flex gap-2 flex-wrap">
                   {card.hasAutograph && (
-                    <span className="px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full font-semibold">
+                    <span className="px-4 py-2 bg-blue-100 text-blue-800 rounded-full font-semibold">
                       Autograph
                     </span>
                   )}
                   {card.hasMemorabilia && (
-                    <span className="px-4 py-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full font-semibold">
+                    <span className="px-4 py-2 bg-green-100 text-green-800 rounded-full font-semibold">
                       Memorabilia
                     </span>
                   )}
                   {card.isNumbered && card.printRun && (
-                    <span className="px-4 py-2 bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 rounded-full font-semibold">
+                    <span className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full font-semibold">
                       /{card.printRun}
                     </span>
                   )}
                   {card.variant && card.variant !== '—' && (
-                    <span className="px-4 py-2 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded-full font-semibold">
+                    <span className="px-4 py-2 bg-purple-100 text-purple-800 rounded-full font-semibold">
                       {card.variant}
                     </span>
                   )}
                   {card.parallelType && (
-                    <span className="px-4 py-2 bg-pink-100 dark:bg-pink-900 text-pink-800 dark:text-pink-200 rounded-full font-semibold">
+                    <span className="px-4 py-2 bg-pink-100 text-pink-800 rounded-full font-semibold">
                       {card.parallelType}
                     </span>
                   )}
                   {card.rarity && (
-                    <span className="px-4 py-2 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-full font-semibold capitalize">
+                    <span className="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-full font-semibold capitalize">
                       {card.rarity.replace(/_/g, ' ')}
                     </span>
                   )}
                   {card.finish && (
-                    <span className="px-4 py-2 bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 rounded-full font-semibold capitalize">
+                    <span className="px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full font-semibold capitalize">
                       {card.finish}
                     </span>
                   )}
                   {card.colorVariant && (
-                    <span className="px-4 py-2 bg-cyan-100 dark:bg-cyan-900 text-cyan-800 dark:text-cyan-200 rounded-full font-semibold capitalize">
+                    <span className="px-4 py-2 bg-cyan-100 text-cyan-800 rounded-full font-semibold capitalize">
                       {card.colorVariant}
                     </span>
                   )}
                   {card.specialFeatures && card.specialFeatures.map((feature, idx) => (
                     <span
                       key={idx}
-                      className="px-4 py-2 bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-200 rounded-full font-semibold capitalize"
+                      className="px-4 py-2 bg-teal-100 text-teal-800 rounded-full font-semibold capitalize"
                     >
                       {feature.replace(/_/g, ' ')}
                     </span>
                   ))}
                   {card.serialNumber && (
-                    <span className="px-4 py-2 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded-full font-semibold">
+                    <span className="px-4 py-2 bg-red-100 text-red-800 rounded-full font-semibold">
                       Serial: {card.serialNumber}
                     </span>
                   )}
@@ -230,55 +230,55 @@ export default function CardDetailPage() {
           </div>
 
           {/* Card Details */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8 border border-gray-200 dark:border-gray-700">
-            <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-6">Card Details</h2>
+          <div className="bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-200">
+            <h2 className="text-2xl font-black text-gray-900 mb-6">Card Details</h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Player</div>
-                <div className="text-lg font-bold text-gray-900 dark:text-white">{card.playerName || '—'}</div>
+                <div className="text-sm text-gray-600 mb-1">Player</div>
+                <div className="text-lg font-bold text-gray-900">{card.playerName || '—'}</div>
               </div>
               <div>
-                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Team</div>
-                <div className="text-lg font-bold text-gray-900 dark:text-white">{card.team || '—'}</div>
+                <div className="text-sm text-gray-600 mb-1">Team</div>
+                <div className="text-lg font-bold text-gray-900">{card.team || '—'}</div>
               </div>
               <div>
-                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Card Number</div>
-                <div className="text-lg font-bold text-gray-900 dark:text-white">{card.cardNumber || '—'}</div>
+                <div className="text-sm text-gray-600 mb-1">Card Number</div>
+                <div className="text-lg font-bold text-gray-900">{card.cardNumber || '—'}</div>
               </div>
               {card.variant && (
                 <div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Variant</div>
-                  <div className="text-lg font-bold text-gray-900 dark:text-white">{card.variant}</div>
+                  <div className="text-sm text-gray-600 mb-1">Variant</div>
+                  <div className="text-lg font-bold text-gray-900">{card.variant}</div>
                 </div>
               )}
               {card.parallelType && (
                 <div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Parallel</div>
-                  <div className="text-lg font-bold text-gray-900 dark:text-white">{card.parallelType}</div>
+                  <div className="text-sm text-gray-600 mb-1">Parallel</div>
+                  <div className="text-lg font-bold text-gray-900">{card.parallelType}</div>
                 </div>
               )}
               {card.serialNumber && (
                 <div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Serial Number</div>
-                  <div className="text-lg font-bold text-gray-900 dark:text-white">{card.serialNumber}</div>
+                  <div className="text-sm text-gray-600 mb-1">Serial Number</div>
+                  <div className="text-lg font-bold text-gray-900">{card.serialNumber}</div>
                 </div>
               )}
               {card.rarity && (
                 <div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Rarity</div>
-                  <div className="text-lg font-bold text-gray-900 dark:text-white capitalize">{card.rarity.replace(/_/g, ' ')}</div>
+                  <div className="text-sm text-gray-600 mb-1">Rarity</div>
+                  <div className="text-lg font-bold text-gray-900 capitalize">{card.rarity.replace(/_/g, ' ')}</div>
                 </div>
               )}
               {card.finish && (
                 <div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Finish</div>
-                  <div className="text-lg font-bold text-gray-900 dark:text-white capitalize">{card.finish}</div>
+                  <div className="text-sm text-gray-600 mb-1">Finish</div>
+                  <div className="text-lg font-bold text-gray-900 capitalize">{card.finish}</div>
                 </div>
               )}
               {card.colorVariant && (
                 <div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Color</div>
-                  <div className="text-lg font-bold text-gray-900 dark:text-white capitalize">{card.colorVariant}</div>
+                  <div className="text-sm text-gray-600 mb-1">Color</div>
+                  <div className="text-lg font-bold text-gray-900 capitalize">{card.colorVariant}</div>
                 </div>
               )}
             </div>
@@ -286,11 +286,11 @@ export default function CardDetailPage() {
 
           {/* Card Images */}
           {(card.imageFront || card.imageBack || card.images.length > 0) && (
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8 border border-gray-200 dark:border-gray-700">
-              <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-6">Card Images</h2>
+            <div className="bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-200">
+              <h2 className="text-2xl font-black text-gray-900 mb-6">Card Images</h2>
               <div className="grid md:grid-cols-2 gap-6">
                 {card.imageFront && (
-                  <div className="relative bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden aspect-[2.5/3.5] border-2 border-footy-green dark:border-footy-orange">
+                  <div className="relative bg-gray-100 rounded-lg overflow-hidden aspect-[2.5/3.5] border-2 border-footy-green">
                     <Image
                       src={card.imageFront}
                       alt={`${card.playerName} front`}
@@ -304,7 +304,7 @@ export default function CardDetailPage() {
                   </div>
                 )}
                 {card.imageBack && (
-                  <div className="relative bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden aspect-[2.5/3.5] border-2 border-footy-green dark:border-footy-orange">
+                  <div className="relative bg-gray-100 rounded-lg overflow-hidden aspect-[2.5/3.5] border-2 border-footy-green">
                     <Image
                       src={card.imageBack}
                       alt={`${card.playerName} back`}
@@ -320,7 +320,7 @@ export default function CardDetailPage() {
                 {card.images.map((image) => (
                   <div
                     key={image.id}
-                    className="relative bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden aspect-[2.5/3.5] border-2 border-footy-green dark:border-footy-orange"
+                    className="relative bg-gray-100 rounded-lg overflow-hidden aspect-[2.5/3.5] border-2 border-footy-green"
                   >
                     <Image
                       src={image.url}
@@ -357,7 +357,7 @@ export default function CardDetailPage() {
         </aside>
       </div>
 
-      <footer className="bg-footy-green dark:bg-gray-950 text-white transition-colors duration-300 mt-12">
+      <footer className="bg-footy-green text-white transition-colors duration-300 mt-12">
         <div className="max-w-4xl mx-auto px-4 py-8 text-center">
           <p className="text-sm">
             <span className="text-white">footy</span><span className="text-footy-orange">.bot</span> © 2024-{new Date().getFullYear()}

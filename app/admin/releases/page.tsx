@@ -91,10 +91,10 @@ export default function ManageReleasesPage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900">
+      <div className="flex flex-col min-h-screen bg-white">
         <Header />
         <div className="flex-grow flex items-center justify-center">
-          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
@@ -117,7 +117,7 @@ export default function ManageReleasesPage() {
   });
 
   return (
-    <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900">
+    <div className="flex flex-col min-h-screen bg-white">
       <Header />
 
       <main className="flex-grow max-w-7xl mx-auto w-full px-4 py-8">
@@ -126,7 +126,7 @@ export default function ManageReleasesPage() {
             <div className="flex items-center gap-4">
               <Link
                 href="/admin"
-                className="text-gray-600 dark:text-gray-400 hover:text-footy-green dark:hover:text-green-400 transition-colors flex items-center gap-2"
+                className="text-gray-600 hover:text-footy-green transition-colors flex items-center gap-2"
                 title="Back to Admin Portal"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -134,7 +134,7 @@ export default function ManageReleasesPage() {
                 </svg>
                 Admin Portal
               </Link>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-3xl font-bold text-gray-900">
                 Manage Releases & Sets
               </h1>
             </div>
@@ -150,8 +150,8 @@ export default function ManageReleasesPage() {
             <div
               className={`p-4 rounded-lg mb-4 ${
                 message.type === "success"
-                  ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100"
-                  : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100"
+                  ? "bg-green-100 text-green-800"
+                  : "bg-red-100 text-red-800"
               }`}
             >
               {message.text}
@@ -163,7 +163,7 @@ export default function ManageReleasesPage() {
             <select
               value={manufacturerFilter}
               onChange={(e) => setManufacturerFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+              className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
             >
               <option value="all">All Manufacturers</option>
               {manufacturers.map((manufacturer) => (
@@ -176,17 +176,17 @@ export default function ManageReleasesPage() {
 
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="bg-gradient-to-r from-footy-green to-green-600 dark:from-footy-green dark:to-green-700 rounded-lg p-6 text-white">
+            <div className="bg-gradient-to-r from-footy-green to-green-600 rounded-lg p-6 text-white">
               <div className="text-3xl font-bold">{filteredReleases.length}</div>
               <div className="text-sm opacity-90">Total Releases</div>
             </div>
-            <div className="bg-gradient-to-r from-footy-green to-green-600 dark:from-footy-green dark:to-green-700 rounded-lg p-6 text-white">
+            <div className="bg-gradient-to-r from-footy-green to-green-600 rounded-lg p-6 text-white">
               <div className="text-3xl font-bold">
                 {filteredReleases.reduce((sum, r) => sum + r.sets.length, 0)}
               </div>
               <div className="text-sm opacity-90">Total Sets</div>
             </div>
-            <div className="bg-gradient-to-r from-footy-green to-green-600 dark:from-footy-green dark:to-green-700 rounded-lg p-6 text-white">
+            <div className="bg-gradient-to-r from-footy-green to-green-600 rounded-lg p-6 text-white">
               <div className="text-3xl font-bold">
                 {filteredReleases.reduce(
                   (sum, r) => sum + r.sets.reduce((s, set) => s + set._count.cards, 0),
@@ -201,8 +201,8 @@ export default function ManageReleasesPage() {
         {/* Releases List */}
         <div className="space-y-4">
           {filteredReleases.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <p className="text-gray-600 dark:text-gray-400">
+            <div className="text-center py-12 bg-gray-50 rounded-lg">
+              <p className="text-gray-600">
                 No releases found. Create your first release to get started!
               </p>
             </div>
@@ -210,23 +210,23 @@ export default function ManageReleasesPage() {
             filteredReleases.map((release) => (
               <div
                 key={release.id}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow"
+                className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
               >
                 <div className="p-6">
                   <div className="flex items-start justify-between">
                     <div className="flex-grow">
                       <div className="flex items-center gap-3 mb-2">
-                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                        <h2 className="text-xl font-bold text-gray-900">
                           {release.manufacturer.name} {release.name}
                         </h2>
                         {release.year && (
-                          <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm font-semibold">
+                          <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
                             {release.year}
                           </span>
                         )}
                       </div>
 
-                      <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
+                      <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
                         <span className="flex items-center gap-1">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -247,8 +247,8 @@ export default function ManageReleasesPage() {
                         </span>
                       </div>
 
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
-                        Slug: <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">{release.slug}</code>
+                      <div className="text-sm text-gray-500">
+                        Slug: <code className="bg-gray-100 px-2 py-1 rounded">{release.slug}</code>
                       </div>
                     </div>
 
@@ -282,21 +282,21 @@ export default function ManageReleasesPage() {
 
                   {/* Sets preview */}
                   {release.sets.length > 0 && (
-                    <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                      <div className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <div className="text-sm font-semibold text-gray-700 mb-2">
                         Sets in this release:
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {release.sets.slice(0, 5).map((set) => (
                           <span
                             key={set.id}
-                            className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-xs"
+                            className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
                           >
                             {set.name} ({set._count.cards} cards)
                           </span>
                         ))}
                         {release.sets.length > 5 && (
-                          <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-xs">
+                          <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
                             +{release.sets.length - 5} more
                           </span>
                         )}

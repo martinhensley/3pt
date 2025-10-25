@@ -445,10 +445,10 @@ export default function CreateReleasePage() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-50">
         <Header />
         <div className="flex items-center justify-center h-screen">
-          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
@@ -459,7 +459,7 @@ export default function CreateReleasePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50">
       <Header />
 
       <div className="max-w-4xl mx-auto px-4 py-8">
@@ -467,14 +467,14 @@ export default function CreateReleasePage() {
         <div className="mb-8">
           <button
             onClick={() => router.push("/admin")}
-            className="text-footy-green dark:text-footy-orange hover:underline mb-4 flex items-center gap-2"
+            className="text-footy-green hover:underline mb-4 flex items-center gap-2"
           >
             ← Back to Dashboard
           </button>
-          <h1 className="text-3xl font-bold text-footy-green dark:text-footy-orange mb-2">
+          <h1 className="text-3xl font-bold text-footy-green mb-2">
             Create Release & Set(s)
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600">
             Upload documents to analyze and create a new release with sets
           </p>
         </div>
@@ -484,8 +484,8 @@ export default function CreateReleasePage() {
           <div
             className={`mb-6 p-4 rounded-lg ${
               message.type === "success"
-                ? "bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200"
-                : "bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200"
+                ? "bg-green-50 text-green-800"
+                : "bg-red-50 text-red-800"
             }`}
           >
             {message.text}
@@ -493,10 +493,10 @@ export default function CreateReleasePage() {
         )}
 
         {/* Form */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 space-y-6">
+        <div className="bg-white rounded-xl shadow-lg p-6 space-y-6">
           {/* Document Upload */}
           <div>
-            <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
               Upload Documents for Analysis (PDFs, CSVs, etc.)
             </label>
             <input
@@ -504,24 +504,24 @@ export default function CreateReleasePage() {
               multiple
               accept=".pdf,.csv,.html,.htm"
               onChange={handleFileChange}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white text-gray-900"
             />
             {releaseFiles.length > 0 && (
               <div className="mt-3 space-y-2">
-                <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                <p className="text-sm font-semibold text-gray-700">
                   Documents to analyze:
                 </p>
                 {releaseFiles.map((file, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-2 rounded"
+                    className="flex items-center justify-between bg-gray-50 p-2 rounded"
                   >
                     <div className="flex items-center gap-2">
-                      <svg className="w-4 h-4 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
-                      <span className="text-sm text-gray-700 dark:text-gray-300">{file.name}</span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                      <span className="text-sm text-gray-700">{file.name}</span>
+                      <span className="text-xs text-gray-500">
                         ({(file.size / 1024).toFixed(1)} KB)
                       </span>
                     </div>
@@ -541,10 +541,10 @@ export default function CreateReleasePage() {
 
           {/* Image Upload */}
           <div>
-            <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
               Upload Set Images (JPG, PNG, WebP)
             </label>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+            <p className="text-xs text-gray-600 mb-2">
               These images will be displayed in the post
             </p>
             <input
@@ -552,24 +552,24 @@ export default function CreateReleasePage() {
               multiple
               accept=".jpg,.jpeg,.png,.webp,.gif"
               onChange={handleImageFileChange}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white text-gray-900"
             />
             {imageFiles.length > 0 && (
               <div className="mt-3 space-y-2">
-                <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                <p className="text-sm font-semibold text-gray-700">
                   Images for post:
                 </p>
                 {imageFiles.map((file, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-2 rounded"
+                    className="flex items-center justify-between bg-gray-50 p-2 rounded"
                   >
                     <div className="flex items-center gap-2">
-                      <svg className="w-4 h-4 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
-                      <span className="text-sm text-gray-700 dark:text-gray-300">{file.name}</span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                      <span className="text-sm text-gray-700">{file.name}</span>
+                      <span className="text-xs text-gray-500">
                         ({(file.size / 1024).toFixed(1)} KB)
                       </span>
                     </div>
@@ -603,76 +603,76 @@ export default function CreateReleasePage() {
         {analysisResult && (
           <div className="mt-6 space-y-6">
             {/* Release Information Summary */}
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-4">
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-blue-900 mb-4">
                 Release Information
               </h3>
               <div className="space-y-4 text-sm">
                 <div>
-                  <label className="block font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                  <label className="block font-semibold text-gray-900 mb-1">
                     Manufacturer:
                   </label>
                   <input
                     type="text"
                     value={editedManufacturer}
                     onChange={(e) => setEditedManufacturer(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="e.g., Panini, Topps, Upper Deck"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                    <label className="block font-semibold text-gray-900 mb-1">
                       Year:
                     </label>
                     <input
                       type="text"
                       value={editedYear}
                       onChange={(e) => setEditedYear(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="e.g., 2024 or 2024-25"
                     />
                   </div>
                   <div>
-                    <label className="block font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                    <label className="block font-semibold text-gray-900 mb-1">
                       Release Name:
                     </label>
                     <input
                       type="text"
                       value={editedReleaseName}
                       onChange={(e) => setEditedReleaseName(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="e.g., Donruss Soccer, Select, Prizm"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                  <label className="block font-semibold text-gray-900 mb-1">
                     Release Date (Optional):
                   </label>
                   <input
                     type="date"
                     value={editedReleaseDate}
                     onChange={(e) => setEditedReleaseDate(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  <p className="text-sm text-gray-600 mt-1">
                     Official release date for display on homepage (leave empty if unknown)
                   </p>
                 </div>
-                <div className="pt-2 border-t border-blue-300 dark:border-blue-700">
-                  <p className="text-gray-800 dark:text-gray-200">
+                <div className="pt-2 border-t border-blue-300">
+                  <p className="text-gray-800">
                     <span className="font-semibold">Full Release:</span> {editedYear} {editedReleaseName}
                   </p>
                 </div>
-                <p className="text-gray-800 dark:text-gray-200">
+                <p className="text-gray-800">
                   <span className="font-semibold">Sets Detected:</span> {editedSets.length}
                 </p>
                 <p>
                   <span className="font-semibold">Total Cards Extracted:</span>{" "}
                   {editedSets.reduce((sum, set) => sum + (set.cards?.length || 0), 0)}
                 </p>
-                <div className="mt-3 pt-3 border-t border-blue-300 dark:border-blue-700">
+                <div className="mt-3 pt-3 border-t border-blue-300">
                   <div className="flex items-center justify-between mb-3">
                     <p className="font-semibold">Sets Breakdown:</p>
                     <button
@@ -690,14 +690,14 @@ export default function CreateReleasePage() {
                     <ul className="list-none space-y-3">
                       {editedSets.map((set, idx) => {
                         return (
-                        <li key={idx} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+                        <li key={idx} className="bg-white border border-gray-200 rounded-lg p-3">
                           <div className="flex items-start justify-between gap-2 mb-2">
                             <input
                               type="text"
                               value={set.name}
                               onChange={(e) => handleUpdateSet(idx, "name", e.target.value)}
                               placeholder="Set Name (e.g., Base Set, Optic)"
-                              className="flex-1 px-2 py-1 text-sm font-semibold border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-1 focus:ring-blue-500"
+                              className="flex-1 px-2 py-1 text-sm font-semibold border border-gray-300 rounded bg-white text-gray-900 focus:ring-1 focus:ring-blue-500"
                             />
                             <button
                               type="button"
@@ -716,19 +716,19 @@ export default function CreateReleasePage() {
                             value={set.totalCards || ""}
                             onChange={(e) => handleUpdateSet(idx, "totalCards", e.target.value)}
                             placeholder="Total Cards (optional)"
-                            className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-1 focus:ring-blue-500 mb-2"
+                            className="w-full px-2 py-1 text-xs border border-gray-300 rounded bg-white text-gray-900 focus:ring-1 focus:ring-blue-500 mb-2"
                           />
                           <textarea
                             value={set.description || ""}
                             onChange={(e) => handleUpdateSet(idx, "description", e.target.value)}
                             placeholder="Description (optional)"
                             rows={2}
-                            className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-1 focus:ring-blue-500 mb-2"
+                            className="w-full px-2 py-1 text-xs border border-gray-300 rounded bg-white text-gray-900 focus:ring-1 focus:ring-blue-500 mb-2"
                           />
 
                           {/* Checklist Upload/Paste Section */}
-                          <div className="border-t border-gray-200 dark:border-gray-600 pt-2 mt-2">
-                            <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                          <div className="border-t border-gray-200 pt-2 mt-2">
+                            <p className="text-xs font-semibold text-gray-700 mb-2">
                               Add Checklist (optional):
                             </p>
                             <div className="flex flex-col gap-2">
@@ -743,13 +743,13 @@ export default function CreateReleasePage() {
                                     }}
                                     className="hidden"
                                   />
-                                  <div className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded border border-gray-300 dark:border-gray-600 cursor-pointer text-center transition-colors">
+                                  <div className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded border border-gray-300 cursor-pointer text-center transition-colors">
                                     Upload File (TXT, CSV, PDF)
                                   </div>
                                 </label>
                               </div>
                               <details className="text-xs">
-                                <summary className="cursor-pointer text-blue-600 dark:text-blue-400 hover:underline">
+                                <summary className="cursor-pointer text-blue-600 hover:underline">
                                   Or paste checklist text
                                 </summary>
                                 <textarea
@@ -761,9 +761,9 @@ export default function CreateReleasePage() {
                                       e.target.value = ''; // Clear after processing
                                     }
                                   }}
-                                  className="w-full px-2 py-1 mt-2 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-1 focus:ring-blue-500"
+                                  className="w-full px-2 py-1 mt-2 text-xs border border-gray-300 rounded bg-white text-gray-900 focus:ring-1 focus:ring-blue-500"
                                 />
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                <p className="text-xs text-gray-500 mt-1">
                                   Format: &quot;1 Kylian Mbappe, France&quot; (one per line)
                                 </p>
                               </details>
@@ -771,32 +771,32 @@ export default function CreateReleasePage() {
                           </div>
 
                           {set.cards && set.cards.length > 0 && (
-                            <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded">
+                            <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded">
                               <div className="flex items-center justify-between gap-2 mb-1">
                                 <div className="flex items-center gap-1">
-                                  <svg className="w-3 h-3 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                  <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                   </svg>
-                                  <span className="text-xs font-semibold text-green-700 dark:text-green-300">
+                                  <span className="text-xs font-semibold text-green-700">
                                     Checklist loaded: {set.cards.length} cards
                                   </span>
                                 </div>
                                 <button
                                   type="button"
                                   onClick={() => handleClearChecklist(idx)}
-                                  className="px-2 py-0.5 text-xs bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400 rounded transition-colors"
+                                  className="px-2 py-0.5 text-xs bg-red-100 hover:bg-red-200 text-red-700 rounded transition-colors"
                                   title="Clear checklist"
                                 >
                                   Clear
                                 </button>
                               </div>
                               <details className="text-xs">
-                                <summary className="cursor-pointer text-green-600 dark:text-green-400 hover:underline">
+                                <summary className="cursor-pointer text-green-600 hover:underline">
                                   View cards
                                 </summary>
                                 <div className="mt-2 max-h-40 overflow-y-auto space-y-1">
                                   {set.cards.map((card, cardIdx) => (
-                                    <div key={cardIdx} className="text-xs text-gray-700 dark:text-gray-300">
+                                    <div key={cardIdx} className="text-xs text-gray-700">
                                       #{card.cardNumber} {card.playerName}
                                       {card.team && ` (${card.team})`}
                                     </div>
@@ -807,8 +807,8 @@ export default function CreateReleasePage() {
                           )}
 
                           {/* Parallels/Variations Upload/Paste Section */}
-                          <div className="border-t border-gray-200 dark:border-gray-600 pt-2 mt-2">
-                            <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                          <div className="border-t border-gray-200 pt-2 mt-2">
+                            <p className="text-xs font-semibold text-gray-700 mb-2">
                               Add Parallels/Variations (optional):
                             </p>
                             <div className="flex flex-col gap-2">
@@ -823,13 +823,13 @@ export default function CreateReleasePage() {
                                     }}
                                     className="hidden"
                                   />
-                                  <div className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded border border-gray-300 dark:border-gray-600 cursor-pointer text-center transition-colors">
+                                  <div className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded border border-gray-300 cursor-pointer text-center transition-colors">
                                     Upload File (TXT, CSV)
                                   </div>
                                 </label>
                               </div>
                               <details className="text-xs">
-                                <summary className="cursor-pointer text-blue-600 dark:text-blue-400 hover:underline">
+                                <summary className="cursor-pointer text-blue-600 hover:underline">
                                   Or paste parallels text
                                 </summary>
                                 <textarea
@@ -841,9 +841,9 @@ export default function CreateReleasePage() {
                                       e.target.value = ''; // Clear after processing
                                     }
                                   }}
-                                  className="w-full px-2 py-1 mt-2 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-1 focus:ring-blue-500"
+                                  className="w-full px-2 py-1 mt-2 text-xs border border-gray-300 rounded bg-white text-gray-900 focus:ring-1 focus:ring-blue-500"
                                 />
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                <p className="text-xs text-gray-500 mt-1">
                                   Format: &quot;Gold – /10&quot; or &quot;Black – 1/1&quot; (one per line)
                                 </p>
                               </details>
@@ -851,34 +851,34 @@ export default function CreateReleasePage() {
                           </div>
 
                           {set.features && set.features.length > 0 && (
-                            <div className="mt-2 p-2 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded">
+                            <div className="mt-2 p-2 bg-purple-50 border border-purple-200 rounded">
                               <div className="flex items-center justify-between gap-2 mb-1">
                                 <div className="flex items-center gap-1">
-                                  <svg className="w-3 h-3 text-purple-600 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                                  <svg className="w-3 h-3 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M3 12v3c0 1.657 3.134 3 7 3s7-1.343 7-3v-3c0 1.657-3.134 3-7 3s-7-1.343-7-3z" />
                                     <path d="M3 7v3c0 1.657 3.134 3 7 3s7-1.343 7-3V7c0 1.657-3.134 3-7 3S3 8.657 3 7z" />
                                     <path d="M17 5c0 1.657-3.134 3-7 3S3 6.657 3 5s3.134-3 7-3 7 1.343 7 3z" />
                                   </svg>
-                                  <span className="text-xs font-semibold text-purple-700 dark:text-purple-300">
+                                  <span className="text-xs font-semibold text-purple-700">
                                     Parallels loaded: {set.features.length}
                                   </span>
                                 </div>
                                 <button
                                   type="button"
                                   onClick={() => handleClearParallels(idx)}
-                                  className="px-2 py-0.5 text-xs bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400 rounded transition-colors"
+                                  className="px-2 py-0.5 text-xs bg-red-100 hover:bg-red-200 text-red-700 rounded transition-colors"
                                   title="Clear parallels"
                                 >
                                   Clear
                                 </button>
                               </div>
                               <details className="text-xs">
-                                <summary className="cursor-pointer text-purple-600 dark:text-purple-400 hover:underline">
+                                <summary className="cursor-pointer text-purple-600 hover:underline">
                                   View parallels
                                 </summary>
                                 <div className="mt-2 max-h-40 overflow-y-auto space-y-1">
                                   {set.features.map((parallel, parallelIdx) => (
-                                    <div key={parallelIdx} className="text-xs text-gray-700 dark:text-gray-300">
+                                    <div key={parallelIdx} className="text-xs text-gray-700">
                                       • {parallel}
                                     </div>
                                   ))}
@@ -891,7 +891,7 @@ export default function CreateReleasePage() {
                       })}
                     </ul>
                   ) : (
-                    <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                    <p className="text-sm text-gray-500 italic">
                       No sets detected. Click &quot;Add Set&quot; to manually add sets.
                     </p>
                   )}
@@ -900,9 +900,9 @@ export default function CreateReleasePage() {
             </div>
 
             {/* Editable Release Content */}
-            <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
               {/* Header */}
-              <div className="bg-gradient-to-r from-footy-green to-green-700 dark:from-footy-orange dark:to-orange-700 px-8 py-6">
+              <div className="bg-gradient-to-r from-footy-green to-green-700 px-8 py-6">
                 <h3 className="text-2xl font-black text-white flex items-center gap-3">
                   <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -916,16 +916,16 @@ export default function CreateReleasePage() {
 
               <div className="p-8 space-y-8">
                 {/* Title */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border-2 border-gray-200 dark:border-gray-700 shadow-sm">
+                <div className="bg-white rounded-xl p-6 border-2 border-gray-200 shadow-sm">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-lg">
                       T
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-gray-900 dark:text-white">
+                      <label className="block text-sm font-bold text-gray-900">
                         Release Title
                       </label>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-gray-500">
                         Format: Year Release Name (e.g., &quot;2024-25 Donruss Soccer&quot;)
                       </p>
                     </div>
@@ -934,22 +934,22 @@ export default function CreateReleasePage() {
                     type="text"
                     value={editedTitle}
                     onChange={(e) => setEditedTitle(e.target.value)}
-                    className="w-full px-4 py-3 text-lg font-semibold border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-footy-orange focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all"
+                    className="w-full px-4 py-3 text-lg font-semibold border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange focus:border-transparent bg-white text-gray-900 transition-all"
                     placeholder="e.g., 2024-25 Donruss Soccer"
                   />
                 </div>
 
                 {/* Description */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border-2 border-gray-200 dark:border-gray-700 shadow-sm">
+                <div className="bg-white rounded-xl p-6 border-2 border-gray-200 shadow-sm">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-lg">
                       D
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-gray-900 dark:text-white">
+                      <label className="block text-sm font-bold text-gray-900">
                         Description
                       </label>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-gray-500">
                         1-5 sentence summary displayed in previews
                       </p>
                     </div>
@@ -958,11 +958,11 @@ export default function CreateReleasePage() {
                     value={editedDescription}
                     onChange={(e) => setEditedDescription(e.target.value)}
                     rows={3}
-                    className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-footy-orange focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange focus:border-transparent bg-white text-gray-900 transition-all"
                     placeholder="A concise summary that captures the essence of this release..."
                   />
                   <div className="mt-2 flex justify-end">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                    <span className="text-xs text-gray-500">
                       {editedDescription.length} characters
                     </span>
                   </div>

@@ -665,10 +665,10 @@ export default function EditReleasePage() {
 
   if (status === "loading" || fetchingRelease) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-50">
         <Header />
         <div className="flex items-center justify-center h-screen">
-          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
@@ -680,10 +680,10 @@ export default function EditReleasePage() {
 
   if (!release) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-50">
         <Header />
         <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200 p-4 rounded-lg">
+          <div className="bg-red-50 text-red-800 p-4 rounded-lg">
             Release not found
           </div>
         </div>
@@ -692,7 +692,7 @@ export default function EditReleasePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50">
       <Header />
 
       <div className="max-w-4xl mx-auto px-4 py-8">
@@ -700,14 +700,14 @@ export default function EditReleasePage() {
         <div className="mb-8">
           <button
             onClick={() => router.push("/admin")}
-            className="text-footy-green dark:text-footy-orange hover:underline mb-4 flex items-center gap-2"
+            className="text-footy-green hover:underline mb-4 flex items-center gap-2"
           >
             ← Back to Dashboard
           </button>
-          <h1 className="text-3xl font-bold text-footy-green dark:text-footy-orange mb-2">
+          <h1 className="text-3xl font-bold text-footy-green mb-2">
             Edit Release
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600">
             Update release information and manage sets
           </p>
         </div>
@@ -717,8 +717,8 @@ export default function EditReleasePage() {
           <div
             className={`mb-6 p-4 rounded-lg ${
               message.type === "success"
-                ? "bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200"
-                : "bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200"
+                ? "bg-green-50 text-green-800"
+                : "bg-red-50 text-red-800"
             }`}
           >
             {message.text}
@@ -726,55 +726,55 @@ export default function EditReleasePage() {
         )}
 
         {/* Release Information */}
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6 mb-6">
-          <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-4">
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 mb-6">
+          <h3 className="text-lg font-semibold text-blue-900 mb-4">
             Release Information
           </h3>
           <div className="space-y-4 text-sm">
             <div>
-              <label className="block font-semibold text-gray-900 dark:text-gray-100 mb-1">
+              <label className="block font-semibold text-gray-900 mb-1">
                 Manufacturer:
               </label>
               <input
                 type="text"
                 value={editedManufacturer}
                 onChange={(e) => setEditedManufacturer(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="e.g., Panini, Topps, Upper Deck"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                <label className="block font-semibold text-gray-900 mb-1">
                   Year:
                 </label>
                 <input
                   type="text"
                   value={editedYear}
                   onChange={(e) => setEditedYear(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="e.g., 2024 or 2024-25"
                 />
               </div>
               <div>
-                <label className="block font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                <label className="block font-semibold text-gray-900 mb-1">
                   Release Name:
                 </label>
                 <input
                   type="text"
                   value={editedReleaseName}
                   onChange={(e) => setEditedReleaseName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="e.g., Donruss Soccer, Select, Prizm"
                 />
               </div>
             </div>
-            <div className="pt-2 border-t border-blue-300 dark:border-blue-700">
-              <p className="text-gray-800 dark:text-gray-200">
+            <div className="pt-2 border-t border-blue-300">
+              <p className="text-gray-800">
                 <span className="font-semibold">Full Release:</span> {editedYear} {editedReleaseName}
               </p>
             </div>
-            <p className="text-gray-800 dark:text-gray-200">
+            <p className="text-gray-800">
               <span className="font-semibold">Sets:</span> {editedSets.filter(s => !s.isDeleted).length}
             </p>
             <p>
@@ -785,21 +785,21 @@ export default function EditReleasePage() {
         </div>
 
         {/* Release Content Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
             Release Content
           </h3>
 
           <div className="space-y-4">
             {/* GenAI Description Generator */}
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
-              <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-                <svg className="w-5 h-5 text-footy-green dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
+              <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                <svg className="w-5 h-5 text-footy-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
                 GenAI: Generate Description from Sell Sheet
               </h4>
-              <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
+              <p className="text-xs text-gray-600 mb-3">
                 Upload a sell sheet or info document to automatically generate a compelling description
               </p>
               <div className="flex items-center gap-3">
@@ -807,7 +807,7 @@ export default function EditReleasePage() {
                   type="file"
                   accept=".pdf,.png,.jpg,.jpeg,.webp"
                   onChange={(e) => setDescriptionFile(e.target.files?.[0] || null)}
-                  className="text-sm text-gray-600 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-footy-green hover:file:bg-green-200 dark:file:bg-green-900 dark:file:text-green-300"
+                  className="text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-footy-green hover:file:bg-green-200"
                 />
                 <button
                   type="button"
@@ -837,17 +837,17 @@ export default function EditReleasePage() {
 
             {/* Manual Description Input */}
             <div>
-              <label className="block font-semibold text-gray-900 dark:text-gray-100 mb-1">
+              <label className="block font-semibold text-gray-900 mb-1">
                 Description:
               </label>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+              <p className="text-xs text-gray-500 mb-2">
                 1-5 sentence summary displayed in previews and on the release page
               </p>
               <textarea
                 value={editedDescription}
                 onChange={(e) => setEditedDescription(e.target.value)}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="A brief summary of this release for collectors..."
               />
             </div>
@@ -855,9 +855,9 @@ export default function EditReleasePage() {
         </div>
 
         {/* Sets Management */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-lg font-semibold text-gray-900">
               Manage Sets
             </h3>
             <button
@@ -879,7 +879,7 @@ export default function EditReleasePage() {
                 .filter(({ set }) => !set.isDeleted)
                 .map(({ set, originalIdx: idx }) => {
                 return (
-                  <div key={idx} className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                  <div key={idx} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                     <div className="flex items-start justify-between gap-2 mb-3">
                       <div className="flex-1">
                         <input
@@ -887,7 +887,7 @@ export default function EditReleasePage() {
                           value={set.name}
                           onChange={(e) => handleUpdateSet(idx, "name", e.target.value)}
                           placeholder="Set Name (e.g., Base Set, Optic)"
-                          className="w-full px-3 py-2 font-semibold border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 font-semibold border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
                       <button
@@ -909,7 +909,7 @@ export default function EditReleasePage() {
                         value={set.totalCards || ""}
                         onChange={(e) => handleUpdateSet(idx, "totalCards", e.target.value)}
                         placeholder="Total Cards (optional)"
-                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
 
@@ -920,7 +920,7 @@ export default function EditReleasePage() {
                           onChange={(e) => handleUpdateSet(idx, "description", e.target.value)}
                           placeholder="Description (optional) - Click the AI button to generate"
                           rows={2}
-                          className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
+                          className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500"
                         />
                         <button
                           type="button"
@@ -963,14 +963,14 @@ export default function EditReleasePage() {
                           )}
                         </button>
                       </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      <p className="text-xs text-gray-500 mt-1">
                         AI generates 1-5 sentence descriptions from a soccer card expert perspective
                       </p>
                     </div>
 
                     {/* Checklist Upload/Paste Section */}
-                    <div className="border-t border-gray-300 dark:border-gray-600 pt-3 mt-3">
-                      <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    <div className="border-t border-gray-300 pt-3 mt-3">
+                      <p className="text-sm font-semibold text-gray-700 mb-2">
                         Checklist:
                       </p>
                       <div className="flex flex-col gap-2">
@@ -985,13 +985,13 @@ export default function EditReleasePage() {
                               }}
                               className="hidden"
                             />
-                            <div className="px-3 py-2 text-sm bg-blue-100 hover:bg-blue-200 dark:bg-blue-600 dark:hover:bg-blue-500 text-blue-700 dark:text-blue-100 rounded-lg border border-blue-300 dark:border-blue-600 cursor-pointer text-center transition-colors font-medium">
+                            <div className="px-3 py-2 text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg border border-blue-300 cursor-pointer text-center transition-colors font-medium">
                               📄 Upload Checklist (TXT, CSV)
                             </div>
                           </label>
                         </div>
                         <details className="text-sm">
-                          <summary className="cursor-pointer text-blue-600 dark:text-blue-400 hover:underline">
+                          <summary className="cursor-pointer text-blue-600 hover:underline">
                             Or paste checklist text
                           </summary>
                           <textarea
@@ -1003,9 +1003,9 @@ export default function EditReleasePage() {
                                 e.target.value = ''; // Clear after processing
                               }
                             }}
-                            className="w-full px-3 py-2 mt-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 mt-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500"
                           />
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          <p className="text-xs text-gray-500 mt-1">
                             Supports: &quot;1,Player Name,Team&quot; or &quot;1 Player Name, Team&quot; (one per line, optional header row)
                           </p>
                         </details>
@@ -1013,32 +1013,32 @@ export default function EditReleasePage() {
                     </div>
 
                     {set.cards && set.cards.length > 0 && (
-                      <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                      <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
                         <div className="flex items-center justify-between gap-2 mb-2">
                           <div className="flex items-center gap-2">
-                            <svg className="w-4 h-4 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                             </svg>
-                            <span className="text-sm font-semibold text-green-700 dark:text-green-300">
+                            <span className="text-sm font-semibold text-green-700">
                               Checklist loaded: {set.cards.length} cards
                             </span>
                           </div>
                           <button
                             type="button"
                             onClick={() => handleClearChecklist(idx)}
-                            className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400 rounded transition-colors"
+                            className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 text-red-700 rounded transition-colors"
                             title="Clear checklist"
                           >
                             Clear
                           </button>
                         </div>
                         <details className="text-sm">
-                          <summary className="cursor-pointer text-green-600 dark:text-green-400 hover:underline">
+                          <summary className="cursor-pointer text-green-600 hover:underline">
                             View cards
                           </summary>
                           <div className="mt-2 max-h-40 overflow-y-auto space-y-1">
                             {set.cards.map((card, cardIdx) => (
-                              <div key={cardIdx} className="text-xs text-gray-700 dark:text-gray-300">
+                              <div key={cardIdx} className="text-xs text-gray-700">
                                 #{card.cardNumber} {card.playerName}
                                 {card.team && ` (${card.team})`}
                               </div>
@@ -1049,8 +1049,8 @@ export default function EditReleasePage() {
                     )}
 
                     {/* Parallels/Variations Upload/Paste Section */}
-                    <div className="border-t border-gray-300 dark:border-gray-600 pt-3 mt-3">
-                      <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    <div className="border-t border-gray-300 pt-3 mt-3">
+                      <p className="text-sm font-semibold text-gray-700 mb-2">
                         Parallels/Variations:
                       </p>
                       <div className="flex flex-col gap-2">
@@ -1065,13 +1065,13 @@ export default function EditReleasePage() {
                               }}
                               className="hidden"
                             />
-                            <div className="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-gray-600 cursor-pointer text-center transition-colors">
+                            <div className="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg border border-gray-300 cursor-pointer text-center transition-colors">
                               Upload File (TXT, CSV)
                             </div>
                           </label>
                         </div>
                         <details className="text-sm">
-                          <summary className="cursor-pointer text-blue-600 dark:text-blue-400 hover:underline">
+                          <summary className="cursor-pointer text-blue-600 hover:underline">
                             Or paste parallels text
                           </summary>
                           <textarea
@@ -1083,9 +1083,9 @@ export default function EditReleasePage() {
                                 e.target.value = ''; // Clear after processing
                               }
                             }}
-                            className="w-full px-3 py-2 mt-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 mt-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500"
                           />
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          <p className="text-xs text-gray-500 mt-1">
                             Format: &quot;Gold – /10&quot; or &quot;Black – 1/1&quot; (one per line)
                           </p>
                         </details>
@@ -1093,34 +1093,34 @@ export default function EditReleasePage() {
                     </div>
 
                     {set.parallels && set.parallels.length > 0 && (
-                      <div className="mt-3 p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
+                      <div className="mt-3 p-3 bg-purple-50 border border-purple-200 rounded-lg">
                         <div className="flex items-center justify-between gap-2 mb-2">
                           <div className="flex items-center gap-2">
-                            <svg className="w-4 h-4 text-purple-600 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
                               <path d="M3 12v3c0 1.657 3.134 3 7 3s7-1.343 7-3v-3c0 1.657-3.134 3-7 3s-7-1.343-7-3z" />
                               <path d="M3 7v3c0 1.657 3.134 3 7 3s7-1.343 7-3V7c0 1.657-3.134 3-7 3S3 8.657 3 7z" />
                               <path d="M17 5c0 1.657-3.134 3-7 3S3 6.657 3 5s3.134-3 7-3 7 1.343 7 3z" />
                             </svg>
-                            <span className="text-sm font-semibold text-purple-700 dark:text-purple-300">
+                            <span className="text-sm font-semibold text-purple-700">
                               Parallels loaded: {set.parallels.length}
                             </span>
                           </div>
                           <button
                             type="button"
                             onClick={() => handleClearParallels(idx)}
-                            className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400 rounded transition-colors"
+                            className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 text-red-700 rounded transition-colors"
                             title="Clear parallels"
                           >
                             Clear
                           </button>
                         </div>
                         <details className="text-sm">
-                          <summary className="cursor-pointer text-purple-600 dark:text-purple-400 hover:underline">
+                          <summary className="cursor-pointer text-purple-600 hover:underline">
                             View parallels
                           </summary>
                           <div className="mt-2 max-h-40 overflow-y-auto space-y-1">
                             {set.parallels.map((parallel, parallelIdx) => (
-                              <div key={parallelIdx} className="text-xs text-gray-700 dark:text-gray-300">
+                              <div key={parallelIdx} className="text-xs text-gray-700">
                                 • {parallel}
                               </div>
                             ))}
@@ -1133,7 +1133,7 @@ export default function EditReleasePage() {
               })}
             </div>
           ) : (
-            <p className="text-sm text-gray-500 dark:text-gray-400 italic text-center py-8">
+            <p className="text-sm text-gray-500 italic text-center py-8">
               No sets found. Click &quot;Add Set&quot; to create a set.
             </p>
           )}

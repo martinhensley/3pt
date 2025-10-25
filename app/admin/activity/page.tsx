@@ -107,10 +107,10 @@ function ActivityContent() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-50">
         <Header />
         <div className="flex items-center justify-center h-screen">
-          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
@@ -131,7 +131,7 @@ function ActivityContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50">
       <Header />
 
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -139,27 +139,27 @@ function ActivityContent() {
         <div className="mb-8">
           <button
             onClick={() => router.back()}
-            className="text-footy-green dark:text-footy-orange hover:underline mb-4 flex items-center gap-2"
+            className="text-footy-green hover:underline mb-4 flex items-center gap-2"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             Back
           </button>
-          <h1 className="text-3xl font-bold text-footy-green dark:text-footy-orange mb-2">
+          <h1 className="text-3xl font-bold text-footy-green mb-2">
             Activity History
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600">
             Complete history of posts, releases, sets, and cards
           </p>
         </div>
 
         {/* Filters and Sorting */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
             {/* Type Filter */}
             <div className="flex flex-wrap gap-2">
-              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 self-center mr-2">
+              <span className="text-sm font-semibold text-gray-700 self-center mr-2">
                 Filter by:
               </span>
               {["ALL", "RELEASE", "SET", "CARD", "POST"].map((type) => (
@@ -168,8 +168,8 @@ function ActivityContent() {
                   onClick={() => handleTypeFilterChange(type)}
                   className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
                     typeFilter === type
-                      ? "bg-footy-green dark:bg-footy-orange text-white"
-                      : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                      ? "bg-footy-green text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                 >
                   {type === "ALL" ? "All" : type.charAt(0) + type.slice(1).toLowerCase() + "s"}
@@ -179,15 +179,15 @@ function ActivityContent() {
 
             {/* Sort Options */}
             <div className="flex gap-2 items-center">
-              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <span className="text-sm font-semibold text-gray-700">
                 Sort by:
               </span>
               <button
                 onClick={() => handleSortChange("date")}
                 className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all flex items-center gap-1 ${
                   sortBy === "date"
-                    ? "bg-footy-green dark:bg-footy-orange text-white"
-                    : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                    ? "bg-footy-green text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
                 Date
@@ -201,8 +201,8 @@ function ActivityContent() {
                 onClick={() => handleSortChange("type")}
                 className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all flex items-center gap-1 ${
                   sortBy === "type"
-                    ? "bg-footy-green dark:bg-footy-orange text-white"
-                    : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                    ? "bg-footy-green text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
                 Type
@@ -217,31 +217,31 @@ function ActivityContent() {
         </div>
 
         {/* Activity List */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           {activities.length === 0 ? (
             <div className="p-12 text-center">
-              <p className="text-gray-500 dark:text-gray-400">No activity found</p>
+              <p className="text-gray-500">No activity found</p>
             </div>
           ) : (
             <>
-              <div className="divide-y divide-gray-200 dark:divide-gray-700">
+              <div className="divide-y divide-gray-200">
                 {activities.map((activity) => (
                   <div
                     key={activity.id}
-                    className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                    className="p-6 hover:bg-gray-50 transition-colors cursor-pointer"
                     onClick={() => activity.link && router.push(activity.link)}
                   >
                     <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-12 h-12 bg-footy-green/10 dark:bg-footy-orange/10 rounded-full flex items-center justify-center text-2xl">
+                      <div className="flex-shrink-0 w-12 h-12 bg-footy-green/10 rounded-full flex items-center justify-center text-2xl">
                         {getActivityIcon(activity.type)}
                       </div>
                       <div className="flex-grow">
                         <div className="flex items-start justify-between gap-4">
                           <div>
-                            <h3 className="font-semibold text-lg text-gray-900 dark:text-white mb-1">
+                            <h3 className="font-semibold text-lg text-gray-900 mb-1">
                               {activity.title}
                             </h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                            <p className="text-sm text-gray-600">
                               {new Date(activity.date).toLocaleDateString("en-US", {
                                 weekday: "long",
                                 month: "short",
@@ -252,7 +252,7 @@ function ActivityContent() {
                               })}
                             </p>
                           </div>
-                          <span className="text-xs font-bold px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full">
+                          <span className="text-xs font-bold px-3 py-1 bg-gray-100 text-gray-700 rounded-full">
                             {activity.type}
                           </span>
                         </div>
@@ -264,16 +264,16 @@ function ActivityContent() {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="bg-gray-50 dark:bg-gray-900 px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
                   <div className="flex items-center justify-between">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-gray-600">
                       Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, total)} of {total} activities
                     </p>
                     <div className="flex gap-2">
                       <button
                         onClick={() => handlePageChange(page - 1)}
                         disabled={page === 1}
-                        className="px-4 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        className="px-4 py-2 rounded-lg bg-white border border-gray-300 text-gray-700 font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
                       >
                         Previous
                       </button>
@@ -298,8 +298,8 @@ function ActivityContent() {
                               onClick={() => handlePageChange(pageNum)}
                               className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
                                 page === pageNum
-                                  ? "bg-footy-green dark:bg-footy-orange text-white"
-                                  : "bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                                  ? "bg-footy-green text-white"
+                                  : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
                               }`}
                             >
                               {pageNum}
@@ -311,7 +311,7 @@ function ActivityContent() {
                       <button
                         onClick={() => handlePageChange(page + 1)}
                         disabled={page === totalPages}
-                        className="px-4 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        className="px-4 py-2 rounded-lg bg-white border border-gray-300 text-gray-700 font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
                       >
                         Next
                       </button>

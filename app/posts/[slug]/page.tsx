@@ -56,10 +56,10 @@ export default function PostPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900">
+      <div className="flex flex-col min-h-screen bg-white">
         <Header showBackButton />
         <div className="flex-grow flex items-center justify-center">
-          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
@@ -100,7 +100,7 @@ export default function PostPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
+    <div className="flex flex-col min-h-screen bg-white transition-colors duration-300">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
@@ -119,7 +119,7 @@ export default function PostPage() {
         <main className="flex-grow max-w-4xl mx-auto">
         <article>
           <div className="mb-8">
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
               <span className="bg-footy-orange text-white px-3 py-1 rounded-full font-semibold">
                 {post.type === "CARD" ? "Card" : post.type === "SET" ? "Set" : post.type === "RELEASE" ? "Release" : "General"}
               </span>
@@ -133,12 +133,12 @@ export default function PostPage() {
               </time>
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-bold text-footy-green dark:text-footy-orange mb-6">
+            <h1 className="text-4xl md:text-5xl font-bold text-footy-green mb-6">
               {post.title}
             </h1>
 
             {post.excerpt && (
-              <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">{post.excerpt}</p>
+              <p className="text-xl text-gray-600 mb-8">{post.excerpt}</p>
             )}
           </div>
 
@@ -147,7 +147,7 @@ export default function PostPage() {
               {post.images.map((image) => (
                 <div
                   key={image.id}
-                  className="relative bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden border-2 border-footy-green dark:border-footy-orange shadow-lg"
+                  className="relative bg-gray-100 rounded-lg overflow-hidden border-2 border-footy-green shadow-lg"
                 >
                   <Image
                     src={image.url}
@@ -158,7 +158,7 @@ export default function PostPage() {
                     sizes="(max-width: 768px) 100vw, 50vw"
                   />
                   {image.caption && (
-                    <p className="p-2 text-sm text-gray-600 dark:text-gray-300 text-center bg-white dark:bg-gray-800">
+                    <p className="p-2 text-sm text-gray-600 text-center bg-white">
                       {image.caption}
                     </p>
                   )}
@@ -168,14 +168,14 @@ export default function PostPage() {
           )}
 
           <div
-            className="prose prose-lg max-w-none prose-headings:text-footy-green dark:prose-headings:text-footy-orange prose-a:text-footy-orange prose-strong:text-footy-green dark:prose-strong:text-footy-orange dark:prose-invert"
+            className="prose prose-lg max-w-none prose-headings:text-footy-green prose-a:text-footy-orange prose-strong:text-footy-green"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
 
-          <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+          <div className="mt-12 pt-8 border-t border-gray-200">
             <Link
               href="/"
-              className="inline-flex items-center text-footy-green dark:text-footy-orange hover:text-footy-orange font-semibold transition-colors"
+              className="inline-flex items-center text-footy-green hover:text-footy-orange font-semibold transition-colors"
             >
               ← View All Posts
             </Link>
@@ -198,7 +198,7 @@ export default function PostPage() {
         </aside>
       </div>
 
-      <footer className="bg-footy-green dark:bg-gray-950 text-white transition-colors duration-300">
+      <footer className="bg-footy-green text-white transition-colors duration-300">
         <div className="max-w-4xl mx-auto px-4 py-8 text-center">
           <p className="text-sm">
             <span className="text-white">footy</span><span className="text-footy-orange">.bot</span> © 2024-{new Date().getFullYear()}

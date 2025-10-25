@@ -187,10 +187,10 @@ export default function EditPostPage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-50">
         <Header />
         <div className="flex items-center justify-center h-screen">
-          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
@@ -201,7 +201,7 @@ export default function EditPostPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50">
       <Header />
 
       <div className="max-w-4xl mx-auto px-4 py-8">
@@ -209,14 +209,14 @@ export default function EditPostPage() {
         <div className="mb-8">
           <button
             onClick={() => router.push("/admin/posts")}
-            className="text-footy-green dark:text-footy-orange hover:underline mb-4 flex items-center gap-2"
+            className="text-footy-green hover:underline mb-4 flex items-center gap-2"
           >
             ← Back to Posts
           </button>
-          <h1 className="text-3xl font-bold text-footy-green dark:text-footy-orange mb-2">
+          <h1 className="text-3xl font-bold text-footy-green mb-2">
             Edit Post
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600">
             Update post content and settings
           </p>
         </div>
@@ -226,8 +226,8 @@ export default function EditPostPage() {
           <div
             className={`mb-6 p-4 rounded-lg ${
               message.type === "success"
-                ? "bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200"
-                : "bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200"
+                ? "bg-green-50 text-green-800"
+                : "bg-red-50 text-red-800"
             }`}
           >
             {message.text}
@@ -235,18 +235,18 @@ export default function EditPostPage() {
         )}
 
         {/* Form */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 space-y-6">
+        <div className="bg-white rounded-xl shadow-lg p-6 space-y-6">
           {/* Post Type Badge */}
           <div>
             <span
               className={`px-3 py-1 rounded-full font-semibold text-sm ${
                 post.type === "RELEASE"
-                  ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200"
+                  ? "bg-green-100 text-green-800"
                   : post.type === "SET"
-                  ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200"
+                  ? "bg-blue-100 text-blue-800"
                   : post.type === "CARD"
-                  ? "bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200"
-                  : "bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200"
+                  ? "bg-orange-100 text-orange-800"
+                  : "bg-purple-100 text-purple-800"
               }`}
             >
               {post.type}
@@ -255,38 +255,38 @@ export default function EditPostPage() {
 
           {/* Title */}
           <div>
-            <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
               Title
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white text-gray-900"
             />
           </div>
 
           {/* Excerpt */}
           <div>
-            <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
               Excerpt
             </label>
             <textarea
               value={excerpt}
               onChange={(e) => setExcerpt(e.target.value)}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white text-gray-900"
             />
           </div>
 
           {/* Regenerate Content Button (only for RELEASE posts) */}
           {post.type === "RELEASE" && (
-            <div className="flex items-center gap-3 p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
+            <div className="flex items-center gap-3 p-4 bg-orange-50 rounded-lg border border-orange-200">
               <div className="flex-grow">
-                <p className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
+                <p className="text-sm font-semibold text-gray-900 mb-1">
                   AI Content Regeneration
                 </p>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
+                <p className="text-xs text-gray-600">
                   Use AI to regenerate the title, excerpt, and content based on the current release data
                 </p>
               </div>
@@ -302,21 +302,21 @@ export default function EditPostPage() {
 
           {/* Content */}
           <div>
-            <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
               Content (HTML)
             </label>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={15}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono text-sm"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white text-gray-900 font-mono text-sm"
             />
           </div>
 
           {/* Current Images */}
           {post.images.length > 0 && (
             <div>
-              <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+              <label className="block text-sm font-semibold text-gray-900 mb-2">
                 Current Images
               </label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -357,7 +357,7 @@ export default function EditPostPage() {
 
           {/* Add New Images */}
           <div>
-            <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
               Add New Images
             </label>
             <input
@@ -365,10 +365,10 @@ export default function EditPostPage() {
               multiple
               accept=".jpg,.jpeg,.png,.webp,.gif"
               onChange={handleImageFileChange}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white text-gray-900"
             />
             {newImages.length > 0 && (
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+              <p className="text-sm text-gray-600 mt-2">
                 {newImages.length} new image(s) selected
               </p>
             )}
@@ -383,7 +383,7 @@ export default function EditPostPage() {
               onChange={(e) => setPublished(e.target.checked)}
               className="w-5 h-5 text-footy-green rounded focus:ring-2 focus:ring-footy-orange"
             />
-            <label htmlFor="published" className="text-sm font-semibold text-gray-900 dark:text-white">
+            <label htmlFor="published" className="text-sm font-semibold text-gray-900">
               Published
             </label>
           </div>
@@ -399,7 +399,7 @@ export default function EditPostPage() {
             </button>
             <button
               onClick={() => router.push("/admin/posts")}
-              className="px-6 py-4 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              className="px-6 py-4 bg-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-300 transition-colors"
             >
               Cancel
             </button>

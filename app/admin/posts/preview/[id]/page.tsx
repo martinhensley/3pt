@@ -50,10 +50,10 @@ export default function PreviewPostPage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900">
+      <div className="flex flex-col min-h-screen bg-white">
         <Header showBackButton />
         <div className="flex-grow flex items-center justify-center">
-          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
@@ -64,24 +64,24 @@ export default function PreviewPostPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900">
+    <div className="flex flex-col min-h-screen bg-white">
       <Header showBackButton />
 
       {/* Preview Banner */}
-      <div className="bg-yellow-100 dark:bg-yellow-900/30 border-b-2 border-yellow-500 dark:border-yellow-700 py-3 px-4">
+      <div className="bg-yellow-100 border-b-2 border-yellow-500 py-3 px-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <svg className="w-5 h-5 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
-            <span className="font-semibold text-yellow-800 dark:text-yellow-200">
+            <span className="font-semibold text-yellow-800">
               Preview Mode - This post is {post.published ? "published" : "not published"}
             </span>
           </div>
           <button
             onClick={() => router.push("/admin/posts")}
-            className="text-sm text-yellow-700 dark:text-yellow-300 hover:underline"
+            className="text-sm text-yellow-700 hover:underline"
           >
             Back to Posts
           </button>
@@ -96,31 +96,31 @@ export default function PreviewPostPage() {
               <span
                 className={`px-3 py-1 rounded-full font-semibold text-sm ${
                   post.type === "RELEASE"
-                    ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200"
+                    ? "bg-green-100 text-green-800"
                     : post.type === "SET"
-                    ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200"
+                    ? "bg-blue-100 text-blue-800"
                     : post.type === "CARD"
-                    ? "bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200"
-                    : "bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200"
+                    ? "bg-orange-100 text-orange-800"
+                    : "bg-purple-100 text-purple-800"
                 }`}
               >
                 {post.type}
               </span>
               {!post.published && (
-                <span className="px-3 py-1 rounded-full font-semibold text-sm bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200">
+                <span className="px-3 py-1 rounded-full font-semibold text-sm bg-yellow-100 text-yellow-800">
                   DRAFT
                 </span>
               )}
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               {post.title}
             </h1>
             {post.excerpt && (
-              <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed">
+              <p className="text-xl text-gray-600 leading-relaxed">
                 {post.excerpt}
               </p>
             )}
-            <div className="flex items-center gap-4 mt-6 text-sm text-gray-500 dark:text-gray-400">
+            <div className="flex items-center gap-4 mt-6 text-sm text-gray-500">
               <time dateTime={post.createdAt}>
                 {new Date(post.createdAt).toLocaleDateString("en-US", {
                   year: "numeric",
@@ -166,13 +166,13 @@ export default function PreviewPostPage() {
 
           {/* Post Content */}
           <div
-            className="prose prose-lg dark:prose-invert max-w-none
-              prose-headings:text-gray-900 dark:prose-headings:text-white
-              prose-p:text-gray-700 dark:prose-p:text-gray-300
-              prose-a:text-footy-green dark:prose-a:text-footy-orange
-              prose-strong:text-gray-900 dark:prose-strong:text-white
-              prose-ul:text-gray-700 dark:prose-ul:text-gray-300
-              prose-ol:text-gray-700 dark:prose-ol:text-gray-300"
+            className="prose prose-lg max-w-none
+              prose-headings:text-gray-900
+              prose-p:text-gray-700
+              prose-a:text-footy-green
+              prose-strong:text-gray-900
+              prose-ul:text-gray-700
+              prose-ol:text-gray-700"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
         </article>

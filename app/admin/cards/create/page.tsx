@@ -412,22 +412,22 @@ export default function CreateCardPage() {
   }, [scannedCards, selectedRelease, router]);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50">
       <Header />
 
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2 text-footy-green dark:text-footy-orange">
+          <h1 className="text-3xl font-bold mb-2 text-footy-green">
             Create Cards
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600">
             AI-powered card scanning and cataloging
           </p>
         </div>
 
         {/* Step 1: Select Release */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4 text-gray-900 flex items-center gap-2">
             <span className="bg-footy-green text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
               1
             </span>
@@ -437,7 +437,7 @@ export default function CreateCardPage() {
           <select
             value={selectedReleaseId}
             onChange={(e) => handleReleaseChange(e.target.value)}
-            className="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white text-lg"
+            className="w-full p-3 border rounded-lg text-lg"
           >
             <option value="">Choose a release...</option>
             {releases.map((release) => (
@@ -448,15 +448,15 @@ export default function CreateCardPage() {
           </select>
 
           {selectedRelease && (
-            <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              <p className="text-sm font-semibold text-gray-700 mb-2">
                 Available Sets:
               </p>
               <div className="flex flex-wrap gap-2">
                 {selectedRelease.sets.map((set) => (
                   <span
                     key={set.id}
-                    className="px-3 py-1 bg-footy-green/10 text-footy-green dark:bg-footy-orange/10 dark:text-footy-orange rounded-full text-sm"
+                    className="px-3 py-1 bg-footy-green/10 text-footy-green rounded-full text-sm"
                   >
                     {set.name}
                   </span>
@@ -468,8 +468,8 @@ export default function CreateCardPage() {
 
         {/* Step 2: Upload Images */}
         {selectedReleaseId && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
+          <div className="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 className="text-xl font-semibold mb-4 text-gray-900 flex items-center gap-2">
               <span className="bg-footy-green text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
                 2
               </span>
@@ -484,7 +484,7 @@ export default function CreateCardPage() {
                   className={`px-4 py-2 rounded-lg font-semibold ${
                     mode === 'single'
                       ? 'bg-footy-green text-white'
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                      : 'bg-gray-200 text-gray-700'
                   }`}
                 >
                   Single Card
@@ -494,7 +494,7 @@ export default function CreateCardPage() {
                   className={`px-4 py-2 rounded-lg font-semibold ${
                     mode === 'bulk'
                       ? 'bg-footy-green text-white'
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                      : 'bg-gray-200 text-gray-700'
                   }`}
                 >
                   Bulk Upload
@@ -505,7 +505,7 @@ export default function CreateCardPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Front Images */}
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                <label className="block text-sm font-medium mb-2 text-gray-700">
                   Front Images (Required)
                 </label>
                 <input
@@ -513,7 +513,7 @@ export default function CreateCardPage() {
                   multiple={mode === 'bulk'}
                   accept="image/*"
                   onChange={handleFrontImagesChange}
-                  className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="w-full p-2 border rounded-lg"
                 />
                 <p className="text-sm text-gray-500 mt-1">
                   {frontImages.length} file(s) selected
@@ -522,7 +522,7 @@ export default function CreateCardPage() {
 
               {/* Back Images */}
               <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                <label className="block text-sm font-medium mb-2 text-gray-700">
                   Back Images (Optional)
                 </label>
                 <input
@@ -530,7 +530,7 @@ export default function CreateCardPage() {
                   multiple={mode === 'bulk'}
                   accept="image/*"
                   onChange={handleBackImagesChange}
-                  className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="w-full p-2 border rounded-lg"
                 />
                 <p className="text-sm text-gray-500 mt-1">
                   {backImages.length} file(s) selected
@@ -561,8 +561,8 @@ export default function CreateCardPage() {
 
         {/* Step 3: Review & Save */}
         {scannedCards.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold mb-4 text-gray-900 flex items-center gap-2">
               <span className="bg-footy-green text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
                 3
               </span>
@@ -572,28 +572,28 @@ export default function CreateCardPage() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b-2 dark:border-gray-700">
-                    <th className="text-left p-2 text-gray-900 dark:text-white">Card #</th>
-                    <th className="text-left p-2 text-gray-900 dark:text-white">Player</th>
-                    <th className="text-left p-2 text-gray-900 dark:text-white">Set</th>
-                    <th className="text-left p-2 text-gray-900 dark:text-white">Parallel</th>
-                    <th className="text-left p-2 text-gray-900 dark:text-white">Team</th>
-                    <th className="text-center p-2 text-gray-900 dark:text-white">Auto</th>
-                    <th className="text-center p-2 text-gray-900 dark:text-white">Mem</th>
-                    <th className="text-left p-2 text-gray-900 dark:text-white">Serial</th>
-                    <th className="text-center p-2 text-gray-900 dark:text-white">Match</th>
-                    <th className="text-center p-2 text-gray-900 dark:text-white">Conf</th>
+                  <tr className="border-b-2">
+                    <th className="text-left p-2 text-gray-900">Card #</th>
+                    <th className="text-left p-2 text-gray-900">Player</th>
+                    <th className="text-left p-2 text-gray-900">Set</th>
+                    <th className="text-left p-2 text-gray-900">Parallel</th>
+                    <th className="text-left p-2 text-gray-900">Team</th>
+                    <th className="text-center p-2 text-gray-900">Auto</th>
+                    <th className="text-center p-2 text-gray-900">Mem</th>
+                    <th className="text-left p-2 text-gray-900">Serial</th>
+                    <th className="text-center p-2 text-gray-900">Match</th>
+                    <th className="text-center p-2 text-gray-900">Conf</th>
                   </tr>
                 </thead>
                 <tbody>
                   {scannedCards.map((card, idx) => (
-                    <tr key={idx} className="border-b dark:border-gray-700">
+                    <tr key={idx} className="border-b">
                       <td className="p-2">
                         <input
                           type="text"
                           value={card.cardNumber}
                           onChange={(e) => handleUpdateCard(idx, 'cardNumber', e.target.value)}
-                          className="w-20 p-1 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                          className="w-20 p-1 border rounded"
                         />
                       </td>
                       <td className="p-2">
@@ -601,14 +601,14 @@ export default function CreateCardPage() {
                           type="text"
                           value={card.playerName}
                           onChange={(e) => handleUpdateCard(idx, 'playerName', e.target.value)}
-                          className="w-40 p-1 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                          className="w-40 p-1 border rounded"
                         />
                       </td>
                       <td className="p-2">
                         <select
                           value={card.setId || ''}
                           onChange={(e) => handleUpdateCard(idx, 'setId', e.target.value)}
-                          className="w-32 p-1 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm"
+                          className="w-32 p-1 border rounded text-sm"
                         >
                           <option value="">Select...</option>
                           {selectedRelease?.sets.map((set) => (
@@ -618,7 +618,7 @@ export default function CreateCardPage() {
                           ))}
                         </select>
                       </td>
-                      <td className="p-2 text-sm text-gray-700 dark:text-gray-300">
+                      <td className="p-2 text-sm text-gray-700">
                         {card.parallelName || 'Base'}
                       </td>
                       <td className="p-2">
@@ -626,7 +626,7 @@ export default function CreateCardPage() {
                           type="text"
                           value={card.team || ''}
                           onChange={(e) => handleUpdateCard(idx, 'team', e.target.value)}
-                          className="w-28 p-1 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                          className="w-28 p-1 border rounded"
                         />
                       </td>
                       <td className="p-2 text-center">
@@ -651,7 +651,7 @@ export default function CreateCardPage() {
                           value={card.serialNumber || ''}
                           onChange={(e) => handleUpdateCard(idx, 'serialNumber', e.target.value)}
                           placeholder="e.g., 15/99"
-                          className="w-20 p-1 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm"
+                          className="w-20 p-1 border rounded text-sm"
                         />
                       </td>
                       <td className="p-2 text-center">
@@ -659,10 +659,10 @@ export default function CreateCardPage() {
                           <span
                             className={`text-xs font-bold px-2 py-1 rounded ${
                               card.matchConfidence === 'high'
-                                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                                ? 'bg-green-100 text-green-800'
                                 : card.matchConfidence === 'medium'
-                                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                                : 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'
+                                ? 'bg-yellow-100 text-yellow-800'
+                                : 'bg-orange-100 text-orange-800'
                             }`}
                             title={`Matched to existing card in checklist (${card.matchPercentage}%)`}
                           >
@@ -678,10 +678,10 @@ export default function CreateCardPage() {
                         <span
                           className={`text-sm font-semibold ${
                             card.confidence >= 70
-                              ? 'text-green-600 dark:text-green-400'
+                              ? 'text-green-600'
                               : card.confidence >= 50
-                              ? 'text-yellow-600 dark:text-yellow-400'
-                              : 'text-red-600 dark:text-red-400'
+                              ? 'text-yellow-600'
+                              : 'text-red-600'
                           }`}
                         >
                           {card.confidence}%
@@ -708,7 +708,7 @@ export default function CreateCardPage() {
                   setFrontImages([]);
                   setBackImages([]);
                 }}
-                className="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition-all"
+                className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-all"
               >
                 Clear All
               </button>

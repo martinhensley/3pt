@@ -132,10 +132,10 @@ export default function ManagePostsPage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-50">
         <Header />
         <div className="flex items-center justify-center h-screen">
-          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
@@ -146,7 +146,7 @@ export default function ManagePostsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50">
       <Header />
 
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -154,14 +154,14 @@ export default function ManagePostsPage() {
         <div className="mb-8">
           <button
             onClick={() => router.push("/admin")}
-            className="text-footy-green dark:text-footy-orange hover:underline mb-4 flex items-center gap-2"
+            className="text-footy-green hover:underline mb-4 flex items-center gap-2"
           >
             ← Back to Dashboard
           </button>
-          <h1 className="text-3xl font-bold text-footy-green dark:text-footy-orange mb-2">
+          <h1 className="text-3xl font-bold text-footy-green mb-2">
             Manage Posts
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600">
             View, edit, publish, and delete all blog posts
           </p>
         </div>
@@ -171,8 +171,8 @@ export default function ManagePostsPage() {
           <div
             className={`mb-6 p-4 rounded-lg ${
               message.type === "success"
-                ? "bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200"
-                : "bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200"
+                ? "bg-green-50 text-green-800"
+                : "bg-red-50 text-red-800"
             }`}
           >
             {message.text}
@@ -180,10 +180,10 @@ export default function ManagePostsPage() {
         )}
 
         {/* Filters */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <div className="flex flex-wrap gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+              <label className="block text-sm font-semibold text-gray-900 mb-2">
                 Status
               </label>
               <div className="flex gap-2">
@@ -192,7 +192,7 @@ export default function ManagePostsPage() {
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     filter === "all"
                       ? "bg-footy-green text-white"
-                      : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                      : "bg-gray-200 text-gray-700"
                   }`}
                 >
                   All ({posts.length})
@@ -202,7 +202,7 @@ export default function ManagePostsPage() {
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     filter === "published"
                       ? "bg-footy-green text-white"
-                      : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                      : "bg-gray-200 text-gray-700"
                   }`}
                 >
                   Published ({posts.filter(p => p.published).length})
@@ -212,7 +212,7 @@ export default function ManagePostsPage() {
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     filter === "draft"
                       ? "bg-footy-green text-white"
-                      : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                      : "bg-gray-200 text-gray-700"
                   }`}
                 >
                   Drafts ({posts.filter(p => !p.published).length})
@@ -221,13 +221,13 @@ export default function ManagePostsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+              <label className="block text-sm font-semibold text-gray-900 mb-2">
                 Type
               </label>
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
               >
                 <option value="all">All Types</option>
                 <option value="RELEASE">Releases</option>
@@ -242,19 +242,19 @@ export default function ManagePostsPage() {
         {/* Posts List */}
         <div className="space-y-4">
           {filteredPosts.length === 0 ? (
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-12 text-center">
-              <p className="text-gray-600 dark:text-gray-400">No posts found</p>
+            <div className="bg-white rounded-xl shadow-lg p-12 text-center">
+              <p className="text-gray-600">No posts found</p>
             </div>
           ) : (
             filteredPosts.map((post) => (
               <div
                 key={post.id}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
+                className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
               >
                 <div className="flex gap-6">
                   {/* Thumbnail */}
                   {post.images[0] && (
-                    <div className="flex-shrink-0 w-32 h-32 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
+                    <div className="flex-shrink-0 w-32 h-32 bg-gray-100 rounded-lg overflow-hidden">
                       <Image
                         src={post.images[0].url}
                         alt={post.title}
@@ -269,19 +269,19 @@ export default function ManagePostsPage() {
                   <div className="flex-grow">
                     <div className="flex items-start justify-between mb-2">
                       <div>
-                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">
                           {post.title}
                         </h3>
                         <div className="flex items-center gap-2 text-sm">
                           <span
                             className={`px-2 py-1 rounded-full font-semibold text-xs ${
                               post.type === "RELEASE"
-                                ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200"
+                                ? "bg-green-100 text-green-800"
                                 : post.type === "SET"
-                                ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200"
+                                ? "bg-blue-100 text-blue-800"
                                 : post.type === "CARD"
-                                ? "bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200"
-                                : "bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200"
+                                ? "bg-orange-100 text-orange-800"
+                                : "bg-purple-100 text-purple-800"
                             }`}
                           >
                             {post.type}
@@ -289,13 +289,13 @@ export default function ManagePostsPage() {
                           <span
                             className={`px-2 py-1 rounded-full font-semibold text-xs ${
                               post.published
-                                ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200"
-                                : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-yellow-100 text-yellow-800"
                             }`}
                           >
                             {post.published ? "Published" : "Draft"}
                           </span>
-                          <span className="text-gray-500 dark:text-gray-400">
+                          <span className="text-gray-500">
                             {new Date(post.createdAt).toLocaleDateString()}
                           </span>
                         </div>
@@ -303,7 +303,7 @@ export default function ManagePostsPage() {
                     </div>
 
                     {post.excerpt && (
-                      <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
+                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">
                         {post.excerpt}
                       </p>
                     )}
@@ -312,7 +312,7 @@ export default function ManagePostsPage() {
                     <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => handleViewPost(post.slug, post.type, post.published, post.id)}
-                        className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm font-medium"
+                        className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm font-medium"
                       >
                         {post.published ? "View" : "Preview"}
                       </button>
@@ -325,7 +325,7 @@ export default function ManagePostsPage() {
                       {post.type === "RELEASE" && post.releaseId && (
                         <button
                           onClick={() => router.push(`/admin/releases/edit/${post.releaseId}`)}
-                          className="px-4 py-2 bg-footy-green dark:bg-footy-orange text-white rounded-lg hover:bg-green-700 dark:hover:bg-orange-600 transition-colors text-sm font-medium"
+                          className="px-4 py-2 bg-footy-green text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
                         >
                           Edit Release
                         </button>

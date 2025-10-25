@@ -41,36 +41,36 @@ export default function ReleasesIndex() {
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="flex flex-col min-h-screen bg-gray-50">
         <Header />
         <div className="flex-grow flex items-center justify-center">
-          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <div className="flex flex-col min-h-screen bg-gray-50 transition-colors duration-300">
       <Header />
 
       <div className="flex-grow max-w-7xl mx-auto w-full px-4 py-12">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-footy-green dark:text-footy-orange mb-2">
+          <h1 className="text-4xl font-bold text-footy-green mb-2">
             All Releases
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600">
             Browse our complete collection of soccer card releases
           </p>
         </div>
 
         {releases.length === 0 ? (
           <div className="text-center py-20">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-12 max-w-2xl mx-auto transition-colors duration-300">
-              <h2 className="text-3xl font-bold text-footy-green dark:text-footy-orange mb-4">
+            <div className="bg-white rounded-lg shadow-lg p-12 max-w-2xl mx-auto transition-colors duration-300">
+              <h2 className="text-3xl font-bold text-footy-green mb-4">
                 No Releases Yet
               </h2>
-              <p className="text-gray-600 dark:text-gray-300">
+              <p className="text-gray-600">
                 Check back soon for the latest soccer card releases!
               </p>
             </div>
@@ -83,10 +83,10 @@ export default function ReleasesIndex() {
                 <Link
                   key={release.id}
                   href={`/releases/${release.slug}`}
-                  className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col"
+                  className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col"
                 >
                   {release.images[0] && (
-                    <div className="relative w-full bg-gray-100 dark:bg-gray-700">
+                    <div className="relative w-full bg-gray-100">
                       <Image
                         src={release.images[0].url}
                         alt={title}
@@ -120,19 +120,19 @@ export default function ReleasesIndex() {
                       )}
                     </div>
 
-                    <h2 className={`font-bold text-footy-green dark:text-footy-orange mb-3 ${
+                    <h2 className={`font-bold text-footy-green mb-3 ${
                       release.images[0] ? "text-xl line-clamp-2" : "text-2xl line-clamp-4"
                     }`}>
                       {title}
                     </h2>
 
                     {release.description && (
-                      <p className={`text-gray-600 dark:text-gray-300 mb-4 flex-grow ${
+                      <p className={`text-gray-600 mb-4 flex-grow ${
                         release.images[0] ? "line-clamp-3" : "line-clamp-[12]"
                       }`}>{release.description}</p>
                     )}
 
-                    <div className="mt-auto text-footy-orange dark:text-footy-orange font-semibold">
+                    <div className="mt-auto text-footy-orange font-semibold">
                       View release →
                     </div>
                   </div>
@@ -143,7 +143,7 @@ export default function ReleasesIndex() {
         )}
       </div>
 
-      <footer className="bg-footy-green dark:bg-gray-950 text-white transition-colors duration-300">
+      <footer className="bg-footy-green text-white transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="text-center">
             <p className="text-sm">

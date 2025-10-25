@@ -109,10 +109,10 @@ export default function CreatePostPage() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-50">
         <Header />
         <div className="flex items-center justify-center h-screen">
-          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
@@ -123,7 +123,7 @@ export default function CreatePostPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50">
       <Header />
 
       <div className="max-w-4xl mx-auto px-4 py-8">
@@ -131,14 +131,14 @@ export default function CreatePostPage() {
         <div className="mb-8">
           <button
             onClick={() => router.push("/admin/posts")}
-            className="text-footy-green dark:text-footy-orange hover:underline mb-4 flex items-center gap-2"
+            className="text-footy-green hover:underline mb-4 flex items-center gap-2"
           >
             ← Back to Posts
           </button>
-          <h1 className="text-3xl font-bold text-footy-green dark:text-footy-orange mb-2">
+          <h1 className="text-3xl font-bold text-footy-green mb-2">
             Create Post
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600">
             Create a new blog post or article
           </p>
         </div>
@@ -148,8 +148,8 @@ export default function CreatePostPage() {
           <div
             className={`mb-6 p-4 rounded-lg ${
               message.type === "success"
-                ? "bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200"
-                : "bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200"
+                ? "bg-green-50 text-green-800"
+                : "bg-red-50 text-red-800"
             }`}
           >
             {message.text}
@@ -157,16 +157,16 @@ export default function CreatePostPage() {
         )}
 
         {/* Form */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 space-y-6">
+        <div className="bg-white rounded-xl shadow-lg p-6 space-y-6">
           {/* Post Type */}
           <div>
-            <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
               Post Type
             </label>
             <select
               value={type}
               onChange={(e) => setType(e.target.value as "NEWS" | "REVIEW" | "GUIDE" | "ANALYSIS" | "GENERAL")}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white text-gray-900"
             >
               <option value="NEWS">News</option>
               <option value="REVIEW">Review</option>
@@ -178,14 +178,14 @@ export default function CreatePostPage() {
 
           {/* Title */}
           <div>
-            <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
               Title <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white text-gray-900"
               placeholder="Enter post title"
               required
             />
@@ -193,39 +193,39 @@ export default function CreatePostPage() {
 
           {/* Excerpt */}
           <div>
-            <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
               Excerpt (Optional)
             </label>
             <textarea
               value={excerpt}
               onChange={(e) => setExcerpt(e.target.value)}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white text-gray-900"
               placeholder="Brief summary of the post"
             />
           </div>
 
           {/* Content */}
           <div>
-            <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
               Content <span className="text-red-500">*</span>
             </label>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={15}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono text-sm"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white text-gray-900 font-mono text-sm"
               placeholder="Post content (HTML supported)"
               required
             />
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs text-gray-500 mt-1">
               You can use HTML tags like &lt;p&gt;, &lt;h3&gt;, &lt;strong&gt;, &lt;em&gt;, &lt;ul&gt;, &lt;li&gt;
             </p>
           </div>
 
           {/* Images */}
           <div>
-            <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
               Images (Optional)
             </label>
             <input
@@ -233,24 +233,24 @@ export default function CreatePostPage() {
               multiple
               accept=".jpg,.jpeg,.png,.webp,.gif"
               onChange={handleImageFileChange}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white text-gray-900"
             />
             {imageFiles.length > 0 && (
               <div className="mt-3 space-y-2">
-                <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                <p className="text-sm font-semibold text-gray-700">
                   Selected images:
                 </p>
                 {imageFiles.map((file, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-2 rounded"
+                    className="flex items-center justify-between bg-gray-50 p-2 rounded"
                   >
                     <div className="flex items-center gap-2">
-                      <svg className="w-4 h-4 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
-                      <span className="text-sm text-gray-700 dark:text-gray-300">{file.name}</span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                      <span className="text-sm text-gray-700">{file.name}</span>
+                      <span className="text-xs text-gray-500">
                         ({(file.size / 1024).toFixed(1)} KB)
                       </span>
                     </div>
@@ -277,7 +277,7 @@ export default function CreatePostPage() {
               onChange={(e) => setPublished(e.target.checked)}
               className="w-4 h-4 text-footy-orange focus:ring-footy-orange border-gray-300 rounded"
             />
-            <label htmlFor="published" className="text-sm font-semibold text-gray-900 dark:text-white">
+            <label htmlFor="published" className="text-sm font-semibold text-gray-900">
               Publish immediately
             </label>
           </div>

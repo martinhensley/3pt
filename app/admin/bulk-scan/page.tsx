@@ -285,28 +285,28 @@ export default function BulkScanPage() {
   }, [selectedSetId, selectedParallelId, scannedCards, router]);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4 max-w-6xl">
-        <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white">
+        <h1 className="text-3xl font-bold mb-8 text-gray-900">
           Bulk Card Scanning
         </h1>
 
         {/* Context Selection */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4 text-gray-900">
             1. Select Context
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Release */}
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium mb-2 text-gray-700">
                 Release
               </label>
               <select
                 value={selectedReleaseId}
                 onChange={(e) => handleReleaseChange(e.target.value)}
-                className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="w-full p-2 border rounded"
               >
                 <option value="">Select Release</option>
                 {releases.map((release) => (
@@ -319,14 +319,14 @@ export default function BulkScanPage() {
 
             {/* Set */}
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium mb-2 text-gray-700">
                 Set
               </label>
               <select
                 value={selectedSetId}
                 onChange={(e) => handleSetChange(e.target.value)}
                 disabled={!selectedReleaseId}
-                className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:opacity-50"
+                className="w-full p-2 border rounded disabled:opacity-50"
               >
                 <option value="">Select Set</option>
                 {sets.map((set) => (
@@ -339,14 +339,14 @@ export default function BulkScanPage() {
 
             {/* Parallel */}
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium mb-2 text-gray-700">
                 Parallel (Optional)
               </label>
               <select
                 value={selectedParallelId}
                 onChange={(e) => setSelectedParallelId(e.target.value)}
                 disabled={!selectedSetId}
-                className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:opacity-50"
+                className="w-full p-2 border rounded disabled:opacity-50"
               >
                 <option value="">Base / No Parallel</option>
                 {parallels.map((parallel) => (
@@ -360,15 +360,15 @@ export default function BulkScanPage() {
         </div>
 
         {/* Image Upload */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4 text-gray-900">
             2. Upload Images
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Front Images */}
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium mb-2 text-gray-700">
                 Front Images (Required)
               </label>
               <input
@@ -376,7 +376,7 @@ export default function BulkScanPage() {
                 multiple
                 accept="image/*"
                 onChange={handleFrontImagesChange}
-                className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="w-full p-2 border rounded"
               />
               <p className="text-sm text-gray-500 mt-1">
                 {frontImages.length} file(s) selected
@@ -385,7 +385,7 @@ export default function BulkScanPage() {
 
             {/* Back Images */}
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium mb-2 text-gray-700">
                 Back Images (Optional)
               </label>
               <input
@@ -393,7 +393,7 @@ export default function BulkScanPage() {
                 multiple
                 accept="image/*"
                 onChange={handleBackImagesChange}
-                className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="w-full p-2 border rounded"
               />
               <p className="text-sm text-gray-500 mt-1">
                 {backImages.length} file(s) selected
@@ -413,41 +413,41 @@ export default function BulkScanPage() {
 
         {/* Scanned Cards */}
         {scannedCards.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold mb-4 text-gray-900">
               3. Review & Save
             </h2>
 
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b dark:border-gray-700">
-                    <th className="text-left p-2 text-gray-900 dark:text-white">Card #</th>
-                    <th className="text-left p-2 text-gray-900 dark:text-white">Player</th>
-                    <th className="text-left p-2 text-gray-900 dark:text-white">Team</th>
-                    <th className="text-left p-2 text-gray-900 dark:text-white">Auto</th>
-                    <th className="text-left p-2 text-gray-900 dark:text-white">Mem</th>
-                    <th className="text-left p-2 text-gray-900 dark:text-white">Serial</th>
-                    <th className="text-left p-2 text-gray-900 dark:text-white">Conf</th>
-                    <th className="text-left p-2 text-gray-900 dark:text-white">Status</th>
+                  <tr className="border-b">
+                    <th className="text-left p-2 text-gray-900">Card #</th>
+                    <th className="text-left p-2 text-gray-900">Player</th>
+                    <th className="text-left p-2 text-gray-900">Team</th>
+                    <th className="text-left p-2 text-gray-900">Auto</th>
+                    <th className="text-left p-2 text-gray-900">Mem</th>
+                    <th className="text-left p-2 text-gray-900">Serial</th>
+                    <th className="text-left p-2 text-gray-900">Conf</th>
+                    <th className="text-left p-2 text-gray-900">Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {scannedCards.map((card, idx) => (
-                    <tr key={idx} className="border-b dark:border-gray-700">
-                      <td className="p-2 text-gray-900 dark:text-white">{card.cardNumber}</td>
-                      <td className="p-2 text-gray-900 dark:text-white">{card.playerName}</td>
-                      <td className="p-2 text-gray-900 dark:text-white">{card.team || '-'}</td>
-                      <td className="p-2 text-gray-900 dark:text-white">{card.hasAutograph ? '✓' : '-'}</td>
-                      <td className="p-2 text-gray-900 dark:text-white">{card.hasMemorabilia ? '✓' : '-'}</td>
-                      <td className="p-2 text-gray-900 dark:text-white">{card.serialNumber || '-'}</td>
-                      <td className="p-2 text-gray-900 dark:text-white">{card.confidence}%</td>
+                    <tr key={idx} className="border-b">
+                      <td className="p-2 text-gray-900">{card.cardNumber}</td>
+                      <td className="p-2 text-gray-900">{card.playerName}</td>
+                      <td className="p-2 text-gray-900">{card.team || '-'}</td>
+                      <td className="p-2 text-gray-900">{card.hasAutograph ? '✓' : '-'}</td>
+                      <td className="p-2 text-gray-900">{card.hasMemorabilia ? '✓' : '-'}</td>
+                      <td className="p-2 text-gray-900">{card.serialNumber || '-'}</td>
+                      <td className="p-2 text-gray-900">{card.confidence}%</td>
                       <td className="p-2">
                         {card.status === 'scanned' && (
-                          <span className="text-green-600 dark:text-green-400">✓</span>
+                          <span className="text-green-600">✓</span>
                         )}
                         {card.status === 'error' && (
-                          <span className="text-red-600 dark:text-red-400" title={card.error}>
+                          <span className="text-red-600" title={card.error}>
                             Error
                           </span>
                         )}

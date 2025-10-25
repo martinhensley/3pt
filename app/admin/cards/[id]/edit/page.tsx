@@ -171,10 +171,10 @@ export default function EditCardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-50">
         <Header />
         <div className="flex items-center justify-center min-h-[60vh]">
-          <p className="text-gray-600 dark:text-gray-300">Loading card...</p>
+          <p className="text-gray-600">Loading card...</p>
         </div>
       </div>
     );
@@ -182,16 +182,16 @@ export default function EditCardPage() {
 
   if (!card) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-50">
         <Header />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">
               Card Not Found
             </h1>
             <Link
               href="/admin/cards"
-              className="text-footy-green dark:text-footy-orange hover:underline"
+              className="text-footy-green hover:underline"
             >
               ← Back to Cards
             </Link>
@@ -202,24 +202,24 @@ export default function EditCardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50">
       <Header />
 
       <div className="container mx-auto px-4 py-8 max-w-5xl">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-footy-green dark:text-footy-orange mb-2">
+            <h1 className="text-3xl font-bold text-footy-green mb-2">
               Edit Card
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-600">
               {card.set.release.year} {card.set.release.manufacturer.name}{' '}
               {card.set.release.name} - {card.set.name}
             </p>
           </div>
           <Link
             href="/admin/cards"
-            className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all"
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all"
           >
             ← Back to Cards
           </Link>
@@ -227,18 +227,18 @@ export default function EditCardPage() {
 
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Card Images */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
               Card Images
             </h2>
 
             {/* Front Image */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Front Image
               </label>
               {frontImagePreview && (
-                <div className="mb-3 relative w-full aspect-[2.5/3.5] bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
+                <div className="mb-3 relative w-full aspect-[2.5/3.5] bg-gray-200 rounded-lg overflow-hidden">
                   <Image
                     src={frontImagePreview}
                     alt="Front preview"
@@ -252,17 +252,17 @@ export default function EditCardPage() {
                 type="file"
                 accept="image/*"
                 onChange={handleFrontImageChange}
-                className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="w-full px-3 py-2 border rounded-lg"
               />
             </div>
 
             {/* Back Image */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Back Image
               </label>
               {backImagePreview && (
-                <div className="mb-3 relative w-full aspect-[2.5/3.5] bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
+                <div className="mb-3 relative w-full aspect-[2.5/3.5] bg-gray-200 rounded-lg overflow-hidden">
                   <Image
                     src={backImagePreview}
                     alt="Back preview"
@@ -276,16 +276,16 @@ export default function EditCardPage() {
                 type="file"
                 accept="image/*"
                 onChange={handleBackImageChange}
-                className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="w-full px-3 py-2 border rounded-lg"
               />
             </div>
           </div>
 
           {/* Card Details (Read-only) */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
               Card Details
-              <span className="text-sm font-normal text-gray-500 dark:text-gray-400 ml-2">
+              <span className="text-sm font-normal text-gray-500 ml-2">
                 (inherited from checklist)
               </span>
             </h2>
@@ -293,40 +293,40 @@ export default function EditCardPage() {
             <div className="space-y-4">
               {/* Player Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Player Name
                 </label>
-                <div className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300">
+                <div className="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-600">
                   {card.playerName || '—'}
                 </div>
               </div>
 
               {/* Card Number */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Card Number
                 </label>
-                <div className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300">
+                <div className="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-600">
                   {card.cardNumber || '—'}
                 </div>
               </div>
 
               {/* Team */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Team
                 </label>
-                <div className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300">
+                <div className="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-600">
                   {card.team || '—'}
                 </div>
               </div>
 
               {/* Parallel Type */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Parallel Type
                 </label>
-                <div className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300">
+                <div className="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-600">
                   {card.parallelType || 'Base'}
                 </div>
               </div>
@@ -334,19 +334,19 @@ export default function EditCardPage() {
               {/* Serial Number & Print Run */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Serial Number
                   </label>
-                  <div className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300">
+                  <div className="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-600">
                     {card.serialNumber || '—'}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Print Run
                   </label>
-                  <div className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300">
+                  <div className="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-600">
                     {card.printRun ? `/${card.printRun}` : '—'}
                   </div>
                 </div>
@@ -354,27 +354,27 @@ export default function EditCardPage() {
 
               {/* Special Features */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Special Features
                 </label>
                 <div className="flex gap-2 flex-wrap">
                   {card.hasAutograph && (
-                    <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-sm rounded-full">
+                    <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
                       Autograph
                     </span>
                   )}
                   {card.hasMemorabilia && (
-                    <span className="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-sm rounded-full">
+                    <span className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
                       Memorabilia
                     </span>
                   )}
                   {card.isNumbered && (
-                    <span className="px-3 py-1 bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 text-sm rounded-full">
+                    <span className="px-3 py-1 bg-orange-100 text-orange-800 text-sm rounded-full">
                       Numbered
                     </span>
                   )}
                   {!card.hasAutograph && !card.hasMemorabilia && !card.isNumbered && (
-                    <span className="text-gray-500 dark:text-gray-400 text-sm">None</span>
+                    <span className="text-gray-500 text-sm">None</span>
                   )}
                 </div>
               </div>
@@ -382,11 +382,11 @@ export default function EditCardPage() {
           </div>
 
           {/* footy notes - Full Width */}
-          <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="lg:col-span-2 bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
               footy notes
             </h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+            <p className="text-sm text-gray-600 mb-3">
               Internal notes about this card (not visible to public)
             </p>
             <textarea
@@ -394,7 +394,7 @@ export default function EditCardPage() {
               onChange={(e) => setFootyNotes(e.target.value)}
               rows={6}
               placeholder="Add any notes about this card..."
-              className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white resize-none"
+              className="w-full px-3 py-2 border rounded-lg resize-none"
             />
           </div>
         </div>
@@ -403,14 +403,14 @@ export default function EditCardPage() {
         <div className="mt-6 flex gap-4 justify-end">
           <Link
             href="/admin/cards"
-            className="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all"
+            className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all"
           >
             Cancel
           </Link>
           <button
             onClick={handleSave}
             disabled={saving}
-            className="px-6 py-3 bg-gradient-to-r from-footy-green to-green-700 dark:from-footy-orange dark:to-orange-700 text-white rounded-lg font-semibold hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="px-6 py-3 bg-gradient-to-r from-footy-green to-green-700 text-white rounded-lg font-semibold hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
             {saving ? 'Saving...' : 'Save Changes'}
           </button>

@@ -53,12 +53,12 @@ export default function EbayAdHorizontal({
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-gray-800 border-2 border-footy-gold rounded-lg shadow-lg p-6 my-8">
-        <p className="text-sm text-footy-dark-green dark:text-footy-gold font-bold mb-6 text-center uppercase tracking-wide">
+      <div className="bg-white border-2 border-footy-gold rounded-lg shadow-lg p-6 my-8">
+        <p className="text-sm text-footy-dark-green font-bold mb-6 text-center uppercase tracking-wide">
           {title}
         </p>
         <div className="flex items-center justify-center py-12">
-          <p className="text-sm text-gray-600 dark:text-gray-400">Loading...</p>
+          <p className="text-sm text-gray-600">Loading...</p>
         </div>
       </div>
     );
@@ -69,8 +69,8 @@ export default function EbayAdHorizontal({
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 border-2 border-footy-gold rounded-lg shadow-lg p-6 my-8">
-      <p className="text-sm text-footy-dark-green dark:text-footy-gold font-bold mb-6 text-center uppercase tracking-wide">
+    <div className="bg-white border-2 border-footy-gold rounded-lg shadow-lg p-6 my-8">
+      <p className="text-sm text-footy-dark-green font-bold mb-6 text-center uppercase tracking-wide">
         {title}
       </p>
 
@@ -81,9 +81,9 @@ export default function EbayAdHorizontal({
             href={product.itemAffiliateWebUrl}
             target="_blank"
             rel="noopener noreferrer sponsored"
-            className="block bg-gray-50 dark:bg-gray-700 rounded-lg border-2 border-gray-200 dark:border-gray-600 hover:border-footy-gold hover:shadow-md dark:hover:border-footy-gold transition-all duration-200 overflow-hidden group"
+            className="block bg-gray-50 rounded-lg border-2 border-gray-200 hover:border-footy-gold hover:shadow-md transition-all duration-200 overflow-hidden group"
           >
-            <div className="relative w-full h-40 bg-white dark:bg-gray-600">
+            <div className="relative w-full h-40 bg-white">
               {product.image ? (
                 <Image
                   src={product.image}
@@ -95,29 +95,29 @@ export default function EbayAdHorizontal({
                 />
               ) : (
                 <div className="flex items-center justify-center h-full p-2">
-                  <p className="text-xs text-gray-400 dark:text-gray-500 text-center">No Image Available</p>
+                  <p className="text-xs text-gray-400 text-center">No Image Available</p>
                 </div>
               )}
             </div>
 
-            <div className="p-3 bg-white dark:bg-gray-800">
-              <p className="text-xs text-gray-900 dark:text-gray-100 font-semibold line-clamp-2 mb-2 leading-tight min-h-[32px]">
+            <div className="p-3 bg-white">
+              <p className="text-xs text-gray-900 font-semibold line-clamp-2 mb-2 leading-tight min-h-[32px]">
                 {product.title}
               </p>
-              <p className="text-base font-bold text-footy-dark-green dark:text-footy-gold">
+              <p className="text-base font-bold text-footy-dark-green">
                 {new Intl.NumberFormat("en-US", {
                   style: "currency",
                   currency: product.currency,
                 }).format(parseFloat(product.price))}
               </p>
-              <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-1">View on eBay →</p>
+              <p className="text-[10px] text-gray-500 mt-1">View on eBay →</p>
             </div>
           </a>
         ))}
       </div>
 
-      <div className="mt-4 pt-4 border-t border-gray-300 dark:border-gray-600">
-        <p className="text-xs text-gray-500 dark:text-gray-400 text-center font-medium">
+      <div className="mt-4 pt-4 border-t border-gray-300">
+        <p className="text-xs text-gray-500 text-center font-medium">
           Sponsored Links
         </p>
       </div>

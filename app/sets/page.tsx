@@ -46,36 +46,36 @@ export default function SetsIndex() {
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="flex flex-col min-h-screen bg-gray-50">
         <Header />
         <div className="flex-grow flex items-center justify-center">
-          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <div className="flex flex-col min-h-screen bg-gray-50 transition-colors duration-300">
       <Header />
 
       <div className="flex-grow max-w-7xl mx-auto w-full px-4 py-12">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-footy-green dark:text-footy-orange mb-2">
+          <h1 className="text-4xl font-bold text-footy-green mb-2">
             All Sets
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600">
             Browse our complete collection of soccer card sets
           </p>
         </div>
 
         {sets.length === 0 ? (
           <div className="text-center py-20">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-12 max-w-2xl mx-auto transition-colors duration-300">
-              <h2 className="text-3xl font-bold text-footy-green dark:text-footy-orange mb-4">
+            <div className="bg-white rounded-lg shadow-lg p-12 max-w-2xl mx-auto transition-colors duration-300">
+              <h2 className="text-3xl font-bold text-footy-green mb-4">
                 No Sets Yet
               </h2>
-              <p className="text-gray-600 dark:text-gray-300">
+              <p className="text-gray-600">
                 Check back soon for the latest soccer card sets!
               </p>
             </div>
@@ -93,9 +93,9 @@ export default function SetsIndex() {
                 <Link
                   key={set.id}
                   href={`/sets/${set.slug}`}
-                  className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col border border-gray-200 dark:border-gray-700"
+                  className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col border border-gray-200"
                 >
-                  <div className="bg-gradient-to-r from-footy-green to-green-700 dark:from-footy-orange dark:to-orange-700 p-6 text-white">
+                  <div className="bg-gradient-to-r from-footy-green to-green-700 p-6 text-white">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full font-semibold text-xs uppercase">
                         Set
@@ -111,26 +111,26 @@ export default function SetsIndex() {
 
                   <div className="p-6 flex-grow flex flex-col">
                     <div className="grid grid-cols-2 gap-4 mb-4">
-                      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-                        <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                      <div className="bg-gray-50 rounded-lg p-3">
+                        <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">
                           Cards
                         </div>
-                        <div className="text-2xl font-black text-footy-green dark:text-footy-orange">
+                        <div className="text-2xl font-black text-footy-green">
                           {cardCount > 0 ? cardCount.toLocaleString() : '—'}
                         </div>
                       </div>
-                      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-                        <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                      <div className="bg-gray-50 rounded-lg p-3">
+                        <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">
                           Parallels
                         </div>
-                        <div className="text-2xl font-black text-footy-green dark:text-footy-orange">
+                        <div className="text-2xl font-black text-footy-green">
                           {parallelCount > 0 ? parallelCount : '—'}
                         </div>
                       </div>
                     </div>
 
-                    <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
-                      <div className="text-footy-orange dark:text-footy-orange font-semibold flex items-center gap-2">
+                    <div className="mt-auto pt-4 border-t border-gray-200">
+                      <div className="text-footy-orange font-semibold flex items-center gap-2">
                         View checklist →
                       </div>
                     </div>
@@ -142,7 +142,7 @@ export default function SetsIndex() {
         )}
       </div>
 
-      <footer className="bg-footy-green dark:bg-gray-950 text-white transition-colors duration-300">
+      <footer className="bg-footy-green text-white transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="text-center">
             <p className="text-sm">

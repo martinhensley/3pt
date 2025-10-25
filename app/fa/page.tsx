@@ -11,8 +11,8 @@ export default function FaRedirect() {
   }, [router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-      <p className="text-gray-600 dark:text-gray-300">Redirecting to admin dashboard...</p>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <p className="text-gray-600">Redirecting to admin dashboard...</p>
     </div>
   );
 }

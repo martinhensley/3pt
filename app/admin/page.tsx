@@ -80,10 +80,10 @@ export default function AdminDashboard() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-50">
         <Header />
         <div className="flex items-center justify-center h-screen">
-          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
@@ -94,13 +94,13 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50">
       <Header />
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-footy-green dark:text-footy-orange">
+          <h1 className="text-3xl font-bold text-footy-green">
             Footy&apos;s Dashboard
           </h1>
         </div>
@@ -108,7 +108,7 @@ export default function AdminDashboard() {
         {/* Statistics Grid */}
         {stats && (
           <>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">
               Overview Statistics
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -135,7 +135,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Data Quality Alerts */}
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">
               Data Quality Alerts
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -252,12 +252,12 @@ export default function AdminDashboard() {
             {stats.recentActivity && stats.recentActivity.length > 0 && (
               <>
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  <h2 className="text-xl font-bold text-gray-900">
                     Recent Activity
                   </h2>
                   <button
                     onClick={() => router.push("/admin/activity")}
-                    className="text-sm font-semibold text-footy-green dark:text-footy-orange hover:underline flex items-center gap-1"
+                    className="text-sm font-semibold text-footy-green hover:underline flex items-center gap-1"
                   >
                     View All Activity
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -265,24 +265,24 @@ export default function AdminDashboard() {
                     </svg>
                   </button>
                 </div>
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
+                <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
                   <div className="space-y-4">
                     {stats.recentActivity.map((activity, index) => (
                       <div
                         key={index}
-                        className="flex items-start gap-4 pb-4 border-b border-gray-200 dark:border-gray-700 last:border-0 last:pb-0"
+                        className="flex items-start gap-4 pb-4 border-b border-gray-200 last:border-0 last:pb-0"
                       >
-                        <div className="flex-shrink-0 w-10 h-10 bg-footy-green/10 dark:bg-footy-orange/10 rounded-full flex items-center justify-center">
+                        <div className="flex-shrink-0 w-10 h-10 bg-footy-green/10 rounded-full flex items-center justify-center">
                           {activity.type === "RELEASE" && "📦"}
                           {activity.type === "SET" && "📚"}
                           {activity.type === "CARD" && "🃏"}
                           {activity.type === "POST" && "📝"}
                         </div>
                         <div className="flex-grow">
-                          <p className="font-medium text-gray-900 dark:text-white">
+                          <p className="font-medium text-gray-900">
                             {activity.title}
                           </p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                          <p className="text-sm text-gray-600">
                             {new Date(activity.date).toLocaleDateString("en-US", {
                               month: "short",
                               day: "numeric",
@@ -292,7 +292,7 @@ export default function AdminDashboard() {
                             })}
                           </p>
                         </div>
-                        <span className="text-xs font-semibold px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded">
+                        <span className="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-700 rounded">
                           {activity.type}
                         </span>
                       </div>
@@ -306,15 +306,15 @@ export default function AdminDashboard() {
             <div className="grid md:grid-cols-3 gap-6 mb-8">
               {/* Recent Posts */}
               {stats.recentPosts && stats.recentPosts.length > 0 && (
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <div className="bg-white rounded-xl shadow-lg p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                       <span className="text-xl">📝</span>
                       Recent Posts
                     </h3>
                     <button
                       onClick={() => router.push("/admin/posts")}
-                      className="text-xs text-footy-green dark:text-footy-orange hover:underline"
+                      className="text-xs text-footy-green hover:underline"
                     >
                       View All
                     </button>
@@ -323,20 +323,20 @@ export default function AdminDashboard() {
                     {stats.recentPosts.map((post) => (
                       <div
                         key={post.id}
-                        className="pb-3 border-b border-gray-200 dark:border-gray-700 last:border-0 last:pb-0"
+                        className="pb-3 border-b border-gray-200 last:border-0 last:pb-0"
                       >
                         <button
                           onClick={() => router.push(`/admin/posts/edit/${post.id}`)}
-                          className="text-left w-full hover:text-footy-green dark:hover:text-footy-orange transition-colors"
+                          className="text-left w-full hover:text-footy-green transition-colors"
                         >
-                          <p className="font-medium text-sm text-gray-900 dark:text-white line-clamp-2">
+                          <p className="font-medium text-sm text-gray-900 line-clamp-2">
                             {post.title}
                           </p>
                           <div className="flex items-center gap-2 mt-1">
-                            <span className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded">
+                            <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">
                               {post.type}
                             </span>
-                            <p className="text-xs text-gray-500 dark:text-gray-500">
+                            <p className="text-xs text-gray-500">
                               {new Date(post.createdAt).toLocaleDateString("en-US", {
                                 month: "short",
                                 day: "numeric",
@@ -352,15 +352,15 @@ export default function AdminDashboard() {
 
               {/* Recent Releases */}
               {stats.recentReleases && stats.recentReleases.length > 0 && (
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <div className="bg-white rounded-xl shadow-lg p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                       <span className="text-xl">📦</span>
                       Recent Releases
                     </h3>
                     <button
                       onClick={() => router.push("/admin/releases")}
-                      className="text-xs text-footy-green dark:text-footy-orange hover:underline"
+                      className="text-xs text-footy-green hover:underline"
                     >
                       View All
                     </button>
@@ -369,22 +369,22 @@ export default function AdminDashboard() {
                     {stats.recentReleases.map((release) => (
                       <div
                         key={release.id}
-                        className="pb-3 border-b border-gray-200 dark:border-gray-700 last:border-0 last:pb-0"
+                        className="pb-3 border-b border-gray-200 last:border-0 last:pb-0"
                       >
                         <button
                           onClick={() => router.push(`/admin/releases/edit/${release.id}`)}
-                          className="text-left w-full hover:text-footy-green dark:hover:text-footy-orange transition-colors"
+                          className="text-left w-full hover:text-footy-green transition-colors"
                         >
-                          <p className="font-medium text-sm text-gray-900 dark:text-white line-clamp-2">
+                          <p className="font-medium text-sm text-gray-900 line-clamp-2">
                             {release.manufacturer} {release.name}
                           </p>
                           <div className="flex items-center gap-2 mt-1">
                             {release.year && (
-                              <span className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 rounded">
+                              <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-600 rounded">
                                 {release.year}
                               </span>
                             )}
-                            <p className="text-xs text-gray-500 dark:text-gray-500">
+                            <p className="text-xs text-gray-500">
                               {new Date(release.createdAt).toLocaleDateString("en-US", {
                                 month: "short",
                                 day: "numeric",
@@ -400,15 +400,15 @@ export default function AdminDashboard() {
 
               {/* Recent Cards */}
               {stats.recentCards && stats.recentCards.length > 0 && (
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <div className="bg-white rounded-xl shadow-lg p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                       <span className="text-xl">🃏</span>
                       Recent Cards
                     </h3>
                     <button
                       onClick={() => router.push("/admin/cards")}
-                      className="text-xs text-footy-green dark:text-footy-orange hover:underline"
+                      className="text-xs text-footy-green hover:underline"
                     >
                       View All
                     </button>
@@ -417,20 +417,20 @@ export default function AdminDashboard() {
                     {stats.recentCards.map((card) => (
                       <div
                         key={card.id}
-                        className="pb-3 border-b border-gray-200 dark:border-gray-700 last:border-0 last:pb-0"
+                        className="pb-3 border-b border-gray-200 last:border-0 last:pb-0"
                       >
                         <div className="text-left w-full">
-                          <p className="font-medium text-sm text-gray-900 dark:text-white line-clamp-1">
+                          <p className="font-medium text-sm text-gray-900 line-clamp-1">
                             {card.playerName}
                           </p>
-                          <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
+                          <p className="text-xs text-gray-600 line-clamp-1">
                             #{card.cardNumber} - {card.setName}
                           </p>
                           <div className="flex items-center gap-2 mt-1">
-                            <span className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded line-clamp-1">
+                            <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded line-clamp-1">
                               {card.manufacturer}
                             </span>
-                            <p className="text-xs text-gray-500 dark:text-gray-500">
+                            <p className="text-xs text-gray-500">
                               {new Date(card.createdAt).toLocaleDateString("en-US", {
                                 month: "short",
                                 day: "numeric",
@@ -461,7 +461,7 @@ function StatCard({
   icon: string;
 }) {
   return (
-    <div className="bg-gradient-to-br from-footy-green to-green-700 dark:from-footy-green dark:to-green-800 rounded-xl p-6 shadow-lg text-white">
+    <div className="bg-gradient-to-br from-footy-green to-green-700 rounded-xl p-6 shadow-lg text-white">
       <div className="flex items-center justify-between mb-2">
         <span className="text-3xl opacity-90">{icon}</span>
         <span className="text-3xl font-bold">
@@ -491,9 +491,9 @@ function AlertCard({
   const router = useRouter();
 
   const severityClasses = {
-    warning: "from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border-yellow-200 dark:border-yellow-800",
-    info: "from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800",
-    good: "from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800",
+    warning: "from-yellow-50 to-amber-50 border-yellow-200",
+    info: "from-blue-50 to-indigo-50 border-blue-200",
+    good: "from-green-50 to-emerald-50 border-green-200",
   };
 
   const severityIcon = {
@@ -509,14 +509,14 @@ function AlertCard({
     >
       <div className="flex items-start justify-between mb-2">
         <span className="text-2xl">{severityIcon[severity]}</span>
-        <span className="text-2xl font-bold text-gray-900 dark:text-white">
+        <span className="text-2xl font-bold text-gray-900">
           {value}
         </span>
       </div>
-      <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-1">
+      <h3 className="text-sm font-bold text-gray-900 mb-1">
         {title}
       </h3>
-      <p className="text-xs text-gray-600 dark:text-gray-400">{description}</p>
+      <p className="text-xs text-gray-600">{description}</p>
     </div>
   );
 }

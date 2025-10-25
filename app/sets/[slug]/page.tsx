@@ -101,10 +101,10 @@ export default function SetPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="flex flex-col min-h-screen bg-gray-50">
         <Header />
         <div className="flex-grow flex items-center justify-center">
-          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
@@ -112,13 +112,13 @@ export default function SetPage() {
 
   if (!set) {
     return (
-      <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="flex flex-col min-h-screen bg-gray-50">
         <Header />
         <div className="flex-grow flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-footy-green dark:text-footy-orange mb-4">Set Not Found</h1>
-            <p className="text-gray-600 dark:text-gray-300 mb-8">The set you&apos;re looking for doesn&apos;t exist.</p>
-            <Link href="/" className="text-footy-orange dark:text-footy-orange hover:underline font-semibold">
+            <h1 className="text-2xl font-bold text-footy-green mb-4">Set Not Found</h1>
+            <p className="text-gray-600 mb-8">The set you&apos;re looking for doesn&apos;t exist.</p>
+            <Link href="/" className="text-footy-orange hover:underline font-semibold">
               ← Back to Home
             </Link>
           </div>
@@ -138,7 +138,7 @@ export default function SetPage() {
   }) : [];
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <div className="flex flex-col min-h-screen bg-gray-50 transition-colors duration-300">
       <Header />
 
       <div className="flex-grow flex gap-4 max-w-[1400px] mx-auto w-full px-4 py-12">
@@ -155,7 +155,7 @@ export default function SetPage() {
           <div className="mb-6">
             <button
               onClick={() => router.back()}
-              className="text-footy-green dark:text-footy-orange hover:underline flex items-center gap-1"
+              className="text-footy-green hover:underline flex items-center gap-1"
             >
               ← Back
             </button>
@@ -232,9 +232,9 @@ export default function SetPage() {
         )}
 
         {/* Card Checklist */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-8 transition-colors duration-300">
-          <h3 className="text-2xl font-bold text-footy-green dark:text-footy-orange mb-6 flex items-center gap-2">
-            <svg className="w-6 h-6 text-footy-green dark:text-footy-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-white rounded-lg shadow-lg p-8 mb-8 transition-colors duration-300">
+          <h3 className="text-2xl font-bold text-footy-green mb-6 flex items-center gap-2">
+            <svg className="w-6 h-6 text-footy-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
             </svg>
             Set Checklist ({setCardCount > 0 ? setCardCount.toLocaleString() : '—'} cards)
@@ -281,36 +281,36 @@ export default function SetPage() {
                   <Link
                     key={card.id}
                     href={`/cards/${cardSlug}`}
-                    className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-footy-orange hover:shadow-lg transition-all"
+                    className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-footy-orange hover:shadow-lg transition-all"
                   >
                   {card.cardNumber && (
-                    <div className="flex-shrink-0 w-16 h-16 bg-footy-green dark:bg-footy-orange text-white rounded-lg flex items-center justify-center font-bold text-lg">
+                    <div className="flex-shrink-0 w-16 h-16 bg-footy-green text-white rounded-lg flex items-center justify-center font-bold text-lg">
                       {card.cardNumber}
                     </div>
                   )}
                   <div className="flex-grow">
-                    <div className="font-bold text-lg text-footy-green dark:text-footy-orange">
+                    <div className="font-bold text-lg text-footy-green">
                       {card.playerName || 'Unknown Player'}
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                    <div className="text-sm text-gray-600">
                       {card.team && <span>{card.team}</span>}
-                      {card.variant && <span className="ml-2 text-purple-600 dark:text-purple-400">• {card.variant}</span>}
+                      {card.variant && <span className="ml-2 text-purple-600">• {card.variant}</span>}
                     </div>
                   </div>
                   {(card.hasAutograph || card.hasMemorabilia || card.isNumbered) && (
                     <div className="flex gap-2 flex-wrap">
                       {card.hasAutograph && (
-                        <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-full font-semibold">
+                        <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-semibold">
                           AUTO
                         </span>
                       )}
                       {card.hasMemorabilia && (
-                        <span className="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded-full font-semibold">
+                        <span className="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-semibold">
                           MEM
                         </span>
                       )}
                       {card.isNumbered && card.printRun && (
-                        <span className="px-3 py-1 bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 text-xs rounded-full font-semibold">
+                        <span className="px-3 py-1 bg-orange-100 text-orange-800 text-xs rounded-full font-semibold">
                           /{card.printRun}
                         </span>
                       )}
@@ -322,11 +322,11 @@ export default function SetPage() {
             </div>
           ) : (
             <div className="text-center py-8">
-              <p className="text-gray-500 dark:text-gray-400 text-lg italic">
+              <p className="text-gray-500 text-lg italic">
                 Detailed checklist not yet available for this set
               </p>
               {set.totalCards && (
-                <p className="text-gray-600 dark:text-gray-300 mt-2">
+                <p className="text-gray-600 mt-2">
                   This set contains {set.totalCards} cards
                 </p>
               )}
@@ -350,7 +350,7 @@ export default function SetPage() {
       </aside>
     </div>
 
-    <footer className="bg-footy-green dark:bg-gray-950 text-white transition-colors duration-300">
+    <footer className="bg-footy-green text-white transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="text-center">
           <p className="text-sm">

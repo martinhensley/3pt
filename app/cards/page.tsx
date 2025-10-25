@@ -127,17 +127,17 @@ export default function CardsIndexPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-900">
+      <div className="min-h-screen bg-white">
         <Header />
         <div className="flex items-center justify-center min-h-[60vh]">
-          <p className="text-gray-600 dark:text-gray-300">Loading cards...</p>
+          <p className="text-gray-600">Loading cards...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
+    <div className="min-h-screen bg-white transition-colors duration-300">
       <Header />
 
       <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 py-8">
@@ -151,7 +151,7 @@ export default function CardsIndexPage() {
 
         <main className="flex-grow max-w-5xl">
           {/* Header */}
-          <div className="bg-gradient-to-r from-footy-green to-green-700 dark:from-footy-orange dark:to-orange-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
+          <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
             <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
               All Cards
             </h1>
@@ -161,10 +161,10 @@ export default function CardsIndexPage() {
           </div>
 
           {/* Filters */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8 border border-gray-200 dark:border-gray-700">
+          <div className="bg-white rounded-xl shadow-lg p-6 mb-8 border border-gray-200">
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Search Cards
                 </label>
                 <input
@@ -172,17 +172,17 @@ export default function CardsIndexPage() {
                   placeholder="Player name, team, or card number..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green dark:focus:ring-footy-orange bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Filter by Release
                 </label>
                 <select
                   value={filterRelease}
                   onChange={(e) => setFilterRelease(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green dark:focus:ring-footy-orange bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900"
                 >
                   <option value="">All Releases</option>
                   {releases.map((release) => (
@@ -196,10 +196,10 @@ export default function CardsIndexPage() {
           </div>
 
           {/* Cards Grid */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8 border border-gray-200 dark:border-gray-700">
+          <div className="bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-200">
             {filteredCards.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-gray-500 dark:text-gray-400 text-lg">
+                <p className="text-gray-500 text-lg">
                   No cards found matching your filters.
                 </p>
               </div>
@@ -209,11 +209,11 @@ export default function CardsIndexPage() {
                   <Link
                     key={card.id}
                     href={`/cards/${getCardSlug(card)}`}
-                    className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-footy-orange hover:shadow-lg transition-all cursor-pointer"
+                    className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200 hover:border-footy-orange hover:shadow-lg transition-all cursor-pointer"
                   >
                     {/* Card Image Preview */}
                     {card.imageFront ? (
-                      <div className="flex-shrink-0 w-24 h-32 bg-gray-200 dark:bg-gray-600 rounded-lg overflow-hidden relative">
+                      <div className="flex-shrink-0 w-24 h-32 bg-gray-200 rounded-lg overflow-hidden relative">
                         <Image
                           src={card.imageFront}
                           alt={`${card.playerName} card`}
@@ -223,23 +223,23 @@ export default function CardsIndexPage() {
                         />
                       </div>
                     ) : (
-                      <div className="flex-shrink-0 w-16 h-16 bg-footy-green dark:bg-footy-orange text-white rounded-lg flex items-center justify-center font-black text-lg">
+                      <div className="flex-shrink-0 w-16 h-16 bg-footy-green text-white rounded-lg flex items-center justify-center font-black text-lg">
                         {card.cardNumber || '?'}
                       </div>
                     )}
 
                     <div className="flex-grow">
-                      <div className="font-bold text-lg text-gray-900 dark:text-white">
+                      <div className="font-bold text-lg text-gray-900">
                         {card.playerName || 'Unknown Player'}
                       </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">
+                      <div className="text-sm text-gray-600">
                         {card.set.release.year} {card.set.release.name}
                         {card.set.name && ` - ${card.set.name}`}
                       </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">
+                      <div className="text-sm text-gray-600">
                         {card.cardNumber && <span>#{card.cardNumber}</span>}
                         {card.team && <span className="ml-2">• {card.team}</span>}
-                        {card.variant && <span className="ml-2 text-purple-600 dark:text-purple-400">• {card.variant}</span>}
+                        {card.variant && <span className="ml-2 text-purple-600">• {card.variant}</span>}
                         {card.parallelType && <span className="ml-2 text-footy-orange">• {card.parallelType}</span>}
                       </div>
                     </div>
@@ -247,17 +247,17 @@ export default function CardsIndexPage() {
                     {(card.hasAutograph || card.hasMemorabilia || card.isNumbered) && (
                       <div className="flex gap-2 flex-wrap">
                         {card.hasAutograph && (
-                          <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-full font-semibold">
+                          <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-semibold">
                             AUTO
                           </span>
                         )}
                         {card.hasMemorabilia && (
-                          <span className="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded-full font-semibold">
+                          <span className="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-semibold">
                             MEM
                           </span>
                         )}
                         {card.isNumbered && card.printRun && (
-                          <span className="px-3 py-1 bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 text-xs rounded-full font-semibold">
+                          <span className="px-3 py-1 bg-orange-100 text-orange-800 text-xs rounded-full font-semibold">
                             /{card.printRun}
                           </span>
                         )}
@@ -285,7 +285,7 @@ export default function CardsIndexPage() {
         </aside>
       </div>
 
-      <footer className="bg-footy-green dark:bg-gray-950 text-white transition-colors duration-300 mt-12">
+      <footer className="bg-footy-green text-white transition-colors duration-300 mt-12">
         <div className="max-w-4xl mx-auto px-4 py-8 text-center">
           <p className="text-sm">
             <span className="text-white">footy</span><span className="text-footy-orange">.bot</span> © 2024-{new Date().getFullYear()}
