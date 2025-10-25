@@ -107,7 +107,7 @@ export default function PostPage() {
       />
       <Header showBackButton />
 
-      <div className="flex-grow flex gap-4 max-w-[1400px] mx-auto w-full px-4 py-12">
+      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
         <aside className="hidden lg:block w-72 flex-shrink-0">
           <EbayAd
             query={adKeywords.primaryQuery}
@@ -198,8 +198,8 @@ export default function PostPage() {
         </aside>
       </div>
 
-      <footer className="bg-footy-green text-white">
-        <div className="max-w-4xl mx-auto px-4 py-8 text-center">
+      <footer className="bg-footy-green text-white mt-12">
+        <div className="max-w-7xl mx-auto px-4 py-12 text-center">
           <p className="text-sm">
             <span className="text-white">footy</span><span className="text-footy-orange">.bot</span> © 2024-{new Date().getFullYear()}
           </p>
