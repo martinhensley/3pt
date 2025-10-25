@@ -97,7 +97,8 @@ export async function GET(request: NextRequest) {
           .replace(/\s+/g, '-')
           .replace(/[^a-z0-9-]/g, '')
           .replace(/-+/g, '-')
-          .replace(/^-|-$/g, '');
+          .replace(/^-|-$/g, '')
+          .replace(/1-of-1/g, '1of1'); // Convert "1-of-1" to "1of1"
 
         return generatedSlug === slug;
       });
