@@ -94,6 +94,16 @@ export async function addSetToRelease(
 
 /**
  * Add cards to a set
+ *
+ * IMPORTANT: This function automatically creates cards for ALL parallels defined in the set.
+ * When a set has parallels (e.g., ["Gold", "Silver", "Bronze"]), this function will:
+ * 1. Create base cards (parallelType = "Base")
+ * 2. Create parallel cards for each parallel type defined in set.parallels
+ *
+ * Example: If checklist has 200 cards and set has 14 parallels:
+ * - Creates 200 base cards (parallelType = "Base")
+ * - Creates 200 × 14 = 2,800 parallel cards
+ * - Total: 3,000 cards
  */
 export async function addCardsToSet(
   setId: string,
@@ -103,14 +113,53 @@ export async function addCardsToSet(
     cardNumber?: string;
     variant?: string;
   }>
-): Promise<{ count: number }> {
-  return await prisma.card.createMany({
+): Promise<{ count: number; breakdown: { base: number; parallels: number } }> {
+  // Get the set to check if it has parallels defined
+  const set = await prisma.set.findUnique({
+    where: { id: setId },
+    select: { parallels: true },
+  });
+
+  const parallels = set?.parallels?.filter((p): p is string => p !== null) || [];
+
+  // Create base cards
+  const baseResult = await prisma.card.createMany({
     data: cards.map((card) => ({
       ...card,
       setId,
+      parallelType: "Base", // Explicitly set as "Base" instead of null
     })),
-    skipDuplicates: true, // Skip if duplicate card numbers exist
+    skipDuplicates: true,
   });
+
+  let parallelCount = 0;
+
+  // Create parallel cards if set has parallels defined
+  if (parallels.length > 0) {
+    for (const parallel of parallels) {
+      const parallelResult = await prisma.card.createMany({
+        data: cards.map((card) => ({
+          ...card,
+          setId,
+          parallelType: parallel,
+        })),
+        skipDuplicates: true,
+      });
+      parallelCount += parallelResult.count;
+    }
+  }
+
+  const totalCount = baseResult.count + parallelCount;
+
+  console.log(`Created ${totalCount} total cards: ${baseResult.count} base + ${parallelCount} parallel cards`);
+
+  return {
+    count: totalCount,
+    breakdown: {
+      base: baseResult.count,
+      parallels: parallelCount,
+    }
+  };
 }
 
 /**
