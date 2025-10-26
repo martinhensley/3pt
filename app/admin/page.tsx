@@ -138,27 +138,6 @@ export default function AdminDashboard() {
                 icon="📝"
               />
             </div>
-
-            {/* Data Quality Alerts */}
-            <h2 className="text-xl font-bold text-gray-900 mb-4">
-              Data Quality Alerts
-            </h2>
-            <div className="grid md:grid-cols-2 gap-6 mb-8">
-              <AlertCard
-                title="Sets and Parallel Sets Without Card Images"
-                value={stats.parallelSetsWithoutImages}
-                description="Sets that don't have any card images"
-                link="/admin/sets?filter=no-cards"
-                severity={stats.parallelSetsWithoutImages > 0 ? "warning" : "good"}
-              />
-              <AlertCard
-                title="Releases Without Posts"
-                value={stats.releasesWithoutPosts}
-                description="Releases not linked to blog posts"
-                link="/admin/releases?filter=no-posts"
-                severity={stats.releasesWithoutPosts > 0 ? "info" : "good"}
-              />
-            </div>
           </>
         )}
 
