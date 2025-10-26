@@ -175,7 +175,7 @@ export default function CardDetailPage() {
                   .replace(/^-|-$/g, "")}`,
               },
               ...(card.parallelType && card.parallelType.toLowerCase() !== 'base' ? [{
-                label: card.parallelType,
+                label: card.parallelType.replace(/\s*–\s*/g, ' '),
                 href: `/sets/${[
                   card.set.release.year || "",
                   card.set.release.name,
@@ -201,7 +201,7 @@ export default function CardDetailPage() {
                   .replace(/^-|-$/g, "")}`,
               }] : []),
               {
-                label: `${card.parallelType && card.parallelType.toLowerCase() !== 'base' ? `${card.parallelType} ` : ""}${card.playerName || "Unknown Player"} ${card.cardNumber ? `#${card.cardNumber}` : ""}`.trim(),
+                label: `${card.parallelType && card.parallelType.toLowerCase() !== 'base' ? `${card.parallelType.replace(/\s*–\s*/g, ' ')} ` : ""}${card.playerName || "Unknown Player"} ${card.cardNumber ? `#${card.cardNumber}` : ""}`.trim(),
                 href: `/cards/${slug}`,
               },
             ]}
@@ -252,7 +252,7 @@ export default function CardDetailPage() {
                   )}
                   {card.parallelType && (
                     <span className="px-4 py-2 bg-pink-100 text-pink-800 rounded-full font-semibold">
-                      {card.parallelType}
+                      {card.parallelType.replace(/\s*–\s*/g, ' ')}
                     </span>
                   )}
                   {card.rarity && (
@@ -313,7 +313,7 @@ export default function CardDetailPage() {
               {card.parallelType && (
                 <div>
                   <div className="text-sm text-gray-600 mb-1">Parallel</div>
-                  <div className="text-lg font-bold text-gray-900">{card.parallelType}</div>
+                  <div className="text-lg font-bold text-gray-900">{card.parallelType.replace(/\s*–\s*/g, ' ')}</div>
                 </div>
               )}
               {card.serialNumber && (
