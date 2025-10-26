@@ -155,33 +155,50 @@ export default function CardDetailPage() {
                   .replace(/\bbase\s+set\b/gi, "Base")
                   .replace(/\bsets?\b/gi, "")
                   .trim(),
-                href: `/sets/${card.set.release.year || ""}-${card.set.release.name}-${card.set.name
-                  .replace(/\boptic\s+base\s+set\b/gi, "Optic")
-                  .replace(/\boptic\s+base\b/gi, "Optic")
-                  .replace(/\bbase\s+optic\b/gi, "Optic")
-                  .replace(/\bbase\s+set\b/gi, "Base")
-                  .replace(/\bsets?\b/gi, "")
-                  .trim()}`
+                href: `/sets/${[
+                  card.set.release.year || "",
+                  card.set.release.name,
+                  card.set.name
+                    .replace(/\boptic\s+base\s+set\b/gi, "Optic")
+                    .replace(/\boptic\s+base\b/gi, "Optic")
+                    .replace(/\bbase\s+optic\b/gi, "Optic")
+                    .replace(/\bbase\s+set\b/gi, "Base")
+                    .replace(/\bsets?\b/gi, "")
+                    .trim()
+                ]
+                  .filter(Boolean)
+                  .join("-")
                   .toLowerCase()
                   .replace(/\s+/g, "-")
                   .replace(/[^a-z0-9-]/g, "")
                   .replace(/-+/g, "-")
-                  .replace(/^-|-$/g, ""),
+                  .replace(/^-|-$/g, "")}`,
               },
               ...(card.parallelType && card.parallelType.toLowerCase() !== 'base' ? [{
                 label: card.parallelType,
-                href: `/sets/${card.set.release.year || ""}-${card.set.release.name}-${card.set.name
-                  .replace(/\boptic\s+base\s+set\b/gi, "Optic")
-                  .replace(/\boptic\s+base\b/gi, "Optic")
-                  .replace(/\bbase\s+optic\b/gi, "Optic")
-                  .replace(/\bbase\s+set\b/gi, "Base")
-                  .replace(/\bsets?\b/gi, "")
-                  .trim()}/parallels/${card.parallelType}`
+                href: `/sets/${[
+                  card.set.release.year || "",
+                  card.set.release.name,
+                  card.set.name
+                    .replace(/\boptic\s+base\s+set\b/gi, "Optic")
+                    .replace(/\boptic\s+base\b/gi, "Optic")
+                    .replace(/\bbase\s+optic\b/gi, "Optic")
+                    .replace(/\bbase\s+set\b/gi, "Base")
+                    .replace(/\bsets?\b/gi, "")
+                    .trim()
+                ]
+                  .filter(Boolean)
+                  .join("-")
                   .toLowerCase()
                   .replace(/\s+/g, "-")
-                  .replace(/[^a-z0-9-/]/g, "")
+                  .replace(/[^a-z0-9-]/g, "")
                   .replace(/-+/g, "-")
-                  .replace(/^-|-$/g, ""),
+                  .replace(/^-|-$/g, "")}/parallels/${card.parallelType
+                  .toLowerCase()
+                  .replace(/\s+/g, "-")
+                  .replace(/[^a-z0-9-]/g, "")
+                  .replace(/-+/g, "-")
+                  .replace(/^-|-$/g, "")}`,
               }] : []),
               {
                 label: `${card.parallelType && card.parallelType.toLowerCase() !== 'base' ? `${card.parallelType} ` : ""}${card.playerName || "Unknown Player"} ${card.cardNumber ? `#${card.cardNumber}` : ""}`.trim(),
