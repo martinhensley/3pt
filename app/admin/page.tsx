@@ -111,7 +111,7 @@ export default function AdminDashboard() {
             <h2 className="text-xl font-bold text-gray-900 mb-4">
               Overview Statistics
             </h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
               <StatCard
                 title="Total Releases"
                 value={stats.totalReleases}
@@ -121,6 +121,11 @@ export default function AdminDashboard() {
                 title="Total Sets"
                 value={stats.totalSets}
                 icon="📚"
+              />
+              <StatCard
+                title="Sets Without Checklists"
+                value={stats.setsWithoutChecklists}
+                icon="📋"
               />
               <StatCard
                 title="Cards with Image/Total Cards"
@@ -138,20 +143,13 @@ export default function AdminDashboard() {
             <h2 className="text-xl font-bold text-gray-900 mb-4">
               Data Quality Alerts
             </h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
               <AlertCard
                 title="Sets and Parallel Sets Without Card Images"
                 value={stats.parallelSetsWithoutImages}
                 description="Sets that don't have any card images"
                 link="/admin/sets?filter=no-cards"
                 severity={stats.parallelSetsWithoutImages > 0 ? "warning" : "good"}
-              />
-              <AlertCard
-                title="Sets Without Checklists"
-                value={stats.setsWithoutChecklists}
-                description="Sets missing totalCards or checklist data"
-                link="/admin/sets?filter=no-checklist"
-                severity={stats.setsWithoutChecklists > 0 ? "warning" : "good"}
               />
               <AlertCard
                 title="Releases Without Posts"
