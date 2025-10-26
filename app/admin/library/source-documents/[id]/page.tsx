@@ -79,8 +79,9 @@ export default function SourceDocumentDetailPage() {
       setEditTags(data.tags.join(", "));
       setEditDocType(data.documentType);
       setError("");
-    } catch (err: any) {
-      setError(err.message || "Failed to load document");
+    } catch (err) {
+      const error = err as Error;
+      setError(error.message || "Failed to load document");
       console.error(err);
     } finally {
       setLoading(false);

@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     const sortOrder = searchParams.get('sortOrder') || 'desc';
 
     // Build where clause - only CHECKLIST documents
-    const where: any = {
+    const where: Record<string, unknown> = {
       documentType: 'CHECKLIST',
     };
 

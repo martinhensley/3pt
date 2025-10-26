@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     const sortOrder = searchParams.get('sortOrder') || 'desc';
 
     // Build where clause - only images associated with cards
-    const where: any = {
+    const where: Record<string, unknown> = {
       cardId: { not: null },
     };
 

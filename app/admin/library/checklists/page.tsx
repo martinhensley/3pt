@@ -79,10 +79,11 @@ export default function ChecklistsLibraryPage() {
       setChecklists(data.checklists);
       setPagination(data.pagination);
       setError("");
-    } catch (err: any) {
+    } catch (err) {
       // Only set error if we're not redirecting
-      if (err.message && !err.message.includes("redirect")) {
-        setError(err.message || "Failed to load checklists");
+      const error = err as Error;
+      if (error.message && !error.message.includes("redirect")) {
+        setError(error.message || "Failed to load checklists");
         console.error(err);
       }
     } finally {

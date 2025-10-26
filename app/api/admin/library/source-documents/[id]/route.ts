@@ -72,10 +72,9 @@ export async function GET(
     };
 
     // Remove the raw relations from response
-    delete (response as any).releases;
-    delete (response as any).posts;
+    const { releases: _releases, posts: _posts, ...cleanResponse } = response;
 
-    return NextResponse.json(response);
+    return NextResponse.json({ ...cleanResponse, usedIn: response.usedIn });
   } catch (error) {
     console.error('Source document detail error:', error);
     return NextResponse.json(
@@ -101,7 +100,7 @@ export async function PATCH(
     const { displayName, description, tags, documentType } = body;
 
     // Build update data
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
     if (displayName !== undefined) updateData.displayName = displayName;
     if (description !== undefined) updateData.description = description;
     if (tags !== undefined) updateData.tags = tags;

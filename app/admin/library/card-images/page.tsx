@@ -85,10 +85,11 @@ export default function CardImagesLibraryPage() {
       setImages(data.images);
       setPagination(data.pagination);
       setError("");
-    } catch (err: any) {
+    } catch (err) {
       // Only set error if we're not redirecting
-      if (err.message && !err.message.includes("redirect")) {
-        setError(err.message || "Failed to load card images");
+      const error = err as Error;
+      if (error.message && !error.message.includes("redirect")) {
+        setError(error.message || "Failed to load card images");
         console.error(err);
       }
     } finally {
