@@ -514,7 +514,7 @@ export default function CardsIndexPage() {
                         {card.cardNumber && <span>#{card.cardNumber}</span>}
                         {card.team && <span className="ml-2">• {card.team}</span>}
                         {card.variant && <span className="ml-2 text-purple-600">• {card.variant}</span>}
-                        {card.parallelType && <span className="ml-2 text-footy-orange">• {card.parallelType}</span>}
+                        {card.parallelType && <span className="ml-2 text-footy-orange">• {card.parallelType.replace(/\s*–\s*/g, ' ')}</span>}
                       </div>
                     </div>
 

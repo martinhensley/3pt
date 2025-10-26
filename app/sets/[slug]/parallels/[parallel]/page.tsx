@@ -177,7 +177,7 @@ export default function ParallelPage() {
                   href: `/sets/${setSlug}`,
                 },
                 {
-                  label: parallelName,
+                  label: parallelName.replace(/\s*–\s*/g, ' '),
                   href: `/sets/${setSlug}/parallels/${parallelSlug}`,
                 },
               ]}
@@ -195,7 +195,7 @@ export default function ParallelPage() {
                     .replace(/\bbase\s+optic\b/gi, 'Optic')
                     .replace(/\bbase\s+set\b/gi, '')
                     .replace(/\bsets?\b/gi, '')
-                    .trim()} {parallelName.replace(/\bbase\b/gi, '').trim()}
+                    .trim()} {parallelName.replace(/\bbase\b/gi, '').replace(/\s*–\s*/g, ' ').trim()}
                 </h1>
                 <div className="text-xl">
                   {cards.length} Card{cards.length !== 1 ? 's' : ''} in the Parallel Set
@@ -285,7 +285,7 @@ export default function ParallelPage() {
                         {card.cardNumber && <span>#{card.cardNumber}</span>}
                         {card.team && <span className="ml-2">• {card.team}</span>}
                         {card.variant && <span className="ml-2 text-purple-600">• {card.variant}</span>}
-                        {card.parallelType && <span className="ml-2 text-footy-orange">• {card.parallelType}</span>}
+                        {card.parallelType && <span className="ml-2 text-footy-orange">• {card.parallelType.replace(/\s*–\s*/g, ' ')}</span>}
                       </div>
                     </div>
 
