@@ -140,7 +140,7 @@ export default function AdminDashboard() {
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               <AlertCard
-                title="Sets and Parallel Sets Without Cards"
+                title="Sets and Parallel Sets Without Card Images"
                 value={stats.parallelSetsWithoutImages}
                 description="Sets that don't have any card images"
                 link="/admin/sets?filter=no-cards"
