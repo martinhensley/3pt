@@ -141,6 +141,9 @@ export default function AdminDashboard() {
           </>
         )}
 
+        {/* Divider */}
+        <hr className="border-gray-300 my-8" />
+
         {/* Quick Actions - No heading per user request */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
           <button
