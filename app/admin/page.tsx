@@ -123,7 +123,7 @@ export default function AdminDashboard() {
                 icon="📚"
               />
               <StatCard
-                title="Cards w/ Image/Total"
+                title="Cards with Image/Total Cards"
                 value={`${stats.cardsWithImages}/${stats.totalCards}`}
                 icon="🃏"
               />
