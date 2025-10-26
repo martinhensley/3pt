@@ -142,9 +142,52 @@ export async function GET(request: NextRequest) {
           .replace(/^-|-$/g, '')
           .replace(/1-of-1/g, '1of1'); // Convert "1-of-1" to "1of1"
 
-        // Only match if the generated slug exactly matches the requested slug
+        // Try exact match first
         return generatedSlug === slug;
       });
+
+      // If no exact match found, try fuzzy matching as fallback
+      // This helps when URLs might be slightly different due to formatting
+      if (!card) {
+        card = cards.find(c => {
+          const cardSlugParts = [
+            c.set.release.year,
+            c.set.release.name,
+            cleanSetName,
+            c.cardNumber || '',
+            c.playerName || 'unknown',
+          ];
+
+          if (c.parallelType && c.parallelType.toLowerCase() !== 'base') {
+            cardSlugParts.push(c.parallelType);
+          }
+
+          const generatedSlug = cardSlugParts
+            .filter(Boolean)
+            .join('-')
+            .toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^a-z0-9-]/g, '')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '')
+            .replace(/1-of-1/g, '1of1');
+
+          // Check if the requested slug starts with the base pattern (without parallel)
+          // This helps match Base cards when parallel-specific URL is requested
+          const baseSlugPattern = cardSlugParts.slice(0, 5)
+            .filter(Boolean)
+            .join('-')
+            .toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^a-z0-9-]/g, '')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '');
+
+          // Only use fuzzy match for Base cards (null or "Base" parallelType)
+          const isBaseCard = !c.parallelType || c.parallelType === '' || c.parallelType.toLowerCase() === 'base';
+          return isBaseCard && slug.startsWith(baseSlugPattern);
+        });
+      }
     }
 
     if (!card) {
