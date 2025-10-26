@@ -53,6 +53,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [statsExpanded, setStatsExpanded] = useState(true);
   const [actionsExpanded, setActionsExpanded] = useState(true);
+  const [libraryExpanded, setLibraryExpanded] = useState(true);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -255,6 +256,68 @@ export default function AdminDashboard() {
               View, edit, and publish posts
             </span>
           </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Library Accordion */}
+        <div className="bg-white rounded-xl shadow-lg mb-8 overflow-hidden">
+          <button
+            onClick={() => setLibraryExpanded(!libraryExpanded)}
+            className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+          >
+            <h2 className="text-xl font-bold text-gray-900">Library</h2>
+            <svg
+              className={`w-6 h-6 text-gray-600 transition-transform ${libraryExpanded ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          {libraryExpanded && (
+            <div className="px-6 pb-6">
+              <div className="grid md:grid-cols-3 gap-4">
+                <button
+                  onClick={() => router.push("/admin/library/source-documents")}
+                  className="bg-gradient-to-r from-blue-500 to-blue-700 text-white p-6 rounded-xl hover:shadow-lg transition-all flex flex-col items-center gap-2"
+                >
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                  <span className="font-semibold">Source Documents</span>
+                  <span className="text-xs text-white/80 text-center">
+                    PDFs, docs used for GenAI releases and posts
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => router.push("/admin/library/checklists")}
+                  className="bg-gradient-to-r from-teal-500 to-teal-700 text-white p-6 rounded-xl hover:shadow-lg transition-all flex flex-col items-center gap-2"
+                >
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                  </svg>
+                  <span className="font-semibold">Checklists</span>
+                  <span className="text-xs text-white/80 text-center">
+                    Manage set checklists and card listings
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => router.push("/admin/library/card-images")}
+                  className="bg-gradient-to-r from-indigo-500 to-indigo-700 text-white p-6 rounded-xl hover:shadow-lg transition-all flex flex-col items-center gap-2"
+                >
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span className="font-semibold">Card Images</span>
+                  <span className="text-xs text-white/80 text-center">
+                    Browse and manage all card images
+                  </span>
+                </button>
               </div>
             </div>
           )}
