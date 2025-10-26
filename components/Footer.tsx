@@ -17,7 +17,7 @@ export default function Footer({ rounded = true }: FooterProps) {
               <span className="text-white">footy</span><span className="text-footy-orange">.bot</span>
             </h3>
             <p className="text-sm text-green-100">
-              Your ultimate destination for soccer trading cards, releases, and collection management.
+              The ultimate resource for soccer trading cards, comps, and collection management.
             </p>
           </div>
 
