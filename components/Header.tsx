@@ -12,7 +12,7 @@ interface HeaderProps {
 export default function Header({ showBackButton = false, rounded = true, showAd = false }: HeaderProps) {
   return (
     <header className={`bg-gradient-to-r from-footy-green to-green-700 text-white shadow-lg ${rounded ? 'rounded-xl' : ''}`}>
-      <div className="max-w-[1600px] mx-auto px-6 py-8">
+      <div className="px-6 py-8">
         {/* Top section with back button */}
         {showBackButton && (
           <div className="mb-4">
@@ -65,7 +65,7 @@ export default function Header({ showBackButton = false, rounded = true, showAd 
 
       {/* Optional ad space below header */}
       {showAd && (
-        <div className="max-w-[1600px] mx-auto px-6 pb-6">
+        <div className="px-6 pb-6">
           <EbayAdHorizontal query="soccer trading cards" limit={4} title="Featured Soccer Cards" />
         </div>
       )}
