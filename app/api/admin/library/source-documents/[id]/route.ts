@@ -10,7 +10,7 @@ export const runtime = 'nodejs';
 // GET - Get single document with full details and usage
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check authentication
@@ -19,8 +19,10 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { id } = await params;
+
     const document = await prisma.sourceDocument.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         releases: {
           include: {
@@ -87,7 +89,7 @@ export async function GET(
 // PATCH - Update document metadata
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check authentication
@@ -95,6 +97,8 @@ export async function PATCH(
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const { id } = await params;
 
     const body = await request.json();
     const { displayName, description, tags, documentType } = body;
@@ -107,7 +111,7 @@ export async function PATCH(
     if (documentType !== undefined) updateData.documentType = documentType as DocumentType;
 
     const document = await prisma.sourceDocument.update({
-      where: { id: params.id },
+      where: { id },
       data: updateData,
     });
 
@@ -127,7 +131,7 @@ export async function PATCH(
 // DELETE - Delete a source document
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check authentication
@@ -136,9 +140,11 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { id } = await params;
+
     // Get the document first to retrieve the blob URL
     const document = await prisma.sourceDocument.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!document) {
@@ -150,7 +156,7 @@ export async function DELETE(
 
     // Delete from database (this will cascade to join tables)
     await prisma.sourceDocument.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     // Delete from Vercel Blob

@@ -8,7 +8,7 @@ export const runtime = 'nodejs';
 // POST - Link a document to content (release or post)
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check authentication
@@ -17,6 +17,7 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { id } = await params;
     const body = await request.json();
     const { contentType, contentId, usageContext } = body;
 
@@ -36,7 +37,7 @@ export async function POST(
 
     // Check if document exists
     const document = await prisma.sourceDocument.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!document) {
@@ -65,12 +66,12 @@ export async function POST(
         where: {
           releaseId_documentId: {
             releaseId: contentId,
-            documentId: params.id,
+            documentId: id,
           },
         },
         create: {
           releaseId: contentId,
-          documentId: params.id,
+          documentId: id,
           usageContext,
           linkedById: session.user.email || 'unknown',
         },
@@ -96,12 +97,12 @@ export async function POST(
         where: {
           postId_documentId: {
             postId: contentId,
-            documentId: params.id,
+            documentId: id,
           },
         },
         create: {
           postId: contentId,
-          documentId: params.id,
+          documentId: id,
           usageContext,
           linkedById: session.user.email || 'unknown',
         },
@@ -113,7 +114,7 @@ export async function POST(
 
     // Update document usage stats
     await prisma.sourceDocument.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         usageCount: { increment: 1 },
         lastUsedAt: new Date(),
@@ -136,7 +137,7 @@ export async function POST(
 // DELETE - Unlink a document from content
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check authentication
@@ -144,6 +145,8 @@ export async function DELETE(
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const { id } = await params;
 
     const { searchParams } = new URL(request.url);
     const contentType = searchParams.get('contentType');
@@ -168,21 +171,21 @@ export async function DELETE(
       await prisma.releaseSourceDocument.deleteMany({
         where: {
           releaseId: contentId,
-          documentId: params.id,
+          documentId: id,
         },
       });
     } else {
       await prisma.postSourceDocument.deleteMany({
         where: {
           postId: contentId,
-          documentId: params.id,
+          documentId: id,
         },
       });
     }
 
     // Update document usage stats
     await prisma.sourceDocument.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         usageCount: { decrement: 1 },
       },
