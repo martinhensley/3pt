@@ -150,6 +150,18 @@ export async function GET(request: NextRequest) {
       // This helps when URLs might be slightly different due to formatting
       if (!card) {
         card = cards.find(c => {
+          // Clean set name for this card
+          let cleanSetName = c.set.name;
+          if (cleanSetName.toLowerCase().includes('optic')) {
+            cleanSetName = cleanSetName
+              .replace(/\boptic\s+base\s+set\b/gi, 'Optic')
+              .replace(/\boptic\s+base\b/gi, 'Optic')
+              .replace(/\bbase\s+optic\b/gi, 'Optic');
+          } else {
+            cleanSetName = cleanSetName.replace(/\bbase\s+set\b/gi, 'Base');
+          }
+          cleanSetName = cleanSetName.replace(/\bsets?\b/gi, '').trim();
+
           const cardSlugParts = [
             c.set.release.year,
             c.set.release.name,
