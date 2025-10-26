@@ -109,7 +109,7 @@ export default function AdminDashboard() {
         {stats && (
           <>
             <h2 className="text-xl font-bold text-gray-900 mb-4">
-              Overview Statistics
+              Stats
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
               <StatCard
