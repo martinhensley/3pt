@@ -51,6 +51,8 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [statsExpanded, setStatsExpanded] = useState(true);
+  const [actionsExpanded, setActionsExpanded] = useState(true);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -105,47 +107,76 @@ export default function AdminDashboard() {
           </h1>
         </div>
 
-        {/* Statistics Grid */}
+        {/* Statistics Accordion */}
         {stats && (
-          <>
-            <h2 className="text-xl font-bold text-gray-900 mb-4">
-              Stats
-            </h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-              <StatCard
-                title="Total Releases"
-                value={stats.totalReleases}
-                icon="📦"
-              />
-              <StatCard
-                title="Total Sets"
-                value={stats.totalSets}
-                icon="📚"
-              />
-              <StatCard
-                title="Sets Without Checklists"
-                value={stats.setsWithoutChecklists}
-                icon="📋"
-              />
-              <StatCard
-                title="Cards with Image/Total Cards"
-                value={`${stats.cardsWithImages}/${stats.totalCards}`}
-                icon="🃏"
-              />
-              <StatCard
-                title="Published Posts"
-                value={`${stats.publishedPosts}/${stats.totalPosts}`}
-                icon="📝"
-              />
-            </div>
-          </>
+          <div className="bg-white rounded-xl shadow-lg mb-6 overflow-hidden">
+            <button
+              onClick={() => setStatsExpanded(!statsExpanded)}
+              className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            >
+              <h2 className="text-xl font-bold text-gray-900">Stats</h2>
+              <svg
+                className={`w-6 h-6 text-gray-600 transition-transform ${statsExpanded ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {statsExpanded && (
+              <div className="px-6 pb-6">
+                <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
+                  <StatCard
+                    title="Total Releases"
+                    value={stats.totalReleases}
+                    icon="📦"
+                  />
+                  <StatCard
+                    title="Total Sets"
+                    value={stats.totalSets}
+                    icon="📚"
+                  />
+                  <StatCard
+                    title="Sets Without Checklists"
+                    value={stats.setsWithoutChecklists}
+                    icon="📋"
+                  />
+                  <StatCard
+                    title="Cards with Image/Total Cards"
+                    value={`${stats.cardsWithImages}/${stats.totalCards}`}
+                    icon="🃏"
+                  />
+                  <StatCard
+                    title="Published Posts"
+                    value={`${stats.publishedPosts}/${stats.totalPosts}`}
+                    icon="📝"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         )}
 
-        {/* Divider */}
-        <hr className="border-gray-300 my-8" />
-
-        {/* Quick Actions - No heading per user request */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        {/* Quick Actions Accordion */}
+        <div className="bg-white rounded-xl shadow-lg mb-8 overflow-hidden">
+          <button
+            onClick={() => setActionsExpanded(!actionsExpanded)}
+            className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+          >
+            <h2 className="text-xl font-bold text-gray-900">Quick Actions</h2>
+            <svg
+              className={`w-6 h-6 text-gray-600 transition-transform ${actionsExpanded ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          {actionsExpanded && (
+            <div className="px-6 pb-6">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           <button
             onClick={() => router.push("/admin/releases/create")}
             className="bg-gradient-to-r from-footy-green to-green-700 text-white p-6 rounded-xl hover:shadow-lg transition-all flex flex-col items-center gap-2"
@@ -224,6 +255,9 @@ export default function AdminDashboard() {
               View, edit, and publish posts
             </span>
           </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Recent Activity */}
