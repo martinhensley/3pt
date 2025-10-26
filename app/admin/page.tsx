@@ -142,7 +142,7 @@ export default function AdminDashboard() {
               <AlertCard
                 title="Sets and Parallel Sets Without Cards"
                 value={stats.parallelSetsWithoutImages}
-                description="Sets that don't have any cards catalogued"
+                description="Sets that don't have any card images"
                 link="/admin/sets?filter=no-cards"
                 severity={stats.parallelSetsWithoutImages > 0 ? "warning" : "good"}
               />
