@@ -748,7 +748,7 @@ export default function CreateReleasePage() {
                         Upload Release Images (JPG, PNG, WebP):
                       </p>
                       <p className="text-xs text-gray-600 mb-2">
-                        These images will be displayed in the release's image carousel
+                        These images will be displayed in the release&apos;s image carousel
                       </p>
                       <input
                         type="file"
