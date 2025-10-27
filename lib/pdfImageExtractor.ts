@@ -143,7 +143,7 @@ export async function extractImagesFromPDF(pdfPath: string): Promise<ExtractedIm
                 const colorSpaceStr = colorSpace?.toString();
                 console.log(`  ColorSpace: ${colorSpaceStr}`);
 
-                let channels = 3;
+                let channels: 1 | 2 | 3 | 4 = 3;
                 if (colorSpaceStr === '/DeviceGray' || colorSpaceStr === '/Gray') {
                   channels = 1;
                 } else if (colorSpaceStr === '/DeviceRGB' || colorSpaceStr === '/RGB') {
