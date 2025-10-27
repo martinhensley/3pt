@@ -68,26 +68,24 @@ export default function Home() {
       });
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex flex-col min-h-screen bg-gray-50">
-        <Header />
-        <div className="flex-grow flex items-center justify-center">
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
-      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
+      {/* Header - fixed outside main layout */}
+      <div className="max-w-[1600px] mx-auto w-full px-4 pt-6">
+        <Header rounded={true} />
+      </div>
+
+      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pb-12">
         <aside className="hidden lg:block w-72 flex-shrink-0">
           <EbayAd query="soccer cards" limit={3} title="Latest Soccer Cards" />
         </aside>
 
-        <main className="flex-grow space-y-6">
-          <Header rounded={true} />
+        <main className="flex-grow space-y-6">{loading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
+          </div>
+        ) : (
+          <>
         {content.length === 0 ? (
           <div className="text-center py-20">
             <div className="bg-white rounded-lg shadow-lg p-12 max-w-2xl mx-auto transition-colors duration-300">
@@ -234,13 +232,18 @@ export default function Home() {
         )}
 
         <EbayAdHorizontal query="soccer memorabilia" limit={4} title="More Soccer Collectibles" />
-
-          <Footer rounded={true} />
+          </>
+        )}
         </main>
 
         <aside className="hidden lg:block w-72 flex-shrink-0">
           <EbayAd query="soccer autographs" limit={3} title="Soccer Autographs" />
         </aside>
+      </div>
+
+      {/* Footer - fixed outside main layout */}
+      <div className="max-w-[1600px] mx-auto w-full px-4">
+        <Footer rounded={true} />
       </div>
     </div>
   );
