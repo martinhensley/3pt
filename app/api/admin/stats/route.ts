@@ -74,11 +74,11 @@ export async function GET() {
         select: { id: true },
       }),
 
-      // Recent posts for activity feed
+      // Recent posts for activity feed (last 5)
       prisma.post.findMany({
-        take: 10,
+        take: 5,
         orderBy: {
-          createdAt: "desc",
+          updatedAt: "desc",
         },
         select: {
           id: true,
@@ -86,14 +86,15 @@ export async function GET() {
           title: true,
           slug: true,
           createdAt: true,
+          updatedAt: true,
         },
       }),
 
-      // Recent releases
+      // Recent releases (last 5)
       prisma.release.findMany({
-        take: 10,
+        take: 5,
         orderBy: {
-          createdAt: "desc",
+          updatedAt: "desc",
         },
         select: {
           id: true,
@@ -101,6 +102,7 @@ export async function GET() {
           year: true,
           slug: true,
           createdAt: true,
+          updatedAt: true,
           manufacturer: {
             select: {
               name: true,
@@ -109,20 +111,9 @@ export async function GET() {
         },
       }),
 
-      // Recent cards with images only
+      // Recent cards (last 5)
       prisma.card.findMany({
-        take: 10,
-        where: {
-          OR: [
-            { imageFront: { not: null } },
-            { imageBack: { not: null } },
-            {
-              images: {
-                some: {},
-              },
-            },
-          ],
-        },
+        take: 5,
         orderBy: {
           updatedAt: "desc",
         },
@@ -131,6 +122,7 @@ export async function GET() {
           playerName: true,
           cardNumber: true,
           createdAt: true,
+          updatedAt: true,
           set: {
             select: {
               name: true,
@@ -153,11 +145,45 @@ export async function GET() {
     const setsWithoutChecklists = totalSets - setsWithTotalCards.length;
     const releasesWithoutPosts = totalReleases - releasesWithPosts.length;
 
-    const recentActivity = recentPosts.map((post) => ({
-      type: post.type,
-      title: post.title,
-      date: post.createdAt.toISOString(),
-    }));
+    // Combine all recent activity from posts, releases, and cards
+    const allActivities = [
+      ...recentPosts.map((post) => ({
+        type: "POST" as const,
+        title: post.title,
+        id: post.id,
+        createdAt: post.createdAt,
+        updatedAt: post.updatedAt,
+        isNew: post.createdAt.getTime() === post.updatedAt.getTime(),
+      })),
+      ...recentReleases.map((release) => ({
+        type: "RELEASE" as const,
+        title: `${release.manufacturer.name} ${release.name}${release.year ? ` (${release.year})` : ""}`,
+        id: release.id,
+        createdAt: release.createdAt,
+        updatedAt: release.updatedAt,
+        isNew: release.createdAt.getTime() === release.updatedAt.getTime(),
+      })),
+      ...recentCards.map((card) => ({
+        type: "CARD" as const,
+        title: `${card.playerName || "Unknown Player"} - ${card.set.name}`,
+        id: card.id,
+        createdAt: card.createdAt,
+        updatedAt: card.updatedAt,
+        isNew: card.createdAt.getTime() === card.updatedAt.getTime(),
+      })),
+    ];
+
+    // Sort by updatedAt and take top 5
+    const recentActivity = allActivities
+      .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
+      .slice(0, 5)
+      .map((activity) => ({
+        type: activity.type,
+        title: activity.title,
+        id: activity.id,
+        date: activity.updatedAt.toISOString(),
+        action: activity.isNew ? "created" : "edited",
+      }));
 
     return NextResponse.json({
       totalReleases,
@@ -170,30 +196,6 @@ export async function GET() {
       setsWithoutChecklists,
       releasesWithoutPosts,
       recentActivity,
-      recentPosts: recentPosts.map((post) => ({
-        id: post.id,
-        type: post.type,
-        title: post.title,
-        slug: post.slug,
-        createdAt: post.createdAt.toISOString(),
-      })),
-      recentReleases: recentReleases.map((release) => ({
-        id: release.id,
-        name: release.name,
-        year: release.year,
-        slug: release.slug,
-        manufacturer: release.manufacturer.name,
-        createdAt: release.createdAt.toISOString(),
-      })),
-      recentCards: recentCards.map((card) => ({
-        id: card.id,
-        playerName: card.playerName,
-        cardNumber: card.cardNumber,
-        setName: card.set.name,
-        releaseName: card.set.release.name,
-        manufacturer: card.set.release.manufacturer.name,
-        createdAt: card.createdAt.toISOString(),
-      })),
     });
   } catch (error) {
     console.error("Get stats error:", error);

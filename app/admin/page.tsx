@@ -16,33 +16,11 @@ interface Stats {
   setsWithoutChecklists: number;
   releasesWithoutPosts: number;
   recentActivity: {
-    type: string;
+    type: "POST" | "RELEASE" | "CARD";
     title: string;
+    id: string;
     date: string;
-  }[];
-  recentPosts: {
-    id: string;
-    type: string;
-    title: string;
-    slug: string;
-    createdAt: string;
-  }[];
-  recentReleases: {
-    id: string;
-    name: string;
-    year: string | null;
-    slug: string;
-    manufacturer: string;
-    createdAt: string;
-  }[];
-  recentCards: {
-    id: string;
-    playerName: string;
-    cardNumber: string;
-    setName: string;
-    releaseName: string;
-    manufacturer: string;
-    createdAt: string;
+    action: "created" | "edited";
   }[];
 }
 
@@ -122,6 +100,68 @@ export default function AdminDashboard() {
             Footy&apos;s Dashboard
           </h1>
         </div>
+
+        {/* Recent Activity - Moved to top */}
+        {stats && stats.recentActivity && stats.recentActivity.length > 0 && (
+          <>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-900">
+                Recent Activity
+              </h2>
+              <button
+                onClick={() => router.push("/admin/activity")}
+                className="text-sm font-semibold text-footy-green hover:underline flex items-center gap-1"
+              >
+                View All Activity
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+            <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+              <div className="space-y-4">
+                {stats.recentActivity.map((activity, index) => (
+                  <div
+                    key={index}
+                    className="flex items-start gap-4 pb-4 border-b border-gray-200 last:border-0 last:pb-0"
+                  >
+                    <div className="flex-shrink-0 w-10 h-10 bg-footy-green/10 rounded-full flex items-center justify-center">
+                      {activity.type === "RELEASE" && "📦"}
+                      {activity.type === "CARD" && "🃏"}
+                      {activity.type === "POST" && "📝"}
+                    </div>
+                    <div className="flex-grow">
+                      <p className="font-medium text-gray-900">
+                        {activity.title}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {new Date(activity.date).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs font-semibold px-2 py-1 rounded ${
+                        activity.action === "created"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-blue-100 text-blue-700"
+                      }`}>
+                        {activity.action === "created" ? "New" : "Edited"}
+                      </span>
+                      <span className="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-700 rounded">
+                        {activity.type}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Statistics Accordion */}
         {stats && (
@@ -337,207 +377,6 @@ export default function AdminDashboard() {
             </div>
           )}
         </div>
-
-        {/* Recent Activity */}
-        {stats && (
-          <>
-            {stats.recentActivity && stats.recentActivity.length > 0 && (
-              <>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-bold text-gray-900">
-                    Recent Activity
-                  </h2>
-                  <button
-                    onClick={() => router.push("/admin/activity")}
-                    className="text-sm font-semibold text-footy-green hover:underline flex items-center gap-1"
-                  >
-                    View All Activity
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                </div>
-                <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-                  <div className="space-y-4">
-                    {stats.recentActivity.map((activity, index) => (
-                      <div
-                        key={index}
-                        className="flex items-start gap-4 pb-4 border-b border-gray-200 last:border-0 last:pb-0"
-                      >
-                        <div className="flex-shrink-0 w-10 h-10 bg-footy-green/10 rounded-full flex items-center justify-center">
-                          {activity.type === "RELEASE" && "📦"}
-                          {activity.type === "SET" && "📚"}
-                          {activity.type === "CARD" && "🃏"}
-                          {activity.type === "POST" && "📝"}
-                        </div>
-                        <div className="flex-grow">
-                          <p className="font-medium text-gray-900">
-                            {activity.title}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {new Date(activity.date).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </p>
-                        </div>
-                        <span className="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-700 rounded">
-                          {activity.type}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </>
-            )}
-
-            {/* Recent Content Sections */}
-            <div className="grid md:grid-cols-3 gap-6 mb-8">
-              {/* Recent Posts */}
-              {stats.recentPosts && stats.recentPosts.length > 0 && (
-                <div className="bg-white rounded-xl shadow-lg p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                      <span className="text-xl">📝</span>
-                      Recent Posts
-                    </h3>
-                    <button
-                      onClick={() => router.push("/admin/posts")}
-                      className="text-xs text-footy-green hover:underline"
-                    >
-                      View All
-                    </button>
-                  </div>
-                  <div className="space-y-3">
-                    {stats.recentPosts.map((post) => (
-                      <div
-                        key={post.id}
-                        className="pb-3 border-b border-gray-200 last:border-0 last:pb-0"
-                      >
-                        <button
-                          onClick={() => router.push(`/admin/posts/edit/${post.id}`)}
-                          className="text-left w-full hover:text-footy-green transition-colors"
-                        >
-                          <p className="font-medium text-sm text-gray-900 line-clamp-2">
-                            {post.title}
-                          </p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">
-                              {post.type}
-                            </span>
-                            <p className="text-xs text-gray-500">
-                              {new Date(post.createdAt).toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                              })}
-                            </p>
-                          </div>
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Recent Releases */}
-              {stats.recentReleases && stats.recentReleases.length > 0 && (
-                <div className="bg-white rounded-xl shadow-lg p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                      <span className="text-xl">📦</span>
-                      Recent Releases
-                    </h3>
-                    <button
-                      onClick={() => router.push("/admin/releases")}
-                      className="text-xs text-footy-green hover:underline"
-                    >
-                      View All
-                    </button>
-                  </div>
-                  <div className="space-y-3">
-                    {stats.recentReleases.map((release) => (
-                      <div
-                        key={release.id}
-                        className="pb-3 border-b border-gray-200 last:border-0 last:pb-0"
-                      >
-                        <button
-                          onClick={() => router.push(`/admin/releases/edit/${release.id}`)}
-                          className="text-left w-full hover:text-footy-green transition-colors"
-                        >
-                          <p className="font-medium text-sm text-gray-900 line-clamp-2">
-                            {release.manufacturer} {release.name}
-                          </p>
-                          <div className="flex items-center gap-2 mt-1">
-                            {release.year && (
-                              <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-600 rounded">
-                                {release.year}
-                              </span>
-                            )}
-                            <p className="text-xs text-gray-500">
-                              {new Date(release.createdAt).toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                              })}
-                            </p>
-                          </div>
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Recent Cards */}
-              {stats.recentCards && stats.recentCards.length > 0 && (
-                <div className="bg-white rounded-xl shadow-lg p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                      <span className="text-xl">🃏</span>
-                      Recent Cards
-                    </h3>
-                    <button
-                      onClick={() => router.push("/admin/cards")}
-                      className="text-xs text-footy-green hover:underline"
-                    >
-                      View All
-                    </button>
-                  </div>
-                  <div className="space-y-3">
-                    {stats.recentCards.map((card) => (
-                      <div
-                        key={card.id}
-                        className="pb-3 border-b border-gray-200 last:border-0 last:pb-0"
-                      >
-                        <div className="text-left w-full">
-                          <p className="font-medium text-sm text-gray-900 line-clamp-1">
-                            {card.playerName}
-                          </p>
-                          <p className="text-xs text-gray-600 line-clamp-1">
-                            #{card.cardNumber} - {card.setName}
-                          </p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded line-clamp-1">
-                              {card.manufacturer}
-                            </span>
-                            <p className="text-xs text-gray-500">
-                              {new Date(card.createdAt).toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                              })}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </>
-        )}
     </AdminLayout>
   );
 }
