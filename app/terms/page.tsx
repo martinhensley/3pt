@@ -360,16 +360,10 @@ export default function TermsPage() {
               Contact Information
             </h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              If you have any questions about these Terms, please contact us:
+              If you have any questions about these Terms, please contact us through any of our social media platforms listed in the footer below, including Twitter, Facebook, Instagram, and YouTube.
             </p>
-            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-              <p className="text-gray-900 font-semibold mb-2">
-                <span className="font-orbitron">footy<span className="text-footy-orange">.bot</span></span>
-              </p>
-              <p className="text-gray-700">
-                Website: <a href="https://www.footy.bot" className="text-footy-green hover:underline">www.footy.bot</a>
-              </p>
-              <p className="text-gray-700 mt-4 text-sm">
+            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+              <p className="text-gray-700 text-sm">
                 We will respond to your inquiries as soon as reasonably possible.
               </p>
             </div>

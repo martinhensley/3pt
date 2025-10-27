@@ -147,7 +147,10 @@ export default function AboutPage() {
             <p className="text-gray-700 leading-relaxed mb-4">
               Have questions, suggestions, or feedback? We'd love to hear from you! We're constantly working to improve <span className="font-orbitron">footy<span className="text-footy-orange">.bot</span></span> and your input helps shape the future of our platform.
             </p>
-            <p className="text-gray-700 leading-relaxed">
+            <p className="text-gray-700 leading-relaxed mb-4">
+              You can reach us through any of our social media platforms listed in the footer below, including Twitter, Facebook, Instagram, and YouTube.
+            </p>
+            <p className="text-gray-700 leading-relaxed text-sm text-gray-600">
               While we're a growing platform and may not be able to respond to every message immediately, we read and consider all feedback as we continue to develop new features and expand our database.
             </p>
           </section>
