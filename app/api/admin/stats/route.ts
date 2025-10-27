@@ -23,7 +23,6 @@ export async function GET() {
       releasesWithPosts,
       recentPosts,
       recentReleases,
-      recentCards,
     ] = await Promise.all([
       prisma.release.count(),
       prisma.set.count(),
@@ -110,42 +109,12 @@ export async function GET() {
           },
         },
       }),
-
-      // Recent cards (last 5)
-      prisma.card.findMany({
-        take: 5,
-        orderBy: {
-          updatedAt: "desc",
-        },
-        select: {
-          id: true,
-          playerName: true,
-          cardNumber: true,
-          createdAt: true,
-          updatedAt: true,
-          set: {
-            select: {
-              name: true,
-              release: {
-                select: {
-                  name: true,
-                  manufacturer: {
-                    select: {
-                      name: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      }),
     ]);
 
     const setsWithoutChecklists = totalSets - setsWithTotalCards.length;
     const releasesWithoutPosts = totalReleases - releasesWithPosts.length;
 
-    // Combine all recent activity from posts, releases, and cards
+    // Combine all recent activity from posts and releases (excluding cards to avoid clutter)
     const allActivities = [
       ...recentPosts.map((post) => ({
         type: "POST" as const,
@@ -162,14 +131,6 @@ export async function GET() {
         createdAt: release.createdAt,
         updatedAt: release.updatedAt,
         isNew: release.createdAt.getTime() === release.updatedAt.getTime(),
-      })),
-      ...recentCards.map((card) => ({
-        type: "CARD" as const,
-        title: `${card.playerName || "Unknown Player"} - ${card.set.name}`,
-        id: card.id,
-        createdAt: card.createdAt,
-        updatedAt: card.updatedAt,
-        isNew: card.createdAt.getTime() === card.updatedAt.getTime(),
       })),
     ];
 

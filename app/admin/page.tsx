@@ -16,7 +16,7 @@ interface Stats {
   setsWithoutChecklists: number;
   releasesWithoutPosts: number;
   recentActivity: {
-    type: "POST" | "RELEASE" | "CARD";
+    type: "POST" | "RELEASE";
     title: string;
     id: string;
     date: string;
@@ -127,7 +127,6 @@ export default function AdminDashboard() {
                   >
                     <div className="flex-shrink-0 w-10 h-10 bg-footy-green/10 rounded-full flex items-center justify-center">
                       {activity.type === "RELEASE" && "📦"}
-                      {activity.type === "CARD" && "🃏"}
                       {activity.type === "POST" && "📝"}
                     </div>
                     <div className="flex-grow">
