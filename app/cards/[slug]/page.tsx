@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import Header from "@/components/Header";
@@ -54,7 +54,6 @@ interface Card {
 
 export default function CardDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const slug = params.slug as string;
   const [card, setCard] = useState<Card | null>(null);
   const [loading, setLoading] = useState(true);

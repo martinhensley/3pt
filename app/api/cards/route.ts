@@ -174,16 +174,6 @@ export async function GET(request: NextRequest) {
             cardSlugParts.push(c.parallelType);
           }
 
-          const generatedSlug = cardSlugParts
-            .filter(Boolean)
-            .join('-')
-            .toLowerCase()
-            .replace(/\s+/g, '-')
-            .replace(/[^a-z0-9-]/g, '')
-            .replace(/-+/g, '-')
-            .replace(/^-|-$/g, '')
-            .replace(/1-of-1/g, '1of1');
-
           // Check if the requested slug starts with the base pattern (without parallel)
           // This helps match Base cards when parallel-specific URL is requested
           const baseSlugPattern = cardSlugParts.slice(0, 5)

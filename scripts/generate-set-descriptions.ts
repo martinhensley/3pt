@@ -6,7 +6,19 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-async function generateSetDescription(set: any): Promise<string> {
+interface SetWithRelations {
+  release: {
+    year: string | null;
+    manufacturer: { name: string };
+    name: string;
+  };
+  name: string;
+  _count: { cards: number };
+  totalCards: string | null;
+  parallels: string[] | null;
+}
+
+async function generateSetDescription(set: SetWithRelations): Promise<string> {
   const setFullName = `${set.release.year || ''} ${set.release.manufacturer.name} ${set.release.name} ${set.name}`.trim();
   const cardCount = set._count.cards || (set.totalCards ? parseInt(set.totalCards) : 0);
   const parallelCount = Array.isArray(set.parallels) ? set.parallels.length : 0;
@@ -92,7 +104,10 @@ async function main() {
 
       try {
         console.log(`🔄 Generating description for: ${setFullName}`);
-        const description = await generateSetDescription(set);
+        const description = await generateSetDescription({
+          ...set,
+          parallels: Array.isArray(set.parallels) ? set.parallels as string[] : null,
+        });
 
         await prisma.set.update({
           where: { id: set.id },

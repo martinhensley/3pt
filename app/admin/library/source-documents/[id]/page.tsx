@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { DocumentType } from "@prisma/client";
+import Image from "next/image";
 
 interface UsedInRelease {
   id: string;
@@ -344,11 +345,16 @@ export default function SourceDocumentDetailPage() {
               {document.mimeType.includes("image") && (
                 <div className="mb-6">
                   <h2 className="text-lg font-semibold text-gray-900 mb-2">Preview</h2>
-                  <img
-                    src={document.blobUrl}
-                    alt={document.displayName}
-                    className="max-w-full h-auto rounded-lg shadow-lg"
-                  />
+                  <div className="relative w-full max-w-4xl">
+                    <Image
+                      src={document.blobUrl}
+                      alt={document.displayName}
+                      width={1200}
+                      height={800}
+                      className="rounded-lg shadow-lg w-full h-auto"
+                      style={{ maxWidth: '100%', height: 'auto' }}
+                    />
+                  </div>
                 </div>
               )}
 

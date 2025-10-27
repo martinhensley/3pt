@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { generateObject } from "ai";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { z } from "zod";
-import { writeFile, mkdir } from "fs/promises";
+import { writeFile } from "fs/promises";
 import path from "path";
 import os from "os";
 

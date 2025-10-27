@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import Header from "@/components/Header";
@@ -46,7 +46,6 @@ interface Card {
 
 export default function ParallelPage() {
   const params = useParams();
-  const router = useRouter();
   // Use the slug as-is - it's already been cleaned by the release page link generation
   const setSlug = params.slug as string;
   const parallelSlug = params.parallel as string;

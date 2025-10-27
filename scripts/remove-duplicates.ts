@@ -37,7 +37,7 @@ async function removeDuplicates() {
   let totalDuplicates = 0;
   const toDelete: string[] = [];
 
-  groups.forEach((group, key) => {
+  groups.forEach((group) => {
     if (group.length > 1) {
       const [keep, ...duplicates] = group;
       console.log(`\nDUPLICATE GROUP (${group.length} cards):`);

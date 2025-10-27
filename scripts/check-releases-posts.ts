@@ -19,13 +19,14 @@ async function checkReleasesAndPosts() {
     console.log(`  Posts linked: ${r.posts.length}`);
   });
 
-  // Check posts with RELEASE type (this type no longer exists!)
-  const releasePosts = await prisma.post.findMany({
-    where: { type: 'RELEASE' as any },
-  }).catch(() => []);
+  // Check posts with releaseId (posts linked to releases)
+  const postsWithRelease = await prisma.post.findMany({
+    where: { releaseId: { not: null } },
+    select: { id: true, title: true, type: true, releaseId: true },
+  });
 
-  console.log('\n=== POSTS WITH TYPE "RELEASE" ===');
-  console.log(`Total: ${releasePosts.length}`);
+  console.log('\n=== POSTS LINKED TO RELEASES ===');
+  console.log(`Total: ${postsWithRelease.length}`);
 
   // Check all post types
   const allPosts = await prisma.post.findMany({

@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -46,7 +46,6 @@ interface Set {
 
 export default function SetPage() {
   const params = useParams();
-  const router = useRouter();
   // Use the slug as-is - it's already been cleaned by the release page link generation
   const slug = params.slug as string;
   const [set, setSet] = useState<Set | null>(null);

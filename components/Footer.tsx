@@ -48,19 +48,19 @@ export default function Footer({ rounded = true }: FooterProps) {
             <h3 className="text-lg font-semibold mb-4">Resources</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="#" className="text-green-100 hover:text-white transition-colors">
+                <Link href="/about" className="text-green-100 hover:text-white transition-colors">
                   About Us
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-green-100 hover:text-white transition-colors">
+                <Link href="/privacy" className="text-green-100 hover:text-white transition-colors">
                   Privacy Policy
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-green-100 hover:text-white transition-colors">
+                <Link href="/terms" className="text-green-100 hover:text-white transition-colors">
                   Terms of Service
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

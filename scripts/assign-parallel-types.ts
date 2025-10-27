@@ -49,7 +49,7 @@ async function main() {
 
   // Assign parallel types
   let updateCount = 0;
-  for (const [cardNumber, cardGroup] of cardsByNumber) {
+  for (const cardGroup of cardsByNumber.values()) {
     // Assign each card in the group to a parallel type in order
     for (let i = 0; i < cardGroup.length; i++) {
       const card = cardGroup[i];

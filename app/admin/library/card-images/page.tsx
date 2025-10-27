@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface CardImage {
   id: string;
@@ -200,10 +201,12 @@ export default function CardImagesLibraryPage() {
                 >
                   {/* Image */}
                   <div className="aspect-[3/4] bg-gray-100 relative">
-                    <img
+                    <Image
                       src={image.url}
                       alt={image.card.displayName}
-                      className="absolute inset-0 w-full h-full object-cover"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     />
                   </div>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 interface UploadedFile {
   url: string;
@@ -193,11 +194,13 @@ export default function MultiFileUpload({
               >
                 {/* Show thumbnail for images */}
                 {file.type === "image" && (
-                  <div className="flex-shrink-0 w-16 h-16 mr-3">
-                    <img
+                  <div className="flex-shrink-0 w-16 h-16 mr-3 relative">
+                    <Image
                       src={file.url}
                       alt={file.filename}
-                      className="w-full h-full object-cover rounded border border-gray-300"
+                      fill
+                      className="object-cover rounded border border-gray-300"
+                      sizes="64px"
                     />
                   </div>
                 )}
