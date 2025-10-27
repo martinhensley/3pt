@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
+import Breadcrumb from "@/components/Breadcrumb";
 import Link from "next/link";
 
 interface Release {
@@ -118,22 +119,17 @@ export default function ManageReleasesPage() {
   return (
     <AdminLayout>
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-4">
-              <Link
-                href="/admin"
-                className="text-gray-600 hover:text-footy-green transition-colors flex items-center gap-2"
-                title="Back to Admin Portal"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Admin Portal
-              </Link>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Manage Releases & Sets
-              </h1>
-            </div>
+          <Breadcrumb
+            items={[
+              { label: "Admin", href: "/admin" },
+              { label: "Releases", href: "/admin/releases" },
+            ]}
+          />
+
+          <div className="flex items-center justify-between mt-6 mb-4">
+            <h1 className="text-3xl font-bold text-gray-900">
+              Manage Releases & Sets
+            </h1>
             <Link
               href="/admin/releases/create"
               className="px-4 py-2 bg-footy-green hover:bg-green-700 text-white rounded-lg transition-colors"
