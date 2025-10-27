@@ -869,6 +869,134 @@ export default function EditReleasePage() {
           </div>
         </div>
 
+        {/* Release Content Section */}
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Release Content
+          </h3>
+
+          <div className="space-y-4">
+            {/* Release Title */}
+            <div>
+              <label className="block font-semibold text-gray-900 mb-1">
+                Release Title:
+              </label>
+              <p className="text-xs text-gray-500 mb-2">
+                Formatted title displayed in posts (e.g., "2024-25 Panini Obsidian Soccer")
+              </p>
+              <input
+                type="text"
+                value={`${editedYear} ${editedManufacturer} ${editedReleaseName}`.trim()}
+                readOnly
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900"
+              />
+            </div>
+
+            {/* GenAI Description Generator */}
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
+              <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                <svg className="w-5 h-5 text-footy-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+                GenAI: Generate Description from Source Files
+              </h4>
+              {sourceFiles.length > 0 ? (
+                <>
+                  <p className="text-xs text-gray-600 mb-3">
+                    Uses uploaded source files ({sourceFiles.length} file{sourceFiles.length !== 1 ? 's' : ''}) to generate description
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleGenerateDescription}
+                    disabled={generatingDescription}
+                    className="px-4 py-2 bg-gradient-to-r from-footy-green to-green-600 hover:from-green-700 hover:to-green-700 text-white rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {generatingDescription ? (
+                      <>
+                        <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        Generate Description
+                      </>
+                    )}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="text-xs text-gray-600 mb-3">
+                    Upload source files below first, or optionally add a new file here
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <label className="flex-1">
+                      <input
+                        type="file"
+                        accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.csv"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            handleFileUpload(file);
+                            e.target.value = "";
+                          }
+                        }}
+                        className="text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
+                        disabled={uploadingFile}
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleGenerateDescription}
+                      disabled={generatingDescription || sourceFiles.length === 0}
+                      className="px-4 py-2 bg-gradient-to-r from-footy-green to-green-600 hover:from-green-700 hover:to-green-700 text-white rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {generatingDescription ? (
+                        <>
+                          <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                          </svg>
+                          Generate Description
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Manual Description Input */}
+            <div>
+              <label className="block font-semibold text-gray-900 mb-1">
+                Description:
+              </label>
+              <p className="text-xs text-gray-500 mb-2">
+                3-7 sentence summary displayed in previews and on the release page
+              </p>
+              <textarea
+                value={editedDescription}
+                onChange={(e) => setEditedDescription(e.target.value)}
+                rows={4}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="A brief summary of this release for collectors..."
+              />
+            </div>
+          </div>
+        </div>
+
         {/* Source Files Section */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -1012,109 +1140,6 @@ export default function EditReleasePage() {
               </svg>
               <p className="mt-2 text-sm text-gray-500">No images uploaded yet</p>
               <p className="text-xs text-gray-400 mt-1">Images will be displayed in posts about this release</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Release Content Section */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Release Content
-          </h3>
-
-          <div className="space-y-4">
-            {/* GenAI Description Generator */}
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
-              <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                <svg className="w-5 h-5 text-footy-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
-                GenAI: Generate Description from Source Files
-              </h4>
-              {sourceFiles.length > 0 ? (
-                <>
-                  <p className="text-xs text-gray-600 mb-3">
-                    Uses uploaded source files ({sourceFiles.length} file{sourceFiles.length !== 1 ? 's' : ''}) to generate description
-                  </p>
-                  <button
-                    type="button"
-                    onClick={handleGenerateDescription}
-                    disabled={generatingDescription}
-                    className="px-4 py-2 bg-gradient-to-r from-footy-green to-green-600 hover:from-green-700 hover:to-green-700 text-white rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {generatingDescription ? (
-                      <>
-                        <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Generating...
-                      </>
-                    ) : (
-                      <>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                        Generate Description
-                      </>
-                    )}
-                  </button>
-                </>
-              ) : (
-                <>
-                  <p className="text-xs text-gray-600 mb-3">
-                    Upload source files above first, or optionally add a new file here
-                  </p>
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="file"
-                      accept=".pdf,.png,.jpg,.jpeg,.webp"
-                      onChange={(e) => setDescriptionFile(e.target.files?.[0] || null)}
-                      className="text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-footy-green hover:file:bg-green-200"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleGenerateDescription}
-                      disabled={!descriptionFile || generatingDescription}
-                      className="px-4 py-2 bg-gradient-to-r from-footy-green to-green-600 hover:from-green-700 hover:to-green-700 text-white rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {generatingDescription ? (
-                        <>
-                          <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          Generating...
-                        </>
-                      ) : (
-                        <>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                          </svg>
-                          Generate Description
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* Manual Description Input */}
-            <div>
-              <label className="block font-semibold text-gray-900 mb-1">
-                Description:
-              </label>
-              <p className="text-xs text-gray-500 mb-2">
-                3-7 sentence summary displayed in previews and on the release page
-              </p>
-              <textarea
-                value={editedDescription}
-                onChange={(e) => setEditedDescription(e.target.value)}
-                rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="A brief summary of this release for collectors..."
-              />
             </div>
           </div>
         </div>
