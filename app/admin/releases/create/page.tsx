@@ -749,10 +749,10 @@ export default function CreateReleasePage() {
                     {/* Manual Image Upload Section */}
                     <div className="mb-4">
                       <p className="text-xs font-semibold text-gray-700 mb-2">
-                        Upload Set Images (JPG, PNG, WebP):
+                        Upload Release Images (JPG, PNG, WebP):
                       </p>
                       <p className="text-xs text-gray-600 mb-2">
-                        These images will be displayed in the post
+                        These images will be displayed in the release's image carousel
                       </p>
                       <input
                         type="file"
