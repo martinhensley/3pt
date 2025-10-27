@@ -92,7 +92,7 @@ export async function extractImagesFromPDF(pdfPath: string): Promise<ExtractedIm
 
             // Get dimensions
             const imgWidth = typeof width === 'number' ? width : (width && typeof width === 'object' && 'value' in width ? width.value : 0);
-            const imgHeight = typeof height === 'number' ? height : (height && typeof height === 'object' && 'value' in width ? height.value : 0);
+            const imgHeight = typeof height === 'number' ? height : (height && typeof height === 'object' && 'value' in height ? height.value : 0);
 
             console.log(`  Image dimensions: ${imgWidth}x${imgHeight}`);
 
