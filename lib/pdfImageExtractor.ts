@@ -52,7 +52,8 @@ export async function extractImagesFromPDF(pdfPath: string): Promise<ExtractedIm
         }
 
         // Get all XObject entries
-        const xObjectKeys = xObjects.dict ? xObjects.dict.entries() : [];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const xObjectKeys = (xObjects as any).dict ? (xObjects as any).dict.entries() : [];
         let imageIndexOnPage = 0;
 
         console.log(`Page ${pageIndex + 1}: Found ${xObjectKeys.length} XObjects`);
@@ -63,7 +64,8 @@ export async function extractImagesFromPDF(pdfPath: string): Promise<ExtractedIm
             if (!xObject || typeof xObject !== 'object') continue;
 
             // Check if this XObject is an image
-            const subtypeRef = xObject.dict?.get(pdfDoc.context.obj('Subtype'));
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const subtypeRef = (xObject as any).dict?.get(pdfDoc.context.obj('Subtype'));
             const subtype = subtypeRef ? pdfDoc.context.lookup(subtypeRef) : null;
 
             if (!subtype || subtype.toString() !== '/Image') {
@@ -74,10 +76,14 @@ export async function extractImagesFromPDF(pdfPath: string): Promise<ExtractedIm
             console.log(`Page ${pageIndex + 1}, XObject ${key}: Found image!`);
 
             // Get image properties using dict.get
-            const widthRef = xObject.dict?.get(pdfDoc.context.obj('Width'));
-            const heightRef = xObject.dict?.get(pdfDoc.context.obj('Height'));
-            const colorSpaceRef = xObject.dict?.get(pdfDoc.context.obj('ColorSpace'));
-            const filterRef = xObject.dict?.get(pdfDoc.context.obj('Filter'));
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const widthRef = (xObject as any).dict?.get(pdfDoc.context.obj('Width'));
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const heightRef = (xObject as any).dict?.get(pdfDoc.context.obj('Height'));
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const colorSpaceRef = (xObject as any).dict?.get(pdfDoc.context.obj('ColorSpace'));
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const filterRef = (xObject as any).dict?.get(pdfDoc.context.obj('Filter'));
 
             const width = widthRef ? pdfDoc.context.lookup(widthRef) : null;
             const height = heightRef ? pdfDoc.context.lookup(heightRef) : null;
@@ -101,7 +107,8 @@ export async function extractImagesFromPDF(pdfPath: string): Promise<ExtractedIm
 
             // Try to get image contents
             try {
-              imageData = xObject.contents;
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              imageData = (xObject as any).contents;
             } catch (e) {
               console.log(`  Failed to get image contents:`, e);
               continue;
