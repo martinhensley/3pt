@@ -56,22 +56,22 @@ export default function AdminHeader() {
               Admin Dashboard
             </Link>
             <Link
-              href="/admin/posts/create"
+              href="/admin/posts"
               className="text-footy-orange hover:text-white transition-colors text-sm md:text-base font-bold"
             >
-              Create Post
+              Manage Posts
             </Link>
             <Link
-              href="/admin/releases/create"
+              href="/admin/releases"
               className="text-footy-orange hover:text-white transition-colors text-sm md:text-base font-bold"
             >
-              Create Release
+              Manage Releases
             </Link>
             <Link
-              href="/admin/cards/create"
+              href="/admin/cards"
               className="text-footy-orange hover:text-white transition-colors text-sm md:text-base font-bold"
             >
-              Scan Cards
+              Manage Cards
             </Link>
             <button
               type="button"

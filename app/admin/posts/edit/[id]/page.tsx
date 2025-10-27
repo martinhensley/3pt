@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
+import Breadcrumb from "@/components/Breadcrumb";
 import AdminHeader from "@/components/AdminHeader";
 import Image from "next/image";
 import RichTextEditor from "@/components/RichTextEditor";
@@ -206,13 +207,15 @@ export default function EditPostPage() {
     <AdminLayout maxWidth="4xl">
         {/* Header */}
         <div className="mb-8">
-          <button
-            onClick={() => router.push("/admin/posts")}
-            className="text-footy-green hover:underline mb-4 flex items-center gap-2"
-          >
-            ← Back to Posts
-          </button>
-          <h1 className="text-3xl font-bold text-footy-green mb-2">
+          <Breadcrumb
+            items={[
+              { label: "Admin", href: "/admin" },
+              { label: "Posts", href: "/admin/posts" },
+              { label: "Edit Post", href: `/admin/posts/edit/${postId}` },
+            ]}
+          />
+
+          <h1 className="text-3xl font-bold text-footy-green mb-2 mt-6">
             Edit Post
           </h1>
           <p className="text-gray-600">

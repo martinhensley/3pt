@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import AdminLayout from '@/components/AdminLayout';
+import Breadcrumb from '@/components/Breadcrumb';
 
 interface Card {
   id: string;
@@ -137,22 +138,25 @@ export default function AdminCardsPage() {
   return (
     <AdminLayout maxWidth="7xl">
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-footy-green mb-2">
+      <div className="mb-8">
+        <Breadcrumb
+          items={[
+            { label: "Admin", href: "/admin" },
+            { label: "Cards", href: "/admin/cards" },
+          ]}
+        />
+
+        <div className="flex items-center justify-between mt-6">
+          <div>
+            <h1 className="text-3xl font-bold text-footy-green mb-2">
               Manage Card Images
             </h1>
             <p className="text-gray-600">
               View and edit card details, add images, and manage notes
             </p>
           </div>
-          <Link
-            href="/admin"
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all"
-          >
-            ← Back to Dashboard
-          </Link>
         </div>
+      </div>
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">

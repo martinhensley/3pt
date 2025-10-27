@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import AdminLayout from "@/components/AdminLayout";
+import Breadcrumb from "@/components/Breadcrumb";
 import AdminHeader from "@/components/AdminHeader";
 
 interface ActivityItem {
@@ -135,16 +136,14 @@ function ActivityContent() {
     <AdminLayout>
         {/* Header */}
         <div className="mb-8">
-          <button
-            onClick={() => router.back()}
-            className="text-footy-green hover:underline mb-4 flex items-center gap-2"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back
-          </button>
-          <h1 className="text-3xl font-bold text-footy-green mb-2">
+          <Breadcrumb
+            items={[
+              { label: "Admin", href: "/admin" },
+              { label: "Activity", href: "/admin/activity" },
+            ]}
+          />
+
+          <h1 className="text-3xl font-bold text-footy-green mb-2 mt-6">
             Activity History
           </h1>
           <p className="text-gray-600">

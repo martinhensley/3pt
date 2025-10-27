@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
+import Breadcrumb from "@/components/Breadcrumb";
 import AdminHeader from "@/components/AdminHeader";
 
 interface CardInfo {
@@ -783,13 +784,15 @@ export default function EditReleasePage() {
     <AdminLayout maxWidth="4xl">
         {/* Header */}
         <div className="mb-8">
-          <button
-            onClick={() => router.push("/admin")}
-            className="text-footy-green hover:underline mb-4 flex items-center gap-2"
-          >
-            ← Back to Dashboard
-          </button>
-          <h1 className="text-3xl font-bold text-footy-green mb-2">
+          <Breadcrumb
+            items={[
+              { label: "Admin", href: "/admin" },
+              { label: "Releases", href: "/admin/releases" },
+              { label: "Edit Release", href: `/admin/releases/edit/${releaseId}` },
+            ]}
+          />
+
+          <h1 className="text-3xl font-bold text-footy-green mb-2 mt-6">
             Edit Release
           </h1>
           <p className="text-gray-600">
