@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import AdminLayout from '@/components/AdminLayout';
 
 interface Release {
   id: string;
@@ -285,11 +286,10 @@ export default function BulkScanPage() {
   }, [selectedSetId, selectedParallelId, scannedCards, router]);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4 max-w-6xl">
-        <h1 className="text-3xl font-bold mb-8 text-gray-900">
-          Bulk Card Scanning
-        </h1>
+    <AdminLayout maxWidth="6xl">
+      <h1 className="text-3xl font-bold mb-8 text-gray-900">
+        Bulk Card Scanning
+      </h1>
 
         {/* Context Selection */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
@@ -467,7 +467,6 @@ export default function BulkScanPage() {
             </button>
           </div>
         )}
-      </div>
-    </div>
+    </AdminLayout>
   );
 }

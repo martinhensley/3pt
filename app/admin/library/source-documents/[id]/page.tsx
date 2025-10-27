@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { DocumentType } from "@prisma/client";
 import Image from "next/image";
+import AdminLayout from "@/components/AdminLayout";
 
 interface UsedInRelease {
   id: string;
@@ -167,43 +168,46 @@ export default function SourceDocumentDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
-          <p className="mt-4 text-gray-600">Loading document...</p>
+      <AdminLayout maxWidth="1600px">
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
+            <p className="mt-4 text-gray-600">Loading document...</p>
+          </div>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   if (!document) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-xl text-gray-600">Document not found</p>
-          <button
-            onClick={() => router.push("/admin/library/source-documents")}
-            className="mt-4 text-footy-green hover:text-green-700"
-          >
-            ← Back to Library
-          </button>
+      <AdminLayout maxWidth="1600px">
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <p className="text-xl text-gray-600">Document not found</p>
+            <button
+              onClick={() => router.push("/admin/library/source-documents")}
+              className="mt-4 text-footy-green hover:text-green-700"
+            >
+              ← Back to Library
+            </button>
+          </div>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-[1600px] mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <button
-            onClick={() => router.push("/admin/library/source-documents")}
-            className="text-footy-green hover:text-green-700 mb-4 inline-block"
-          >
-            ← Back to Library
-          </button>
-        </div>
+    <AdminLayout maxWidth="1600px">
+      {/* Header */}
+      <div className="mb-8">
+        <button
+          onClick={() => router.push("/admin/library/source-documents")}
+          className="text-footy-green hover:text-green-700 mb-4 inline-block"
+        >
+          ← Back to Library
+        </button>
+      </div>
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
@@ -471,7 +475,6 @@ export default function SourceDocumentDetailPage() {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+    </AdminLayout>
   );
 }

@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import Header from "@/components/Header";
+import AdminLayout from "@/components/AdminLayout";
 import Link from "next/link";
 
 interface Release {
@@ -91,12 +91,11 @@ export default function ManageReleasesPage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="flex flex-col min-h-screen bg-white">
-        <Header />
-        <div className="flex-grow flex items-center justify-center">
+      <AdminLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
           <p className="text-gray-600">Loading...</p>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
@@ -117,10 +116,7 @@ export default function ManageReleasesPage() {
   });
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      <Header />
-
-      <main className="flex-grow max-w-7xl mx-auto w-full px-4 py-8">
+    <AdminLayout>
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">
@@ -308,7 +304,6 @@ export default function ManageReleasesPage() {
             ))
           )}
         </div>
-      </main>
-    </div>
+    </AdminLayout>
   );
 }

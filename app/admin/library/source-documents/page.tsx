@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { DocumentType } from "@prisma/client";
+import AdminLayout from "@/components/AdminLayout";
 
 interface SourceDocument {
   id: string;
@@ -158,21 +159,20 @@ export default function SourceDocumentsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-[1600px] mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <button
-            onClick={() => router.push("/admin")}
-            className="text-footy-green hover:text-green-700 mb-4 inline-block"
-          >
-            ← Back to Admin
-          </button>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Source Documents Library</h1>
-          <p className="text-gray-600">
-            Manage all source files used for content creation (sell sheets, checklists, etc.)
-          </p>
-        </div>
+    <AdminLayout maxWidth="1600px">
+      {/* Header */}
+      <div className="mb-8">
+        <button
+          onClick={() => router.push("/admin")}
+          className="text-footy-green hover:text-green-700 mb-4 inline-block"
+        >
+          ← Back to Admin
+        </button>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Source Documents Library</h1>
+        <p className="text-gray-600">
+          Manage all source files used for content creation (sell sheets, checklists, etc.)
+        </p>
+      </div>
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
@@ -342,8 +342,6 @@ export default function SourceDocumentsPage() {
             )}
           </>
         )}
-
-      </div>
-    </div>
+    </AdminLayout>
   );
 }

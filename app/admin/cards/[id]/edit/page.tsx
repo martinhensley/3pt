@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import Header from '@/components/Header';
+import AdminLayout from '@/components/AdminLayout';
 
 interface Card {
   id: string;
@@ -171,19 +171,17 @@ export default function EditCardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Header />
+      <AdminLayout maxWidth="5xl">
         <div className="flex items-center justify-center min-h-[60vh]">
           <p className="text-gray-600">Loading card...</p>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   if (!card) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Header />
+      <AdminLayout maxWidth="5xl">
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">
@@ -197,16 +195,13 @@ export default function EditCardPage() {
             </Link>
           </div>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
-        {/* Header */}
+    <AdminLayout maxWidth="5xl">
+      {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-footy-green mb-2">
@@ -415,7 +410,6 @@ export default function EditCardPage() {
             {saving ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
-      </div>
-    </div>
+    </AdminLayout>
   );
 }

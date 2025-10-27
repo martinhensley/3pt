@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import AdminLayout from "@/components/AdminLayout";
 
 interface Checklist {
   id: string;
@@ -124,21 +125,20 @@ export default function ChecklistsLibraryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-[1600px] mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <button
-            onClick={() => router.push("/admin")}
-            className="text-footy-green hover:text-green-700 mb-4 inline-block"
-          >
-            ← Back to Admin
-          </button>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Checklists Library</h1>
-          <p className="text-gray-600">
-            View and manage all set checklists uploaded during release creation
-          </p>
-        </div>
+    <AdminLayout maxWidth="1600px">
+      {/* Header */}
+      <div className="mb-8">
+        <button
+          onClick={() => router.push("/admin")}
+          className="text-footy-green hover:text-green-700 mb-4 inline-block"
+        >
+          ← Back to Admin
+        </button>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Checklists Library</h1>
+        <p className="text-gray-600">
+          View and manage all set checklists uploaded during release creation
+        </p>
+      </div>
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
@@ -279,7 +279,6 @@ export default function ChecklistsLibraryPage() {
             )}
           </>
         )}
-      </div>
-    </div>
+    </AdminLayout>
   );
 }

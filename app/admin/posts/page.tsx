@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import Header from "@/components/Header";
+import AdminLayout from "@/components/AdminLayout";
 import Image from "next/image";
 
 interface Post {
@@ -132,12 +132,11 @@ export default function ManagePostsPage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <div className="flex items-center justify-center h-screen">
+      <AdminLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
           <p className="text-gray-600">Loading...</p>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
@@ -146,10 +145,7 @@ export default function ManagePostsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-
-      <div className="max-w-7xl mx-auto px-4 py-8">
+    <AdminLayout>
         {/* Header */}
         <div className="mb-8">
           <button
@@ -353,7 +349,6 @@ export default function ManagePostsPage() {
             ))
           )}
         </div>
-      </div>
-    </div>
+    </AdminLayout>
   );
 }

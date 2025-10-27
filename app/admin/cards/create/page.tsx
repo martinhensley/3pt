@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/Header';
+import AdminLayout from '@/components/AdminLayout';
 
 interface Release {
   id: string;
@@ -412,18 +412,15 @@ export default function CreateCardPage() {
   }, [scannedCards, selectedRelease, router]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2 text-footy-green">
-            Create Cards
-          </h1>
-          <p className="text-gray-600">
-            AI-powered card scanning and cataloging
-          </p>
-        </div>
+    <AdminLayout maxWidth="7xl">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2 text-footy-green">
+          Create Cards
+        </h1>
+        <p className="text-gray-600">
+          AI-powered card scanning and cataloging
+        </p>
+      </div>
 
         {/* Step 1: Select Release */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
@@ -715,7 +712,6 @@ export default function CreateCardPage() {
             </div>
           </div>
         )}
-      </div>
-    </div>
+    </AdminLayout>
   );
 }

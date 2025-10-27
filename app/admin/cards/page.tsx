@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import Header from '@/components/Header';
+import AdminLayout from '@/components/AdminLayout';
 
 interface Card {
   id: string;
@@ -126,24 +126,20 @@ export default function AdminCardsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Header />
+      <AdminLayout maxWidth="7xl">
         <div className="flex items-center justify-center min-h-[60vh]">
           <p className="text-gray-600">Loading cards...</p>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-footy-green mb-2">
+    <AdminLayout maxWidth="7xl">
+      {/* Header */}
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-footy-green mb-2">
               Manage Card Images
             </h1>
             <p className="text-gray-600">
@@ -416,7 +412,6 @@ export default function AdminCardsPage() {
             </button>
           </div>
         )}
-      </div>
-    </div>
+    </AdminLayout>
   );
 }

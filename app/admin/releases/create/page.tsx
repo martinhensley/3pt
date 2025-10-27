@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import Header from "@/components/Header";
+import AdminLayout from "@/components/AdminLayout";
 import { generateReleaseSlug } from "@/lib/slugGenerator";
 
 interface CardInfo {
@@ -37,6 +37,7 @@ export default function CreateReleasePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [regeneratingDescription, setRegeneratingDescription] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   // Form state
@@ -60,6 +61,13 @@ export default function CreateReleasePage() {
       router.push("/");
     }
   }, [status, router]);
+
+  // Auto-trigger analysis when files are uploaded
+  useEffect(() => {
+    if (releaseFiles.length > 0 && !analysisResult && !loading) {
+      handleAnalyze();
+    }
+  }, [releaseFiles]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -143,9 +151,9 @@ export default function CreateReleasePage() {
       setEditedSets(analysis.sets || []);
 
       // Populate editable post fields with AI-generated content
-      // Format title as "Year Release Name" (e.g., "2024-25 Donruss Soccer")
-      const formattedTitle = analysis.year
-        ? `${analysis.year} ${analysis.releaseName}`
+      // Format title as "Year-Manufacturer-ReleaseName" (e.g., "2024-25 Panini Obsidian Soccer")
+      const formattedTitle = analysis.year && analysis.manufacturer
+        ? `${analysis.year} ${analysis.manufacturer} ${analysis.releaseName}`
         : analysis.releaseName;
       setEditedTitle(formattedTitle);
       setEditedDescription(analysis.description);
@@ -159,6 +167,51 @@ export default function CreateReleasePage() {
       console.error(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRegenerateDescription = async () => {
+    if (!analysisResult) return;
+
+    try {
+      setRegeneratingDescription(true);
+
+      // Re-analyze to get a new description
+      const response = await fetch("/api/analyze/release", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          files: [], // We're regenerating based on existing analysis
+          createDatabaseRecords: false,
+          regenerateDescription: true,
+          analysisData: {
+            manufacturer: editedManufacturer,
+            releaseName: editedReleaseName,
+            year: editedYear,
+            sets: editedSets,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to regenerate description");
+      }
+
+      const result = await response.json();
+      setEditedDescription(result.description || result.analysisData?.description || "");
+
+      setMessage({
+        type: "success",
+        text: "Description regenerated successfully!",
+      });
+    } catch (error) {
+      setMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Failed to regenerate description"
+      });
+      console.error(error);
+    } finally {
+      setRegeneratingDescription(false);
     }
   };
 
@@ -445,12 +498,11 @@ export default function CreateReleasePage() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <div className="flex items-center justify-center h-screen">
+      <AdminLayout maxWidth="4xl">
+        <div className="flex items-center justify-center min-h-[60vh]">
           <p className="text-gray-600">Loading...</p>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
@@ -459,10 +511,7 @@ export default function CreateReleasePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-
-      <div className="max-w-4xl mx-auto px-4 py-8">
+    <AdminLayout maxWidth="4xl">
         {/* Header */}
         <div className="mb-8">
           <button
@@ -926,7 +975,7 @@ export default function CreateReleasePage() {
                         Release Title
                       </label>
                       <p className="text-xs text-gray-500">
-                        Format: Year Release Name (e.g., &quot;2024-25 Donruss Soccer&quot;)
+                        Format: Year Manufacturer Release Name (e.g., &quot;2024-25 Panini Obsidian Soccer&quot;)
                       </p>
                     </div>
                   </div>
@@ -935,24 +984,36 @@ export default function CreateReleasePage() {
                     value={editedTitle}
                     onChange={(e) => setEditedTitle(e.target.value)}
                     className="w-full px-4 py-3 text-lg font-semibold border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange focus:border-transparent bg-white text-gray-900 transition-all"
-                    placeholder="e.g., 2024-25 Donruss Soccer"
+                    placeholder="e.g., 2024-25 Panini Obsidian Soccer"
                   />
                 </div>
 
                 {/* Description */}
                 <div className="bg-white rounded-xl p-6 border-2 border-gray-200 shadow-sm">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-lg">
-                      D
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-lg">
+                        D
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-gray-900">
+                          Description
+                        </label>
+                        <p className="text-xs text-gray-500">
+                          1-5 sentence summary displayed in previews
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-sm font-bold text-gray-900">
-                        Description
-                      </label>
-                      <p className="text-xs text-gray-500">
-                        1-5 sentence summary displayed in previews
-                      </p>
-                    </div>
+                    <button
+                      onClick={handleRegenerateDescription}
+                      disabled={regeneratingDescription || !analysisResult}
+                      className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-bold rounded-lg hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      {regeneratingDescription ? "Regenerating..." : "AI Regenerate"}
+                    </button>
                   </div>
                   <textarea
                     value={editedDescription}
@@ -963,7 +1024,7 @@ export default function CreateReleasePage() {
                   />
                   <div className="mt-2 flex justify-end">
                     <span className="text-xs text-gray-500">
-                      {editedDescription.length} characters
+                      {editedDescription?.length || 0} characters
                     </span>
                   </div>
                 </div>
@@ -974,14 +1035,13 @@ export default function CreateReleasePage() {
             {/* Create Release Button */}
             <button
               onClick={handleCreateRelease}
-              disabled={loading || !editedTitle.trim() || !editedDescription.trim()}
+              disabled={loading || !editedTitle?.trim() || !editedDescription?.trim()}
               className="w-full bg-gradient-to-r from-footy-orange to-orange-600 text-white font-bold py-4 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {loading ? "Creating Release..." : "Create Release"}
             </button>
           </div>
         )}
-      </div>
-    </div>
+    </AdminLayout>
   );
 }

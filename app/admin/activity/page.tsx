@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
-import Header from "@/components/Header";
+import AdminLayout from "@/components/AdminLayout";
 
 interface ActivityItem {
   id: string;
@@ -131,10 +131,7 @@ function ActivityContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-
-      <div className="max-w-7xl mx-auto px-4 py-8">
+    <AdminLayout>
         {/* Header */}
         <div className="mb-8">
           <button
@@ -322,8 +319,7 @@ function ActivityContent() {
             </>
           )}
         </div>
-      </div>
-    </div>
+    </AdminLayout>
   );
 }
 

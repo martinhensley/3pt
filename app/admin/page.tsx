@@ -1,9 +1,9 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import Header from "@/components/Header";
+import AdminLayout from "@/components/AdminLayout";
 
 interface Stats {
   totalReleases: number;
@@ -55,17 +55,17 @@ export default function AdminDashboard() {
   const [actionsExpanded, setActionsExpanded] = useState(true);
   const [libraryExpanded, setLibraryExpanded] = useState(true);
 
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/");
-    }
-  }, [status, router]);
+  // Removed redirect - allow unauthenticated users to see login page
 
   useEffect(() => {
+    if (status === "loading") return; // Wait for auth to finish loading
+
     if (session?.user) {
       fetchStats();
+    } else {
+      setLoading(false); // Stop loading if no user session
     }
-  }, [session]);
+  }, [session, status]);
 
   const fetchStats = async () => {
     try {
@@ -83,26 +83,39 @@ export default function AdminDashboard() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <div className="flex items-center justify-center h-screen">
+      <AdminLayout maxWidth="1600px">
+        <div className="flex items-center justify-center min-h-[60vh]">
           <p className="text-gray-600">Loading...</p>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   if (!session?.user) {
-    return null;
+    return (
+      <AdminLayout maxWidth="1600px">
+        <div className="flex flex-col items-center justify-center min-h-[60vh]">
+          <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
+            <h1 className="text-3xl font-bold text-footy-green mb-4">
+              Admin Login Required
+            </h1>
+            <p className="text-gray-600 mb-6">
+              Please sign in to access the admin dashboard.
+            </p>
+            <button
+              onClick={() => signIn()}
+              className="w-full bg-gradient-to-r from-footy-green to-green-700 text-white font-bold py-3 px-6 rounded-xl hover:shadow-lg hover:scale-105 transition-all"
+            >
+              Sign In
+            </button>
+          </div>
+        </div>
+      </AdminLayout>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-[1600px] mx-auto px-4 pt-6">
-        <Header />
-      </div>
-
-      <div className="max-w-[1600px] mx-auto px-4 py-8">
+    <AdminLayout maxWidth="1600px">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-footy-green">
@@ -525,8 +538,7 @@ export default function AdminDashboard() {
             </div>
           </>
         )}
-      </div>
-    </div>
+    </AdminLayout>
   );
 }
 

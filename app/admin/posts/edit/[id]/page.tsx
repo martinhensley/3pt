@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import Header from "@/components/Header";
+import AdminLayout from "@/components/AdminLayout";
 import Image from "next/image";
 import RichTextEditor from "@/components/RichTextEditor";
 
@@ -202,10 +202,7 @@ export default function EditPostPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-
-      <div className="max-w-4xl mx-auto px-4 py-8">
+    <AdminLayout maxWidth="4xl">
         {/* Header */}
         <div className="mb-8">
           <button
@@ -408,7 +405,6 @@ export default function EditPostPage() {
             </button>
           </div>
         </div>
-      </div>
-    </div>
+    </AdminLayout>
   );
 }
