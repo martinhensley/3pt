@@ -173,6 +173,7 @@ export default function PreviewPostPage() {
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
         </article>
+      </main>
     </AdminLayout>
   );
 }
