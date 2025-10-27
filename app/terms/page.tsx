@@ -35,7 +35,7 @@ export default function TermsPage() {
           {/* Introduction */}
           <section>
             <p className="text-gray-700 leading-relaxed mb-4">
-              Welcome to <span className="font-orbitron">footy<span className="text-footy-orange">.bot</span></span>. These Terms of Service ("Terms") govern your access to and use of our website, services, and content. By accessing or using our website, you agree to be bound by these Terms and our Privacy Policy.
+              Welcome to <span className="font-orbitron">footy<span className="text-footy-orange">.bot</span></span>. These Terms of Service (&ldquo;Terms&rdquo;) govern your access to and use of our website, services, and content. By accessing or using our website, you agree to be bound by these Terms and our Privacy Policy.
             </p>
             <div className="bg-gray-50 border border-gray-400 rounded-lg p-4">
               <p className="text-gray-700 text-sm leading-relaxed font-semibold">
@@ -89,7 +89,7 @@ export default function TermsPage() {
             </h2>
             <div className="space-y-3 text-sm">
               <p className="text-gray-700 leading-relaxed font-semibold">
-                THE WEBSITE AND ALL CONTENT, SERVICES, AND PRODUCTS ARE PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS WITHOUT ANY WARRANTIES OF ANY KIND.
+                THE WEBSITE AND ALL CONTENT, SERVICES, AND PRODUCTS ARE PROVIDED ON AN &ldquo;AS IS&rdquo; AND &ldquo;AS AVAILABLE&rdquo; BASIS WITHOUT ANY WARRANTIES OF ANY KIND.
               </p>
               <p className="text-gray-700 leading-relaxed">
                 TO THE FULLEST EXTENT PERMITTED BY LAW, <span className="font-orbitron text-xs">footy<span className="text-footy-orange">.bot</span></span> EXPRESSLY DISCLAIMS ALL WARRANTIES, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, INCLUDING BUT NOT LIMITED TO:
@@ -220,7 +220,7 @@ export default function TermsPage() {
               Indemnification
             </h2>
             <p className="text-gray-700 leading-relaxed">
-              You agree to defend, indemnify, and hold harmless <span className="font-orbitron">footy<span className="text-footy-orange">.bot</span></span>, its owners, officers, directors, employees, agents, licensors, suppliers, and service providers from and against any and all claims, liabilities, damages, losses, costs, expenses, fees (including reasonable attorneys' fees and court costs) arising from or relating to: (a) your use of the website; (b) your violation of these Terms; (c) your violation of any rights of another party; (d) your violation of any applicable laws or regulations; (e) any content you submit, post, or transmit through the website; or (f) any transactions or interactions you have with third parties through the website.
+              You agree to defend, indemnify, and hold harmless <span className="font-orbitron">footy<span className="text-footy-orange">.bot</span></span>, its owners, officers, directors, employees, agents, licensors, suppliers, and service providers from and against any and all claims, liabilities, damages, losses, costs, expenses, fees (including reasonable attorneys&apos; fees and court costs) arising from or relating to: (a) your use of the website; (b) your violation of these Terms; (c) your violation of any rights of another party; (d) your violation of any applicable laws or regulations; (e) any content you submit, post, or transmit through the website; or (f) any transactions or interactions you have with third parties through the website.
             </p>
           </section>
 
@@ -286,13 +286,13 @@ export default function TermsPage() {
                 <strong>Binding Arbitration:</strong> Except as otherwise provided herein, any dispute, controversy, or claim arising out of or relating to these Terms, or the breach, termination, enforcement, interpretation, or validity thereof, including disputes about the scope or applicability of this agreement to arbitrate, shall be resolved by binding arbitration administered by the American Arbitration Association (AAA) in accordance with its Commercial Arbitration Rules and the procedures set forth in these Terms.
               </p>
               <p className="text-gray-700 leading-relaxed">
-                <strong>CLASS ACTION WAIVER:</strong> YOU AND <span className="font-orbitron text-xs">footy<span className="text-footy-orange">.bot</span></span> AGREE THAT EACH PARTY MAY BRING CLAIMS AGAINST THE OTHER ONLY IN YOUR OR ITS INDIVIDUAL CAPACITY AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED CLASS, CONSOLIDATED, OR REPRESENTATIVE PROCEEDING. UNLESS BOTH YOU AND WE AGREE OTHERWISE, THE ARBITRATOR MAY NOT CONSOLIDATE MORE THAN ONE PERSON'S CLAIMS AND MAY NOT OTHERWISE PRESIDE OVER ANY FORM OF A REPRESENTATIVE OR CLASS PROCEEDING. YOU HEREBY WAIVE ANY RIGHT TO A JURY TRIAL.
+                <strong>CLASS ACTION WAIVER:</strong> YOU AND <span className="font-orbitron text-xs">footy<span className="text-footy-orange">.bot</span></span> AGREE THAT EACH PARTY MAY BRING CLAIMS AGAINST THE OTHER ONLY IN YOUR OR ITS INDIVIDUAL CAPACITY AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED CLASS, CONSOLIDATED, OR REPRESENTATIVE PROCEEDING. UNLESS BOTH YOU AND WE AGREE OTHERWISE, THE ARBITRATOR MAY NOT CONSOLIDATE MORE THAN ONE PERSON&apos;S CLAIMS AND MAY NOT OTHERWISE PRESIDE OVER ANY FORM OF A REPRESENTATIVE OR CLASS PROCEEDING. YOU HEREBY WAIVE ANY RIGHT TO A JURY TRIAL.
               </p>
               <p className="text-gray-700 leading-relaxed">
-                <strong>Arbitration Procedure:</strong> The arbitration will be conducted in English. The arbitrator's decision will be final and binding. Judgment on the arbitration award may be entered in any court having jurisdiction. Each party shall bear its own costs and expenses and an equal share of the arbitrator's fees and administrative fees of arbitration.
+                <strong>Arbitration Procedure:</strong> The arbitration will be conducted in English. The arbitrator&apos;s decision will be final and binding. Judgment on the arbitration award may be entered in any court having jurisdiction. Each party shall bear its own costs and expenses and an equal share of the arbitrator&apos;s fees and administrative fees of arbitration.
               </p>
               <p className="text-gray-700 leading-relaxed">
-                <strong>Exceptions to Arbitration:</strong> Either party may seek injunctive or other equitable relief in any court of competent jurisdiction to prevent the actual or threatened infringement, misappropriation, or violation of a party's intellectual property rights or proprietary information.
+                <strong>Exceptions to Arbitration:</strong> Either party may seek injunctive or other equitable relief in any court of competent jurisdiction to prevent the actual or threatened infringement, misappropriation, or violation of a party&apos;s intellectual property rights or proprietary information.
               </p>
               <p className="text-gray-700 leading-relaxed">
                 <strong>30-Day Right to Opt-Out:</strong> You have the right to opt out of binding arbitration within thirty (30) days of first accepting these Terms by sending written notice to the contact address provided in these Terms. Your notice must include your name, address, and a clear statement that you wish to opt out of this arbitration agreement.
@@ -319,7 +319,7 @@ export default function TermsPage() {
               Changes to Terms
             </h2>
             <p className="text-gray-700 leading-relaxed mb-3">
-              We reserve the right to modify or replace these Terms at any time at our sole discretion. If a revision is material, we will provide at least 30 days' notice prior to any new terms taking effect by posting a notice on the website. What constitutes a material change will be determined at our sole discretion.
+              We reserve the right to modify or replace these Terms at any time at our sole discretion. If a revision is material, we will provide at least 30 days&apos; notice prior to any new terms taking effect by posting a notice on the website. What constitutes a material change will be determined at our sole discretion.
             </p>
             <p className="text-gray-700 leading-relaxed">
               By continuing to access or use the website after revisions become effective, you agree to be bound by the revised terms. If you do not agree to the new terms, you are no longer authorized to use the website.

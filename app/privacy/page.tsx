@@ -138,7 +138,7 @@ export default function PrivacyPage() {
                   eBay Partner Network
                 </h3>
                 <p className="text-gray-700 leading-relaxed">
-                  Our website displays product listings from eBay through the eBay Partner Network. When you click on eBay links, you may be directed to eBay's website, which is governed by eBay's privacy policy. We may earn a commission from qualifying purchases made through these affiliate links.
+                  Our website displays product listings from eBay through the eBay Partner Network. When you click on eBay links, you may be directed to eBay&apos;s website, which is governed by eBay&apos;s privacy policy. We may earn a commission from qualifying purchases made through these affiliate links.
                 </p>
               </div>
 
@@ -218,10 +218,10 @@ export default function PrivacyPage() {
             </p>
           </section>
 
-          {/* Children's Privacy */}
+          {/* Children&apos;s Privacy */}
           <section>
             <h2 className="text-xl font-bold text-gray-800 mb-4 pb-2 border-b border-gray-300">
-              Children's Privacy
+              Children&apos;s Privacy
             </h2>
             <p className="text-gray-700 leading-relaxed">
               Our website is not intended for children under the age of 13. We do not knowingly collect personal information from children under 13. If you believe we have collected information from a child under 13, please contact us immediately, and we will take steps to delete such information.
@@ -254,7 +254,7 @@ export default function PrivacyPage() {
               Changes to This Privacy Policy
             </h2>
             <p className="text-gray-700 leading-relaxed">
-              We may update this Privacy Policy from time to time to reflect changes in our practices or for other operational, legal, or regulatory reasons. We will notify you of any material changes by posting the new Privacy Policy on this page and updating the "Last Updated" date. Your continued use of the website after such changes constitutes your acceptance of the updated Privacy Policy.
+              We may update this Privacy Policy from time to time to reflect changes in our practices or for other operational, legal, or regulatory reasons. We will notify you of any material changes by posting the new Privacy Policy on this page and updating the &ldquo;Last Updated&rdquo; date. Your continued use of the website after such changes constitutes your acceptance of the updated Privacy Policy.
             </p>
           </section>
 
@@ -309,7 +309,7 @@ export default function PrivacyPage() {
             </h2>
             <div className="bg-gray-100 border border-gray-300 rounded-lg p-4">
               <p className="text-gray-700 text-sm leading-relaxed mb-3">
-                THE WEBSITE AND ALL INFORMATION, CONTENT, MATERIALS, AND SERVICES INCLUDED ON OR OTHERWISE MADE AVAILABLE TO YOU THROUGH THIS WEBSITE ARE PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS, UNLESS OTHERWISE SPECIFIED IN WRITING.
+                THE WEBSITE AND ALL INFORMATION, CONTENT, MATERIALS, AND SERVICES INCLUDED ON OR OTHERWISE MADE AVAILABLE TO YOU THROUGH THIS WEBSITE ARE PROVIDED ON AN &ldquo;AS IS&rdquo; AND &ldquo;AS AVAILABLE&rdquo; BASIS, UNLESS OTHERWISE SPECIFIED IN WRITING.
               </p>
               <p className="text-gray-700 text-sm leading-relaxed mb-3">
                 WE MAKE NO REPRESENTATIONS OR WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, AS TO THE OPERATION OF THE WEBSITE OR THE INFORMATION, CONTENT, MATERIALS, OR SERVICES INCLUDED ON OR MADE AVAILABLE THROUGH THE WEBSITE, UNLESS OTHERWISE SPECIFIED IN WRITING.
@@ -341,7 +341,7 @@ export default function PrivacyPage() {
               Affiliate Disclosure (FTC Compliance)
             </h2>
             <p className="text-gray-700 leading-relaxed mb-3">
-              In compliance with the Federal Trade Commission's 16 CFR Part 255 ("Guides Concerning the Use of Endorsements and Testimonials in Advertising"):
+              In compliance with the Federal Trade Commission&apos;s 16 CFR Part 255 (&ldquo;Guides Concerning the Use of Endorsements and Testimonials in Advertising&rdquo;):
             </p>
             <div className="bg-gray-50 border border-gray-400 rounded-lg p-4">
               <p className="text-gray-700 text-sm leading-relaxed mb-3">
@@ -362,7 +362,7 @@ export default function PrivacyPage() {
               Indemnification
             </h2>
             <p className="text-gray-700 leading-relaxed">
-              You agree to defend, indemnify, and hold harmless <span className="font-orbitron">footy<span className="text-footy-orange">.bot</span></span>, its officers, directors, employees, agents, licensors, and service providers from and against any claims, liabilities, damages, judgments, awards, losses, costs, expenses, or fees (including reasonable attorneys' fees) arising out of or relating to your violation of this Privacy Policy or your use of the website, including, but not limited to, your User Content, any use of the website's content, services, and products other than as expressly authorized in this Privacy Policy, or your use of any information obtained from the website.
+              You agree to defend, indemnify, and hold harmless <span className="font-orbitron">footy<span className="text-footy-orange">.bot</span></span>, its officers, directors, employees, agents, licensors, and service providers from and against any claims, liabilities, damages, judgments, awards, losses, costs, expenses, or fees (including reasonable attorneys&apos; fees) arising out of or relating to your violation of this Privacy Policy or your use of the website, including, but not limited to, your User Content, any use of the website&apos;s content, services, and products other than as expressly authorized in this Privacy Policy, or your use of any information obtained from the website.
             </p>
           </section>
 
@@ -379,7 +379,7 @@ export default function PrivacyPage() {
                 <strong>CLASS ACTION WAIVER:</strong> YOU AND <span className="font-orbitron text-xs">footy<span className="text-footy-orange">.bot</span></span> AGREE THAT EACH MAY BRING CLAIMS AGAINST THE OTHER ONLY IN YOUR OR ITS INDIVIDUAL CAPACITY AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED CLASS OR REPRESENTATIVE PROCEEDING. YOU WAIVE ANY RIGHT TO A JURY TRIAL.
               </p>
               <p className="text-gray-700 leading-relaxed">
-                <strong>Exceptions:</strong> Either party may seek injunctive or other equitable relief in any court of competent jurisdiction to prevent the actual or threatened infringement, misappropriation, or violation of a party's intellectual property rights.
+                <strong>Exceptions:</strong> Either party may seek injunctive or other equitable relief in any court of competent jurisdiction to prevent the actual or threatened infringement, misappropriation, or violation of a party&apos;s intellectual property rights.
               </p>
               <p className="text-gray-700 leading-relaxed">
                 <strong>30-Day Right to Opt-Out:</strong> You have the right to opt out of binding arbitration within 30 days of first accepting this Privacy Policy by sending written notice to the contact information below.
