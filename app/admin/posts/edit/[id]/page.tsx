@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
+import AdminHeader from "@/components/AdminHeader";
 import Image from "next/image";
 import RichTextEditor from "@/components/RichTextEditor";
 
@@ -189,7 +190,7 @@ export default function EditPostPage() {
   if (status === "loading" || loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header />
+        <AdminHeader />
         <div className="flex items-center justify-center h-screen">
           <p className="text-gray-600">Loading...</p>
         </div>

@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
+import AdminHeader from "@/components/AdminHeader";
 
 interface CardInfo {
   id?: string;
@@ -753,7 +754,7 @@ export default function EditReleasePage() {
   if (status === "loading" || fetchingRelease) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header />
+        <AdminHeader />
         <div className="flex items-center justify-center h-screen">
           <p className="text-gray-600">Loading...</p>
         </div>
@@ -768,7 +769,7 @@ export default function EditReleasePage() {
   if (!release) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header />
+        <AdminHeader />
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="bg-red-50 text-red-800 p-4 rounded-lg">
             Release not found

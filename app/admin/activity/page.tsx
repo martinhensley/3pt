@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import AdminLayout from "@/components/AdminLayout";
+import AdminHeader from "@/components/AdminHeader";
 
 interface ActivityItem {
   id: string;
@@ -108,7 +109,7 @@ function ActivityContent() {
   if (status === "loading" || loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header />
+        <AdminHeader />
         <div className="flex items-center justify-center h-screen">
           <p className="text-gray-600">Loading...</p>
         </div>
@@ -327,7 +328,7 @@ export default function ActivityHistory() {
   return (
     <Suspense fallback={
       <div className="flex flex-col min-h-screen bg-gray-50">
-        <Header />
+        <AdminHeader />
         <div className="flex-grow flex items-center justify-center">
           <p className="text-gray-600">Loading...</p>
         </div>
