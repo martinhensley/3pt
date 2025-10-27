@@ -15,7 +15,9 @@ export const metadata: Metadata = {
 export default function TermsPage() {
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
-      <Header />
+      <div className="max-w-6xl mx-auto px-6 w-full">
+        <Header />
+      </div>
 
       <main className="flex-grow max-w-6xl mx-auto px-6 py-8">
         {/* Hero Section */}
@@ -381,7 +383,9 @@ export default function TermsPage() {
         </div>
       </main>
 
-      <Footer />
+      <div className="max-w-6xl mx-auto px-6 w-full">
+        <Footer />
+      </div>
     </div>
   );
 }
