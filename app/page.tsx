@@ -69,18 +69,16 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      {/* Header - fixed outside main layout */}
-      <div className="max-w-[1600px] mx-auto w-full px-4 pt-6 mb-6">
-        <Header rounded={true} />
-      </div>
-
-      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pb-12">
+    <div className="min-h-screen bg-gray-50">
+      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
         <aside className="hidden lg:block w-72 flex-shrink-0">
           <EbayAd query="soccer cards" limit={3} title="Latest Soccer Cards" />
         </aside>
 
-        <main className="flex-grow space-y-6">{loading ? (
+        <main className="flex-grow max-w-5xl space-y-6">
+          <Header rounded={true} />
+
+          {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
           </div>
@@ -231,7 +229,9 @@ export default function Home() {
           </div>
         )}
 
-        <EbayAdHorizontal query="soccer memorabilia" limit={4} title="More Soccer Collectibles" />
+          <EbayAdHorizontal query="soccer memorabilia" limit={4} title="More Soccer Collectibles" />
+
+          <Footer rounded={true} />
           </>
         )}
         </main>
@@ -239,11 +239,6 @@ export default function Home() {
         <aside className="hidden lg:block w-72 flex-shrink-0">
           <EbayAd query="soccer autographs" limit={3} title="Soccer Autographs" />
         </aside>
-      </div>
-
-      {/* Footer - fixed outside main layout */}
-      <div className="max-w-[1600px] mx-auto w-full px-4">
-        <Footer rounded={true} />
       </div>
     </div>
   );
