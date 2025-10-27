@@ -161,3 +161,35 @@ export async function PUT(request: NextRequest) {
     );
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Release ID is required" },
+        { status: 400 }
+      );
+    }
+
+    // Delete the release - Prisma will cascade delete related records based on schema
+    await prisma.release.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ success: true, message: "Release deleted successfully" });
+  } catch (error) {
+    console.error("Failed to delete release:", error);
+    return NextResponse.json(
+      { error: "Failed to delete release" },
+      { status: 500 }
+    );
+  }
+}
