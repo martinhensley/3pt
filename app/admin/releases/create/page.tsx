@@ -29,8 +29,9 @@ interface ReleaseAnalysisResult {
   sets: SetInfo[];
   features: string[];
   title: string;
-  content: string;
-  description: string;
+  content?: string;
+  excerpt: string;
+  extractedImageUrls?: string[];
 }
 
 export default function CreateReleasePage() {
@@ -44,6 +45,8 @@ export default function CreateReleasePage() {
   const [releaseFiles, setReleaseFiles] = useState<File[]>([]);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [analysisResult, setAnalysisResult] = useState<ReleaseAnalysisResult | null>(null);
+  const [extractedImages, setExtractedImages] = useState<string[]>([]);
+  const [uploadedFileUrls, setUploadedFileUrls] = useState<Array<{ url: string; filename: string }>>([]);
 
   // Editable release fields
   const [editedManufacturer, setEditedManufacturer] = useState("");
@@ -102,6 +105,7 @@ export default function CreateReleasePage() {
 
       // Upload files
       const uploadedFileData: Array<{ url: string; type: string }> = [];
+      const fileUrls: Array<{ url: string; filename: string }> = [];
       for (const file of releaseFiles) {
         const formData = new FormData();
         formData.append("file", file);
@@ -121,8 +125,12 @@ export default function CreateReleasePage() {
           else if (ext === "html" || ext === "htm") type = "html";
 
           uploadedFileData.push({ url, type });
+          fileUrls.push({ url, filename: file.name });
         }
       }
+
+      // Store uploaded file URLs for display
+      setUploadedFileUrls(fileUrls);
 
       const allFiles = uploadedFileData;
 
@@ -150,17 +158,24 @@ export default function CreateReleasePage() {
       setEditedYear(analysis.year);
       setEditedSets(analysis.sets || []);
 
+      // Store extracted images from PDF
+      if (analysis.extractedImageUrls && analysis.extractedImageUrls.length > 0) {
+        setExtractedImages(analysis.extractedImageUrls);
+      }
+
       // Populate editable post fields with AI-generated content
       // Format title as "Year-Manufacturer-ReleaseName" (e.g., "2024-25 Panini Obsidian Soccer")
       const formattedTitle = analysis.year && analysis.manufacturer
         ? `${analysis.year} ${analysis.manufacturer} ${analysis.releaseName}`
         : analysis.releaseName;
       setEditedTitle(formattedTitle);
-      setEditedDescription(analysis.description);
+      setEditedDescription(analysis.excerpt || "");
 
+      const imageCount = analysis.extractedImageUrls?.length || 0;
+      const imageMessage = imageCount > 0 ? ` ${imageCount} images extracted from PDF.` : '';
       setMessage({
         type: "success",
-        text: "Release analyzed successfully! Review and edit the content below before publishing.",
+        text: `Release analyzed successfully!${imageMessage} Review and edit the content below before publishing.`,
       });
     } catch (error) {
       setMessage({ type: "error", text: error instanceof Error ? error.message : "Failed to analyze release" });
@@ -176,20 +191,15 @@ export default function CreateReleasePage() {
     try {
       setRegeneratingDescription(true);
 
-      // Re-analyze to get a new description
-      const response = await fetch("/api/analyze/release", {
+      // Generate a new description using the AI API
+      const response = await fetch("/api/generate-description", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          files: [], // We're regenerating based on existing analysis
-          createDatabaseRecords: false,
-          regenerateDescription: true,
-          analysisData: {
-            manufacturer: editedManufacturer,
-            releaseName: editedReleaseName,
-            year: editedYear,
-            sets: editedSets,
-          },
+          manufacturer: editedManufacturer,
+          releaseName: editedReleaseName,
+          year: editedYear,
+          sets: editedSets,
         }),
       });
 
@@ -198,7 +208,7 @@ export default function CreateReleasePage() {
       }
 
       const result = await response.json();
-      setEditedDescription(result.description || result.analysisData?.description || "");
+      setEditedDescription(result.excerpt || "");
 
       setMessage({
         type: "success",
@@ -420,7 +430,8 @@ export default function CreateReleasePage() {
             releaseDate: editedReleaseDate || null,
             sets: editedSets,
             slug,
-            description: editedDescription,
+            excerpt: editedDescription,
+            extractedImageUrls: extractedImages,
           },
         }),
       });
@@ -477,6 +488,8 @@ export default function CreateReleasePage() {
       setAnalysisResult(null);
       setReleaseFiles([]);
       setImageFiles([]);
+      setExtractedImages([]);
+      setUploadedFileUrls([]);
       setEditedManufacturer("");
       setEditedReleaseName("");
       setEditedYear("");
@@ -588,53 +601,6 @@ export default function CreateReleasePage() {
             )}
           </div>
 
-          {/* Image Upload */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
-              Upload Set Images (JPG, PNG, WebP)
-            </label>
-            <p className="text-xs text-gray-600 mb-2">
-              These images will be displayed in the post
-            </p>
-            <input
-              type="file"
-              multiple
-              accept=".jpg,.jpeg,.png,.webp,.gif"
-              onChange={handleImageFileChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white text-gray-900"
-            />
-            {imageFiles.length > 0 && (
-              <div className="mt-3 space-y-2">
-                <p className="text-sm font-semibold text-gray-700">
-                  Images for post:
-                </p>
-                {imageFiles.map((file, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between bg-gray-50 p-2 rounded"
-                  >
-                    <div className="flex items-center gap-2">
-                      <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <span className="text-sm text-gray-700">{file.name}</span>
-                      <span className="text-xs text-gray-500">
-                        ({(file.size / 1024).toFixed(1)} KB)
-                      </span>
-                    </div>
-                    <button
-                      onClick={() => removeImageFile(index)}
-                      className="text-red-500 hover:text-red-700 p-1"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
 
           {/* Analyze Button */}
           {!analysisResult && (
@@ -721,6 +687,114 @@ export default function CreateReleasePage() {
                   <span className="font-semibold">Total Cards Extracted:</span>{" "}
                   {editedSets.reduce((sum, set) => sum + (set.cards?.length || 0), 0)}
                 </p>
+                {/* Source Documents Section */}
+                {(uploadedFileUrls.length > 0 || extractedImages.length > 0 || imageFiles.length > 0) && (
+                  <div className="mt-3 pt-3 border-t border-blue-300">
+                    <p className="font-semibold text-gray-800 mb-3">
+                      Source Documents:
+                    </p>
+
+                    {/* Uploaded Files */}
+                    {uploadedFileUrls.length > 0 && (
+                      <div className="mb-4">
+                        <p className="text-xs font-semibold text-gray-700 mb-2">
+                          Uploaded Documents ({uploadedFileUrls.length}):
+                        </p>
+                        <div className="space-y-2">
+                          {uploadedFileUrls.map((file, idx) => (
+                            <div key={idx} className="flex items-center gap-2 p-2 bg-gray-50 rounded border border-gray-200">
+                              <svg className="w-4 h-4 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                              <a
+                                href={file.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm text-blue-600 hover:underline flex-1 truncate"
+                              >
+                                {file.filename}
+                              </a>
+                              <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                              </svg>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Extracted Images from PDF */}
+                    {extractedImages.length > 0 && (
+                      <div className="mb-4">
+                        <p className="text-xs font-semibold text-gray-700 mb-2">
+                          Extracted Images ({extractedImages.length}) - Release Carousel:
+                        </p>
+                        <div className="grid grid-cols-4 gap-2">
+                          {extractedImages.map((imageUrl, idx) => (
+                            <div key={idx} className="relative aspect-square border-2 border-green-300 rounded-lg overflow-hidden bg-white">
+                              <img
+                                src={imageUrl}
+                                alt={`Extracted image ${idx + 1}`}
+                                className="w-full h-full object-contain"
+                              />
+                              <div className="absolute bottom-0 left-0 right-0 bg-green-900/80 text-white text-xs text-center py-1">
+                                Image {idx + 1}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Manual Image Upload Section */}
+                    <div className="mb-4">
+                      <p className="text-xs font-semibold text-gray-700 mb-2">
+                        Upload Set Images (JPG, PNG, WebP):
+                      </p>
+                      <p className="text-xs text-gray-600 mb-2">
+                        These images will be displayed in the post
+                      </p>
+                      <input
+                        type="file"
+                        multiple
+                        accept=".jpg,.jpeg,.png,.webp,.gif"
+                        onChange={handleImageFileChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white text-gray-900 text-sm"
+                      />
+                      {imageFiles.length > 0 && (
+                        <div className="mt-3 space-y-2">
+                          <p className="text-xs font-semibold text-gray-700">
+                            Images for post ({imageFiles.length}):
+                          </p>
+                          {imageFiles.map((file, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center justify-between bg-gray-50 p-2 rounded border border-gray-200"
+                            >
+                              <div className="flex items-center gap-2">
+                                <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <span className="text-sm text-gray-700">{file.name}</span>
+                                <span className="text-xs text-gray-500">
+                                  ({(file.size / 1024).toFixed(1)} KB)
+                                </span>
+                              </div>
+                              <button
+                                onClick={() => removeImageFile(index)}
+                                className="text-red-500 hover:text-red-700 p-1"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
                 <div className="mt-3 pt-3 border-t border-blue-300">
                   <div className="flex items-center justify-between mb-3">
                     <p className="font-semibold">Sets Breakdown:</p>

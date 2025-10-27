@@ -8,6 +8,11 @@ import {
   createReleaseWithSets,
   addCardsToSet,
 } from "@/lib/database";
+import { extractImagesFromPDF, filterImagesBySize } from "@/lib/pdfImageExtractor";
+import { put } from "@vercel/blob";
+import path from "path";
+import { tmpdir } from "os";
+import { writeFile, mkdir } from "fs/promises";
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -30,6 +35,7 @@ export async function POST(request: NextRequest) {
     // Store original files and parsed content for database storage
     let sellSheetText: string | undefined;
     let sourceFiles: Array<{ url: string; type: string; filename?: string }> | undefined;
+    let extractedImageUrls: string[] = [];
 
     // If analysisData is provided, use it directly (for creating DB records after analysis)
     if (analysisData) {
@@ -37,6 +43,7 @@ export async function POST(request: NextRequest) {
       // Get sell sheet data if it was passed through
       sellSheetText = analysisData.sellSheetText;
       sourceFiles = analysisData.sourceFiles;
+      extractedImageUrls = analysisData.extractedImageUrls || [];
     } else {
       // Otherwise, perform analysis
       if (!files || !Array.isArray(files) || files.length === 0) {
@@ -69,12 +76,82 @@ export async function POST(request: NextRequest) {
         filename: parsedDocuments[index]?.metadata?.filename,
       }));
 
+      // Extract images from PDF files and upload to Vercel Blob
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const parsedDoc = parsedDocuments[i];
+
+        if (file.type === 'pdf' || parsedDoc?.type === 'pdf') {
+          try {
+            console.log(`Extracting images from PDF: ${file.url}`);
+
+            // Download PDF to temp location
+            const tempDir = path.join(tmpdir(), 'footy-pdf-extraction');
+            await mkdir(tempDir, { recursive: true });
+
+            const response = await fetch(file.url);
+            if (!response.ok) {
+              console.warn(`Failed to download PDF: ${response.statusText}`);
+              continue;
+            }
+
+            const pdfBuffer = Buffer.from(await response.arrayBuffer());
+            const tempPdfPath = path.join(tempDir, `temp-${Date.now()}.pdf`);
+            await writeFile(tempPdfPath, pdfBuffer);
+
+            // Extract images from PDF
+            const extractedImages = await extractImagesFromPDF(tempPdfPath);
+            console.log(`Found ${extractedImages.length} images in PDF`);
+
+            // Filter to get substantial images (min 200x200)
+            const filteredImages = filterImagesBySize(extractedImages, 200, 200);
+            console.log(`${filteredImages.length} images after filtering`);
+
+            // Upload each image to Vercel Blob
+            for (let imgIndex = 0; imgIndex < filteredImages.length; imgIndex++) {
+              const image = filteredImages[imgIndex];
+              const filename = `release-image-p${image.pageNumber}-${imgIndex}.${image.format}`;
+
+              try {
+                const blob = await put(filename, image.buffer, {
+                  access: 'public',
+                  contentType: `image/${image.format}`,
+                });
+
+                extractedImageUrls.push(blob.url);
+                console.log(`Uploaded image: ${blob.url}`);
+              } catch (uploadError) {
+                console.warn(`Failed to upload image ${filename}:`, uploadError);
+              }
+            }
+          } catch (extractError) {
+            console.warn(`Failed to extract images from PDF ${file.url}:`, extractError);
+            // Continue with other files
+          }
+        }
+      }
+
+      console.log(`Total extracted images: ${extractedImageUrls.length}`);
+
       // Analyze with AI
       analysis = await analyzeReleaseDocuments(parsedDocuments);
 
-      // Attach sell sheet data to analysis for potential later use
-      (analysis as ReleaseAnalysis & { sellSheetText?: string; sourceFiles?: Array<{ url: string; type: string; filename?: string }> }).sellSheetText = sellSheetText;
-      (analysis as ReleaseAnalysis & { sellSheetText?: string; sourceFiles?: Array<{ url: string; type: string; filename?: string }> }).sourceFiles = sourceFiles;
+      // Attach sell sheet data and extracted images to analysis for potential later use
+      (analysis as ReleaseAnalysis & {
+        sellSheetText?: string;
+        sourceFiles?: Array<{ url: string; type: string; filename?: string }>;
+        extractedImageUrls?: string[];
+      }).sellSheetText = sellSheetText;
+      (analysis as ReleaseAnalysis & {
+        sellSheetText?: string;
+        sourceFiles?: Array<{ url: string; type: string; filename?: string }>;
+        extractedImageUrls?: string[];
+      }).sourceFiles = sourceFiles;
+      (analysis as ReleaseAnalysis & {
+        sellSheetText?: string;
+        sourceFiles?: Array<{ url: string; type: string; filename?: string }>;
+        extractedImageUrls?: string[];
+      }).extractedImageUrls = extractedImageUrls;
     }
 
     // Create database records if requested
@@ -93,7 +170,7 @@ export async function POST(request: NextRequest) {
             name: analysis.releaseName,
             year: analysis.year,
             slug: analysis.slug,
-            description: analysis.description,
+            description: analysis.excerpt,
             releaseDate: analysis.releaseDate ? new Date(analysis.releaseDate) : null,
             sellSheetText,
             sourceFiles,
@@ -125,11 +202,39 @@ export async function POST(request: NextRequest) {
           }
         }
 
+        // Create Image records for extracted PDF images
+        // These will be used in the release image carousel
+        const imagesCreated: string[] = [];
+        if (extractedImageUrls.length > 0) {
+          const { prisma } = await import('@/lib/prisma');
+
+          for (let i = 0; i < extractedImageUrls.length; i++) {
+            const imageUrl = extractedImageUrls[i];
+
+            try {
+              await prisma.image.create({
+                data: {
+                  releaseId: release.id,
+                  url: imageUrl,
+                  order: i,
+                  caption: null,
+                },
+              });
+              imagesCreated.push(imageUrl);
+            } catch (imageError) {
+              console.warn(`Failed to create image record for ${imageUrl}:`, imageError);
+            }
+          }
+
+          console.log(`Created ${imagesCreated.length} image records for release`);
+        }
+
         createdRecords = {
           manufacturer,
           release,
           cardsCreated,
           totalCards: Object.values(cardsCreated).reduce((sum, count) => sum + count, 0),
+          imagesCreated,
         };
       } catch (dbError) {
         console.error("Database creation error:", dbError);
