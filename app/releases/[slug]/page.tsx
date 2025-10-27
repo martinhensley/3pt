@@ -261,6 +261,15 @@ export default function ReleasePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
 
+      {/* Header at top - full width */}
+      <div className="w-full px-4 pt-6">
+        <div className="max-w-[1600px] mx-auto">
+          <div className="max-w-5xl mx-auto lg:ml-[304px]">
+            <Header showBackButton={false} rounded={true} />
+          </div>
+        </div>
+      </div>
+
       <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
         <aside className="hidden lg:block w-72 flex-shrink-0">
           <EbayAd
@@ -271,7 +280,6 @@ export default function ReleasePage() {
         </aside>
 
         <main className="flex-grow max-w-5xl space-y-6">
-          <Header showBackButton={false} rounded={true} />
 
           <Breadcrumb
             items={[
