@@ -61,15 +61,6 @@ export default function PostsIndex() {
             </div>
           ) : (
             <>
-              <div className="mb-8">
-                <h1 className="text-4xl font-bold text-footy-green mb-2">
-                  All Posts
-                </h1>
-                <p className="text-gray-600">
-                  Browse our complete collection of articles and posts
-                </p>
-              </div>
-
               {posts.length === 0 ? (
                 <div className="text-center py-20">
                   <div className="bg-white rounded-lg shadow-lg p-12 max-w-2xl mx-auto transition-colors duration-300">
