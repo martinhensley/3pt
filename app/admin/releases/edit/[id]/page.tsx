@@ -791,13 +791,6 @@ export default function EditReleasePage() {
               { label: "Edit Release", href: `/admin/releases/edit/${releaseId}` },
             ]}
           />
-
-          <h1 className="text-3xl font-bold text-footy-green mb-2 mt-6">
-            Edit Release
-          </h1>
-          <p className="text-gray-600">
-            Update release information and manage sets
-          </p>
         </div>
 
         {/* Message */}

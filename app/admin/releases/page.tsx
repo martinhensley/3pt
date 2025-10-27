@@ -122,25 +122,13 @@ export default function ManageReleasesPage() {
           <Breadcrumb
             items={[
               { label: "Admin", href: "/admin" },
-              { label: "Releases", href: "/admin/releases" },
+              { label: "Manage Releases & Sets", href: "/admin/releases" },
             ]}
           />
 
-          <div className="flex items-center justify-between mt-6 mb-4">
-            <h1 className="text-3xl font-bold text-gray-900">
-              Manage Releases & Sets
-            </h1>
-            <Link
-              href="/admin/releases/create"
-              className="px-4 py-2 bg-footy-green hover:bg-green-700 text-white rounded-lg transition-colors"
-            >
-              Create New Release & Set(s)
-            </Link>
-          </div>
-
           {message && (
             <div
-              className={`p-4 rounded-lg mb-4 ${
+              className={`p-4 rounded-lg mb-4 mt-6 ${
                 message.type === "success"
                   ? "bg-green-100 text-green-800"
                   : "bg-red-100 text-red-800"
@@ -150,24 +138,8 @@ export default function ManageReleasesPage() {
             </div>
           )}
 
-          {/* Filters */}
-          <div className="flex gap-4 mb-6">
-            <select
-              value={manufacturerFilter}
-              onChange={(e) => setManufacturerFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
-            >
-              <option value="all">All Manufacturers</option>
-              {manufacturers.map((manufacturer) => (
-                <option key={manufacturer} value={manufacturer}>
-                  {manufacturer}
-                </option>
-              ))}
-            </select>
-          </div>
-
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 mt-6">
             <div className="bg-gradient-to-r from-footy-green to-green-600 rounded-lg p-6 text-white">
               <div className="text-3xl font-bold">{filteredReleases.length}</div>
               <div className="text-sm opacity-90">Total Releases</div>
@@ -187,6 +159,28 @@ export default function ManageReleasesPage() {
               </div>
               <div className="text-sm opacity-90">Total Cards</div>
             </div>
+          </div>
+
+          {/* Filters and Actions */}
+          <div className="flex items-center justify-between gap-4 mb-6">
+            <select
+              value={manufacturerFilter}
+              onChange={(e) => setManufacturerFilter(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
+            >
+              <option value="all">All Manufacturers</option>
+              {manufacturers.map((manufacturer) => (
+                <option key={manufacturer} value={manufacturer}>
+                  {manufacturer}
+                </option>
+              ))}
+            </select>
+            <Link
+              href="/admin/releases/create"
+              className="px-4 py-2 bg-footy-green hover:bg-green-700 text-white rounded-lg transition-colors"
+            >
+              Create New Release
+            </Link>
           </div>
         </div>
 

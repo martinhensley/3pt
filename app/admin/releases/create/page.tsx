@@ -535,13 +535,6 @@ export default function CreateReleasePage() {
               { label: "Create Release", href: "/admin/releases/create" },
             ]}
           />
-
-          <h1 className="text-3xl font-bold text-footy-green mb-2 mt-6">
-            Create Release & Set(s)
-          </h1>
-          <p className="text-gray-600">
-            Upload documents to analyze and create a new release with sets
-          </p>
         </div>
 
         {/* Message */}

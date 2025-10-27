@@ -139,16 +139,9 @@ function ActivityContent() {
           <Breadcrumb
             items={[
               { label: "Admin", href: "/admin" },
-              { label: "Activity", href: "/admin/activity" },
+              { label: "Activity History", href: "/admin/activity" },
             ]}
           />
-
-          <h1 className="text-3xl font-bold text-footy-green mb-2 mt-6">
-            Activity History
-          </h1>
-          <p className="text-gray-600">
-            Complete history of posts, releases, sets, and cards
-          </p>
         </div>
 
         {/* Filters and Sorting */}

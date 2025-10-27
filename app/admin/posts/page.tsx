@@ -152,16 +152,9 @@ export default function ManagePostsPage() {
           <Breadcrumb
             items={[
               { label: "Admin", href: "/admin" },
-              { label: "Posts", href: "/admin/posts" },
+              { label: "Manage Posts", href: "/admin/posts" },
             ]}
           />
-
-          <h1 className="text-3xl font-bold text-footy-green mb-2 mt-6">
-            Manage Posts
-          </h1>
-          <p className="text-gray-600">
-            View, edit, publish, and delete all blog posts
-          </p>
         </div>
 
         {/* Message */}

@@ -214,13 +214,6 @@ export default function EditPostPage() {
               { label: "Edit Post", href: `/admin/posts/edit/${postId}` },
             ]}
           />
-
-          <h1 className="text-3xl font-bold text-footy-green mb-2 mt-6">
-            Edit Post
-          </h1>
-          <p className="text-gray-600">
-            Update post content and settings
-          </p>
         </div>
 
         {/* Message */}

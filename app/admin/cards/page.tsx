@@ -142,20 +142,9 @@ export default function AdminCardsPage() {
         <Breadcrumb
           items={[
             { label: "Admin", href: "/admin" },
-            { label: "Cards", href: "/admin/cards" },
+            { label: "Manage Card Images", href: "/admin/cards" },
           ]}
         />
-
-        <div className="flex items-center justify-between mt-6">
-          <div>
-            <h1 className="text-3xl font-bold text-footy-green mb-2">
-              Manage Card Images
-            </h1>
-            <p className="text-gray-600">
-              View and edit card details, add images, and manage notes
-            </p>
-          </div>
-        </div>
       </div>
 
         {/* Filters */}
