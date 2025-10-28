@@ -490,6 +490,7 @@ export default function EditReleasePage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          releaseId: release!.id,
           manufacturer: editedManufacturer,
           releaseName: editedReleaseName,
           year: editedYear,
