@@ -43,42 +43,9 @@ export async function GET(request: NextRequest) {
         },
       });
     } else if (slug) {
-      // Parse slug to extract card info
-      // Format: year-releasename-setname-cardnumber-playername-parallel
-      // Example: 2024-25-donruss-soccer-optic-200-mikayil-faye-gold-power-1of1
-
-      // Extract player name from slug for filtering
-      // Player names typically appear after set name and card number
-      // Look for consecutive non-numeric parts that could be a name
-      const slugParts = slug.split('-');
-
-      // Find player name parts (after we skip year, release, set, and card number)
-      // Strategy: Look for first name-like word that's not a known keyword
-      const skipWords = ['base', 'optic', 'donruss', 'soccer', 'panini', 'topps', 'select', 'prizm'];
-      const potentialNameParts: string[] = [];
-
-      for (let i = 0; i < slugParts.length; i++) {
-        const part = slugParts[i];
-        // Skip years (2024, 25), skip known keywords, skip very long parts (likely parallel names)
-        if (!/^\d+$/.test(part) && !skipWords.includes(part.toLowerCase()) && part.length <= 12) {
-          // Could be part of a player name
-          if (potentialNameParts.length < 3) { // Names rarely have more than 3 parts
-            potentialNameParts.push(part);
-          }
-        }
-      }
-
-      // Use first potential name part for searching (usually last name or first name)
-      const searchName = potentialNameParts.length > 0 ? potentialNameParts[0] : '';
-
-      // Fetch cards matching the player name (case insensitive partial match)
-      const cards = await prisma.card.findMany({
-        where: searchName ? {
-          playerName: {
-            contains: searchName,
-            mode: 'insensitive'
-          }
-        } : {},
+      // Fetch by slug - now that cards have slugs in the database
+      card = await prisma.card.findUnique({
+        where: { slug },
         include: {
           set: {
             include: {
@@ -93,103 +60,7 @@ export async function GET(request: NextRequest) {
             orderBy: { order: 'asc' }
           },
         },
-        // Limit to reasonable number to avoid loading entire database
-        take: 100
       });
-
-      // Find the best matching card by generating slugs for each card
-      card = cards.find(c => {
-        // Clean set name: Handle Optic vs Base Set differently
-        let cleanSetName = c.set.name;
-
-        // For Optic sets: "Optic Base Set" -> "Optic", "Base Optic" -> "Optic"
-        if (cleanSetName.toLowerCase().includes('optic')) {
-          cleanSetName = cleanSetName
-            .replace(/\boptic\s+base\s+set\b/gi, 'Optic')
-            .replace(/\boptic\s+base\b/gi, 'Optic')
-            .replace(/\bbase\s+optic\b/gi, 'Optic');
-        } else {
-          // For Base Set: "Base Set" -> "Base"
-          cleanSetName = cleanSetName
-            .replace(/\bbase\s+set\b/gi, 'Base');
-        }
-
-        // Remove remaining "set/sets"
-        cleanSetName = cleanSetName.replace(/\bsets?\b/gi, '').trim();
-
-        const cardSlugParts = [
-          c.set.release.year,
-          c.set.release.name,
-          cleanSetName,
-          c.cardNumber || '',
-          c.playerName || 'unknown',
-        ];
-
-        // Add parallel/variant if not base
-        if (c.parallelType && c.parallelType.toLowerCase() !== 'base') {
-          cardSlugParts.push(c.parallelType);
-        } else if (c.variant && c.variant.toLowerCase() !== 'base') {
-          cardSlugParts.push(c.variant);
-        }
-
-        const generatedSlug = cardSlugParts
-          .filter(Boolean)
-          .join('-')
-          .toLowerCase()
-          .replace(/\s+/g, '-')
-          .replace(/[^a-z0-9-]/g, '')
-          .replace(/-+/g, '-')
-          .replace(/^-|-$/g, '')
-          .replace(/1-of-1/g, '1of1'); // Convert "1-of-1" to "1of1"
-
-        // Try exact match first
-        return generatedSlug === slug;
-      });
-
-      // If no exact match found, try fuzzy matching as fallback
-      // This helps when URLs might be slightly different due to formatting
-      if (!card) {
-        card = cards.find(c => {
-          // Clean set name for this card
-          let cleanSetName = c.set.name;
-          if (cleanSetName.toLowerCase().includes('optic')) {
-            cleanSetName = cleanSetName
-              .replace(/\boptic\s+base\s+set\b/gi, 'Optic')
-              .replace(/\boptic\s+base\b/gi, 'Optic')
-              .replace(/\bbase\s+optic\b/gi, 'Optic');
-          } else {
-            cleanSetName = cleanSetName.replace(/\bbase\s+set\b/gi, 'Base');
-          }
-          cleanSetName = cleanSetName.replace(/\bsets?\b/gi, '').trim();
-
-          const cardSlugParts = [
-            c.set.release.year,
-            c.set.release.name,
-            cleanSetName,
-            c.cardNumber || '',
-            c.playerName || 'unknown',
-          ];
-
-          if (c.parallelType && c.parallelType.toLowerCase() !== 'base') {
-            cardSlugParts.push(c.parallelType);
-          }
-
-          // Check if the requested slug starts with the base pattern (without parallel)
-          // This helps match Base cards when parallel-specific URL is requested
-          const baseSlugPattern = cardSlugParts.slice(0, 5)
-            .filter(Boolean)
-            .join('-')
-            .toLowerCase()
-            .replace(/\s+/g, '-')
-            .replace(/[^a-z0-9-]/g, '')
-            .replace(/-+/g, '-')
-            .replace(/^-|-$/g, '');
-
-          // Only use fuzzy match for Base cards (null or "Base" parallelType)
-          const isBaseCard = !c.parallelType || c.parallelType === '' || c.parallelType.toLowerCase() === 'base';
-          return isBaseCard && slug.startsWith(baseSlugPattern);
-        });
-      }
     }
 
     if (!card) {
