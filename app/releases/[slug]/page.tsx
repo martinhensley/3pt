@@ -374,10 +374,12 @@ export default function ReleasePage() {
 
             {/* Description */}
             {release.description && (
-              <div className="p-8 pt-6">
-                <p className="text-lg text-white/90 leading-relaxed">
-                  {release.description}
-                </p>
+              <div className="p-8 pt-6 space-y-4">
+                {release.description.split('\n\n').map((paragraph, idx) => (
+                  <p key={idx} className="text-lg text-white/90 leading-relaxed">
+                    {paragraph}
+                  </p>
+                ))}
               </div>
             )}
 

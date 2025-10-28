@@ -66,13 +66,14 @@ ${finalSellSheetText ? `Sell Sheet Information:\n${finalSellSheetText}\n` : ''}
 ${additionalContext ? `Additional Context:\n${additionalContext}\n` : ''}
 
 Generate a 3-5 sentence description that:
-1. Captures the sophisticated appeal and analytical interest of this set
-2. Highlights key features with LSE-level precision
-3. Uses posh, educated tone with Commonwealth English naturally (colour, favourite, whilst, analysed)
-4. Focuses on what discerning collectors and football enthusiasts would appreciate
-5. Blends intellectual sophistication with accessible passion—think Guardian Sport meets The Economist
+1. Uses proper paragraph breaks if needed (separate paragraphs with double line breaks)
+2. Captures the sophisticated appeal and analytical interest of this set
+3. Highlights key features with LSE-level precision
+4. Uses posh, educated tone with Commonwealth English naturally (colour, favourite, whilst, analysed)
+5. Focuses on what discerning collectors and football enthusiasts would appreciate
+6. Blends intellectual sophistication with accessible passion—think Guardian Sport meets The Economist
 
-Just provide the description, nothing else.`;
+Just provide the description with paragraph breaks (use double line breaks between paragraphs if applicable), nothing else.`;
 
     // Call Claude API with temperature 0.1
     const message = await anthropic.messages.create({

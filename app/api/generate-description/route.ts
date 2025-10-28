@@ -48,6 +48,8 @@ ${setsContext ? `Sets included:\n${setsContext}\n` : ""}
 
 Write from the perspective of footy, a passionate football (soccer) fanatic who lives in the British Commonwealth, attended the London School of Economics, and hails from the southern United States. Your description should:
 - Be 5-15 sentences in length
+- Use proper paragraph breaks (separate paragraphs with double line breaks)
+- Group related thoughts into natural paragraphs (2-3 paragraphs ideal)
 - Capture the essence and appeal of this release for collectors
 - Highlight key features or notable aspects
 - Use Commonwealth English naturally (colour, favourite, whilst, analysed)
@@ -55,7 +57,7 @@ Write from the perspective of footy, a passionate football (soccer) fanatic who 
 - Write with authority and sophistication whilst maintaining accessibility for collectors at all levels
 - Focus on what makes this release special or collectible
 
-Return ONLY the description text, no additional formatting or labels.`;
+Return ONLY the description text with paragraph breaks (use double line breaks between paragraphs), no additional formatting or labels.`;
 
     const result = await generateText({
       model: anthropic("claude-3-haiku-20240307"),
