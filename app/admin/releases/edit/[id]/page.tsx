@@ -1201,7 +1201,7 @@ export default function EditReleasePage() {
                         <textarea
                           value={set.description || ""}
                           onChange={(e) => handleUpdateSet(idx, "description", e.target.value)}
-                          placeholder="Description (optional) - Click the AI button to generate"
+                          placeholder="Description (optional, 3-5 sentences) - Click the AI button to generate"
                           rows={2}
                           className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500"
                         />

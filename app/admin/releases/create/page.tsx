@@ -837,7 +837,7 @@ export default function CreateReleasePage() {
                           <textarea
                             value={set.description || ""}
                             onChange={(e) => handleUpdateSet(idx, "description", e.target.value)}
-                            placeholder="Description (optional)"
+                            placeholder="Description (optional, 3-5 sentences)"
                             rows={2}
                             className="w-full px-2 py-1 text-xs border border-gray-300 rounded bg-white text-gray-900 focus:ring-1 focus:ring-blue-500 mb-2"
                           />

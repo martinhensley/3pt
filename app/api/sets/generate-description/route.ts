@@ -65,7 +65,7 @@ ${finalSellSheetText ? `Sell Sheet Information:\n${finalSellSheetText}\n` : ''}
 
 ${additionalContext ? `Additional Context:\n${additionalContext}\n` : ''}
 
-Generate a 1-5 sentence description that:
+Generate a 3-5 sentence description that:
 1. Captures the sophisticated appeal and analytical interest of this set
 2. Highlights key features with LSE-level precision
 3. Uses posh, educated tone with Commonwealth English naturally (colour, favourite, whilst, analysed)
