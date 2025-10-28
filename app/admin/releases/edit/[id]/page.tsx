@@ -485,18 +485,15 @@ export default function EditReleasePage() {
         }
       }
 
-      // Use the first source file (PDF or image preferred) for context
-      const sourceFileUrls = sourceFiles.map(f => f.url);
-
-      // Generate description using AI with source file context
-      const prompt = `Based on the source documents for this ${editedYear} ${editedManufacturer} ${editedReleaseName} release, write a compelling 1-5 sentence description that highlights the key features and appeal of this release for soccer card collectors. Focus on what makes this release special and exciting.`;
-
-      const response = await fetch('/api/generate/post', {
+      // Generate description using AI with release info
+      const response = await fetch('/api/generate-description', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          prompt,
-          sourceFiles: sourceFileUrls
+          manufacturer: editedManufacturer,
+          releaseName: editedReleaseName,
+          year: editedYear,
+          sets: release?.sets || []
         }),
       });
 

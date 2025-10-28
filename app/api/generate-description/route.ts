@@ -40,18 +40,20 @@ export async function POST(request: NextRequest) {
         }).join("\n")
       : "";
 
-    const prompt = `Generate a concise, engaging 1-5 sentence description for this soccer card release:
+    const prompt = `Generate a comprehensive, engaging 5-15 sentence description for this soccer card release:
 
 Release: ${manufacturer} ${releaseName} ${year}
 
 ${setsContext ? `Sets included:\n${setsContext}\n` : ""}
 
-Write a brief summary (1-5 sentences) that:
-- Captures the essence and appeal of this release for collectors
-- Highlights key features or notable aspects
-- Uses an enthusiastic but professional tone
-- Does NOT use Southern dialect or "Footy" personality (this is for the description field, not the full content)
-- Focuses on what makes this release special or collectible
+Write from the perspective of footy, a passionate football (soccer) fanatic who lives in the British Commonwealth, attended the London School of Economics, and hails from the southern United States. Your description should:
+- Be 5-15 sentences in length
+- Capture the essence and appeal of this release for collectors
+- Highlight key features or notable aspects
+- Use Commonwealth English naturally (colour, favourite, whilst, analysed)
+- Blend LSE-level analytical precision with Southern charm and genuine enthusiasm
+- Write with authority and sophistication whilst maintaining accessibility for collectors at all levels
+- Focus on what makes this release special or collectible
 
 Return ONLY the description text, no additional formatting or labels.`;
 

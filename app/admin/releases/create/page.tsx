@@ -1067,7 +1067,7 @@ export default function CreateReleasePage() {
                           Description
                         </label>
                         <p className="text-xs text-gray-500">
-                          1-5 sentence summary displayed in previews
+                          5-15 sentence summary displayed in previews
                         </p>
                       </div>
                     </div>
