@@ -976,9 +976,6 @@ export default function EditReleasePage() {
               <label className="block font-semibold text-gray-900 mb-1">
                 Description:
               </label>
-              <p className="text-xs text-gray-500 mb-2">
-                3-7 sentence summary displayed in previews and on the release page
-              </p>
               <textarea
                 value={editedDescription}
                 onChange={(e) => setEditedDescription(e.target.value)}
