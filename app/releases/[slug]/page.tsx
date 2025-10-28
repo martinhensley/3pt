@@ -399,7 +399,9 @@ export default function ReleasePage() {
                   );
 
                   return sortedSets.map((set, idx) => {
-                    const setCardCount = set.cards?.length || (set.totalCards ? parseInt(set.totalCards) : 0);
+                    // Always prefer totalCards if set, as it represents unique base cards
+                    // set.cards.length includes all parallel variations
+                    const setCardCount = set.totalCards ? parseInt(set.totalCards) : (set.cards?.length || 0);
                     const setParallelCount = Array.isArray(set.parallels) ? set.parallels.length : 0;
 
                     // Clean display name: remove "Base" from Optic sets, keep it for others
