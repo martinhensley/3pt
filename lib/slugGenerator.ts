@@ -1,9 +1,9 @@
 /**
  * Generate a URL-friendly slug from release information
- * Format: manufacturer-name-year (e.g., "panini-donruss-soccer-2024-25")
+ * Format: year-manufacturer-name (e.g., "2024-25-panini-donruss-soccer")
  */
 export function generateReleaseSlug(manufacturer: string, name: string, year?: string): string {
-  const parts = [manufacturer, name, year].filter(Boolean);
+  const parts = [year, manufacturer, name].filter(Boolean);
   return parts
     .join(' ')
     .toLowerCase()
