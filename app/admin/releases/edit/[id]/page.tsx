@@ -1243,9 +1243,6 @@ export default function EditReleasePage() {
                           )}
                         </button>
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        AI generates 1-5 sentence descriptions from a soccer card expert perspective
-                      </p>
                     </div>
 
                     {/* Checklist Upload/Paste Section */}
