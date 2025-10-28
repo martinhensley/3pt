@@ -114,23 +114,57 @@ export async function addCardsToSet(
     variant?: string;
   }>
 ): Promise<{ count: number; breakdown: { base: number; parallels: number } }> {
-  // Get the set to check if it has parallels defined
+  // Get the set with release info to generate slugs
   const set = await prisma.set.findUnique({
     where: { id: setId },
-    select: { parallels: true },
+    select: {
+      name: true,
+      parallels: true,
+      release: {
+        select: {
+          name: true,
+          year: true,
+          manufacturer: {
+            select: {
+              name: true
+            }
+          }
+        }
+      }
+    },
   });
+
+  if (!set) {
+    throw new Error(`Set with id ${setId} not found`);
+  }
 
   // Extract parallels array from Json type
   const parallelsArray = (set?.parallels as string[] | null) || [];
   const parallels = parallelsArray.filter((p): p is string => p !== null);
 
+  // Import slug generator
+  const { generateCardSlug } = await import('./slugGenerator');
+
   // Create base cards
   const baseResult = await prisma.card.createMany({
-    data: cards.map((card) => ({
-      ...card,
-      setId,
-      parallelType: "Base", // Explicitly set as "Base" instead of null
-    })),
+    data: cards.map((card) => {
+      const slug = generateCardSlug(
+        set.release.manufacturer.name,
+        set.release.name,
+        set.release.year || '',
+        set.name,
+        card.cardNumber || '',
+        card.playerName || '',
+        null // Base cards have no variant
+      );
+
+      return {
+        ...card,
+        setId,
+        slug,
+        parallelType: "Base", // Explicitly set as "Base" instead of null
+      };
+    }),
     skipDuplicates: true,
   });
 
@@ -140,11 +174,24 @@ export async function addCardsToSet(
   if (parallels.length > 0) {
     for (const parallel of parallels) {
       const parallelResult = await prisma.card.createMany({
-        data: cards.map((card) => ({
-          ...card,
-          setId,
-          parallelType: parallel,
-        })),
+        data: cards.map((card) => {
+          const slug = generateCardSlug(
+            set.release.manufacturer.name,
+            set.release.name,
+            set.release.year || '',
+            set.name,
+            card.cardNumber || '',
+            card.playerName || '',
+            parallel
+          );
+
+          return {
+            ...card,
+            setId,
+            slug,
+            parallelType: parallel,
+          };
+        }),
         skipDuplicates: true,
       });
       parallelCount += parallelResult.count;

@@ -68,6 +68,7 @@ model Set {
 
 model Card {
   id                    String   @id @default(cuid())
+  slug                  String?  @unique
   playerName            String?
   team                  String?
   cardNumber            String?
