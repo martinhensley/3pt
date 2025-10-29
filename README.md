@@ -131,10 +131,56 @@ Create general content using AI:
 - `GET /sitemap.xml` - Dynamic sitemap
 - `GET /robots.txt` - Search engine directives
 
+## Standardized Page Layout
+
+### Public Page Pattern
+All public-facing pages follow a **standardized three-column layout** to ensure consistent user experience:
+
+```tsx
+<div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+  <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
+    <aside className="hidden lg:block w-72 flex-shrink-0">
+      {/* Left Sidebar - eBay Ads */}
+    </aside>
+
+    <main className="flex-grow max-w-5xl space-y-6">
+      <Header rounded={true} /> {/* Always renders first */}
+
+      {loading ? (
+        <LoadingSpinner />
+      ) : !data ? (
+        <ErrorMessage />
+      ) : (
+        <>
+          <Breadcrumb items={[...]} />
+          {/* Content */}
+          <Footer rounded={true} />
+        </>
+      )}
+    </main>
+
+    <aside className="hidden lg:block w-72 flex-shrink-0">
+      {/* Right Sidebar - eBay Ads */}
+    </aside>
+  </div>
+</div>
+```
+
+**Key Principles:**
+1. Header renders **immediately** before loading conditional (prevents resize)
+2. All three columns render **immediately** (sidebars + main)
+3. Same background gradient in **all states** (loading, error, content)
+4. No early returns - use conditional rendering instead
+5. Footer wraps inside content conditional, not outside
+
+**See `.claude/claude.md` for detailed documentation.**
+
 ## Project Structure
 
 ```
 footy/
+├── .claude/
+│   └── claude.md           # Development documentation & patterns
 ├── app/
 │   ├── admin/              # Admin portal
 │   │   ├── releases/       # Release management
@@ -163,7 +209,9 @@ footy/
 │   ├── sitemap.ts          # Dynamic sitemap
 │   └── robots.ts           # Robots.txt
 ├── components/
-│   ├── Header.tsx          # Site header
+│   ├── Header.tsx          # Site header (standardized)
+│   ├── Footer.tsx          # Site footer
+│   ├── Breadcrumb.tsx      # Navigation breadcrumbs
 │   ├── EbayAd.tsx          # eBay affiliate ads
 │   ├── EntitySelectors.tsx # Release/Set dropdowns
 │   └── MultiFileUpload.tsx # Multi-file upload component
@@ -172,7 +220,9 @@ footy/
 │   ├── auth.ts             # NextAuth config
 │   ├── ai.ts               # Claude AI integration
 │   ├── database.ts         # Database helpers
-│   └── documentParser.ts   # PDF/CSV parsing
+│   ├── documentParser.ts   # PDF/CSV parsing
+│   ├── formatters.ts       # Display formatting utilities
+│   └── slugGenerator.ts    # URL slug generation
 ├── prisma/
 │   └── schema.prisma       # Database schema
 └── public/
