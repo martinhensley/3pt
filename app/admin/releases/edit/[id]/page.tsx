@@ -1369,19 +1369,6 @@ export default function EditReleasePage() {
                             }}
                             className="w-full px-3 py-2 mt-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 font-mono"
                           />
-                          <div className="text-xs text-gray-600 mt-2 space-y-1 bg-blue-50 p-2 rounded">
-                            <p className="font-semibold">✨ Complete Format (auto-fills everything):</p>
-                            <p className="pl-3">• Sub-set name (first line)</p>
-                            <p className="pl-3">• Total cards count (e.g., &quot;22 cards&quot;)</p>
-                            <p className="pl-3">• &quot;Parallels&quot; header (optional)</p>
-                            <p className="pl-3">• Parallel list (one per line)</p>
-                            <p className="pl-3">• Card list: &quot;1 Player Name, Team&quot;</p>
-                          </div>
-                          <div className="text-xs text-gray-500 mt-2">
-                            <p className="font-semibold">Also supports simple card lists:</p>
-                            <p className="pl-3">• &quot;1,Player Name,Team&quot; (CSV)</p>
-                            <p className="pl-3">• &quot;1 Player Name, Team&quot;</p>
-                          </div>
                         </details>
                       </div>
                     </div>
