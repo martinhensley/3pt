@@ -10,6 +10,7 @@ import EbayAd from "@/components/EbayAd";
 import EbayAdHorizontal from "@/components/EbayAdHorizontal";
 import { useEffect, useState, useMemo } from "react";
 import { extractKeywordsFromPost, getAdTitle } from "@/lib/extractKeywords";
+import { formatParallelName } from "@/lib/formatters";
 
 interface Card {
   id: string;
@@ -176,7 +177,7 @@ export default function ParallelPage() {
                   href: `/sets/${setSlug}`,
                 },
                 {
-                  label: parallelName.replace(/\s*–\s*/g, ' '),
+                  label: formatParallelName(parallelName.replace(/\s*–\s*/g, ' ')),
                   href: `/sets/${setSlug}/parallels/${parallelSlug}`,
                 },
               ]}
@@ -194,7 +195,7 @@ export default function ParallelPage() {
                     .replace(/\bbase\s+optic\b/gi, 'Optic')
                     .replace(/\bbase\s+set\b/gi, '')
                     .replace(/\bsets?\b/gi, '')
-                    .trim()} {parallelName.replace(/\bbase\b/gi, '').replace(/\s*–\s*/g, ' ').trim()}
+                    .trim()} {formatParallelName(parallelName.replace(/\bbase\b/gi, '').replace(/\s*–\s*/g, ' ').trim())}
                 </h1>
                 <div className="text-xl">
                   {cards.length} Card{cards.length !== 1 ? 's' : ''} in the Parallel Set
@@ -247,8 +248,7 @@ export default function ParallelPage() {
                   .replace(/\s+/g, '-')
                   .replace(/[^a-z0-9-]/g, '')
                   .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
-                  .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
-                  .replace(/1-of-1/g, '1of1'); // Convert "1-of-1" to "1of1"
+                  .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
 
                 return (
                   <Link
@@ -283,8 +283,8 @@ export default function ParallelPage() {
                       <div className="text-sm text-gray-600">
                         {card.cardNumber && <span>#{card.cardNumber}</span>}
                         {card.team && <span className="ml-2">• {card.team}</span>}
-                        {card.variant && <span className="ml-2 text-purple-600">• {card.variant}</span>}
-                        {card.parallelType && <span className="ml-2 text-footy-orange">• {card.parallelType.replace(/\s*–\s*/g, ' ')}</span>}
+                        {card.variant && <span className="ml-2 text-purple-600">• {formatParallelName(card.variant)}</span>}
+                        {card.parallelType && <span className="ml-2 text-footy-orange">• {formatParallelName(card.parallelType.replace(/\s*–\s*/g, ' '))}</span>}
                       </div>
                     </div>
 

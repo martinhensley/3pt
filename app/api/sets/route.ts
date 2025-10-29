@@ -72,12 +72,13 @@ export async function GET(request: NextRequest) {
         // Try to find exact match first (case-insensitive, slug format)
         const matchedParallel = parallels.find(p => {
           const pSlug = p
+            .replace(/\b1\s*\/\s*1\b/gi, '1-of-1')  // Convert "1/1" to "1-of-1" BEFORE other replacements
+            .replace(/\b1\s*of\s*1\b/gi, '1-of-1')  // Convert "1 of 1" to "1-of-1"
             .toLowerCase()
             .replace(/\s+/g, '-')
             .replace(/[^a-z0-9-]/g, '')
             .replace(/-+/g, '-')
-            .replace(/^-|-$/g, '')
-            .replace(/1-of-1/g, '1of1'); // Convert "1-of-1" to "1of1"
+            .replace(/^-|-$/g, '');
           return pSlug === parallelSlug;
         });
 

@@ -10,6 +10,7 @@ import EbayAd from "@/components/EbayAd";
 import EbayAdHorizontal from "@/components/EbayAdHorizontal";
 import { useEffect, useState, useMemo } from "react";
 import { extractKeywordsFromPost, getAdTitle } from "@/lib/extractKeywords";
+import { formatParallelName } from "@/lib/formatters";
 
 interface CardImage {
   id: string;
@@ -246,12 +247,12 @@ export default function CardDetailPage() {
                   )}
                   {card.variant && card.variant !== '—' && (
                     <span className="px-4 py-2 bg-purple-100 text-purple-800 rounded-full font-semibold">
-                      {card.variant}
+                      {formatParallelName(card.variant)}
                     </span>
                   )}
                   {card.parallelType && (
                     <span className="px-4 py-2 bg-pink-100 text-pink-800 rounded-full font-semibold">
-                      {card.parallelType.replace(/\s*–\s*/g, ' ')}
+                      {formatParallelName(card.parallelType.replace(/\s*–\s*/g, ' '))}
                     </span>
                   )}
                   {card.rarity && (
@@ -306,13 +307,13 @@ export default function CardDetailPage() {
               {card.variant && (
                 <div>
                   <div className="text-sm text-gray-600 mb-1">Variant</div>
-                  <div className="text-lg font-bold text-gray-900">{card.variant}</div>
+                  <div className="text-lg font-bold text-gray-900">{formatParallelName(card.variant)}</div>
                 </div>
               )}
               {card.parallelType && (
                 <div>
                   <div className="text-sm text-gray-600 mb-1">Parallel</div>
-                  <div className="text-lg font-bold text-gray-900">{card.parallelType.replace(/\s*–\s*/g, ' ')}</div>
+                  <div className="text-lg font-bold text-gray-900">{formatParallelName(card.parallelType.replace(/\s*–\s*/g, ' '))}</div>
                 </div>
               )}
               {card.serialNumber && (

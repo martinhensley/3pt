@@ -9,6 +9,7 @@ import EbayAd from "@/components/EbayAd";
 import EbayAdHorizontal from "@/components/EbayAdHorizontal";
 import { useEffect, useState, useMemo } from "react";
 import { extractKeywordsFromPost, getAdTitle } from "@/lib/extractKeywords";
+import { formatParallelName } from "@/lib/formatters";
 
 interface Card {
   id: string;
@@ -105,39 +106,11 @@ export default function SetPage() {
     return extractKeywordsFromPost(postLike as { title: string; content: string; excerpt: string; type: string });
   }, [set, displayName]);
 
-  if (loading) {
-    return (
-      <div className="flex flex-col min-h-screen bg-gray-50">
-        <Header />
-        <div className="flex-grow flex items-center justify-center">
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!set) {
-    return (
-      <div className="flex flex-col min-h-screen bg-gray-50">
-        <Header />
-        <div className="flex-grow flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-footy-green mb-4">Set Not Found</h1>
-            <p className="text-gray-600 mb-8">The set you&apos;re looking for doesn&apos;t exist.</p>
-            <Link href="/" className="text-footy-orange hover:underline font-semibold">
-              ← Back to Home
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const setCardCount = set.cards?.length || (set.totalCards ? parseInt(set.totalCards) : 0);
-  const setParallelCount = Array.isArray(set.parallels) ? set.parallels.length : 0;
+  const setCardCount = set?.cards?.length || (set?.totalCards ? parseInt(set.totalCards) : 0);
+  const setParallelCount = Array.isArray(set?.parallels) ? set.parallels.length : 0;
 
   // Sort cards numerically by cardNumber
-  const sortedCards = set.cards ? [...set.cards].sort((a, b) => {
+  const sortedCards = set?.cards ? [...set.cards].sort((a, b) => {
     const numA = parseInt(a.cardNumber || '0');
     const numB = parseInt(b.cardNumber || '0');
     return numA - numB;
@@ -156,6 +129,23 @@ export default function SetPage() {
 
         <main className="flex-grow max-w-5xl space-y-6">
           <Header rounded={true} />
+
+          {loading ? (
+            <div className="flex-grow flex items-center justify-center py-20">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
+            </div>
+          ) : !set ? (
+            <div className="flex-grow flex items-center justify-center py-20">
+              <div className="text-center">
+                <h1 className="text-2xl font-bold text-footy-green mb-4">Set Not Found</h1>
+                <p className="text-gray-600 mb-8">The set you&apos;re looking for doesn&apos;t exist.</p>
+                <Link href="/" className="text-footy-orange hover:underline font-semibold">
+                  ← Back to Home
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <>
 
           <Breadcrumb
             items={[
@@ -218,14 +208,15 @@ export default function SetPage() {
               {set.parallels.map((parallel: string, idx: number) => {
                 // Create simple parallel slug from parallel name
                 // e.g., "Argyle" -> "argyle", "Gold Prizm" -> "gold-prizm"
-                // Special case: "1 of 1" -> "1of1"
+                // Special case: "1/1" or "1 of 1" -> "1-of-1"
                 const parallelSlug = parallel
+                  .replace(/\b1\s*\/\s*1\b/gi, '1-of-1')  // "1/1" -> "1-of-1" BEFORE other replacements
+                  .replace(/\b1\s*of\s*1\b/gi, '1-of-1')  // "1 of 1" -> "1-of-1"
                   .toLowerCase()
                   .replace(/\s+/g, '-')
                   .replace(/[^a-z0-9-]/g, '')
                   .replace(/-+/g, '-')
-                  .replace(/^-|-$/g, '')
-                  .replace(/1-of-1/g, '1of1'); // Convert "1-of-1" to "1of1"
+                  .replace(/^-|-$/g, '');
 
                 return (
                   <Link
@@ -234,7 +225,7 @@ export default function SetPage() {
                     className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border-2 border-white/20 hover:border-footy-orange hover:bg-footy-orange/20 hover:shadow-lg transition-all"
                   >
                     <div className="font-bold text-white">
-                      {parallel}
+                      {formatParallelName(parallel)}
                     </div>
                   </Link>
                 );
@@ -287,8 +278,7 @@ export default function SetPage() {
                   .replace(/\s+/g, '-')
                   .replace(/[^a-z0-9-]/g, '')
                   .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
-                  .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
-                  .replace(/1-of-1/g, '1of1'); // Convert "1-of-1" to "1of1"
+                  .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
 
                 return (
                   <Link
@@ -307,7 +297,7 @@ export default function SetPage() {
                     </div>
                     <div className="text-sm text-gray-600">
                       {card.team && <span>{card.team}</span>}
-                      {card.variant && <span className="ml-2 text-purple-600">• {card.variant}</span>}
+                      {card.variant && <span className="ml-2 text-purple-600">• {formatParallelName(card.variant)}</span>}
                     </div>
                   </div>
                   {(card.hasAutograph || card.hasMemorabilia || card.isNumbered) && (
@@ -354,6 +344,8 @@ export default function SetPage() {
         />
 
           <Footer rounded={true} />
+            </>
+          )}
         </main>
 
         <aside className="hidden lg:block w-72 flex-shrink-0">
