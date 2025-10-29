@@ -37,6 +37,7 @@ interface Card {
 interface Set {
   id: string;
   name: string;
+  isBaseSet: boolean;
   description: string | null;
   totalCards: string | null;
   parallels: string[] | null;
@@ -383,24 +384,19 @@ export default function ReleasePage() {
               </div>
             )}
 
-            {/* Sets Grouped by Category */}
+            {/* Sets Grouped by Type */}
             <div className="p-8 pt-6 border-t border-white/20 space-y-8">
-              {['BASE', 'AUTOGRAPHS', 'MEMORABILIA', 'INSERTS'].map((category) => {
-                const categorySets = (release.sets || []).filter(set => set.category === category);
+              {[true, false].map((isBase) => {
+                const categorySets = (release.sets || []).filter(set => set.isBaseSet === isBase);
 
                 if (categorySets.length === 0) return null;
 
-                const categoryLabels = {
-                  BASE: 'Base Sets',
-                  AUTOGRAPHS: 'Autograph Sets',
-                  MEMORABILIA: 'Memorabilia Sets',
-                  INSERTS: 'Insert Sets'
-                };
+                const categoryLabel = isBase ? 'Base Sets' : 'Other Sets';
 
                 return (
-                  <div key={category}>
+                  <div key={isBase ? 'base' : 'other'}>
                     <h3 className="text-2xl font-bold text-white mb-4">
-                      {categoryLabels[category as keyof typeof categoryLabels]}
+                      {categoryLabel}
                     </h3>
                     <div className="bg-white/5 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10">
                       {/* Header Row */}

@@ -52,18 +52,18 @@ model Release {
 }
 
 model Set {
-  id          String      @id @default(cuid())
+  id          String   @id @default(cuid())
   name        String
-  category    SetCategory @default(BASE) // Category: BASE, AUTOGRAPHS, MEMORABILIA, INSERTS
-  description String?     // AI-generated description from sell sheets (3-5 sentences)
+  isBaseSet   Boolean  @default(false) // true for base sets, false for all others (autographs, inserts, memorabilia)
+  description String?  // AI-generated description from sell sheets (3-5 sentences)
   releaseId   String
-  release     Release     @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  release     Release  @relation(fields: [releaseId], references: [id], onDelete: Cascade)
   totalCards  String?
-  parallels   Json?       // Array of {name: string, printRun: string}
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  parallels   Json?    // Array of {name: string, printRun: string}
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   cards       Card[]
-  posts       Post[]      // Posts that reference this set
+  posts       Post[]   // Posts that reference this set
   images      Image[]
 }
 
@@ -156,13 +156,6 @@ enum PostType {
   GUIDE      // How-to or buying guide
   ANALYSIS   // Market analysis or trends
   GENERAL    // General content
-}
-
-enum SetCategory {
-  BASE         // Base cards (can have multiple base sets per release, e.g., Donruss Base, Donruss Optic)
-  AUTOGRAPHS   // Autograph cards
-  MEMORABILIA  // Jersey/patch/memorabilia cards
-  INSERTS      // Insert cards
 }
 
 // Source documents used for content creation (sell sheets, checklists, etc.)

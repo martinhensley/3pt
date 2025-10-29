@@ -19,7 +19,7 @@ interface CardInfo {
 interface SetInfo {
   id?: string;
   name: string;
-  category: 'BASE' | 'AUTOGRAPHS' | 'MEMORABILIA' | 'INSERTS';
+  isBaseSet: boolean;
   description?: string;
   totalCards?: string;
   parallels?: string[];
@@ -48,7 +48,7 @@ interface Release {
   sets: Array<{
     id: string;
     name: string;
-    category: 'BASE' | 'AUTOGRAPHS' | 'MEMORABILIA' | 'INSERTS';
+    isBaseSet: boolean;
     description: string | null;
     totalCards: string | null;
     parallels: string[] | null;
@@ -117,10 +117,10 @@ export default function EditReleasePage() {
         setSourceFiles(data.sourceFiles as SourceFile[] || []);
 
         // Transform sets data
-        const transformedSets: SetInfo[] = data.sets.map((set: { id: string; name: string; category: 'BASE' | 'AUTOGRAPHS' | 'MEMORABILIA' | 'INSERTS'; description: string | null; totalCards: string | null; parallels: string[] | null; cards: { id: string; playerName: string | null; team: string | null; cardNumber: string | null; variant: string | null }[] }) => ({
+        const transformedSets: SetInfo[] = data.sets.map((set: { id: string; name: string; isBaseSet: boolean; description: string | null; totalCards: string | null; parallels: string[] | null; cards: { id: string; playerName: string | null; team: string | null; cardNumber: string | null; variant: string | null }[] }) => ({
           id: set.id,
           name: set.name,
-          category: set.category,
+          isBaseSet: set.isBaseSet,
           description: set.description || "",
           totalCards: set.totalCards || "",
           parallels: set.parallels || [],
@@ -153,10 +153,10 @@ export default function EditReleasePage() {
   }, [releaseId, status]);
 
   // Set management functions
-  const handleAddSet = (category: 'BASE' | 'AUTOGRAPHS' | 'MEMORABILIA' | 'INSERTS' = 'BASE') => {
+  const handleAddSet = (isBaseSet: boolean = false) => {
     const newSet: SetInfo = {
       name: "",
-      category,
+      isBaseSet,
       description: "",
       totalCards: "",
       parallels: [],
@@ -719,7 +719,7 @@ export default function EditReleasePage() {
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 name: set.name,
-                category: set.category,
+                isBaseSet: set.isBaseSet,
                 totalCards: set.totalCards || null,
                 releaseId: release.id,
                 parallels: set.parallels || [],
@@ -771,7 +771,7 @@ export default function EditReleasePage() {
               body: JSON.stringify({
                 id: set.id,
                 name: set.name,
-                category: set.category,
+                isBaseSet: set.isBaseSet,
                 totalCards: set.totalCards || null,
                 parallels: set.parallels || [],
               }),
@@ -1235,37 +1235,32 @@ export default function EditReleasePage() {
         {/* Sets Management */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-6">
-            Manage Sets by Category
+            Manage Sets
           </h3>
 
-          {/* Base Sets Category */}
-          {['BASE', 'AUTOGRAPHS', 'MEMORABILIA', 'INSERTS'].map((category) => {
+          {/* Base Sets and Other Sets */}
+          {[true, false].map((isBase) => {
             const categorySets = editedSets
               .map((set, idx) => ({ set, originalIdx: idx }))
-              .filter(({ set }) => !set.isDeleted && set.category === category);
+              .filter(({ set }) => !set.isDeleted && set.isBaseSet === isBase);
 
-            const categoryLabels = {
-              BASE: 'Base Sets',
-              AUTOGRAPHS: 'Autograph Sets',
-              MEMORABILIA: 'Memorabilia Sets',
-              INSERTS: 'Insert Sets'
-            };
+            const categoryLabel = isBase ? 'Base Sets' : 'Other Sets';
 
             return (
-              <div key={category} className="mb-6">
+              <div key={isBase ? 'base' : 'other'} className="mb-6">
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="text-md font-semibold text-gray-800">
-                    {categoryLabels[category as keyof typeof categoryLabels]}
+                    {categoryLabel}
                   </h4>
                   <button
                     type="button"
-                    onClick={() => handleAddSet(category as 'BASE' | 'AUTOGRAPHS' | 'MEMORABILIA' | 'INSERTS')}
+                    onClick={() => handleAddSet(isBase)}
                     className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors flex items-center gap-1.5"
                   >
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
-                    Add {categoryLabels[category as keyof typeof categoryLabels].replace(' Sets', '')}
+                    Add {categoryLabel.replace(' Sets', '')}
                   </button>
                 </div>
 
@@ -1279,7 +1274,7 @@ export default function EditReleasePage() {
                               type="text"
                               value={set.name}
                               onChange={(e) => handleUpdateSet(idx, "name", e.target.value)}
-                              placeholder={`Set Name (e.g., ${category === 'BASE' ? 'Base Set, Optic' : category === 'AUTOGRAPHS' ? 'Dual Jersey Ink' : category === 'MEMORABILIA' ? 'Patch Cards' : 'Rookie Cards'})`}
+                              placeholder={`Set Name (e.g., ${isBase ? 'Base Set, Optic' : 'Dual Jersey Ink, Rookie Cards, Patch Cards'})`}
                               className="w-full px-3 py-2 font-semibold border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500"
                             />
                           </div>
@@ -1474,7 +1469,7 @@ export default function EditReleasePage() {
                   </div>
                 ) : (
                   <p className="text-sm text-gray-500 italic text-center py-4">
-                    No {categoryLabels[category as keyof typeof categoryLabels].toLowerCase()} yet.
+                    No {categoryLabel.toLowerCase()} yet.
                   </p>
                 )}
               </div>
