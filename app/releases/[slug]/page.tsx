@@ -383,24 +383,34 @@ export default function ReleasePage() {
               </div>
             )}
 
-            {/* All Sets List */}
-            <div className="p-8 pt-6 border-t border-white/20">
-              <div className="bg-white/5 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10">
-                {/* Header Row */}
-                <div className="grid grid-cols-3 gap-4 px-4 py-3 bg-white/10 border-b border-white/20">
-                  <div className="font-bold text-sm uppercase tracking-wide text-white/90">Set Name</div>
-                  <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Parallels</div>
-                  <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Cards</div>
-                </div>
+            {/* Sets Grouped by Category */}
+            <div className="p-8 pt-6 border-t border-white/20 space-y-8">
+              {['BASE', 'AUTOGRAPHS', 'MEMORABILIA', 'INSERTS'].map((category) => {
+                const categorySets = (release.sets || []).filter(set => set.category === category);
 
-                {/* List ALL sets, sorted alphabetically */}
-                {(() => {
-                  // Sort all sets alphabetically by name
-                  const sortedSets = [...(release.sets || [])].sort((a, b) =>
-                    a.name.localeCompare(b.name)
-                  );
+                if (categorySets.length === 0) return null;
 
-                  return sortedSets.map((set, idx) => {
+                const categoryLabels = {
+                  BASE: 'Base Sets',
+                  AUTOGRAPHS: 'Autograph Sets',
+                  MEMORABILIA: 'Memorabilia Sets',
+                  INSERTS: 'Insert Sets'
+                };
+
+                return (
+                  <div key={category}>
+                    <h3 className="text-2xl font-bold text-white mb-4">
+                      {categoryLabels[category as keyof typeof categoryLabels]}
+                    </h3>
+                    <div className="bg-white/5 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10">
+                      {/* Header Row */}
+                      <div className="grid grid-cols-3 gap-4 px-4 py-3 bg-white/10 border-b border-white/20">
+                        <div className="font-bold text-sm uppercase tracking-wide text-white/90">Set Name</div>
+                        <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Parallels</div>
+                        <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Cards</div>
+                      </div>
+
+                      {categorySets.map((set, idx) => {
                     // Always prefer totalCards if set, as it represents unique base cards
                     // set.cards.length includes all parallel variations
                     const setCardCount = set.totalCards ? parseInt(set.totalCards) : (set.cards?.length || 0);
@@ -460,9 +470,11 @@ export default function ReleasePage() {
                         </div>
                       </Link>
                     );
-                  });
-                })()}
-              </div>
+                  })}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 

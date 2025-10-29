@@ -19,6 +19,7 @@ interface CardInfo {
 interface SetInfo {
   id?: string;
   name: string;
+  category: 'BASE' | 'AUTOGRAPHS' | 'MEMORABILIA' | 'INSERTS';
   description?: string;
   totalCards?: string;
   parallels?: string[];
@@ -47,6 +48,7 @@ interface Release {
   sets: Array<{
     id: string;
     name: string;
+    category: 'BASE' | 'AUTOGRAPHS' | 'MEMORABILIA' | 'INSERTS';
     description: string | null;
     totalCards: string | null;
     parallels: string[] | null;
@@ -115,9 +117,10 @@ export default function EditReleasePage() {
         setSourceFiles(data.sourceFiles as SourceFile[] || []);
 
         // Transform sets data
-        const transformedSets: SetInfo[] = data.sets.map((set: { id: string; name: string; description: string | null; totalCards: string | null; parallels: string[] | null; cards: { id: string; playerName: string | null; team: string | null; cardNumber: string | null; variant: string | null }[] }) => ({
+        const transformedSets: SetInfo[] = data.sets.map((set: { id: string; name: string; category: 'BASE' | 'AUTOGRAPHS' | 'MEMORABILIA' | 'INSERTS'; description: string | null; totalCards: string | null; parallels: string[] | null; cards: { id: string; playerName: string | null; team: string | null; cardNumber: string | null; variant: string | null }[] }) => ({
           id: set.id,
           name: set.name,
+          category: set.category,
           description: set.description || "",
           totalCards: set.totalCards || "",
           parallels: set.parallels || [],
@@ -150,9 +153,10 @@ export default function EditReleasePage() {
   }, [releaseId, status]);
 
   // Set management functions
-  const handleAddSet = () => {
+  const handleAddSet = (category: 'BASE' | 'AUTOGRAPHS' | 'MEMORABILIA' | 'INSERTS' = 'BASE') => {
     const newSet: SetInfo = {
       name: "",
+      category,
       description: "",
       totalCards: "",
       parallels: [],
@@ -1137,52 +1141,67 @@ export default function EditReleasePage() {
 
         {/* Sets Management */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Manage Sets
-            </h3>
-            <button
-              type="button"
-              onClick={handleAddSet}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Add Set
-            </button>
-          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-6">
+            Manage Sets by Category
+          </h3>
 
-          {editedSets.length > 0 ? (
-            <div className="space-y-4">
-              {editedSets
-                .map((set, idx) => ({ set, originalIdx: idx }))
-                .filter(({ set }) => !set.isDeleted)
-                .map(({ set, originalIdx: idx }) => {
-                return (
-                  <div key={idx} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                    <div className="flex items-start justify-between gap-2 mb-3">
-                      <div className="flex-1">
-                        <input
-                          type="text"
-                          value={set.name}
-                          onChange={(e) => handleUpdateSet(idx, "name", e.target.value)}
-                          placeholder="Set Name (e.g., Base Set, Optic)"
-                          className="w-full px-3 py-2 font-semibold border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveSet(idx)}
-                        className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
-                        title="Remove set"
-                        disabled={loading}
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
+          {/* Base Sets Category */}
+          {['BASE', 'AUTOGRAPHS', 'MEMORABILIA', 'INSERTS'].map((category) => {
+            const categorySets = editedSets
+              .map((set, idx) => ({ set, originalIdx: idx }))
+              .filter(({ set }) => !set.isDeleted && set.category === category);
+
+            const categoryLabels = {
+              BASE: 'Base Sets',
+              AUTOGRAPHS: 'Autograph Sets',
+              MEMORABILIA: 'Memorabilia Sets',
+              INSERTS: 'Insert Sets'
+            };
+
+            return (
+              <div key={category} className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-md font-semibold text-gray-800">
+                    {categoryLabels[category as keyof typeof categoryLabels]}
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={() => handleAddSet(category as 'BASE' | 'AUTOGRAPHS' | 'MEMORABILIA' | 'INSERTS')}
+                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors flex items-center gap-1.5"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    Add {categoryLabels[category as keyof typeof categoryLabels].replace(' Sets', '')}
+                  </button>
+                </div>
+
+                {categorySets.length > 0 ? (
+                  <div className="space-y-4">
+                    {categorySets.map(({ set, originalIdx: idx }) => (
+                      <div key={idx} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                        <div className="flex items-start justify-between gap-2 mb-3">
+                          <div className="flex-1">
+                            <input
+                              type="text"
+                              value={set.name}
+                              onChange={(e) => handleUpdateSet(idx, "name", e.target.value)}
+                              placeholder={`Set Name (e.g., ${category === 'BASE' ? 'Base Set, Optic' : category === 'AUTOGRAPHS' ? 'Dual Jersey Ink' : category === 'MEMORABILIA' ? 'Patch Cards' : 'Rookie Cards'})`}
+                              className="w-full px-3 py-2 font-semibold border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveSet(idx)}
+                            className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                            title="Remove set"
+                            disabled={loading}
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
 
                     <div className="mb-3">
                       <input
@@ -1406,15 +1425,17 @@ export default function EditReleasePage() {
                         </details>
                       </div>
                     )}
+                      </div>
+                    ))}
                   </div>
-                );
-              })}
-            </div>
-          ) : (
-            <p className="text-sm text-gray-500 italic text-center py-8">
-              No sets found. Click &quot;Add Set&quot; to create a set.
-            </p>
-          )}
+                ) : (
+                  <p className="text-sm text-gray-500 italic text-center py-4">
+                    No {categoryLabels[category as keyof typeof categoryLabels].toLowerCase()} yet.
+                  </p>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* Action Buttons */}

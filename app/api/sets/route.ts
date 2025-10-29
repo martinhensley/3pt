@@ -193,7 +193,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, totalCards, releaseId, parallels } = body;
+    const { name, category, totalCards, releaseId, parallels } = body;
 
     if (!name || !releaseId) {
       return NextResponse.json(
@@ -205,6 +205,7 @@ export async function POST(request: NextRequest) {
     const set = await prisma.set.create({
       data: {
         name,
+        category: category || 'BASE',
         totalCards: totalCards || null,
         releaseId,
         parallels: parallels && parallels.length > 0 ? parallels : null,
@@ -230,7 +231,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, name, totalCards, parallels } = body;
+    const { id, name, category, totalCards, parallels } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -247,6 +248,10 @@ export async function PUT(request: NextRequest) {
 
     if (name) {
       updateFields.name = name;
+    }
+
+    if (category) {
+      updateFields.category = category;
     }
 
     const set = await prisma.set.update({
