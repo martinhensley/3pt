@@ -210,57 +210,45 @@ export default function ReleasePage() {
     setCurrentImageIndex((prev) => (prev - 1 + carouselImages.length) % carouselImages.length);
   };
 
-  if (loading) {
-    return (
-      <div className="flex flex-col min-h-screen bg-white">
-        <Header showBackButton />
-        <div className="flex-grow flex items-center justify-center">
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!release) {
+  if (!release && !loading) {
     notFound();
   }
 
-  // Structured data for SEO
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: `${release.year} ${release.manufacturer.name} ${release.name}`,
-    description: `${release.manufacturer.name} ${release.name} ${release.year || ''} trading card release`,
-    image: release.images.map(img => `https://www.footy.bot${img.url}`),
-    datePublished: release.createdAt,
-    dateModified: release.createdAt,
-    author: {
-      "@type": "Organization",
-      name: "Footy Bot",
-      url: "https://www.footy.bot"
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "Footy Bot",
-      logo: {
-        "@type": "ImageObject",
-        url: "https://www.footy.bot/logo.png"
-      }
-    },
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": `https://www.footy.bot/releases/${release.slug}`
-    },
-    articleSection: "New Releases",
-    keywords: "soccer cards, football cards, trading cards, collectibles"
-  };
-
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
+      {release && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            headline: `${release.year} ${release.manufacturer.name} ${release.name}`,
+            description: `${release.manufacturer.name} ${release.name} ${release.year || ''} trading card release`,
+            image: release.images.map(img => `https://www.footy.bot${img.url}`),
+            datePublished: release.createdAt,
+            dateModified: release.createdAt,
+            author: {
+              "@type": "Organization",
+              name: "Footy Bot",
+              url: "https://www.footy.bot"
+            },
+            publisher: {
+              "@type": "Organization",
+              name: "Footy Bot",
+              logo: {
+                "@type": "ImageObject",
+                url: "https://www.footy.bot/logo.png"
+              }
+            },
+            mainEntityOfPage: {
+              "@type": "WebPage",
+              "@id": `https://www.footy.bot/releases/${release.slug}`
+            },
+            articleSection: "New Releases",
+            keywords: "soccer cards, football cards, trading cards, collectibles"
+          }) }}
+        />
+      )}
 
       {/* Header at top - full width */}
       <div className="w-full px-4 pt-6">
@@ -271,18 +259,23 @@ export default function ReleasePage() {
         </div>
       </div>
 
-      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
-        <aside className="hidden lg:block w-72 flex-shrink-0">
-          <EbayAd
-            query={adKeywords.primaryQuery}
-            limit={3}
-            title={getAdTitle(adKeywords.primaryQuery, "Soccer Cards")}
-          />
-        </aside>
+      {loading ? (
+        <div className="flex-grow flex items-center justify-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
+        </div>
+      ) : release ? (
+        <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
+          <aside className="hidden lg:block w-72 flex-shrink-0">
+            <EbayAd
+              query={adKeywords.primaryQuery}
+              limit={3}
+              title={getAdTitle(adKeywords.primaryQuery, "Soccer Cards")}
+            />
+          </aside>
 
-        <main className="flex-grow max-w-5xl space-y-6">
+          <main className="flex-grow max-w-5xl space-y-6">
 
-          <Breadcrumb
+            <Breadcrumb
             items={[
               { label: "Home", href: "/" },
               {
@@ -497,6 +490,7 @@ export default function ReleasePage() {
           />
         </aside>
       </div>
+      ) : null}
     </div>
   );
 }
