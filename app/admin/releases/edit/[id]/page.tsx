@@ -1354,21 +1354,26 @@ export default function EditReleasePage() {
                         Set Data (Checklist & Parallels):
                       </p>
                       <div className="flex flex-col gap-2">
-                        <details className="text-sm" open>
+                        <details className="text-sm">
                           <summary className="cursor-pointer text-blue-600 hover:underline font-medium">
-                            Paste complete set data (recommended)
+                            📋 Paste set data
                           </summary>
-                          <textarea
-                            placeholder="Paste Set info format: Set Name, # Cards, Parallel info, Checklist"
-                            rows={8}
-                            onChange={(e) => {
-                              if (e.target.value.trim()) {
-                                handleChecklistPaste(idx, e.target.value);
-                                e.target.value = ''; // Clear after processing
-                              }
-                            }}
-                            className="w-full px-3 py-2 mt-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 font-mono"
-                          />
+                          <div className="mt-2">
+                            <textarea
+                              placeholder="Paste Set info format: Set Name, # Cards, Parallel info, Checklist"
+                              rows={4}
+                              onChange={(e) => {
+                                if (e.target.value.trim()) {
+                                  handleChecklistPaste(idx, e.target.value);
+                                  e.target.value = ''; // Clear after processing
+                                }
+                              }}
+                              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 font-mono"
+                            />
+                            <p className="text-xs text-gray-500 mt-1 italic">
+                              Data will auto-load when pasted and show below ↓
+                            </p>
+                          </div>
                         </details>
                       </div>
                     </div>
