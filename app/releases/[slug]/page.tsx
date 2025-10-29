@@ -381,9 +381,6 @@ export default function ReleasePage() {
             <div className="p-8 pt-6 border-t border-white/20">
               {release.sets && release.sets.length > 0 && (
                 <div>
-                  <h3 className="text-2xl font-bold text-white mb-4">
-                    Sets
-                  </h3>
                   <div className="bg-white/5 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10">
                     {/* Header Row */}
                     <div className="grid grid-cols-3 gap-4 px-4 py-3 bg-white/10 border-b border-white/20">
