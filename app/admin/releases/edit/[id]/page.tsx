@@ -1354,7 +1354,7 @@ export default function EditReleasePage() {
                         Set Data (Checklist & Parallels):
                       </p>
                       <div className="flex flex-col gap-2">
-                        <details className="text-sm">
+                        <details className="text-sm" open>
                           <summary className="cursor-pointer text-blue-600 hover:underline font-medium">
                             📋 Paste set data
                           </summary>
