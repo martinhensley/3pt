@@ -399,7 +399,12 @@ export default function ReleasePage() {
                       <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Cards</div>
                     </div>
 
-                    {release.sets.map((set, idx) => {
+                    {[...release.sets].sort((a, b) => {
+                      // Base sets first, then others
+                      if (a.isBaseSet && !b.isBaseSet) return -1;
+                      if (!a.isBaseSet && b.isBaseSet) return 1;
+                      return 0;
+                    }).map((set, idx) => {
                     // Always prefer totalCards if set, as it represents unique base cards
                     // set.cards.length includes all parallel variations
                     const setCardCount = set.totalCards ? parseInt(set.totalCards) : (set.cards?.length || 0);
