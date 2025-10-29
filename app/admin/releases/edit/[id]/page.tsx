@@ -1359,7 +1359,7 @@ export default function EditReleasePage() {
                             Paste complete set data (recommended)
                           </summary>
                           <textarea
-                            placeholder="Paste Set info format: Set Name, # Cards, Parallel info, Checklist&#10;&#10;Example:&#10;Dual Jersey Ink&#10;25 cards&#10;Parallels&#10;&#10;Electric Etch Orange /149&#10;Electric Etch Red /99&#10;&#10;2 Giovani Lo Celso, Argentina /199&#10;3 Lautaro Martinez, Argentina /99&#10;..."
+                            placeholder="Paste Set info format: Set Name, # Cards, Parallel info, Checklist"
                             rows={8}
                             onChange={(e) => {
                               if (e.target.value.trim()) {
