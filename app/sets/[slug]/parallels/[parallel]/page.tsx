@@ -147,7 +147,7 @@ export default function ParallelPage() {
           ) : (
             <>
 
-          {setInfo && (
+          {setInfo && firstCard && (
             <Breadcrumb
               items={[
                 { label: "Home", href: "/" },
@@ -175,7 +175,7 @@ export default function ParallelPage() {
 
           {/* Header */}
           <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
-            {setInfo && (
+            {setInfo && firstCard && (
               <>
                 <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
                   {setInfo.year} {firstCard.set.release.name} {setInfo.name
