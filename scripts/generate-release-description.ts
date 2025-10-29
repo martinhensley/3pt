@@ -16,7 +16,6 @@ async function generateReleaseDescription(releaseId: string) {
       sets: {
         select: {
           name: true,
-          description: true,
           totalCards: true,
           parallels: true,
         },
@@ -55,7 +54,7 @@ Generate a 2-3 sentence description for a soccer trading card release. The descr
         content: `Generate a description for the ${releaseName} trading card release.
 
 Sets included:
-${release.sets.map(set => `- ${set.name}${set.totalCards ? ` (${set.totalCards} cards)` : ''}${set.description ? `\n  ${set.description}` : ''}`).join('\n')}
+${release.sets.map(set => `- ${set.name}${set.totalCards ? ` (${set.totalCards} cards)` : ''}`).join('\n')}
 
 Provide only the description text, no additional commentary.`,
       },

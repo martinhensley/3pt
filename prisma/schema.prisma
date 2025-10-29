@@ -55,7 +55,6 @@ model Set {
   id          String   @id @default(cuid())
   name        String
   isBaseSet   Boolean  @default(false) // true for base sets, false for all others (autographs, inserts, memorabilia)
-  description String?  // AI-generated description from sell sheets (3-5 sentences)
   releaseId   String
   release     Release  @relation(fields: [releaseId], references: [id], onDelete: Cascade)
   totalCards  String?

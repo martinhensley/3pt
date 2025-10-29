@@ -20,7 +20,6 @@ interface SetInfo {
   id?: string;
   name: string;
   isBaseSet: boolean;
-  description?: string;
   totalCards?: string;
   parallels?: string[];
   cards?: CardInfo[];
@@ -49,7 +48,6 @@ interface Release {
     id: string;
     name: string;
     isBaseSet: boolean;
-    description: string | null;
     totalCards: string | null;
     parallels: string[] | null;
     cards: Array<{
@@ -73,7 +71,6 @@ export default function EditReleasePage() {
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [generatingDescription, setGeneratingDescription] = useState(false);
   const [descriptionFile, setDescriptionFile] = useState<File | null>(null);
-  const [generatingSetDescription, setGeneratingSetDescription] = useState<number | null>(null);
   const [sourceFiles, setSourceFiles] = useState<SourceFile[]>([]);
   const [uploadingFile, setUploadingFile] = useState(false);
 
@@ -117,11 +114,10 @@ export default function EditReleasePage() {
         setSourceFiles(data.sourceFiles as SourceFile[] || []);
 
         // Transform sets data
-        const transformedSets: SetInfo[] = data.sets.map((set: { id: string; name: string; isBaseSet: boolean; description: string | null; totalCards: string | null; parallels: string[] | null; cards: { id: string; playerName: string | null; team: string | null; cardNumber: string | null; variant: string | null }[] }) => ({
+        const transformedSets: SetInfo[] = data.sets.map((set: { id: string; name: string; isBaseSet: boolean; totalCards: string | null; parallels: string[] | null; cards: { id: string; playerName: string | null; team: string | null; cardNumber: string | null; variant: string | null }[] }) => ({
           id: set.id,
           name: set.name,
           isBaseSet: set.isBaseSet,
-          description: set.description || "",
           totalCards: set.totalCards || "",
           parallels: set.parallels || [],
           cards: set.cards.map((card: { id: string; playerName: string | null; team: string | null; cardNumber: string | null; variant: string | null }) => ({
@@ -157,7 +153,6 @@ export default function EditReleasePage() {
     const newSet: SetInfo = {
       name: "",
       isBaseSet,
-      description: "",
       totalCards: "",
       parallels: [],
       cards: [],
@@ -169,65 +164,12 @@ export default function EditReleasePage() {
 
   const handleUpdateSet = (index: number, field: keyof SetInfo, value: string) => {
     const updatedSets = [...editedSets];
-    if (field === "name" || field === "description" || field === "totalCards") {
+    if (field === "name" || field === "totalCards") {
       updatedSets[index] = { ...updatedSets[index], [field]: value };
       setEditedSets(updatedSets);
     }
   };
 
-  const handleGenerateSetDescription = async (index: number) => {
-    const set = editedSets[index];
-
-    // Can only generate for saved sets (not new ones)
-    if (!set.id || set.isNew) {
-      setMessage({
-        type: "error",
-        text: "Please save the set first before generating a description"
-      });
-      return;
-    }
-
-    try {
-      setGeneratingSetDescription(index);
-      setMessage(null);
-
-      const response = await fetch("/api/sets/generate-description", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          setId: set.id,
-          sellSheetText: "", // Could be populated from a form field if needed
-          additionalContext: "",
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Update the local state with the generated description
-        const updatedSets = [...editedSets];
-        updatedSets[index] = { ...updatedSets[index], description: data.description };
-        setEditedSets(updatedSets);
-
-        setMessage({
-          type: "success",
-          text: `Generated description for ${set.name}`,
-        });
-      } else {
-        setMessage({
-          type: "error",
-          text: data.error || "Failed to generate description",
-        });
-      }
-    } catch (error) {
-      setMessage({
-        type: "error",
-        text: error instanceof Error ? error.message : "Failed to generate description",
-      });
-    } finally {
-      setGeneratingSetDescription(null);
-    }
-  };
 
   const handleRemoveSet = async (index: number) => {
     const setToRemove = editedSets[index];
@@ -1221,14 +1163,31 @@ export default function EditReleasePage() {
               </label>
             </div>
 
-            {/* Empty State */}
-            <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
-              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <p className="mt-2 text-sm text-gray-500">No images uploaded yet</p>
-              <p className="text-xs text-gray-400 mt-1">Images will be displayed in the release&apos;s image carousel</p>
-            </div>
+            {/* Display existing images */}
+            {release && release.images && release.images.length > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {release.images.map((image) => (
+                  <div key={image.id} className="relative group">
+                    <img
+                      src={image.url}
+                      alt={image.caption || "Release image"}
+                      className="w-full h-48 object-cover rounded-lg border border-gray-200"
+                    />
+                    {image.caption && (
+                      <p className="text-xs text-gray-600 mt-1 truncate">{image.caption}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <p className="mt-2 text-sm text-gray-500">No images uploaded yet</p>
+                <p className="text-xs text-gray-400 mt-1">Images will be displayed in the release&apos;s image carousel</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -1290,58 +1249,6 @@ export default function EditReleasePage() {
                             </svg>
                           </button>
                         </div>
-
-                    <div className="mb-3">
-                      <div className="flex items-start gap-2">
-                        <textarea
-                          value={set.description || ""}
-                          onChange={(e) => handleUpdateSet(idx, "description", e.target.value)}
-                          placeholder="Description (optional, 3-5 sentences) - Click the AI button to generate"
-                          rows={2}
-                          className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleGenerateSetDescription(idx)}
-                          disabled={generatingSetDescription === idx || set.isNew || !set.id}
-                          className="px-3 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 text-white rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap text-sm font-medium disabled:cursor-not-allowed"
-                          title={set.isNew ? "Save the set first to generate description" : "Generate AI description"}
-                        >
-                          {generatingSetDescription === idx ? (
-                            <>
-                              <svg
-                                className="animate-spin h-4 w-4"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                              >
-                                <circle
-                                  className="opacity-25"
-                                  cx="12"
-                                  cy="12"
-                                  r="10"
-                                  stroke="currentColor"
-                                  strokeWidth="4"
-                                ></circle>
-                                <path
-                                  className="opacity-75"
-                                  fill="currentColor"
-                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                ></path>
-                              </svg>
-                              <span>AI</span>
-                            </>
-                          ) : (
-                            <>
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                              </svg>
-                              <span>AI</span>
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    </div>
 
                     {/* Unified Checklist/Set Data Upload/Paste Section */}
                     <div className="border-t border-gray-300 pt-3 mt-3">
