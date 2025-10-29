@@ -461,15 +461,6 @@ export default function ReleasePage() {
             </div>
           </div>
 
-          <div className="mt-8 pt-8 border-t border-gray-200">
-            <Link
-              href="/"
-              className="inline-flex items-center text-footy-green hover:text-green-700 font-semibold transition-colors text-lg"
-            >
-              ← View All Posts
-            </Link>
-          </div>
-
           <EbayAdHorizontal
             query={adKeywords.relatedQuery}
             limit={4}
