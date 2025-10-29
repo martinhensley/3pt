@@ -384,29 +384,22 @@ export default function ReleasePage() {
               </div>
             )}
 
-            {/* Sets Grouped by Type */}
-            <div className="p-8 pt-6 border-t border-white/20 space-y-8">
-              {[true, false].map((isBase) => {
-                const categorySets = (release.sets || []).filter(set => set.isBaseSet === isBase);
+            {/* Sets */}
+            <div className="p-8 pt-6 border-t border-white/20">
+              {release.sets && release.sets.length > 0 && (
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-4">
+                    Sets
+                  </h3>
+                  <div className="bg-white/5 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10">
+                    {/* Header Row */}
+                    <div className="grid grid-cols-3 gap-4 px-4 py-3 bg-white/10 border-b border-white/20">
+                      <div className="font-bold text-sm uppercase tracking-wide text-white/90">Set Name</div>
+                      <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Parallels</div>
+                      <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Cards</div>
+                    </div>
 
-                if (categorySets.length === 0) return null;
-
-                const categoryLabel = isBase ? 'Base Sets' : 'Other Sets';
-
-                return (
-                  <div key={isBase ? 'base' : 'other'}>
-                    <h3 className="text-2xl font-bold text-white mb-4">
-                      {categoryLabel}
-                    </h3>
-                    <div className="bg-white/5 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10">
-                      {/* Header Row */}
-                      <div className="grid grid-cols-3 gap-4 px-4 py-3 bg-white/10 border-b border-white/20">
-                        <div className="font-bold text-sm uppercase tracking-wide text-white/90">Set Name</div>
-                        <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Parallels</div>
-                        <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Cards</div>
-                      </div>
-
-                      {categorySets.map((set, idx) => {
+                    {release.sets.map((set, idx) => {
                     // Always prefer totalCards if set, as it represents unique base cards
                     // set.cards.length includes all parallel variations
                     const setCardCount = set.totalCards ? parseInt(set.totalCards) : (set.cards?.length || 0);
@@ -467,10 +460,9 @@ export default function ReleasePage() {
                       </Link>
                     );
                   })}
-                    </div>
                   </div>
-                );
-              })}
+                </div>
+              )}
             </div>
           </div>
 
