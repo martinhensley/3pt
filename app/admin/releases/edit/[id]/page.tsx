@@ -620,6 +620,9 @@ export default function EditReleasePage() {
       for (const set of editedSets) {
         if (set.isDeleted) continue; // Skip deleted sets
 
+        // Skip sets with empty names (not yet filled out)
+        if (!set.name || set.name.trim() === '') continue;
+
         try {
           if (set.isNew) {
             // Create new set
@@ -628,6 +631,7 @@ export default function EditReleasePage() {
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 name: set.name,
+                category: set.category,
                 totalCards: set.totalCards || null,
                 releaseId: release.id,
                 parallels: set.parallels || [],
@@ -679,6 +683,7 @@ export default function EditReleasePage() {
               body: JSON.stringify({
                 id: set.id,
                 name: set.name,
+                category: set.category,
                 totalCards: set.totalCards || null,
                 parallels: set.parallels || [],
               }),
