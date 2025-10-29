@@ -389,6 +389,65 @@ export default function EditReleasePage() {
     };
   };
 
+  // Bulk parser for multiple sub-sets in one paste
+  const parseBulkSetData = (text: string): Array<{ name: string; totalCards: string; parallels: string[]; cards: CardInfo[] }> => {
+    const lines = text.split('\n').map(line => line.trim());
+    const sets: Array<{ name: string; totalCards: string; parallels: string[]; cards: CardInfo[] }> = [];
+
+    let currentSetLines: string[] = [];
+    let inSet = false;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      // Skip empty lines between sets
+      if (!line) {
+        if (inSet && currentSetLines.length > 0) {
+          // We might be between sections, keep going
+        }
+        continue;
+      }
+
+      // Check if this line could be a new set name
+      // A set name is typically followed by "X cards" within the next few lines
+      const nextFewLines = lines.slice(i + 1, i + 5).filter(l => l);
+      const hasCardsCount = nextFewLines.some(l => /^\d+\s+cards?$/i.test(l));
+
+      // If we find a line that looks like a set name (has cards count after it)
+      // and we're already in a set, save the current set and start a new one
+      if (hasCardsCount && inSet && currentSetLines.length > 10) {
+        // Parse the current set
+        const setText = currentSetLines.join('\n');
+        const setData = parseCompleteSetData(setText);
+        if (setData && setData.cards.length > 0) {
+          sets.push(setData);
+        }
+
+        // Start new set
+        currentSetLines = [line];
+        inSet = true;
+      } else if (hasCardsCount && !inSet) {
+        // Start first set
+        currentSetLines = [line];
+        inSet = true;
+      } else if (inSet) {
+        // Continue current set
+        currentSetLines.push(line);
+      }
+    }
+
+    // Don't forget the last set
+    if (currentSetLines.length > 0) {
+      const setText = currentSetLines.join('\n');
+      const setData = parseCompleteSetData(setText);
+      if (setData && setData.cards.length > 0) {
+        sets.push(setData);
+      }
+    }
+
+    return sets;
+  };
+
   const handleChecklistUpload = async (index: number, file: File) => {
     try {
       setLoading(true);
@@ -481,6 +540,44 @@ export default function EditReleasePage() {
     } catch (error) {
       console.error("Failed to parse pasted checklist:", error);
       setMessage({ type: "error", text: "Failed to parse pasted text. Please check the format." });
+      setTimeout(() => setMessage(null), 5000);
+    }
+  };
+
+  const handleBulkSetPaste = (text: string, category: 'BASE' | 'AUTOGRAPHS' | 'MEMORABILIA' | 'INSERTS') => {
+    try {
+      const bulkSets = parseBulkSetData(text);
+
+      if (bulkSets.length === 0) {
+        setMessage({ type: "error", text: "No sets found in the pasted text. Please check the format." });
+        setTimeout(() => setMessage(null), 5000);
+        return;
+      }
+
+      // Add all parsed sets to the current sets list
+      const newSets: SetInfo[] = bulkSets.map(setData => ({
+        name: setData.name,
+        category: category,
+        totalCards: setData.totalCards || String(setData.cards.length),
+        parallels: setData.parallels,
+        cards: setData.cards,
+        isNew: true,
+        isDeleted: false,
+      }));
+
+      setEditedSets([...editedSets, ...newSets]);
+
+      const totalCards = bulkSets.reduce((sum, set) => sum + set.cards.length, 0);
+      const totalParallels = bulkSets.reduce((sum, set) => sum + set.parallels.length, 0);
+
+      setMessage({
+        type: "success",
+        text: `Successfully loaded ${bulkSets.length} sets with ${totalCards} total cards and ${totalParallels} parallels`
+      });
+      setTimeout(() => setMessage(null), 5000);
+    } catch (error) {
+      console.error("Failed to parse bulk sets:", error);
+      setMessage({ type: "error", text: "Failed to parse bulk sets. Please check the format." });
       setTimeout(() => setMessage(null), 5000);
     }
   };
@@ -1256,16 +1353,51 @@ export default function EditReleasePage() {
                   <h4 className="text-md font-semibold text-gray-800">
                     {categoryLabels[category as keyof typeof categoryLabels]}
                   </h4>
-                  <button
-                    type="button"
-                    onClick={() => handleAddSet(category as 'BASE' | 'AUTOGRAPHS' | 'MEMORABILIA' | 'INSERTS')}
-                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors flex items-center gap-1.5"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                    Add {categoryLabels[category as keyof typeof categoryLabels].replace(' Sets', '')}
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleAddSet(category as 'BASE' | 'AUTOGRAPHS' | 'MEMORABILIA' | 'INSERTS')}
+                      className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors flex items-center gap-1.5"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Add Single
+                    </button>
+                    <details className="relative inline-block">
+                      <summary className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded-lg transition-colors cursor-pointer flex items-center gap-1.5">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                        Bulk Import
+                      </summary>
+                      <div className="absolute right-0 mt-2 w-[600px] bg-white border border-gray-300 rounded-lg shadow-xl p-4 z-50">
+                        <h5 className="text-sm font-semibold text-gray-800 mb-2">
+                          Bulk Import {categoryLabels[category as keyof typeof categoryLabels]}
+                        </h5>
+                        <p className="text-xs text-gray-600 mb-3">
+                          Paste multiple sub-sets at once (e.g., all Autograph sub-sets from a checklist)
+                        </p>
+                        <textarea
+                          placeholder={`Paste multiple sub-sets here&#10;&#10;Example:&#10;Dual Jersey Ink&#10;25 cards&#10;Parallels&#10;Orange /149&#10;Red /99&#10;&#10;2 Giovani Lo Celso /199&#10;3 Lautaro Martinez /99&#10;...&#10;&#10;Galaxy Ink&#10;15 cards&#10;Parallels&#10;Orange /149&#10;...`}
+                          rows={12}
+                          onChange={(e) => {
+                            if (e.target.value.trim()) {
+                              handleBulkSetPaste(e.target.value, category as 'BASE' | 'AUTOGRAPHS' | 'MEMORABILIA' | 'INSERTS');
+                              e.target.value = ''; // Clear after processing
+                              // Close the details element
+                              const details = e.target.closest('details');
+                              if (details) details.removeAttribute('open');
+                            }
+                          }}
+                          className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 font-mono"
+                        />
+                        <p className="text-xs text-gray-500 mt-2 italic">
+                          This will create multiple sets automatically from your paste.
+                        </p>
+                      </div>
+                    </details>
+                  </div>
                 </div>
 
                 {categorySets.length > 0 ? (
