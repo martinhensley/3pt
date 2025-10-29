@@ -250,30 +250,24 @@ export default function ReleasePage() {
         />
       )}
 
-      {/* Header at top - full width */}
-      <div className="w-full px-4 pt-6">
-        <div className="max-w-[1600px] mx-auto">
-          <div className="max-w-5xl mx-auto lg:ml-[304px]">
-            <Header showBackButton={false} rounded={true} />
-          </div>
-        </div>
-      </div>
+      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
+        <aside className="hidden lg:block w-72 flex-shrink-0">
+          <EbayAd
+            query={adKeywords.primaryQuery}
+            limit={3}
+            title={getAdTitle(adKeywords.primaryQuery, "Soccer Cards")}
+          />
+        </aside>
 
-      {loading ? (
-        <div className="flex-grow flex items-center justify-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
-        </div>
-      ) : release ? (
-        <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
-          <aside className="hidden lg:block w-72 flex-shrink-0">
-            <EbayAd
-              query={adKeywords.primaryQuery}
-              limit={3}
-              title={getAdTitle(adKeywords.primaryQuery, "Soccer Cards")}
-            />
-          </aside>
+        <main className="flex-grow max-w-5xl space-y-6">
+          <Header showBackButton={false} rounded={true} />
 
-          <main className="flex-grow max-w-5xl space-y-6">
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
+            </div>
+          ) : release ? (
+            <>
 
             <Breadcrumb
             items={[
@@ -468,6 +462,8 @@ export default function ReleasePage() {
           />
 
           <Footer rounded={true} />
+          </>
+          ) : null}
         </main>
 
         <aside className="hidden lg:block w-72 flex-shrink-0">
@@ -478,7 +474,6 @@ export default function ReleasePage() {
           />
         </aside>
       </div>
-      ) : null}
     </div>
   );
 }
