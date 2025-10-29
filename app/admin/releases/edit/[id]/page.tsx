@@ -338,15 +338,13 @@ export default function EditReleasePage() {
     // First line is the sub-set name
     const name = lines[0];
 
-    // Second line should be "X cards"
-    let totalCards = '';
+    // Second line might be "X cards" - skip it, we'll count actual cards
     let currentIndex = 1;
 
     if (currentIndex < lines.length) {
       const cardsMatch = lines[currentIndex].match(/^(\d+)\s+cards?$/i);
       if (cardsMatch) {
-        totalCards = cardsMatch[1];
-        currentIndex++;
+        currentIndex++; // Skip the "X cards" line
       }
     }
 
@@ -380,6 +378,9 @@ export default function EditReleasePage() {
     // Parse cards from cardsSectionStart onwards
     const cardsText = lines.slice(cardsSectionStart).join('\n');
     const cards = parseChecklistText(cardsText, name);
+
+    // totalCards is the actual count of cards parsed from the checklist
+    const totalCards = String(cards.length);
 
     return {
       name,
@@ -436,12 +437,12 @@ export default function EditReleasePage() {
       const completeData = parseCompleteSetData(text);
 
       if (completeData && completeData.cards.length > 0) {
-        // Complete format detected - update name, parallels, cards, and totalCards
+        // Complete format detected - update name, parallels, cards, and totalCards (auto-counted from checklist)
         const updatedSets = [...editedSets];
         updatedSets[index] = {
           ...updatedSets[index],
           name: completeData.name,
-          totalCards: completeData.totalCards || String(completeData.cards.length),
+          totalCards: String(completeData.cards.length), // Always use actual count
           parallels: completeData.parallels.length > 0 ? completeData.parallels : updatedSets[index].parallels,
           cards: completeData.cards,
         };
@@ -1296,16 +1297,6 @@ export default function EditReleasePage() {
                         </div>
 
                     <div className="mb-3">
-                      <input
-                        type="text"
-                        value={set.totalCards || ""}
-                        onChange={(e) => handleUpdateSet(idx, "totalCards", e.target.value)}
-                        placeholder="Total Cards (optional)"
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-
-                    <div className="mb-3">
                       <div className="flex items-start gap-2">
                         <textarea
                           value={set.description || ""}
@@ -1368,7 +1359,7 @@ export default function EditReleasePage() {
                             Paste complete set data (recommended)
                           </summary>
                           <textarea
-                            placeholder="Paste complete set format here&#10;&#10;Example:&#10;Equinox&#10;22 cards&#10;Parallels&#10;&#10;Electric Etch Orange /75&#10;Electric Etch Red /50&#10;&#10;1 Kylian Mbappe, Real Madrid /120&#10;2 Hugo Ekitike, Eintracht Frankfurt /120"
+                            placeholder="Paste complete set format here&#10;&#10;Example:&#10;Dual Jersey Ink&#10;25 cards&#10;Parallels&#10;&#10;Electric Etch Orange /149&#10;Electric Etch Red /99&#10;&#10;2 Giovani Lo Celso, Argentina /199&#10;3 Lautaro Martinez, Argentina /99&#10;..."
                             rows={8}
                             onChange={(e) => {
                               if (e.target.value.trim()) {
