@@ -79,11 +79,11 @@ export default function Home() {
           <Header rounded={true} />
 
           {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
-          </div>
-        ) : (
-          <>
+            <div className="flex items-center justify-center py-20">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
+            </div>
+          ) : (
+            <>
         {content.length === 0 ? (
           <div className="text-center py-20">
             <div className="bg-white rounded-lg shadow-lg p-12 max-w-2xl mx-auto transition-colors duration-300">

@@ -52,21 +52,21 @@ export default function ReleasesIndex() {
         <main className="flex-grow max-w-5xl space-y-6">
           <Header rounded={true} />
 
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-footy-green mb-2">
+              All Releases
+            </h1>
+            <p className="text-gray-600">
+              Browse our complete collection of soccer card releases
+            </p>
+          </div>
+
           {loading ? (
             <div className="flex items-center justify-center py-20">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
             </div>
           ) : (
             <>
-              <div className="mb-8">
-                <h1 className="text-4xl font-bold text-footy-green mb-2">
-                  All Releases
-                </h1>
-                <p className="text-gray-600">
-                  Browse our complete collection of soccer card releases
-                </p>
-              </div>
-
               {releases.length === 0 ? (
                 <div className="text-center py-20">
                   <div className="bg-white rounded-lg shadow-lg p-12 max-w-2xl mx-auto transition-colors duration-300">
