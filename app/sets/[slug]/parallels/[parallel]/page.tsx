@@ -112,37 +112,7 @@ export default function ParallelPage() {
       });
   }, [setSlug, parallelSlug]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-white">
-        <Header />
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (cards.length === 0) {
-    return (
-      <div className="min-h-screen bg-white">
-        <Header />
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">No Cards Found</h1>
-            <p className="text-gray-600 mb-8">
-              No cards found for this parallel/variation.
-            </p>
-            <Link href="/" className="text-footy-green hover:underline">
-              ← Back to Home
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const firstCard = cards[0];
+  const firstCard = cards.length > 0 ? cards[0] : null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
@@ -157,6 +127,25 @@ export default function ParallelPage() {
 
         <main className="flex-grow max-w-5xl space-y-6">
           <Header rounded={true} />
+
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
+            </div>
+          ) : cards.length === 0 ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="text-center">
+                <h1 className="text-2xl font-bold text-gray-900 mb-4">No Cards Found</h1>
+                <p className="text-gray-600 mb-8">
+                  No cards found for this parallel/variation.
+                </p>
+                <Link href="/" className="text-footy-green hover:underline">
+                  ← Back to Home
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <>
 
           {setInfo && (
             <Breadcrumb
@@ -320,6 +309,8 @@ export default function ParallelPage() {
           />
 
           <Footer rounded={true} />
+          </>
+          )}
         </main>
 
         <aside className="hidden lg:block w-72 flex-shrink-0">

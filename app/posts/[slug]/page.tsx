@@ -56,29 +56,13 @@ export default function PostPage() {
     return extractKeywordsFromPost(post);
   }, [post]);
 
-  if (loading) {
-    return (
-      <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-        <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
-          <aside className="hidden lg:block w-72 flex-shrink-0"></aside>
-          <main className="flex-grow max-w-4xl mx-auto space-y-6">
-            <Header showBackButton={false} rounded={true} />
-            <div className="flex items-center justify-center min-h-[60vh]">
-              <p className="text-gray-600">Loading...</p>
-            </div>
-          </main>
-          <aside className="hidden lg:block w-72 flex-shrink-0"></aside>
-        </div>
-      </div>
-    );
-  }
-
-  if (!post) {
+  // Call notFound if post not found and not loading
+  if (!loading && !post) {
     notFound();
   }
 
-  // Structured data for SEO
-  const structuredData = {
+  // Structured data for SEO (only when post exists)
+  const structuredData = post ? {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: post.title,
@@ -105,14 +89,16 @@ export default function PostPage() {
     },
     articleSection: post.type === "CARD" ? "Trading Cards" : post.type === "SET" ? "Card Sets" : post.type === "RELEASE" ? "New Releases" : "General",
     keywords: "soccer cards, football cards, trading cards, collectibles"
-  };
+  } : null;
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
+      {structuredData && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+      )}
 
       <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
         <aside className="hidden lg:block w-72 flex-shrink-0">
@@ -125,6 +111,13 @@ export default function PostPage() {
 
         <main className="flex-grow max-w-4xl mx-auto space-y-6">
           <Header showBackButton={false} rounded={true} />
+
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
+            </div>
+          ) : post ? (
+            <>
 
           <Breadcrumb
             items={[
@@ -219,6 +212,8 @@ export default function PostPage() {
         />
 
           <Footer rounded={true} />
+            </>
+          ) : null}
         </main>
 
         <aside className="hidden lg:block w-72 flex-shrink-0">

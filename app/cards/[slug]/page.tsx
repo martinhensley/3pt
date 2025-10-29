@@ -98,34 +98,6 @@ export default function CardDetailPage() {
       });
   }, [slug]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-white">
-        <Header />
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!card) {
-    return (
-      <div className="min-h-screen bg-white">
-        <Header />
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Card Not Found</h1>
-            <p className="text-gray-600 mb-8">The card you&apos;re looking for doesn&apos;t exist.</p>
-            <Link href="/" className="text-footy-green hover:underline">
-              ← Back to Home
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
       <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
@@ -139,6 +111,23 @@ export default function CardDetailPage() {
 
         <main className="flex-grow max-w-5xl space-y-6">
           <Header rounded={true} />
+
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
+            </div>
+          ) : !card ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="text-center">
+                <h1 className="text-2xl font-bold text-gray-900 mb-4">Card Not Found</h1>
+                <p className="text-gray-600 mb-8">The card you&apos;re looking for doesn&apos;t exist.</p>
+                <Link href="/" className="text-footy-green hover:underline">
+                  ← Back to Home
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <>
 
           <Breadcrumb
             items={[
@@ -407,6 +396,8 @@ export default function CardDetailPage() {
           />
 
           <Footer rounded={true} />
+          </>
+          )}
         </main>
 
         <aside className="hidden lg:block w-72 flex-shrink-0">
