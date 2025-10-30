@@ -1320,9 +1320,13 @@ export default function EditReleasePage() {
 
         {/* Sets Management */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
             Manage Sets
           </h3>
+          <p className="text-sm text-gray-600 mb-6">
+            <span className="font-medium">Base Sets:</span> Main base cards •
+            <span className="font-medium ml-2">Other Sets:</span> Inserts, autographs, memorabilia
+          </p>
 
           {/* Base Sets and Other Sets */}
           {[true, false].map((isBase) => {
@@ -1331,13 +1335,21 @@ export default function EditReleasePage() {
               .filter(({ set }) => !set.isDeleted && set.isBaseSet === isBase);
 
             const categoryLabel = isBase ? 'Base Sets' : 'Other Sets';
+            const categoryDescription = isBase
+              ? 'Main base cards that come in every pack'
+              : 'Inserts, autographs, memorabilia, and special subsets';
 
             return (
               <div key={isBase ? 'base' : 'other'} className="mb-6">
                 <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-md font-semibold text-gray-800">
-                    {categoryLabel}
-                  </h4>
+                  <div>
+                    <h4 className="text-md font-semibold text-gray-800">
+                      {categoryLabel}
+                    </h4>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {categoryDescription}
+                    </p>
+                  </div>
                   <button
                     type="button"
                     onClick={() => handleAddSet(isBase)}
@@ -1346,7 +1358,7 @@ export default function EditReleasePage() {
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
-                    Add {categoryLabel.replace(' Sets', '')}
+                    Add {isBase ? 'Base' : 'Other'} Set
                   </button>
                 </div>
 
@@ -1378,8 +1390,8 @@ export default function EditReleasePage() {
                         </div>
 
                     {/* Manual Serial Number Mode Toggle */}
-                    <div className="border-t border-gray-300 pt-3 mt-3">
-                      <label className="flex items-center gap-2 cursor-pointer">
+                    <div className="border-t border-gray-300 pt-3 mt-3 bg-blue-50 rounded-lg p-3 -mx-1">
+                      <label className="flex items-start gap-2 cursor-pointer">
                         <input
                           type="checkbox"
                           checked={set.manualSerialMode || false}
@@ -1391,14 +1403,18 @@ export default function EditReleasePage() {
                             };
                             setEditedSets(updatedSets);
                           }}
-                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                          className="w-4 h-4 mt-0.5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-gray-700">
-                          Manual Serial Number Mode
-                        </span>
-                        <span className="text-xs text-gray-500 italic">
-                          (for autograph/memorabilia sets with variable print runs)
-                        </span>
+                        <div className="flex-1">
+                          <div className="text-sm font-medium text-gray-700">
+                            Manual Serial Number Mode
+                          </div>
+                          <div className="text-xs text-gray-600 mt-1">
+                            Enable for autograph/memorabilia sets where each card has a unique serial number.
+                            <br />
+                            <span className="italic">Example: Create &ldquo;Dual Jersey Ink&rdquo; base, then &ldquo;Dual Jersey Ink Electric Etch Orange&rdquo; as separate sets.</span>
+                          </div>
+                        </div>
                       </label>
                     </div>
 
