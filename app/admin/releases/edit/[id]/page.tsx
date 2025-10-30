@@ -317,7 +317,13 @@ export default function EditReleasePage() {
   };
 
   // Unified parser for complete set format: sub-set name, card count, parallels, and card list
-  const parseCompleteSetData = (text: string): { name: string; totalCards: string; parallels: string[]; cards: CardInfo[] } | null => {
+  const parseCompleteSetData = (text: string): {
+    name: string;
+    totalCards: string;
+    standardParallels: string[];
+    variableParallels: Array<{ name: string; maxPrintRun: string }>;
+    cards: CardInfo[]
+  } | null => {
     const lines = text.split('\n').map(line => line.trim()).filter(line => line);
 
     if (lines.length === 0) return null;
@@ -336,7 +342,7 @@ export default function EditReleasePage() {
     }
 
     // Look for "Parallels" section
-    const parallels: string[] = [];
+    const parallelsText: string[] = [];
     let inParallelsSection = false;
     let cardsSectionStart = currentIndex;
 
@@ -358,9 +364,12 @@ export default function EditReleasePage() {
 
       // If in parallels section, add lines as parallels
       if (inParallelsSection && line) {
-        parallels.push(line);
+        parallelsText.push(line);
       }
     }
+
+    // Parse parallels to separate standard from variable
+    const { standardParallels, variableParallels } = parseParallelsText(parallelsText.join('\n'));
 
     // Parse cards from cardsSectionStart onwards
     const cardsText = lines.slice(cardsSectionStart).join('\n');
@@ -372,7 +381,8 @@ export default function EditReleasePage() {
     return {
       name,
       totalCards,
-      parallels,
+      standardParallels,
+      variableParallels,
       cards
     };
   };
@@ -506,22 +516,30 @@ export default function EditReleasePage() {
           ...updatedSets[index],
           name: completeData.name,
           totalCards: String(completeData.cards.length), // Always use actual count
-          parallels: completeData.parallels.length > 0 ? completeData.parallels : updatedSets[index].parallels,
+          parallels: completeData.standardParallels.length > 0 ? completeData.standardParallels : updatedSets[index].parallels,
           cards: completeData.cards,
         };
         setEditedSets(updatedSets);
 
         const details = [];
         details.push(`${completeData.cards.length} cards`);
-        if (completeData.parallels.length > 0) {
-          details.push(`${completeData.parallels.length} parallels`);
+        if (completeData.standardParallels.length > 0) {
+          details.push(`${completeData.standardParallels.length} standard parallels`);
+        }
+        if (completeData.variableParallels.length > 0) {
+          details.push(`${completeData.variableParallels.length} variable parallels`);
         }
 
         setMessage({ type: "success", text: `Successfully loaded "${completeData.name}" with ${details.join(', ')}. Creating cards in database...` });
 
         // Create cards in database if set has an ID (i.e., it's been saved)
         if (updatedSets[index].id) {
-          await createCardsInDatabase(updatedSets[index].id!, completeData.cards, completeData.parallels, false);
+          await createCardsInDatabase(updatedSets[index].id!, completeData.cards, completeData.standardParallels, false);
+        }
+
+        // If there are variable parallels, create stub sets for them
+        if (completeData.variableParallels.length > 0) {
+          createVariableParallelSets(index, completeData.name, completeData.variableParallels);
         }
 
         return;
@@ -566,32 +584,79 @@ export default function EditReleasePage() {
     setEditedSets(updatedSets);
   };
 
-  const parseParallelsText = (text: string): string[] => {
-    const parallels: string[] = [];
+  // Parse parallels from text (one per line)
+  // Returns object with standardParallels (for uniform print runs) and variableParallels (for "or fewer")
+  const parseParallelsText = (text: string): { standardParallels: string[]; variableParallels: Array<{ name: string; maxPrintRun: string }> } => {
+    const standardParallels: string[] = [];
+    const variableParallels: Array<{ name: string; maxPrintRun: string }> = [];
     const lines = text.split('\n').filter(line => line.trim());
 
     for (const line of lines) {
-      // Clean up the line and add to parallels
       const cleaned = line.trim();
-      if (cleaned) {
-        parallels.push(cleaned);
+      if (!cleaned) continue;
+
+      // Check if this parallel has variable print runs ("or fewer (See list below)")
+      const variableMatch = cleaned.match(/^(.+?)\s+\/(\d+)\s+or fewer\s*\(See list below\)/i);
+
+      if (variableMatch) {
+        const [, parallelName, maxPrintRun] = variableMatch;
+        variableParallels.push({
+          name: parallelName.trim(),
+          maxPrintRun: maxPrintRun.trim(),
+        });
+      } else {
+        // Standard parallel with uniform print run
+        standardParallels.push(cleaned);
       }
     }
 
-    return parallels;
+    return { standardParallels, variableParallels };
+  };
+
+  // Auto-create stub sets for variable parallels
+  const createVariableParallelSets = (baseSetIndex: number, baseSetName: string, variableParallels: Array<{ name: string; maxPrintRun: string }>) => {
+    const updatedSets = [...editedSets];
+    const baseSet = updatedSets[baseSetIndex];
+
+    // Create a new stub set for each variable parallel
+    const newSets: SetInfo[] = variableParallels.map(parallel => ({
+      name: `${baseSetName} ${parallel.name}`,
+      isBaseSet: baseSet.isBaseSet,
+      totalCards: baseSet.totalCards,
+      parallels: [],
+      cards: [],
+      isNew: true,
+      manualSerialMode: true, // Auto-enable manual serial mode for variable parallels
+    }));
+
+    // Insert the new sets right after the base set
+    updatedSets.splice(baseSetIndex + 1, 0, ...newSets);
+    setEditedSets(updatedSets);
+
+    setMessage({
+      type: 'success',
+      text: `Created ${newSets.length} parallel sets. Paste checklist for each set with serial numbers.`,
+    });
+    setTimeout(() => setMessage(null), 5000);
   };
 
   const handleParallelsUpload = async (index: number, file: File) => {
     try {
       const text = await file.text();
-      const parallels = parseParallelsText(text);
+      const { standardParallels, variableParallels } = parseParallelsText(text);
 
       const updatedSets = [...editedSets];
       updatedSets[index] = {
         ...updatedSets[index],
-        parallels: parallels,
+        parallels: standardParallels,
       };
       setEditedSets(updatedSets);
+
+      // If there are variable parallels, create stub sets for them
+      if (variableParallels.length > 0) {
+        const baseSetName = updatedSets[index].name;
+        createVariableParallelSets(index, baseSetName, variableParallels);
+      }
     } catch (error) {
       console.error("Failed to parse parallels file:", error);
       alert("Failed to parse parallels file. Please check the format.");
@@ -599,14 +664,20 @@ export default function EditReleasePage() {
   };
 
   const handleParallelsPaste = (index: number, text: string) => {
-    const parallels = parseParallelsText(text);
+    const { standardParallels, variableParallels } = parseParallelsText(text);
 
     const updatedSets = [...editedSets];
     updatedSets[index] = {
       ...updatedSets[index],
-      parallels: parallels,
+      parallels: standardParallels,
     };
     setEditedSets(updatedSets);
+
+    // If there are variable parallels, create stub sets for them
+    if (variableParallels.length > 0) {
+      const baseSetName = updatedSets[index].name;
+      createVariableParallelSets(index, baseSetName, variableParallels);
+    }
   };
 
   const handleClearParallels = (index: number) => {
@@ -1389,34 +1460,24 @@ export default function EditReleasePage() {
                           </button>
                         </div>
 
-                    {/* Manual Serial Number Mode Toggle */}
-                    <div className="border-t border-gray-300 pt-3 mt-3 bg-blue-50 rounded-lg p-3 -mx-1">
-                      <label className="flex items-start gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={set.manualSerialMode || false}
-                          onChange={(e) => {
-                            const updatedSets = [...editedSets];
-                            updatedSets[idx] = {
-                              ...updatedSets[idx],
-                              manualSerialMode: e.target.checked,
-                            };
-                            setEditedSets(updatedSets);
-                          }}
-                          className="w-4 h-4 mt-0.5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                        />
-                        <div className="flex-1">
-                          <div className="text-sm font-medium text-gray-700">
-                            Manual Serial Number Mode
-                          </div>
-                          <div className="text-xs text-gray-600 mt-1">
-                            Enable for autograph/memorabilia sets where each card has a unique serial number.
-                            <br />
-                            <span className="italic">Example: Create &ldquo;Dual Jersey Ink&rdquo; base, then &ldquo;Dual Jersey Ink Electric Etch Orange&rdquo; as separate sets.</span>
+                    {/* Show indicator if this is a variable parallel set (manual serial mode) */}
+                    {set.manualSerialMode && (
+                      <div className="border-t border-gray-300 pt-3 mt-3 bg-blue-50 rounded-lg p-3 -mx-1">
+                        <div className="flex items-start gap-2">
+                          <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-blue-900">
+                              Variable Serial Number Mode
+                            </div>
+                            <div className="text-xs text-blue-700 mt-1">
+                              This parallel set has unique serial numbers per card. Paste checklist with format: &ldquo;Card# Player, Team /serial&rdquo;
+                            </div>
                           </div>
                         </div>
-                      </label>
-                    </div>
+                      </div>
+                    )}
 
                     {/* Unified Checklist/Set Data Upload/Paste Section */}
                     <div className="border-t border-gray-300 pt-3 mt-3">
