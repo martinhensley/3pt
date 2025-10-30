@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import Breadcrumb from "@/components/Breadcrumb";
 import AdminHeader from "@/components/AdminHeader";
-import RichTextEditor from "@/components/RichTextEditor";
+// Removed RichTextEditor - using simple textarea instead
 
 interface CardInfo {
   id?: string;
@@ -1312,10 +1312,12 @@ export default function EditReleasePage() {
               <label className="block font-semibold text-gray-900 mb-2">
                 Description:
               </label>
-              <RichTextEditor
-                content={editedDescription}
-                onChange={(html) => setEditedDescription(html)}
+              <textarea
+                value={editedDescription.replace(/<[^>]*>/g, '')} // Strip HTML tags
+                onChange={(e) => setEditedDescription(e.target.value)}
                 placeholder="A brief summary of this release for collectors..."
+                rows={6}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>
