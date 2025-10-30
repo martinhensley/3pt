@@ -302,7 +302,27 @@ export default function EditReleasePage() {
     const cards: CardInfo[] = [];
     const lines = text.split('\n');
 
-    for (const line of lines) {
+    let startIndex = 0;
+
+    // Skip header lines: parallel name and "X cards" line
+    if (lines.length > 0) {
+      // Check first line - if it doesn't start with a card number, skip it
+      const firstLine = lines[0].trim();
+      if (firstLine && !/^\d+[,.\s]/.test(firstLine)) {
+        startIndex = 1; // Skip first line if it's not a card
+      }
+    }
+
+    // Check second line for "X cards" pattern
+    if (startIndex < lines.length) {
+      const secondLine = lines[startIndex].trim();
+      if (/^\d+\s+cards?$/i.test(secondLine)) {
+        startIndex++; // Skip "X cards" line
+      }
+    }
+
+    for (let i = startIndex; i < lines.length; i++) {
+      const line = lines[i];
       if (!line.trim()) continue;
 
       // Match format: "2 Giovani Lo Celso, Argentina /149" or "2, Giovani Lo Celso, Argentina, /149"
