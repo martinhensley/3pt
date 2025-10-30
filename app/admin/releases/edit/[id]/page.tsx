@@ -714,15 +714,28 @@ export default function EditReleasePage() {
     return { standardParallels, variableParallels };
   };
 
-  // Sort parallels by print run (non-numbered first, then descending by number, /1 becomes "1 of 1" last)
+  // Sort parallels by print run (non-numbered first, then descending by number, "1 of 1" last)
   const sortParallelsByPrintRun = (parallels: string[]): string[] => {
     return [...parallels].sort((a, b) => {
+      // Check if parallel is "1 of 1"
+      const isOneOfOne = (parallel: string): boolean => {
+        return parallel.toLowerCase().includes('1 of 1');
+      };
+
       // Extract print run numbers from parallel names
       const getNumber = (parallel: string): number | null => {
         // Match /1, /10, /99, etc.
         const match = parallel.match(/\/(\d+)(?:\s|$)/);
         return match ? parseInt(match[1], 10) : null;
       };
+
+      const aIsOneOfOne = isOneOfOne(a);
+      const bIsOneOfOne = isOneOfOne(b);
+
+      // "1 of 1" always comes last
+      if (aIsOneOfOne && bIsOneOfOne) return 0;
+      if (aIsOneOfOne) return 1;
+      if (bIsOneOfOne) return -1;
 
       const numA = getNumber(a);
       const numB = getNumber(b);
@@ -733,7 +746,7 @@ export default function EditReleasePage() {
       if (numB === null) return 1;
 
       // Sort by number descending (larger numbers first)
-      // So /99 comes before /10, which comes before /1
+      // So /99 comes before /10, which comes before /5
       return numB - numA;
     });
   };
