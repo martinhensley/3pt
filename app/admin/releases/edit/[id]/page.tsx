@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import Breadcrumb from "@/components/Breadcrumb";
 import AdminHeader from "@/components/AdminHeader";
+import RichTextEditor from "@/components/RichTextEditor";
 
 interface CardInfo {
   id?: string;
@@ -373,7 +374,43 @@ export default function EditReleasePage() {
     }
   };
 
-  const handleChecklistPaste = (index: number, text: string) => {
+  const createCardsInDatabase = async (setId: string, cards: CardInfo[], parallels: string[]) => {
+    try {
+      const response = await fetch('/api/sets/create-cards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          setId,
+          cards,
+          parallels,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create cards');
+      }
+
+      setMessage({
+        type: 'success',
+        text: `Created ${data.created} cards across ${data.parallelsProcessed} parallels (${data.skipped} skipped as duplicates)`,
+      });
+      setTimeout(() => setMessage(null), 5000);
+
+      // Refresh the release data to show updated card counts
+      await fetchRelease();
+    } catch (error) {
+      console.error('Failed to create cards in database:', error);
+      setMessage({
+        type: 'error',
+        text: error instanceof Error ? error.message : 'Failed to create cards in database',
+      });
+      setTimeout(() => setMessage(null), 5000);
+    }
+  };
+
+  const handleChecklistPaste = async (index: number, text: string) => {
     try {
       // First, try parsing as complete set data (with name, parallels, cards)
       const completeData = parseCompleteSetData(text);
@@ -396,8 +433,13 @@ export default function EditReleasePage() {
           details.push(`${completeData.parallels.length} parallels`);
         }
 
-        setMessage({ type: "success", text: `Successfully loaded "${completeData.name}" with ${details.join(', ')}` });
-        setTimeout(() => setMessage(null), 3000);
+        setMessage({ type: "success", text: `Successfully loaded "${completeData.name}" with ${details.join(', ')}. Creating cards in database...` });
+
+        // Create cards in database if set has an ID (i.e., it's been saved)
+        if (updatedSets[index].id) {
+          await createCardsInDatabase(updatedSets[index].id!, completeData.cards, completeData.parallels);
+        }
+
         return;
       }
 
@@ -419,8 +461,12 @@ export default function EditReleasePage() {
       };
       setEditedSets(updatedSets);
 
-      setMessage({ type: "success", text: `Successfully added ${cards.length} cards to ${setName}` });
-      setTimeout(() => setMessage(null), 3000);
+      setMessage({ type: "success", text: `Successfully added ${cards.length} cards to ${setName}. Creating cards in database...` });
+
+      // Create cards in database if set has an ID (i.e., it's been saved)
+      if (updatedSets[index].id) {
+        await createCardsInDatabase(updatedSets[index].id!, cards, updatedSets[index].parallels || []);
+      }
     } catch (error) {
       console.error("Failed to parse pasted checklist:", error);
       setMessage({ type: "error", text: "Failed to parse pasted text. Please check the format." });
@@ -1013,14 +1059,12 @@ export default function EditReleasePage() {
 
             {/* Manual Description Input */}
             <div>
-              <label className="block font-semibold text-gray-900 mb-1">
+              <label className="block font-semibold text-gray-900 mb-2">
                 Description:
               </label>
-              <textarea
-                value={editedDescription}
-                onChange={(e) => setEditedDescription(e.target.value)}
-                rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              <RichTextEditor
+                content={editedDescription}
+                onChange={(html) => setEditedDescription(html)}
                 placeholder="A brief summary of this release for collectors..."
               />
             </div>
