@@ -554,9 +554,73 @@ export default function EditReleasePage() {
           details.push(`${completeData.variableParallels.length} variable parallels`);
         }
 
-        setMessage({ type: "success", text: `Successfully loaded "${completeData.name}" with ${details.join(', ')}. Creating cards in database...` });
+        setMessage({ type: "success", text: `Successfully loaded "${completeData.name}" with ${details.join(', ')}. Saving to database...` });
 
-        // Create cards in database if set has an ID (i.e., it's been saved)
+        // If this is a new set, save it first to get an ID
+        if (updatedSets[index].isNew && !updatedSets[index].id) {
+          try {
+            const response = await fetch('/api/sets', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: completeData.name,
+                isBaseSet: updatedSets[index].isBaseSet,
+                totalCards: completeData.totalCards,
+                parallels: completeData.standardParallels,
+                releaseId: release!.id,
+              }),
+            });
+
+            if (!response.ok) {
+              throw new Error('Failed to create set');
+            }
+
+            const newSet = await response.json();
+            updatedSets[index] = {
+              ...updatedSets[index],
+              id: newSet.id,
+              isNew: false,
+            };
+
+            // Also update any parallel stub sets that were created
+            if (completeData.variableParallels.length > 0) {
+              for (let i = 1; i <= completeData.variableParallels.length; i++) {
+                const parallelSet = updatedSets[index + i];
+                if (parallelSet && parallelSet.isNew) {
+                  const parallelResponse = await fetch('/api/sets', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      name: parallelSet.name,
+                      isBaseSet: parallelSet.isBaseSet,
+                      totalCards: parallelSet.totalCards,
+                      parallels: [],
+                      releaseId: release!.id,
+                    }),
+                  });
+
+                  if (parallelResponse.ok) {
+                    const savedParallelSet = await parallelResponse.json();
+                    updatedSets[index + i] = {
+                      ...parallelSet,
+                      id: savedParallelSet.id,
+                      isNew: false,
+                    };
+                  }
+                }
+              }
+            }
+
+            // Update state with saved set IDs
+            setEditedSets(updatedSets);
+          } catch (error) {
+            setMessage({ type: 'error', text: 'Failed to save set to database' });
+            console.error('Error saving set:', error);
+            return;
+          }
+        }
+
+        // Create cards in database now that we have a set ID
         // If there are variable parallels, the base set also uses manual serial mode
         const useManualSerialMode = completeData.variableParallels.length > 0;
         if (updatedSets[index].id) {
