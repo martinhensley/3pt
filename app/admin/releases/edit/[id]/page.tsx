@@ -15,6 +15,8 @@ interface CardInfo {
   cardNumber: string;
   variant?: string;
   setName?: string;
+  serialNumber?: string;
+  printRun?: number;
 }
 
 interface SetInfo {
@@ -26,6 +28,7 @@ interface SetInfo {
   cards?: CardInfo[];
   isNew?: boolean;
   isDeleted?: boolean;
+  manualSerialMode?: boolean;
 }
 
 interface SourceFile {
@@ -279,6 +282,40 @@ export default function EditReleasePage() {
     return cards;
   };
 
+  // Parser for cards with individual serial numbers: "Card#, Player, Team, /serial"
+  const parseCardsWithSerialNumbers = (text: string, setName: string): CardInfo[] => {
+    const cards: CardInfo[] = [];
+    const lines = text.split('\n');
+
+    for (const line of lines) {
+      if (!line.trim()) continue;
+
+      // Match format: "2 Giovani Lo Celso, Argentina /149" or "2, Giovani Lo Celso, Argentina, /149"
+      // Also handle: "25 Joan Martinez, Real Madrid (NO BASE)"
+      const match = line.match(/^(\d+)[,.\s]+([^,]+?)(?:,\s*([^,/]+?))?(?:\s*\/(\d+))?\s*(?:\(.*?\))?$/);
+
+      if (match) {
+        const [, cardNum, player, team, serial] = match;
+        const cardNumber = cardNum.trim();
+        const playerName = player.trim();
+        const teamName = team?.trim() || '';
+        const serialNumber = serial ? `/${serial}` : undefined;
+        const printRun = serial ? parseInt(serial, 10) : undefined;
+
+        cards.push({
+          cardNumber,
+          playerName,
+          team: teamName || undefined,
+          setName: setName,
+          serialNumber: serialNumber,
+          printRun: printRun,
+        });
+      }
+    }
+
+    return cards;
+  };
+
   // Unified parser for complete set format: sub-set name, card count, parallels, and card list
   const parseCompleteSetData = (text: string): { name: string; totalCards: string; parallels: string[]; cards: CardInfo[] } | null => {
     const lines = text.split('\n').map(line => line.trim()).filter(line => line);
@@ -381,7 +418,7 @@ export default function EditReleasePage() {
     }
   };
 
-  const createCardsInDatabase = async (setId: string, cards: CardInfo[], parallels: string[]) => {
+  const createCardsInDatabase = async (setId: string, cards: CardInfo[], parallels: string[], manualSerialMode: boolean = false) => {
     try {
       const response = await fetch('/api/sets/create-cards', {
         method: 'POST',
@@ -390,6 +427,7 @@ export default function EditReleasePage() {
           setId,
           cards,
           parallels,
+          manualSerialMode,
         }),
       });
 
@@ -399,10 +437,17 @@ export default function EditReleasePage() {
         throw new Error(data.error || 'Failed to create cards');
       }
 
-      setMessage({
-        type: 'success',
-        text: `Created ${data.created} cards across ${data.parallelsProcessed} parallels (${data.skipped} skipped as duplicates)`,
-      });
+      if (manualSerialMode) {
+        setMessage({
+          type: 'success',
+          text: `Created ${data.created} cards with individual serial numbers (${data.skipped} skipped as duplicates)`,
+        });
+      } else {
+        setMessage({
+          type: 'success',
+          text: `Created ${data.created} cards across ${data.parallelsProcessed} parallels (${data.skipped} skipped as duplicates)`,
+        });
+      }
       setTimeout(() => setMessage(null), 5000);
 
       // Refresh the release data to show updated card counts
@@ -419,7 +464,39 @@ export default function EditReleasePage() {
 
   const handleChecklistPaste = async (index: number, text: string) => {
     try {
-      // First, try parsing as complete set data (with name, parallels, cards)
+      const currentSet = editedSets[index];
+      const setName = currentSet.name || `Set ${index + 1}`;
+      const manualSerialMode = currentSet.manualSerialMode || false;
+
+      // If in manual serial mode, use the serial number parser
+      if (manualSerialMode) {
+        const cards = parseCardsWithSerialNumbers(text, setName);
+
+        if (cards.length === 0) {
+          setMessage({ type: "error", text: "No cards found. Format: 'Card# Player, Team /serial' (e.g., '2 Giovani Lo Celso, Argentina /149')" });
+          setTimeout(() => setMessage(null), 5000);
+          return;
+        }
+
+        const updatedSets = [...editedSets];
+        updatedSets[index] = {
+          ...updatedSets[index],
+          cards: cards,
+          totalCards: String(cards.length),
+        };
+        setEditedSets(updatedSets);
+
+        setMessage({ type: "success", text: `Successfully added ${cards.length} cards with serial numbers to ${setName}. Creating cards in database...` });
+
+        // Create cards in database if set has an ID (use empty parallels array for manual serial mode)
+        if (updatedSets[index].id) {
+          await createCardsInDatabase(updatedSets[index].id!, cards, [], true);
+        }
+
+        return;
+      }
+
+      // Standard mode: try parsing as complete set data (with name, parallels, cards)
       const completeData = parseCompleteSetData(text);
 
       if (completeData && completeData.cards.length > 0) {
@@ -444,14 +521,13 @@ export default function EditReleasePage() {
 
         // Create cards in database if set has an ID (i.e., it's been saved)
         if (updatedSets[index].id) {
-          await createCardsInDatabase(updatedSets[index].id!, completeData.cards, completeData.parallels);
+          await createCardsInDatabase(updatedSets[index].id!, completeData.cards, completeData.parallels, false);
         }
 
         return;
       }
 
       // Fall back to simple checklist parsing (just cards)
-      const setName = editedSets[index].name || `Set ${index + 1}`;
       const cards = parseChecklistText(text, setName);
 
       if (cards.length === 0) {
@@ -472,7 +548,7 @@ export default function EditReleasePage() {
 
       // Create cards in database if set has an ID (i.e., it's been saved)
       if (updatedSets[index].id) {
-        await createCardsInDatabase(updatedSets[index].id!, cards, updatedSets[index].parallels || []);
+        await createCardsInDatabase(updatedSets[index].id!, cards, updatedSets[index].parallels || [], false);
       }
     } catch (error) {
       console.error("Failed to parse pasted checklist:", error);
@@ -1301,6 +1377,31 @@ export default function EditReleasePage() {
                           </button>
                         </div>
 
+                    {/* Manual Serial Number Mode Toggle */}
+                    <div className="border-t border-gray-300 pt-3 mt-3">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={set.manualSerialMode || false}
+                          onChange={(e) => {
+                            const updatedSets = [...editedSets];
+                            updatedSets[idx] = {
+                              ...updatedSets[idx],
+                              manualSerialMode: e.target.checked,
+                            };
+                            setEditedSets(updatedSets);
+                          }}
+                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-700">
+                          Manual Serial Number Mode
+                        </span>
+                        <span className="text-xs text-gray-500 italic">
+                          (for autograph/memorabilia sets with variable print runs)
+                        </span>
+                      </label>
+                    </div>
+
                     {/* Unified Checklist/Set Data Upload/Paste Section */}
                     <div className="border-t border-gray-300 pt-3 mt-3">
                       <p className="text-sm font-semibold text-gray-700 mb-2">
@@ -1313,7 +1414,9 @@ export default function EditReleasePage() {
                           </summary>
                           <div className="mt-2">
                             <textarea
-                              placeholder="Paste Set info format: Set Name, # Cards, Parallel info, Checklist"
+                              placeholder={set.manualSerialMode
+                                ? "Paste cards with serial numbers: 'Card# Player, Team /serial' (e.g., '2 Giovani Lo Celso, Argentina /149')"
+                                : "Paste Set info format: Set Name, # Cards, Parallel info, Checklist"}
                               rows={4}
                               onChange={(e) => {
                                 if (e.target.value.trim()) {
@@ -1324,7 +1427,9 @@ export default function EditReleasePage() {
                               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 font-mono"
                             />
                             <p className="text-xs text-gray-500 mt-1 italic">
-                              Data will auto-load when pasted and show below ↓
+                              {set.manualSerialMode
+                                ? "Format: Card# Player, Team /serial (one per line)"
+                                : "Data will auto-load when pasted and show below ↓"}
                             </p>
                           </div>
                         </details>

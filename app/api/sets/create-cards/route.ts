@@ -12,9 +12,11 @@ interface CardData {
   team?: string;
   cardNumber: string;
   variant?: string;
+  serialNumber?: string;
+  printRun?: number;
 }
 
-// POST - Create cards for a set (for all parallels)
+// POST - Create cards for a set (for all parallels or with individual serial numbers)
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -23,10 +25,11 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { setId, cards, parallels } = body as {
+    const { setId, cards, parallels, manualSerialMode } = body as {
       setId: string;
       cards: CardData[];
       parallels: string[];
+      manualSerialMode?: boolean;
     };
 
     if (!setId || !cards || cards.length === 0) {
@@ -52,34 +55,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Set not found" }, { status: 404 });
     }
 
-    // Determine which parallels to create cards for
-    let parallelTypes: string[] = [];
-
-    if (parallels && parallels.length > 0) {
-      // Use provided parallels
-      parallelTypes = parallels;
-    } else if (set.parallels && Array.isArray(set.parallels)) {
-      // Use set's parallels from database
-      parallelTypes = set.parallels.filter((p): p is string => typeof p === 'string');
-    }
-
-    // If no parallels specified, create base cards only
-    if (parallelTypes.length === 0) {
-      // Determine base parallel type based on set name
-      const isOpticSet = set.name.toLowerCase().includes('optic');
-      parallelTypes = [isOpticSet ? 'Optic' : 'Base'];
-    }
-
-    console.log(`Creating cards for set "${set.name}" with ${parallelTypes.length} parallel types and ${cards.length} base cards`);
-
     const createdCards = [];
     const errors = [];
 
-    // Create cards for each parallel type
-    for (const parallelType of parallelTypes) {
+    // Manual Serial Mode: Create cards with individual serial numbers (no parallel duplication)
+    if (manualSerialMode) {
+      console.log(`Creating ${cards.length} cards with individual serial numbers for set "${set.name}"`);
+
       for (const cardData of cards) {
         try {
-          // Generate slug for this card
+          // Use set name as the parallel type for slug generation
           const slug = generateCardSlug(
             set.release.manufacturer.name,
             set.release.name,
@@ -87,7 +72,7 @@ export async function POST(request: NextRequest) {
             set.name,
             cardData.cardNumber,
             cardData.playerName,
-            parallelType
+            set.name  // Use set name as the variant/parallel
           );
 
           // Check if card already exists
@@ -100,7 +85,7 @@ export async function POST(request: NextRequest) {
             continue; // Skip if card already exists
           }
 
-          // Create the card
+          // Create the card with serial number and print run
           const card = await prisma.card.create({
             data: {
               slug,
@@ -108,19 +93,91 @@ export async function POST(request: NextRequest) {
               team: cardData.team || null,
               cardNumber: cardData.cardNumber,
               variant: cardData.variant || null,
-              parallelType: parallelType,
+              parallelType: set.name,  // Store set name as parallel type
+              serialNumber: cardData.serialNumber || null,
+              printRun: cardData.printRun || null,
+              isNumbered: cardData.printRun ? true : false,
               setId: setId,
             },
           });
 
           createdCards.push(card);
         } catch (error) {
-          console.error(`Error creating card ${cardData.cardNumber} - ${cardData.playerName} (${parallelType}):`, error);
+          console.error(`Error creating card ${cardData.cardNumber} - ${cardData.playerName}:`, error);
           errors.push({
             card: `${cardData.cardNumber} - ${cardData.playerName}`,
-            parallel: parallelType,
             error: error instanceof Error ? error.message : 'Unknown error',
           });
+        }
+      }
+    } else {
+      // Standard Mode: Create cards across all parallels
+      let parallelTypes: string[] = [];
+
+      if (parallels && parallels.length > 0) {
+        // Use provided parallels
+        parallelTypes = parallels;
+      } else if (set.parallels && Array.isArray(set.parallels)) {
+        // Use set's parallels from database
+        parallelTypes = set.parallels.filter((p): p is string => typeof p === 'string');
+      }
+
+      // If no parallels specified, create base cards only
+      if (parallelTypes.length === 0) {
+        // Determine base parallel type based on set name
+        const isOpticSet = set.name.toLowerCase().includes('optic');
+        parallelTypes = [isOpticSet ? 'Optic' : 'Base'];
+      }
+
+      console.log(`Creating cards for set "${set.name}" with ${parallelTypes.length} parallel types and ${cards.length} base cards`);
+
+      // Create cards for each parallel type
+      for (const parallelType of parallelTypes) {
+        for (const cardData of cards) {
+          try {
+            // Generate slug for this card
+            const slug = generateCardSlug(
+              set.release.manufacturer.name,
+              set.release.name,
+              set.release.year || '',
+              set.name,
+              cardData.cardNumber,
+              cardData.playerName,
+              parallelType
+            );
+
+            // Check if card already exists
+            const existingCard = await prisma.card.findUnique({
+              where: { slug },
+            });
+
+            if (existingCard) {
+              console.log(`Card already exists: ${slug}`);
+              continue; // Skip if card already exists
+            }
+
+            // Create the card
+            const card = await prisma.card.create({
+              data: {
+                slug,
+                playerName: cardData.playerName,
+                team: cardData.team || null,
+                cardNumber: cardData.cardNumber,
+                variant: cardData.variant || null,
+                parallelType: parallelType,
+                setId: setId,
+              },
+            });
+
+            createdCards.push(card);
+          } catch (error) {
+            console.error(`Error creating card ${cardData.cardNumber} - ${cardData.playerName} (${parallelType}):`, error);
+            errors.push({
+              card: `${cardData.cardNumber} - ${cardData.playerName}`,
+              parallel: parallelType,
+              error: error instanceof Error ? error.message : 'Unknown error',
+            });
+          }
         }
       }
     }
@@ -130,15 +187,37 @@ export async function POST(request: NextRequest) {
       console.log(`Encountered ${errors.length} errors`);
     }
 
-    return NextResponse.json({
-      success: true,
-      created: createdCards.length,
-      skipped: (cards.length * parallelTypes.length) - createdCards.length - errors.length,
-      errors: errors.length,
-      errorDetails: errors.length > 0 ? errors.slice(0, 10) : [], // Return first 10 errors
-      parallelsProcessed: parallelTypes.length,
-      cardsPerParallel: cards.length,
-    });
+    if (manualSerialMode) {
+      return NextResponse.json({
+        success: true,
+        created: createdCards.length,
+        skipped: cards.length - createdCards.length - errors.length,
+        errors: errors.length,
+        errorDetails: errors.length > 0 ? errors.slice(0, 10) : [],
+      });
+    } else {
+      // Calculate parallelsProcessed from the standard mode logic
+      let parallelTypes: string[] = [];
+      if (parallels && parallels.length > 0) {
+        parallelTypes = parallels;
+      } else if (set.parallels && Array.isArray(set.parallels)) {
+        parallelTypes = set.parallels.filter((p): p is string => typeof p === 'string');
+      }
+      if (parallelTypes.length === 0) {
+        const isOpticSet = set.name.toLowerCase().includes('optic');
+        parallelTypes = [isOpticSet ? 'Optic' : 'Base'];
+      }
+
+      return NextResponse.json({
+        success: true,
+        created: createdCards.length,
+        skipped: (cards.length * parallelTypes.length) - createdCards.length - errors.length,
+        errors: errors.length,
+        errorDetails: errors.length > 0 ? errors.slice(0, 10) : [],
+        parallelsProcessed: parallelTypes.length,
+        cardsPerParallel: cards.length,
+      });
+    }
   } catch (error) {
     console.error("Create cards error:", error);
     return NextResponse.json(
