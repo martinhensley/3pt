@@ -64,7 +64,11 @@ export async function POST(request: NextRequest) {
 
       for (const cardData of cards) {
         try {
-          // Use set name as the parallel type for slug generation
+          // For slug generation:
+          // - If parallels array is provided, use the parallel name
+          // - Otherwise, use set name for base cards
+          const slugVariant = parallels && parallels.length > 0 ? parallels[0] : set.name;
+
           const slug = generateCardSlug(
             set.release.manufacturer.name,
             set.release.name,
@@ -72,7 +76,7 @@ export async function POST(request: NextRequest) {
             set.name,
             cardData.cardNumber,
             cardData.playerName,
-            set.name  // Use set name as the variant/parallel
+            slugVariant
           );
 
           // Check if card already exists
@@ -86,6 +90,10 @@ export async function POST(request: NextRequest) {
           }
 
           // Create the card with serial number and print run
+          // If parallels array is empty, this is a base card (parallelType: null)
+          // Otherwise, use the first parallel in the array (for variable parallel checklists)
+          const parallelType = parallels && parallels.length > 0 ? parallels[0] : null;
+
           const card = await prisma.card.create({
             data: {
               slug,
@@ -93,7 +101,7 @@ export async function POST(request: NextRequest) {
               team: cardData.team || null,
               cardNumber: cardData.cardNumber,
               variant: cardData.variant || null,
-              parallelType: set.name,  // Store set name as parallel type
+              parallelType: parallelType,
               serialNumber: cardData.serialNumber || null,
               printRun: cardData.printRun || null,
               isNumbered: cardData.printRun ? true : false,

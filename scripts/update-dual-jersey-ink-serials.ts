@@ -57,9 +57,9 @@ async function updateDualJerseyInkSerials() {
   let updatedCount = 0;
 
   for (const data of cardData) {
-    // Find the card by card number and player name
+    // Find the BASE card by card number and player name (parallelType: null)
     const card = set.cards.find(
-      (c) => c.cardNumber === data.cardNumber && c.playerName === data.playerName
+      (c) => c.cardNumber === data.cardNumber && c.playerName === data.playerName && c.parallelType === null
     );
 
     if (!card) {
