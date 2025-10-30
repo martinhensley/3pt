@@ -524,6 +524,25 @@ export default function EditReleasePage() {
           parallels: completeData.standardParallels.length > 0 ? completeData.standardParallels : updatedSets[index].parallels,
           cards: completeData.cards,
         };
+
+        // If there are variable parallels, create stub sets for them BEFORE setting state
+        if (completeData.variableParallels.length > 0) {
+          const baseSet = updatedSets[index];
+          const newSets: SetInfo[] = completeData.variableParallels.map(parallel => ({
+            name: `${completeData.name} ${parallel.name}`,
+            isBaseSet: baseSet.isBaseSet,
+            totalCards: baseSet.totalCards,
+            parallels: [],
+            cards: [],
+            isNew: true,
+            manualSerialMode: true, // Auto-enable manual serial mode for variable parallels
+          }));
+
+          // Insert the new sets right after the base set
+          updatedSets.splice(index + 1, 0, ...newSets);
+        }
+
+        // Now update state with all changes at once
         setEditedSets(updatedSets);
 
         const details = [];
@@ -547,11 +566,6 @@ export default function EditReleasePage() {
             completeData.standardParallels,
             useManualSerialMode
           );
-        }
-
-        // If there are variable parallels, create stub sets for them
-        if (completeData.variableParallels.length > 0) {
-          createVariableParallelSets(index, completeData.name, completeData.variableParallels);
         }
 
         return;
