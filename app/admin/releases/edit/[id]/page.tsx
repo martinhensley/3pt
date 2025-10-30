@@ -95,6 +95,7 @@ export default function EditReleasePage() {
   const [editedYear, setEditedYear] = useState("");
   const [editedDescription, setEditedDescription] = useState("");
   const [editedSets, setEditedSets] = useState<SetInfo[]>([]);
+  const [collapsedSets, setCollapsedSets] = useState<Set<number>>(new Set()); // Track which sets are collapsed
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -173,7 +174,18 @@ export default function EditReleasePage() {
       isNew: true,
       isDeleted: false,
     };
-    setEditedSets([...editedSets, newSet]);
+    // Add new set at the beginning (top) instead of end
+    setEditedSets([newSet, ...editedSets]);
+  };
+
+  const toggleSetCollapse = (index: number) => {
+    const newCollapsed = new Set(collapsedSets);
+    if (newCollapsed.has(index)) {
+      newCollapsed.delete(index);
+    } else {
+      newCollapsed.add(index);
+    }
+    setCollapsedSets(newCollapsed);
   };
 
   const handleUpdateSet = (index: number, field: keyof SetInfo, value: string) => {
@@ -1565,9 +1577,21 @@ export default function EditReleasePage() {
               {editedSets
                 .map((set, idx) => ({ set, originalIdx: idx }))
                 .filter(({ set }) => !set.isDeleted)
-                .map(({ set, originalIdx: idx }) => (
+                .map(({ set, originalIdx: idx }) => {
+                  const isCollapsed = collapsedSets.has(idx);
+                  return (
                       <div key={idx} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                         <div className="flex items-start justify-between gap-2 mb-3">
+                          <button
+                            type="button"
+                            onClick={() => toggleSetCollapse(idx)}
+                            className="px-2 py-2 hover:bg-gray-200 rounded transition-colors flex-shrink-0"
+                            title={isCollapsed ? "Expand" : "Collapse"}
+                          >
+                            <svg className={`w-5 h-5 text-gray-600 transition-transform ${isCollapsed ? '' : 'rotate-90'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </button>
                           <div className="flex-1">
                             <input
                               type="text"
@@ -1580,7 +1604,7 @@ export default function EditReleasePage() {
                           <button
                             type="button"
                             onClick={() => handleRemoveSet(idx)}
-                            className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                            className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex-shrink-0"
                             title="Remove set"
                             disabled={loading}
                           >
@@ -1589,6 +1613,9 @@ export default function EditReleasePage() {
                             </svg>
                           </button>
                         </div>
+
+                    {!isCollapsed && (
+                      <div>
 
                     {/* Show indicator if this is a variable parallel set (manual serial mode) */}
                     {set.manualSerialMode && (
@@ -1884,7 +1911,10 @@ export default function EditReleasePage() {
                       </details>
                     </div>
                       </div>
-                    ))}
+                    )}
+                      </div>
+                  );
+                })}
             </div>
           ) : (
             <p className="text-sm text-gray-500 italic text-center py-4">
