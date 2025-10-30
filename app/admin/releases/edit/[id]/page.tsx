@@ -560,6 +560,8 @@ export default function EditReleasePage() {
           ...completeData.standardParallels,
           ...completeData.variableParallels.map(p => `${p.name} /${p.maxPrintRun} or fewer`)
         ];
+        console.log('🔍 Combined parallels for storage:', allParallels);
+        console.log('🔍 About to save set with parallels:', allParallels);
 
         updatedSets[index] = {
           ...updatedSets[index],
@@ -589,6 +591,7 @@ export default function EditReleasePage() {
         // If this is a new set, save it first to get an ID
         if (updatedSets[index].isNew && !updatedSets[index].id) {
           try {
+            console.log('📤 Sending to API - parallels:', allParallels);
             const response = await fetch('/api/sets', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -606,6 +609,8 @@ export default function EditReleasePage() {
             }
 
             const newSet = await response.json();
+            console.log('📥 Received from API - newSet:', newSet);
+            console.log('📥 newSet.parallels:', newSet.parallels);
             updatedSets[index] = {
               ...updatedSets[index],
               id: newSet.id,

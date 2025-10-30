@@ -25,13 +25,12 @@ export default function RichTextEditor({
 
   const editor = useEditor({
     immediatelyRender: false,
+    shouldRerenderOnTransaction: false, // Prevent double renders in React strict mode
     extensions: [
       StarterKit.configure({
         heading: {
           levels: [2, 3, 4],
         },
-        // Disable strike since we're adding it manually with Underline
-        strike: false,
       }),
       Image.configure({
         inline: true,
