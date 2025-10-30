@@ -30,6 +30,8 @@ export default function RichTextEditor({
         heading: {
           levels: [2, 3, 4],
         },
+        // Disable strike since we're adding it manually with Underline
+        strike: false,
       }),
       Image.configure({
         inline: true,
