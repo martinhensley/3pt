@@ -598,6 +598,71 @@ export default function EditReleasePage() {
         return;
       }
 
+      // Check if this is a variable parallel checklist (set name + parallel name + cards with serials)
+      // Format: "Dual Jersey Ink Electric Etch Orange\n25 cards\n2 Giovani Lo Celso, Argentina /149\n..."
+      const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+      const firstLine = lines[0];
+      const secondLine = lines[1];
+
+      // Check if first line matches a known parallel from this set
+      const currentSet = editedSets[index];
+      const matchedParallel = currentSet.parallels?.find(p =>
+        firstLine && p.toLowerCase().includes(firstLine.toLowerCase())
+      );
+
+      if (matchedParallel && secondLine && /^\d+\s+cards?$/i.test(secondLine)) {
+        // This is a variable parallel checklist! Update existing cards
+        const cards = parseCardsWithSerialNumbers(text, setName);
+
+        if (cards.length === 0) {
+          setMessage({ type: "error", text: "No cards found in parallel checklist" });
+          setTimeout(() => setMessage(null), 5000);
+          return;
+        }
+
+        if (!currentSet.id) {
+          setMessage({ type: "error", text: "Please save the set first" });
+          setTimeout(() => setMessage(null), 5000);
+          return;
+        }
+
+        setMessage({ type: "success", text: `Updating ${cards.length} cards for parallel "${matchedParallel}"...` });
+
+        // Update cards via API
+        try {
+          const response = await fetch('/api/sets/update-parallel-serials', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              setId: currentSet.id,
+              parallelType: matchedParallel,
+              cards: cards,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || 'Failed to update cards');
+          }
+
+          setMessage({ type: "success", text: `✓ Updated ${data.updated} cards for "${matchedParallel}"` });
+          setTimeout(() => setMessage(null), 3000);
+
+          // Refresh card count
+          await refreshSetCardCount(currentSet.id);
+        } catch (error) {
+          console.error('Failed to update parallel cards:', error);
+          setMessage({
+            type: 'error',
+            text: error instanceof Error ? error.message : 'Failed to update parallel cards',
+          });
+          setTimeout(() => setMessage(null), 5000);
+        }
+
+        return;
+      }
+
       // Standard mode: try parsing as complete set data (with name, parallels, cards)
       const completeData = parseCompleteSetData(text);
 

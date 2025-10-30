@@ -141,6 +141,28 @@ export async function POST(request: NextRequest) {
 
       // Create cards for each parallel type
       for (const parallelType of parallelTypes) {
+        // Determine if this is a variable parallel (has "or fewer" in name)
+        const isVariableParallel = parallelType.toLowerCase().includes('or fewer');
+
+        // Extract print run from parallel name for standard parallels
+        let parallelPrintRun: number | null = null;
+        let parallelSerialNumber: string | null = null;
+
+        if (!isVariableParallel) {
+          // Try to extract print run from parallel name
+          // Match patterns like "/99", "/1", "1 of 1"
+          const printRunMatch = parallelType.match(/\/(\d+)(?:\s|$)/);
+          const oneOfOneMatch = parallelType.match(/1\s+of\s+1/i);
+
+          if (oneOfOneMatch) {
+            parallelPrintRun = 1;
+            parallelSerialNumber = '/1';
+          } else if (printRunMatch) {
+            parallelPrintRun = parseInt(printRunMatch[1], 10);
+            parallelSerialNumber = `/${parallelPrintRun}`;
+          }
+        }
+
         for (const cardData of cards) {
           try {
             // Generate slug for this card
@@ -164,6 +186,11 @@ export async function POST(request: NextRequest) {
               continue; // Skip if card already exists
             }
 
+            // For standard parallels, use the parallel's fixed print run
+            // For variable parallels, leave serial numbers empty
+            const serialNumber = isVariableParallel ? null : parallelSerialNumber;
+            const printRun = isVariableParallel ? null : parallelPrintRun;
+
             // Create the card
             const card = await prisma.card.create({
               data: {
@@ -173,6 +200,9 @@ export async function POST(request: NextRequest) {
                 cardNumber: cardData.cardNumber,
                 variant: cardData.variant || null,
                 parallelType: parallelType,
+                serialNumber: serialNumber,
+                printRun: printRun,
+                isNumbered: printRun ? true : false,
                 setId: setId,
               },
             });
