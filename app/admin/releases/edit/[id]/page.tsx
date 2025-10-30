@@ -1539,51 +1539,33 @@ export default function EditReleasePage() {
 
         {/* Sets Management */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            Manage Sets
-          </h3>
-          <p className="text-sm text-gray-600 mb-6">
-            <span className="font-medium">Base Sets:</span> Main base cards •
-            <span className="font-medium ml-2">Other Sets:</span> Inserts, autographs, memorabilia
-          </p>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Sets
+              </h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Base sets, parallels, inserts, autographs, and memorabilia cards
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => handleAddSet(true)}
+              className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors flex items-center gap-1.5"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Add Set
+            </button>
+          </div>
 
-          {/* Base Sets and Other Sets */}
-          {[true, false].map((isBase) => {
-            const categorySets = editedSets
-              .map((set, idx) => ({ set, originalIdx: idx }))
-              .filter(({ set }) => !set.isDeleted && set.isBaseSet === isBase);
-
-            const categoryLabel = isBase ? 'Base Sets' : 'Other Sets';
-            const categoryDescription = isBase
-              ? 'Main base cards that come in every pack'
-              : 'Inserts, autographs, memorabilia, and special subsets';
-
-            return (
-              <div key={isBase ? 'base' : 'other'} className="mb-6">
-                <div className="flex items-center justify-between mb-3">
-                  <div>
-                    <h4 className="text-md font-semibold text-gray-800">
-                      {categoryLabel}
-                    </h4>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      {categoryDescription}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleAddSet(isBase)}
-                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors flex items-center gap-1.5"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                    Add {isBase ? 'Base' : 'Other'} Set
-                  </button>
-                </div>
-
-                {categorySets.length > 0 ? (
-                  <div className="space-y-4">
-                    {categorySets.map(({ set, originalIdx: idx }) => (
+          {editedSets.filter(set => !set.isDeleted).length > 0 ? (
+            <div className="space-y-4">
+              {editedSets
+                .map((set, idx) => ({ set, originalIdx: idx }))
+                .filter(({ set }) => !set.isDeleted)
+                .map(({ set, originalIdx: idx }) => (
                       <div key={idx} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                         <div className="flex items-start justify-between gap-2 mb-3">
                           <div className="flex-1">
@@ -1591,7 +1573,7 @@ export default function EditReleasePage() {
                               type="text"
                               value={set.name}
                               onChange={(e) => handleUpdateSet(idx, "name", e.target.value)}
-                              placeholder={`Set Name (e.g., ${isBase ? 'Base Set, Optic' : 'Dual Jersey Ink, Rookie Cards, Patch Cards'})`}
+                              placeholder="Set Name (e.g., Base, Optic, Dual Jersey Ink, Color Blast)"
                               className="w-full px-3 py-2 font-semibold border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500"
                             />
                           </div>
@@ -1903,15 +1885,12 @@ export default function EditReleasePage() {
                     </div>
                       </div>
                     ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-500 italic text-center py-4">
-                    No {categoryLabel.toLowerCase()} yet.
-                  </p>
-                )}
-              </div>
-            );
-          })}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500 italic text-center py-4">
+              No sets yet. Click "Add Set" to create your first set.
+            </p>
+          )}
         </div>
 
         {/* Action Buttons */}
