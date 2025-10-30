@@ -556,10 +556,15 @@ export default function EditReleasePage() {
         const updatedSets = [...editedSets];
 
         // Combine all parallels (standard + variable) for storage
-        const allParallels = [
+        const rawParallels = [
           ...completeData.standardParallels,
           ...completeData.variableParallels.map(p => `${p.name} /${p.maxPrintRun} or fewer`)
         ];
+
+        // Normalize /1 to "1 of 1" and sort by print run
+        const normalizedParallels = rawParallels.map(normalizeParallelName);
+        const allParallels = sortParallelsByPrintRun(normalizedParallels);
+
         console.log('🔍 Combined parallels for storage:', allParallels);
         console.log('🔍 About to save set with parallels:', allParallels);
 
@@ -707,6 +712,36 @@ export default function EditReleasePage() {
     }
 
     return { standardParallels, variableParallels };
+  };
+
+  // Sort parallels by print run (non-numbered first, then descending by number, /1 becomes "1 of 1" last)
+  const sortParallelsByPrintRun = (parallels: string[]): string[] => {
+    return [...parallels].sort((a, b) => {
+      // Extract print run numbers from parallel names
+      const getNumber = (parallel: string): number | null => {
+        // Match /1, /10, /99, etc.
+        const match = parallel.match(/\/(\d+)(?:\s|$)/);
+        return match ? parseInt(match[1], 10) : null;
+      };
+
+      const numA = getNumber(a);
+      const numB = getNumber(b);
+
+      // Non-numbered parallels come first
+      if (numA === null && numB === null) return 0;
+      if (numA === null) return -1;
+      if (numB === null) return 1;
+
+      // Sort by number descending (larger numbers first)
+      // So /99 comes before /10, which comes before /1
+      return numB - numA;
+    });
+  };
+
+  // Normalize parallel names: convert /1 to "1 of 1"
+  const normalizeParallelName = (parallel: string): string => {
+    // Replace /1 at the end or before "or fewer" with "1 of 1"
+    return parallel.replace(/\/1(?=\s+or fewer|$)/g, '1 of 1');
   };
 
   // Auto-create stub sets for variable parallels
@@ -1589,7 +1624,7 @@ export default function EditReleasePage() {
                           <p className="text-xs text-gray-600 italic mb-3">
                             Click a parallel to add/view cards for that specific parallel.
                           </p>
-                          {set.parallels.map((parallel, pIdx) => {
+                          {sortParallelsByPrintRun(set.parallels).map((parallel, pIdx) => {
                             // Check if this parallel has "or fewer" indicating variable serial numbers
                             const hasVariableSerials = parallel.toLowerCase().includes('or fewer');
 
@@ -1658,7 +1693,10 @@ export default function EditReleasePage() {
                                             return;
                                           }
 
+                                          console.log('🎯 Parsing text for parallel:', parallel);
+                                          console.log('📝 Input text:', text);
                                           const cards = parseCardsWithSerialNumbers(text, set.name);
+                                          console.log('✅ Parsed cards:', cards);
 
                                           if (cards.length === 0) {
                                             setMessage({ type: "error", text: "No cards found. Check format." });
@@ -1668,6 +1706,7 @@ export default function EditReleasePage() {
 
                                           setMessage({ type: "success", text: `Creating ${cards.length} cards...` });
 
+                                          console.log('💾 Creating cards in database for parallel:', parallel);
                                           await createCardsInDatabase(set.id, cards, [parallel], true);
 
                                           setMessage({ type: "success", text: `✓ Added ${cards.length} cards` });
@@ -1811,7 +1850,7 @@ export default function EditReleasePage() {
                                 View parallels ({set.parallels.length})
                               </summary>
                               <div className="mt-2 max-h-40 overflow-y-auto space-y-1">
-                                {set.parallels.map((parallel, parallelIdx) => (
+                                {sortParallelsByPrintRun(set.parallels).map((parallel, parallelIdx) => (
                                   <div key={parallelIdx} className="text-xs text-gray-700">
                                     • {parallel}
                                   </div>
