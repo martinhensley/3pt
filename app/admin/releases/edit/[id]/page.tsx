@@ -29,6 +29,7 @@ interface SetInfo {
   isNew?: boolean;
   isDeleted?: boolean;
   manualSerialMode?: boolean;
+  selectedParallel?: string; // Which parallel the user is currently adding cards for
 }
 
 interface SourceFile {
@@ -482,6 +483,38 @@ export default function EditReleasePage() {
       const currentSet = editedSets[index];
       const setName = currentSet.name || `Set ${index + 1}`;
       const manualSerialMode = currentSet.manualSerialMode || false;
+      const selectedParallel = currentSet.selectedParallel;
+
+      // If a parallel is selected, user is adding cards for a specific parallel
+      if (selectedParallel && currentSet.parallels && currentSet.parallels.length > 0) {
+        if (!currentSet.id) {
+          setMessage({ type: "error", text: "Please save the set first before adding parallel cards" });
+          setTimeout(() => setMessage(null), 5000);
+          return;
+        }
+
+        // Parse cards with serial numbers
+        const cards = parseCardsWithSerialNumbers(text, setName);
+
+        if (cards.length === 0) {
+          setMessage({ type: "error", text: "No cards found. Format: 'Card# Player, Team /serial' (e.g., '2 Giovani Lo Celso, Argentina /149')" });
+          setTimeout(() => setMessage(null), 5000);
+          return;
+        }
+
+        setMessage({ type: "success", text: `Creating ${cards.length} cards for parallel "${selectedParallel}"...` });
+
+        // Create cards in database for the selected parallel
+        await createCardsInDatabase(currentSet.id, cards, [selectedParallel], true);
+
+        setMessage({ type: "success", text: `Successfully added ${cards.length} cards for parallel "${selectedParallel}"` });
+        setTimeout(() => setMessage(null), 3000);
+
+        // Refresh the release data to show updated card counts
+        await fetchRelease();
+
+        return;
+      }
 
       // If in manual serial mode, use the serial number parser
       if (manualSerialMode) {
@@ -517,30 +550,23 @@ export default function EditReleasePage() {
       if (completeData && completeData.cards.length > 0) {
         // Complete format detected - update name, parallels, cards, and totalCards (auto-counted from checklist)
         const updatedSets = [...editedSets];
+
+        // Combine all parallels (standard + variable) for storage
+        const allParallels = [
+          ...completeData.standardParallels,
+          ...completeData.variableParallels.map(p => `${p.name} /${p.maxPrintRun} or fewer`)
+        ];
+
         updatedSets[index] = {
           ...updatedSets[index],
           name: completeData.name,
           totalCards: String(completeData.cards.length), // Always use actual count
-          parallels: completeData.standardParallels.length > 0 ? completeData.standardParallels : updatedSets[index].parallels,
+          parallels: allParallels.length > 0 ? allParallels : updatedSets[index].parallels,
           cards: completeData.cards,
         };
 
-        // If there are variable parallels, create stub sets for them BEFORE setting state
-        if (completeData.variableParallels.length > 0) {
-          const baseSet = updatedSets[index];
-          const newSets: SetInfo[] = completeData.variableParallels.map(parallel => ({
-            name: `${completeData.name} ${parallel.name}`,
-            isBaseSet: baseSet.isBaseSet,
-            totalCards: baseSet.totalCards,
-            parallels: [],
-            cards: [],
-            isNew: true,
-            manualSerialMode: true, // Auto-enable manual serial mode for variable parallels
-          }));
-
-          // Insert the new sets right after the base set
-          updatedSets.splice(index + 1, 0, ...newSets);
-        }
+        // Variable parallels are stored within the base set, not as separate sets
+        // They will be displayed as parallel badges on the set page
 
         // Now update state with all changes at once
         setEditedSets(updatedSets);
@@ -582,36 +608,7 @@ export default function EditReleasePage() {
               isNew: false,
             };
 
-            // Also update any parallel stub sets that were created
-            if (completeData.variableParallels.length > 0) {
-              for (let i = 1; i <= completeData.variableParallels.length; i++) {
-                const parallelSet = updatedSets[index + i];
-                if (parallelSet && parallelSet.isNew) {
-                  const parallelResponse = await fetch('/api/sets', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      name: parallelSet.name,
-                      isBaseSet: parallelSet.isBaseSet,
-                      totalCards: parallelSet.totalCards,
-                      parallels: [],
-                      releaseId: release!.id,
-                    }),
-                  });
-
-                  if (parallelResponse.ok) {
-                    const savedParallelSet = await parallelResponse.json();
-                    updatedSets[index + i] = {
-                      ...parallelSet,
-                      id: savedParallelSet.id,
-                      isNew: false,
-                    };
-                  }
-                }
-              }
-            }
-
-            // Update state with saved set IDs
+            // Update state with saved set ID
             setEditedSets(updatedSets);
           } catch (error) {
             setMessage({ type: 'error', text: 'Failed to save set to database' });
@@ -1574,6 +1571,38 @@ export default function EditReleasePage() {
                       <p className="text-sm font-semibold text-gray-700 mb-2">
                         Set Data (Checklist & Parallels):
                       </p>
+
+                      {/* Parallel Selector (for sets with parallels already defined) */}
+                      {set.parallels && set.parallels.length > 0 && (
+                        <div className="mb-3">
+                          <label className="block text-xs font-medium text-gray-700 mb-1">
+                            Select Parallel to Add Cards:
+                          </label>
+                          <select
+                            value={set.selectedParallel || ''}
+                            onChange={(e) => {
+                              const updatedSets = [...editedSets];
+                              updatedSets[idx] = {
+                                ...updatedSets[idx],
+                                selectedParallel: e.target.value,
+                              };
+                              setEditedSets(updatedSets);
+                            }}
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500"
+                          >
+                            <option value="">-- Select a parallel --</option>
+                            {set.parallels.map((parallel, pIdx) => (
+                              <option key={pIdx} value={parallel}>
+                                {parallel}
+                              </option>
+                            ))}
+                          </select>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Choose which parallel you&apos;re adding cards for, then paste the checklist below
+                          </p>
+                        </div>
+                      )}
+
                       <div className="flex flex-col gap-2">
                         <details className="text-sm" open>
                           <summary className="cursor-pointer text-blue-600 hover:underline font-medium">
@@ -1581,7 +1610,9 @@ export default function EditReleasePage() {
                           </summary>
                           <div className="mt-2">
                             <textarea
-                              placeholder={set.manualSerialMode
+                              placeholder={set.parallels && set.parallels.length > 0 && set.selectedParallel
+                                ? `Paste cards for "${set.selectedParallel}": 'Card# Player, Team /serial' (e.g., '2 Giovani Lo Celso, Argentina /149')`
+                                : set.manualSerialMode
                                 ? "Paste cards with serial numbers: 'Card# Player, Team /serial' (e.g., '2 Giovani Lo Celso, Argentina /149')"
                                 : "Paste Set info format: Set Name, # Cards, Parallel info, Checklist"}
                               rows={4}
