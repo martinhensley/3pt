@@ -470,6 +470,27 @@ export default function EditReleasePage() {
     }
   };
 
+  // Refresh card count for a specific set without reloading the entire page
+  const refreshSetCardCount = async (setId: string) => {
+    try {
+      const response = await fetch(`/api/sets?id=${setId}`);
+      if (!response.ok) return;
+
+      const setData = await response.json();
+
+      // Update just this set in the editedSets array
+      setEditedSets(prevSets =>
+        prevSets.map(set =>
+          set.id === setId
+            ? { ...set, totalCards: String(setData._count?.cards || 0) }
+            : set
+        )
+      );
+    } catch (error) {
+      console.error('Failed to refresh set card count:', error);
+    }
+  };
+
   const createCardsInDatabase = async (setId: string, cards: CardInfo[], parallels: string[], manualSerialMode: boolean = false) => {
     try {
       const response = await fetch('/api/sets/create-cards', {
@@ -502,8 +523,8 @@ export default function EditReleasePage() {
       }
       setTimeout(() => setMessage(null), 5000);
 
-      // Refresh the release data to show updated card counts
-      await fetchRelease();
+      // Refresh just the card count for this set (don't reload entire page)
+      await refreshSetCardCount(setId);
     } catch (error) {
       console.error('Failed to create cards in database:', error);
       setMessage({
@@ -545,9 +566,6 @@ export default function EditReleasePage() {
 
         setMessage({ type: "success", text: `Successfully added ${cards.length} cards for parallel "${selectedParallel}"` });
         setTimeout(() => setMessage(null), 3000);
-
-        // Refresh the release data to show updated card counts
-        await fetchRelease();
 
         return;
       }
@@ -1758,8 +1776,6 @@ export default function EditReleasePage() {
 
                                           textarea.value = '';
 
-                                          // Refresh to show new cards
-                                          await fetchRelease();
                                         }}
                                         className="px-3 py-1 bg-footy-green hover:bg-green-800 text-white text-xs rounded transition-colors"
                                       >
