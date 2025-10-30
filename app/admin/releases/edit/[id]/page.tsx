@@ -358,9 +358,11 @@ export default function EditReleasePage() {
         continue;
       }
 
-      // Check if this is the start of the cards section (first card number)
-      const cardMatch = line.match(/^(\d+)\.?\s+/);
-      if (cardMatch) {
+      // Check if this is the start of the cards section
+      // Cards start with: "2 Giovani Lo Celso, Argentina" (number followed by space and name with comma)
+      const cardMatch = line.match(/^(\d+)\.?\s+([A-Z][\w\s]+),/);
+      if (cardMatch && inParallelsSection) {
+        // This looks like a card (has player name with comma after card number)
         cardsSectionStart = i;
         break;
       }
