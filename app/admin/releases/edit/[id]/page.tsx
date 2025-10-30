@@ -1918,7 +1918,7 @@ export default function EditReleasePage() {
             </div>
           ) : (
             <p className="text-sm text-gray-500 italic text-center py-4">
-              No sets yet. Click "Add Set" to create your first set.
+              No sets yet. Click &ldquo;Add Set&rdquo; to create your first set.
             </p>
           )}
         </div>
