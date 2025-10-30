@@ -373,7 +373,12 @@ export default function EditReleasePage() {
 
     // Parse cards from cardsSectionStart onwards
     const cardsText = lines.slice(cardsSectionStart).join('\n');
-    const cards = parseChecklistText(cardsText, name);
+
+    // If there are variable parallels, the checklist will have serial numbers
+    // Use the serial number parser to capture them for the base set
+    const cards = variableParallels.length > 0
+      ? parseCardsWithSerialNumbers(cardsText, name)
+      : parseChecklistText(cardsText, name);
 
     // totalCards is the actual count of cards parsed from the checklist
     const totalCards = String(cards.length);
@@ -533,8 +538,15 @@ export default function EditReleasePage() {
         setMessage({ type: "success", text: `Successfully loaded "${completeData.name}" with ${details.join(', ')}. Creating cards in database...` });
 
         // Create cards in database if set has an ID (i.e., it's been saved)
+        // If there are variable parallels, the base set also uses manual serial mode
+        const useManualSerialMode = completeData.variableParallels.length > 0;
         if (updatedSets[index].id) {
-          await createCardsInDatabase(updatedSets[index].id!, completeData.cards, completeData.standardParallels, false);
+          await createCardsInDatabase(
+            updatedSets[index].id!,
+            completeData.cards,
+            completeData.standardParallels,
+            useManualSerialMode
+          );
         }
 
         // If there are variable parallels, create stub sets for them
