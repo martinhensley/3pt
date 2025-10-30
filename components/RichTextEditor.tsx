@@ -23,43 +23,46 @@ export default function RichTextEditor({
 }: RichTextEditorProps) {
   const [uploading, setUploading] = useState(false);
 
-  const editor = useEditor({
-    immediatelyRender: false,
-    shouldRerenderOnTransaction: false, // Prevent double renders in React strict mode
-    extensions: [
-      StarterKit.configure({
-        heading: {
-          levels: [2, 3, 4],
+  const editor = useEditor(
+    {
+      immediatelyRender: false,
+      shouldRerenderOnTransaction: false,
+      extensions: [
+        StarterKit.configure({
+          heading: {
+            levels: [2, 3, 4],
+          },
+        }),
+        Image.configure({
+          inline: true,
+          allowBase64: true,
+        }),
+        Link.configure({
+          openOnClick: false,
+          HTMLAttributes: {
+            class: "text-footy-orange hover:underline",
+          },
+        }),
+        TextAlign.configure({
+          types: ["heading", "paragraph"],
+        }),
+        Underline,
+        TextStyle,
+        Color,
+      ],
+      content,
+      editorProps: {
+        attributes: {
+          class:
+            "prose prose-lg max-w-none min-h-[400px] p-4 focus:outline-none border border-gray-300 rounded-lg",
         },
-      }),
-      Image.configure({
-        inline: true,
-        allowBase64: true,
-      }),
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          class: "text-footy-orange hover:underline",
-        },
-      }),
-      TextAlign.configure({
-        types: ["heading", "paragraph"],
-      }),
-      Underline,
-      TextStyle,
-      Color,
-    ],
-    content,
-    editorProps: {
-      attributes: {
-        class:
-          "prose prose-lg max-w-none min-h-[400px] p-4 focus:outline-none border border-gray-300 rounded-lg",
+      },
+      onUpdate: ({ editor }) => {
+        onChange(editor.getHTML());
       },
     },
-    onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
-    },
-  });
+    [] // Empty dependency array - only create editor once
+  );
 
   useEffect(() => {
     if (editor && content !== editor.getHTML()) {
