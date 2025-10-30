@@ -61,6 +61,8 @@ interface Release {
       team: string | null;
       cardNumber: string | null;
       variant: string | null;
+      parallelType: string | null;
+      serialNumber: string | null;
     }>;
   }>;
   images?: Array<{
