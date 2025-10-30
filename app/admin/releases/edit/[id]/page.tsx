@@ -1574,10 +1574,15 @@ export default function EditReleasePage() {
 
                       {/* Show individual paste boxes for each parallel if parallels are defined */}
                       {set.parallels && set.parallels.length > 0 ? (
-                        <div className="space-y-4">
+                        <div className="space-y-3">
+                          <p className="text-xs text-gray-600 italic">
+                            Paste checklist for each parallel below. Cards will be created when you click the button.
+                          </p>
                           {set.parallels.map((parallel, pIdx) => {
                             // Check if this parallel has "or fewer" indicating variable serial numbers
                             const hasVariableSerials = parallel.toLowerCase().includes('or fewer');
+                            // Create a unique key for this parallel's textarea state
+                            const textareaKey = `${set.id || idx}-${pIdx}`;
 
                             return (
                               <div key={pIdx} className="border border-gray-300 rounded-lg p-3 bg-gray-50">
@@ -1595,32 +1600,62 @@ export default function EditReleasePage() {
                                   )}
                                 </div>
                                 <textarea
+                                  id={textareaKey}
                                   placeholder={hasVariableSerials
                                     ? `Paste checklist with serial numbers: 'Card# Player, Team /serial' (e.g., '2 Giovani Lo Celso, Argentina /149')`
-                                    : `Paste checklist for ${parallel} (will use standard format)`}
+                                    : `Paste checklist for ${parallel}`}
                                   rows={3}
-                                  onChange={(e) => {
-                                    if (e.target.value.trim()) {
-                                      // Set the selected parallel and process the paste
-                                      const updatedSets = [...editedSets];
-                                      updatedSets[idx] = {
-                                        ...updatedSets[idx],
-                                        selectedParallel: parallel,
-                                      };
-                                      setEditedSets(updatedSets);
-
-                                      // Process the checklist for this parallel
-                                      handleChecklistPaste(idx, e.target.value);
-                                      e.target.value = ''; // Clear after processing
-                                    }
-                                  }}
                                   className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 font-mono"
                                 />
-                                <p className="text-xs text-gray-500 mt-1 italic">
-                                  {hasVariableSerials
-                                    ? "Format: Card# Player, Team /serial (one per line)"
-                                    : "Paste checklist and it will auto-process"}
-                                </p>
+                                <div className="flex items-center justify-between mt-2">
+                                  <p className="text-xs text-gray-500 italic">
+                                    {hasVariableSerials
+                                      ? "Format: Card# Player, Team /serial (one per line)"
+                                      : "Standard checklist format"}
+                                  </p>
+                                  <button
+                                    type="button"
+                                    onClick={async () => {
+                                      const textarea = document.getElementById(textareaKey) as HTMLTextAreaElement;
+                                      const text = textarea?.value.trim();
+
+                                      if (!text) {
+                                        setMessage({ type: "error", text: "Please paste checklist data first" });
+                                        setTimeout(() => setMessage(null), 3000);
+                                        return;
+                                      }
+
+                                      if (!set.id) {
+                                        setMessage({ type: "error", text: "Please save the set first" });
+                                        setTimeout(() => setMessage(null), 3000);
+                                        return;
+                                      }
+
+                                      // Parse cards with serial numbers
+                                      const cards = parseCardsWithSerialNumbers(text, set.name);
+
+                                      if (cards.length === 0) {
+                                        setMessage({ type: "error", text: "No cards found. Check format." });
+                                        setTimeout(() => setMessage(null), 3000);
+                                        return;
+                                      }
+
+                                      setMessage({ type: "success", text: `Creating ${cards.length} cards for "${parallel}"...` });
+
+                                      // Create cards in database
+                                      await createCardsInDatabase(set.id, cards, [parallel], true);
+
+                                      setMessage({ type: "success", text: `✓ Added ${cards.length} cards for "${parallel}"` });
+                                      setTimeout(() => setMessage(null), 3000);
+
+                                      // Clear textarea
+                                      textarea.value = '';
+                                    }}
+                                    className="px-3 py-1 bg-footy-green hover:bg-green-800 text-white text-xs rounded transition-colors"
+                                  >
+                                    Add Cards
+                                  </button>
+                                </div>
                               </div>
                             );
                           })}
