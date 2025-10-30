@@ -596,7 +596,7 @@ export default function EditReleasePage() {
                 name: completeData.name,
                 isBaseSet: updatedSets[index].isBaseSet,
                 totalCards: completeData.totalCards,
-                parallels: completeData.standardParallels,
+                parallels: allParallels, // Use combined parallels (standard + variable)
                 releaseId: release!.id,
               }),
             });
