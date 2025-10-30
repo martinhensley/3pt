@@ -59,6 +59,11 @@ interface Release {
       variant: string | null;
     }>;
   }>;
+  images?: Array<{
+    id: string;
+    url: string;
+    caption: string | null;
+  }>;
 }
 
 export default function EditReleasePage() {
@@ -91,62 +96,64 @@ export default function EditReleasePage() {
     }
   }, [status, router]);
 
-  // Fetch release data
-  useEffect(() => {
-    const fetchRelease = async () => {
-      if (!releaseId) return;
+  // Fetch release data function (moved outside useEffect so it can be called from other functions)
+  const fetchRelease = async () => {
+    if (!releaseId) return;
 
-      try {
-        setFetchingRelease(true);
-        const response = await fetch(`/api/releases?id=${releaseId}`);
+    try {
+      setFetchingRelease(true);
+      const response = await fetch(`/api/releases?id=${releaseId}`);
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch release");
-        }
-
-        const data: Release = await response.json();
-        setRelease(data);
-
-        // Populate editable fields
-        setEditedManufacturer(data.manufacturer.name);
-        setEditedReleaseName(data.name);
-        setEditedYear(data.year);
-        setEditedDescription(data.description || "");
-        setSourceFiles(data.sourceFiles as SourceFile[] || []);
-
-        // Transform sets data
-        const transformedSets: SetInfo[] = data.sets.map((set: { id: string; name: string; isBaseSet: boolean; totalCards: string | null; parallels: string[] | null; cards: { id: string; playerName: string | null; team: string | null; cardNumber: string | null; variant: string | null }[] }) => ({
-          id: set.id,
-          name: set.name,
-          isBaseSet: set.isBaseSet,
-          totalCards: set.totalCards || "",
-          parallels: set.parallels || [],
-          cards: set.cards.map((card: { id: string; playerName: string | null; team: string | null; cardNumber: string | null; variant: string | null }) => ({
-            id: card.id,
-            playerName: card.playerName || "",
-            team: card.team || "",
-            cardNumber: card.cardNumber || "",
-            variant: card.variant || "",
-          })),
-          isNew: false,
-          isDeleted: false,
-        }));
-
-        setEditedSets(transformedSets);
-      } catch (error) {
-        console.error("Failed to fetch release:", error);
-        setMessage({
-          type: "error",
-          text: error instanceof Error ? error.message : "Failed to fetch release"
-        });
-      } finally {
-        setFetchingRelease(false);
+      if (!response.ok) {
+        throw new Error("Failed to fetch release");
       }
-    };
 
+      const data: Release = await response.json();
+      setRelease(data);
+
+      // Populate editable fields
+      setEditedManufacturer(data.manufacturer.name);
+      setEditedReleaseName(data.name);
+      setEditedYear(data.year);
+      setEditedDescription(data.description || "");
+      setSourceFiles(data.sourceFiles as SourceFile[] || []);
+
+      // Transform sets data
+      const transformedSets: SetInfo[] = data.sets.map((set: { id: string; name: string; isBaseSet: boolean; totalCards: string | null; parallels: string[] | null; cards: { id: string; playerName: string | null; team: string | null; cardNumber: string | null; variant: string | null }[] }) => ({
+        id: set.id,
+        name: set.name,
+        isBaseSet: set.isBaseSet,
+        totalCards: set.totalCards || "",
+        parallels: set.parallels || [],
+        cards: set.cards.map((card: { id: string; playerName: string | null; team: string | null; cardNumber: string | null; variant: string | null }) => ({
+          id: card.id,
+          playerName: card.playerName || "",
+          team: card.team || "",
+          cardNumber: card.cardNumber || "",
+          variant: card.variant || "",
+        })),
+        isNew: false,
+        isDeleted: false,
+      }));
+
+      setEditedSets(transformedSets);
+    } catch (error) {
+      console.error("Failed to fetch release:", error);
+      setMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Failed to fetch release"
+      });
+    } finally {
+      setFetchingRelease(false);
+    }
+  };
+
+  // Fetch release data on mount
+  useEffect(() => {
     if (status === "authenticated") {
       fetchRelease();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [releaseId, status]);
 
   // Set management functions

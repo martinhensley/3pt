@@ -80,15 +80,15 @@ export async function POST(request: NextRequest) {
       for (const cardData of cards) {
         try {
           // Generate slug for this card
-          const slug = generateCardSlug({
-            year: set.release.year || undefined,
-            manufacturer: set.release.manufacturer.name,
-            release: set.release.name,
-            setName: set.name,
-            cardNumber: cardData.cardNumber,
-            playerName: cardData.playerName,
-            parallelType: parallelType,
-          });
+          const slug = generateCardSlug(
+            set.release.manufacturer.name,
+            set.release.name,
+            set.release.year || '',
+            set.name,
+            cardData.cardNumber,
+            cardData.playerName,
+            parallelType
+          );
 
           // Check if card already exists
           const existingCard = await prisma.card.findUnique({
