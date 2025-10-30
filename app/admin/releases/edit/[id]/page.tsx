@@ -1572,66 +1572,88 @@ export default function EditReleasePage() {
                         Set Data (Checklist & Parallels):
                       </p>
 
-                      {/* Parallel Selector (for sets with parallels already defined) */}
-                      {set.parallels && set.parallels.length > 0 && (
-                        <div className="mb-3">
-                          <label className="block text-xs font-medium text-gray-700 mb-1">
-                            Select Parallel to Add Cards:
-                          </label>
-                          <select
-                            value={set.selectedParallel || ''}
-                            onChange={(e) => {
-                              const updatedSets = [...editedSets];
-                              updatedSets[idx] = {
-                                ...updatedSets[idx],
-                                selectedParallel: e.target.value,
-                              };
-                              setEditedSets(updatedSets);
-                            }}
-                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500"
-                          >
-                            <option value="">-- Select a parallel --</option>
-                            {set.parallels.map((parallel, pIdx) => (
-                              <option key={pIdx} value={parallel}>
-                                {parallel}
-                              </option>
-                            ))}
-                          </select>
-                          <p className="text-xs text-gray-500 mt-1">
-                            Choose which parallel you&apos;re adding cards for, then paste the checklist below
-                          </p>
+                      {/* Show individual paste boxes for each parallel if parallels are defined */}
+                      {set.parallels && set.parallels.length > 0 ? (
+                        <div className="space-y-4">
+                          {set.parallels.map((parallel, pIdx) => {
+                            // Check if this parallel has "or fewer" indicating variable serial numbers
+                            const hasVariableSerials = parallel.toLowerCase().includes('or fewer');
+
+                            return (
+                              <div key={pIdx} className="border border-gray-300 rounded-lg p-3 bg-gray-50">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <span className="text-xs font-bold text-footy-green bg-white px-2 py-1 rounded border border-footy-green">
+                                    {pIdx + 1}
+                                  </span>
+                                  <label className="text-sm font-semibold text-gray-900">
+                                    {parallel}
+                                  </label>
+                                  {hasVariableSerials && (
+                                    <span className="text-xs bg-orange-100 text-orange-800 px-2 py-0.5 rounded-full font-medium">
+                                      Variable Serials
+                                    </span>
+                                  )}
+                                </div>
+                                <textarea
+                                  placeholder={hasVariableSerials
+                                    ? `Paste checklist with serial numbers: 'Card# Player, Team /serial' (e.g., '2 Giovani Lo Celso, Argentina /149')`
+                                    : `Paste checklist for ${parallel} (will use standard format)`}
+                                  rows={3}
+                                  onChange={(e) => {
+                                    if (e.target.value.trim()) {
+                                      // Set the selected parallel and process the paste
+                                      const updatedSets = [...editedSets];
+                                      updatedSets[idx] = {
+                                        ...updatedSets[idx],
+                                        selectedParallel: parallel,
+                                      };
+                                      setEditedSets(updatedSets);
+
+                                      // Process the checklist for this parallel
+                                      handleChecklistPaste(idx, e.target.value);
+                                      e.target.value = ''; // Clear after processing
+                                    }
+                                  }}
+                                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 font-mono"
+                                />
+                                <p className="text-xs text-gray-500 mt-1 italic">
+                                  {hasVariableSerials
+                                    ? "Format: Card# Player, Team /serial (one per line)"
+                                    : "Paste checklist and it will auto-process"}
+                                </p>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="flex flex-col gap-2">
+                          <details className="text-sm" open>
+                            <summary className="cursor-pointer text-blue-600 hover:underline font-medium">
+                              📋 Paste set data
+                            </summary>
+                            <div className="mt-2">
+                              <textarea
+                                placeholder={set.manualSerialMode
+                                  ? "Paste cards with serial numbers: 'Card# Player, Team /serial' (e.g., '2 Giovani Lo Celso, Argentina /149')"
+                                  : "Paste Set info format: Set Name, # Cards, Parallel info, Checklist"}
+                                rows={4}
+                                onChange={(e) => {
+                                  if (e.target.value.trim()) {
+                                    handleChecklistPaste(idx, e.target.value);
+                                    e.target.value = ''; // Clear after processing
+                                  }
+                                }}
+                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 font-mono"
+                              />
+                              <p className="text-xs text-gray-500 mt-1 italic">
+                                {set.manualSerialMode
+                                  ? "Format: Card# Player, Team /serial (one per line)"
+                                  : "Data will auto-load when pasted and show below ↓"}
+                              </p>
+                            </div>
+                          </details>
                         </div>
                       )}
-
-                      <div className="flex flex-col gap-2">
-                        <details className="text-sm" open>
-                          <summary className="cursor-pointer text-blue-600 hover:underline font-medium">
-                            📋 Paste set data
-                          </summary>
-                          <div className="mt-2">
-                            <textarea
-                              placeholder={set.parallels && set.parallels.length > 0 && set.selectedParallel
-                                ? `Paste cards for "${set.selectedParallel}": 'Card# Player, Team /serial' (e.g., '2 Giovani Lo Celso, Argentina /149')`
-                                : set.manualSerialMode
-                                ? "Paste cards with serial numbers: 'Card# Player, Team /serial' (e.g., '2 Giovani Lo Celso, Argentina /149')"
-                                : "Paste Set info format: Set Name, # Cards, Parallel info, Checklist"}
-                              rows={4}
-                              onChange={(e) => {
-                                if (e.target.value.trim()) {
-                                  handleChecklistPaste(idx, e.target.value);
-                                  e.target.value = ''; // Clear after processing
-                                }
-                              }}
-                              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 font-mono"
-                            />
-                            <p className="text-xs text-gray-500 mt-1 italic">
-                              {set.manualSerialMode
-                                ? "Format: Card# Player, Team /serial (one per line)"
-                                : "Data will auto-load when pasted and show below ↓"}
-                            </p>
-                          </div>
-                        </details>
-                      </div>
                     </div>
 
                     {(set.cards && set.cards.length > 0) || (set.parallels && set.parallels.length > 0) ? (
