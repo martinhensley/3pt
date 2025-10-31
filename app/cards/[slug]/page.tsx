@@ -303,7 +303,7 @@ export default function CardDetailPage() {
               )}
               {card.numbered && (
                 <div>
-                  <div className="text-sm text-gray-600 mb-1">Numbered</div>
+                  <div className="text-sm text-gray-600 mb-1">Serial Numbered</div>
                   <div className="text-lg font-bold text-gray-900">{card.numbered}</div>
                 </div>
               )}
