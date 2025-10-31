@@ -42,13 +42,17 @@ export async function POST(request: NextRequest) {
 
     for (const cardData of cards) {
       try {
-        // Find the existing base card by setId, cardNumber, playerName, and parallelType: null
+        // Find the existing base card by setId, cardNumber, playerName
+        // Support both null and "Base" parallelType for backward compatibility
         const existingCard = await prisma.card.findFirst({
           where: {
             setId: setId,
             cardNumber: cardData.cardNumber,
             playerName: cardData.playerName,
-            parallelType: null, // Base cards have null parallelType
+            OR: [
+              { parallelType: null }, // New base cards
+              { parallelType: 'Base' }, // Legacy base cards
+            ],
           },
         });
 
