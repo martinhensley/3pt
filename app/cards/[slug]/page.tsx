@@ -29,6 +29,7 @@ interface Card {
   serialNumber: string | null;
   isNumbered: boolean;
   printRun: number | null;
+  numbered: string | null;
   rarity: string | null;
   finish: string | null;
   hasAutograph: boolean;
