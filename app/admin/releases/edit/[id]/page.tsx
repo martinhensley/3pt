@@ -1807,6 +1807,110 @@ export default function EditReleasePage() {
                           <p className="text-xs text-gray-600 italic mb-3">
                             Click a parallel to add/view cards for that specific parallel.
                           </p>
+
+                          {/* Base Set Section */}
+                          <details className="border border-gray-300 rounded-lg bg-gray-50">
+                            <summary className="cursor-pointer p-3 hover:bg-gray-100 transition-colors">
+                              <div className="flex items-center gap-2 select-none">
+                                <span className="text-xs font-bold text-footy-green bg-white px-2 py-1 rounded border border-footy-green">
+                                  BASE
+                                </span>
+                                <span className="text-sm font-semibold text-gray-900 flex-grow">
+                                  {set.name} (Base Set)
+                                </span>
+                                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-medium">
+                                  {release?.sets?.find(s => s.id === set.id)?.cards?.filter(c => c.parallelType === null || c.parallelType === 'Base').length || 0} cards
+                                </span>
+                              </div>
+                            </summary>
+
+                            <div className="p-3 border-t border-gray-300 bg-white space-y-3">
+                              {/* Update Base Cards Section */}
+                              <div className="border border-blue-200 rounded-lg p-3 bg-blue-50">
+                                <label className="text-xs font-semibold text-gray-700 block mb-2">
+                                  Update Base Set Serial Numbers:
+                                </label>
+                                <textarea
+                                  id={`textarea-base-${set.id || idx}`}
+                                  placeholder="Paste base checklist with serials: 'Card# Player, Team /serial' (e.g., '10 Douglas Costa /12')"
+                                  rows={3}
+                                  className="w-full px-3 py-2 text-xs border border-gray-300 rounded bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 font-mono"
+                                />
+                                <div className="flex items-center justify-between mt-2">
+                                  <p className="text-xs text-gray-500 italic">
+                                    Format: {set.name}\n## cards\nCard# Player, Team /serial
+                                  </p>
+                                  <button
+                                    type="button"
+                                    onClick={async () => {
+                                      const textarea = document.getElementById(`textarea-base-${set.id || idx}`) as HTMLTextAreaElement;
+                                      const text = textarea?.value.trim();
+
+                                      if (!text) {
+                                        setMessage({ type: "error", text: "Please paste base checklist data first" });
+                                        setTimeout(() => setMessage(null), 3000);
+                                        return;
+                                      }
+
+                                      if (!set.id) {
+                                        setMessage({ type: "error", text: "Please save the set first" });
+                                        setTimeout(() => setMessage(null), 3000);
+                                        return;
+                                      }
+
+                                      // Parse base checklist
+                                      const cards = parseCardsWithSerialNumbers(text, set.name);
+
+                                      if (cards.length === 0) {
+                                        setMessage({ type: "error", text: "No cards found in base checklist" });
+                                        setTimeout(() => setMessage(null), 5000);
+                                        return;
+                                      }
+
+                                      setMessage({ type: "success", text: `Updating ${cards.length} base cards...` });
+
+                                      // Update base cards via API
+                                      try {
+                                        const response = await fetch('/api/sets/update-base-serials', {
+                                          method: 'POST',
+                                          headers: { 'Content-Type': 'application/json' },
+                                          body: JSON.stringify({
+                                            setId: set.id,
+                                            cards: cards,
+                                          }),
+                                        });
+
+                                        const data = await response.json();
+
+                                        if (!response.ok) {
+                                          throw new Error(data.error || 'Failed to update base cards');
+                                        }
+
+                                        setMessage({ type: "success", text: `✓ Updated ${data.updated} base cards` });
+                                        setTimeout(() => setMessage(null), 3000);
+
+                                        // Clear textarea
+                                        textarea.value = '';
+
+                                        // Refresh card count
+                                        await refreshSetCardCount(set.id);
+                                      } catch (error) {
+                                        console.error('Failed to update base cards:', error);
+                                        setMessage({
+                                          type: 'error',
+                                          text: error instanceof Error ? error.message : 'Failed to update base cards',
+                                        });
+                                        setTimeout(() => setMessage(null), 5000);
+                                      }
+                                    }}
+                                    className="px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition-colors"
+                                  >
+                                    Update Base Cards
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </details>
                           {sortParallelsByPrintRun(set.parallels).map((parallel, pIdx) => {
                             // Check if this parallel has "or fewer" indicating variable serial numbers
                             const hasVariableSerials = parallel.toLowerCase().includes('or fewer');
