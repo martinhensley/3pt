@@ -13,6 +13,7 @@ import { formatParallelName } from "@/lib/formatters";
 
 interface Card {
   id: string;
+  slug: string | null;
   playerName: string | null;
   team: string | null;
   cardNumber: string | null;
@@ -246,39 +247,8 @@ export default function SetPage() {
           {sortedCards && sortedCards.length > 0 ? (
             <div className="grid gap-3">
               {sortedCards.map((card) => {
-                // Generate slug: year-releasename-setname-card#-player-parallel
-                // Special handling: Only remove "Base" from Optic sets
-                // For regular Base Set, keep "Base" in the slug
-                const cleanSetName = set.name
-                  .replace(/\boptic\s+base\s+set\b/gi, 'Optic') // Optic Base Set -> Optic
-                  .replace(/\boptic\s+base\b/gi, 'Optic') // Optic Base -> Optic
-                  .replace(/\bbase\s+optic\b/gi, 'Optic') // Base Optic -> Optic
-                  .replace(/\bbase\s+set\b/gi, 'Base') // Base Set -> Base (keep "Base")
-                  .replace(/\bsets?\b/gi, '') // Remove remaining "set/sets"
-                  .trim();
-                const slugParts = [
-                  set.release.year,
-                  set.release.name,
-                  cleanSetName,
-                  card.cardNumber || '',
-                  card.playerName || 'unknown',
-                ];
-
-                // Only add parallel/variation if it's not base
-                if (card.parallelType && card.parallelType.toLowerCase() !== 'base') {
-                  slugParts.push(card.parallelType);
-                } else if (card.variant && card.variant.toLowerCase() !== 'base') {
-                  slugParts.push(card.variant);
-                }
-
-                const cardSlug = slugParts
-                  .filter(Boolean)
-                  .join('-')
-                  .toLowerCase()
-                  .replace(/\s+/g, '-')
-                  .replace(/[^a-z0-9-]/g, '')
-                  .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
-                  .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+                // Use the card's slug from the database
+                const cardSlug = card.slug || '';
 
                 return (
                   <Link
