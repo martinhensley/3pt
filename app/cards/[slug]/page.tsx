@@ -278,51 +278,51 @@ export default function CardDetailPage() {
             <h2 className="text-2xl font-black text-gray-900 mb-6">Card Details</h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <span className="text-sm text-gray-600">Player: </span>
-                <span className="text-lg font-bold text-gray-900">{card.playerName || '—'}</span>
+                <span className="text-gray-600">Player: </span>
+                <span className="font-bold text-gray-900">{card.playerName || '—'}</span>
               </div>
               <div>
-                <span className="text-sm text-gray-600">Team: </span>
-                <span className="text-lg font-bold text-gray-900">{card.team || '—'}</span>
+                <span className="text-gray-600">Team: </span>
+                <span className="font-bold text-gray-900">{card.team || '—'}</span>
               </div>
               <div>
-                <span className="text-sm text-gray-600">Card Number: </span>
-                <span className="text-lg font-bold text-gray-900">{card.cardNumber || '—'}</span>
+                <span className="text-gray-600">Card Number: </span>
+                <span className="font-bold text-gray-900">{card.cardNumber || '—'}</span>
               </div>
               {card.variant && (
                 <div>
-                  <span className="text-sm text-gray-600">Variant: </span>
-                  <span className="text-lg font-bold text-gray-900">{formatParallelName(card.variant)}</span>
+                  <span className="text-gray-600">Variant: </span>
+                  <span className="font-bold text-gray-900">{formatParallelName(card.variant)}</span>
                 </div>
               )}
               {card.parallelType && (
                 <div>
-                  <span className="text-sm text-gray-600">Parallel: </span>
-                  <span className="text-lg font-bold text-gray-900">{formatParallelName(card.parallelType.replace(/\s*–\s*/g, ' '))}</span>
+                  <span className="text-gray-600">Parallel: </span>
+                  <span className="font-bold text-gray-900">{formatParallelName(card.parallelType.replace(/\s*–\s*/g, ' '))}</span>
                 </div>
               )}
               {card.numbered && (
                 <div>
-                  <span className="text-sm text-gray-600">Serial Numbered: </span>
-                  <span className="text-lg font-bold text-gray-900">{card.numbered}</span>
+                  <span className="text-gray-600">Serial Numbered: </span>
+                  <span className="font-bold text-gray-900">{card.numbered}</span>
                 </div>
               )}
               {card.rarity && (
                 <div>
-                  <span className="text-sm text-gray-600">Rarity: </span>
-                  <span className="text-lg font-bold text-gray-900 capitalize">{card.rarity.replace(/_/g, ' ')}</span>
+                  <span className="text-gray-600">Rarity: </span>
+                  <span className="font-bold text-gray-900 capitalize">{card.rarity.replace(/_/g, ' ')}</span>
                 </div>
               )}
               {card.finish && (
                 <div>
-                  <span className="text-sm text-gray-600">Finish: </span>
-                  <span className="text-lg font-bold text-gray-900 capitalize">{card.finish}</span>
+                  <span className="text-gray-600">Finish: </span>
+                  <span className="font-bold text-gray-900 capitalize">{card.finish}</span>
                 </div>
               )}
               {card.colorVariant && (
                 <div>
-                  <span className="text-sm text-gray-600">Color: </span>
-                  <span className="text-lg font-bold text-gray-900 capitalize">{card.colorVariant}</span>
+                  <span className="text-gray-600">Color: </span>
+                  <span className="font-bold text-gray-900 capitalize">{card.colorVariant}</span>
                 </div>
               )}
             </div>
