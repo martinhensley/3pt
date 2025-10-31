@@ -197,134 +197,80 @@ export default function CardDetailPage() {
             ]}
           />
 
-          {/* Card Header */}
-          <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
-            <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
-              {card.cardNumber && <span className="text-white/90">#{card.cardNumber} </span>}
-              {card.playerName || 'Unknown Player'}
-            </h1>
+          {/* Card Header with Details */}
+          <div className="rounded-2xl shadow-2xl overflow-hidden mb-8">
+            {/* Green Header Section */}
+            <div className="bg-gradient-to-r from-footy-green to-green-700 text-white p-8">
+              <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
+                {card.cardNumber && <span className="text-white/90">#{card.cardNumber} </span>}
+                {card.playerName || 'Unknown Player'}
+              </h1>
 
-            <div className="text-xl mb-2">
-              {card.set.release.year && <span className="text-white/90">{card.set.release.year} </span>}
-              {card.set.release.manufacturer.name} {card.set.release.name}
-              {card.set.name && card.set.name.toLowerCase() !== 'base set' && ` - ${card.set.name}`}
+              <div className="text-xl mb-2">
+                {card.set.release.year && <span className="text-white/90">{card.set.release.year} </span>}
+                {card.set.release.manufacturer.name} {card.set.release.name}
+                {card.set.name && card.set.name.toLowerCase() !== 'base set' && ` - ${card.set.name}`}
+              </div>
+
+              {card.team && (
+                <div className="text-lg">
+                  {card.team}
+                </div>
+              )}
             </div>
 
-            {card.team && (
-              <div className="text-lg mb-6">
-                {card.team}
+            {/* White Details Section */}
+            <div className="bg-white p-8">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <span className="text-gray-600">Player: </span>
+                  <span className="font-bold text-gray-900">{card.playerName || '—'}</span>
+                </div>
+                <div>
+                  <span className="text-gray-600">Team: </span>
+                  <span className="font-bold text-gray-900">{card.team || '—'}</span>
+                </div>
+                <div>
+                  <span className="text-gray-600">Card Number: </span>
+                  <span className="font-bold text-gray-900">{card.cardNumber || '—'}</span>
+                </div>
+                {card.variant && (
+                  <div>
+                    <span className="text-gray-600">Variant: </span>
+                    <span className="font-bold text-gray-900">{formatParallelName(card.variant)}</span>
+                  </div>
+                )}
+                {card.parallelType && (
+                  <div>
+                    <span className="text-gray-600">Parallel: </span>
+                    <span className="font-bold text-gray-900">{formatParallelName(card.parallelType.replace(/\s*–\s*/g, ' '))}</span>
+                  </div>
+                )}
+                {card.numbered && (
+                  <div>
+                    <span className="text-gray-600">Serial Numbered: </span>
+                    <span className="font-bold text-gray-900">{card.numbered}</span>
+                  </div>
+                )}
+                {card.rarity && (
+                  <div>
+                    <span className="text-gray-600">Rarity: </span>
+                    <span className="font-bold text-gray-900 capitalize">{card.rarity.replace(/_/g, ' ')}</span>
+                  </div>
+                )}
+                {card.finish && (
+                  <div>
+                    <span className="text-gray-600">Finish: </span>
+                    <span className="font-bold text-gray-900 capitalize">{card.finish}</span>
+                  </div>
+                )}
+                {card.colorVariant && (
+                  <div>
+                    <span className="text-gray-600">Color: </span>
+                    <span className="font-bold text-gray-900 capitalize">{card.colorVariant}</span>
+                  </div>
+                )}
               </div>
-            )}
-
-            {/* Card Features */}
-            {(card.hasAutograph || card.hasMemorabilia || card.isNumbered || card.variant || card.parallelType || card.rarity || card.finish || card.colorVariant || (card.specialFeatures && card.specialFeatures.length > 0)) && (
-              <div className="pt-6 border-t border-white/20">
-                <div className="flex gap-2 flex-wrap">
-                  {card.hasAutograph && (
-                    <span className="px-4 py-2 bg-blue-100 text-blue-800 rounded-full font-semibold">
-                      Autograph
-                    </span>
-                  )}
-                  {card.hasMemorabilia && (
-                    <span className="px-4 py-2 bg-green-100 text-green-800 rounded-full font-semibold">
-                      Memorabilia
-                    </span>
-                  )}
-                  {card.isNumbered && card.printRun && (
-                    <span className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full font-semibold">
-                      /{card.printRun}
-                    </span>
-                  )}
-                  {card.variant && card.variant !== '—' && (
-                    <span className="px-4 py-2 bg-purple-100 text-purple-800 rounded-full font-semibold">
-                      {formatParallelName(card.variant)}
-                    </span>
-                  )}
-                  {card.parallelType && (
-                    <span className="px-4 py-2 bg-pink-100 text-pink-800 rounded-full font-semibold">
-                      {formatParallelName(card.parallelType.replace(/\s*–\s*/g, ' '))}
-                    </span>
-                  )}
-                  {card.rarity && (
-                    <span className="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-full font-semibold capitalize">
-                      {card.rarity.replace(/_/g, ' ')}
-                    </span>
-                  )}
-                  {card.finish && (
-                    <span className="px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full font-semibold capitalize">
-                      {card.finish}
-                    </span>
-                  )}
-                  {card.colorVariant && (
-                    <span className="px-4 py-2 bg-cyan-100 text-cyan-800 rounded-full font-semibold capitalize">
-                      {card.colorVariant}
-                    </span>
-                  )}
-                  {card.specialFeatures && card.specialFeatures.map((feature, idx) => (
-                    <span
-                      key={idx}
-                      className="px-4 py-2 bg-teal-100 text-teal-800 rounded-full font-semibold capitalize"
-                    >
-                      {feature.replace(/_/g, ' ')}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Card Details */}
-          <div className="bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-200">
-            <h2 className="text-2xl font-black text-gray-900 mb-6">Card Details</h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <span className="text-gray-600">Player: </span>
-                <span className="font-bold text-gray-900">{card.playerName || '—'}</span>
-              </div>
-              <div>
-                <span className="text-gray-600">Team: </span>
-                <span className="font-bold text-gray-900">{card.team || '—'}</span>
-              </div>
-              <div>
-                <span className="text-gray-600">Card Number: </span>
-                <span className="font-bold text-gray-900">{card.cardNumber || '—'}</span>
-              </div>
-              {card.variant && (
-                <div>
-                  <span className="text-gray-600">Variant: </span>
-                  <span className="font-bold text-gray-900">{formatParallelName(card.variant)}</span>
-                </div>
-              )}
-              {card.parallelType && (
-                <div>
-                  <span className="text-gray-600">Parallel: </span>
-                  <span className="font-bold text-gray-900">{formatParallelName(card.parallelType.replace(/\s*–\s*/g, ' '))}</span>
-                </div>
-              )}
-              {card.numbered && (
-                <div>
-                  <span className="text-gray-600">Serial Numbered: </span>
-                  <span className="font-bold text-gray-900">{card.numbered}</span>
-                </div>
-              )}
-              {card.rarity && (
-                <div>
-                  <span className="text-gray-600">Rarity: </span>
-                  <span className="font-bold text-gray-900 capitalize">{card.rarity.replace(/_/g, ' ')}</span>
-                </div>
-              )}
-              {card.finish && (
-                <div>
-                  <span className="text-gray-600">Finish: </span>
-                  <span className="font-bold text-gray-900 capitalize">{card.finish}</span>
-                </div>
-              )}
-              {card.colorVariant && (
-                <div>
-                  <span className="text-gray-600">Color: </span>
-                  <span className="font-bold text-gray-900 capitalize">{card.colorVariant}</span>
-                </div>
-              )}
             </div>
           </div>
 
