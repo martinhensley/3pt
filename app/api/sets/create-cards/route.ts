@@ -90,7 +90,8 @@ export async function POST(request: NextRequest) {
             set.name,
             cardData.cardNumber,
             cardData.playerName,
-            slugVariant
+            slugVariant,
+            cardData.printRun
           );
 
           // Check if card already exists
@@ -192,7 +193,8 @@ export async function POST(request: NextRequest) {
               set.name,
               cardData.cardNumber,
               cardData.playerName,
-              parallelType
+              parallelType,
+              parallelPrintRun
             );
 
             // Check if card already exists

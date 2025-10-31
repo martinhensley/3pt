@@ -13,8 +13,8 @@ export function generateReleaseSlug(manufacturer: string, name: string, year?: s
 
 /**
  * Generate a URL-friendly slug from card information
- * Format: year-release-set-cardnumber-playername-variant
- * Example: "2024-25-donruss-soccer-optic-2-malik-tillman-green-5"
+ * Format: year-release-set-cardnumber-playername-variant-printrun
+ * Example: "2024-25-donruss-soccer-optic-2-malik-tillman-green-5-49"
  *
  * Special handling for 1/1 cards (chase/grail cards):
  * - "1/1" or "1 of 1" -> "1-of-1" in slugs
@@ -26,7 +26,8 @@ export function generateCardSlug(
   setName: string,
   cardNumber: string,
   playerName: string,
-  variant: string | null
+  variant: string | null,
+  printRun?: number | null
 ): string {
   // Special handling for 1/1 cards - convert to "1-of-1" before slug generation
   const processedVariant = variant
@@ -41,7 +42,8 @@ export function generateCardSlug(
     setName,
     cardNumber,
     playerName,
-    processedVariant
+    processedVariant,
+    printRun ? printRun.toString() : null
   ].filter(Boolean);
 
   return parts
