@@ -598,13 +598,70 @@ export default function EditReleasePage() {
         return;
       }
 
-      // Check if this is a variable parallel checklist (set name + parallel name + cards with serials)
-      // Format: "Dual Jersey Ink Electric Etch Orange\n25 cards\n2 Giovani Lo Celso, Argentina /149\n..."
+      // Check if this is a base or variable parallel checklist update
+      // Format: "Set Name\n25 cards\n2 Giovani Lo Celso, Argentina /149\n..."
       const lines = text.split('\n').map(l => l.trim()).filter(l => l);
       const firstLine = lines[0];
       const secondLine = lines[1];
 
-      // Check if first line matches a known parallel from this set (currentSet already declared above)
+      // Check if first line matches the set name (base checklist update)
+      const isBaseChecklist = firstLine && currentSet.name &&
+        firstLine.toLowerCase() === currentSet.name.toLowerCase() &&
+        secondLine && /^\d+\s+cards?$/i.test(secondLine);
+
+      if (isBaseChecklist) {
+        // This is a base checklist update! Update existing base cards
+        const cards = parseCardsWithSerialNumbers(text, currentSet.name);
+
+        if (cards.length === 0) {
+          setMessage({ type: "error", text: "No cards found in base checklist" });
+          setTimeout(() => setMessage(null), 5000);
+          return;
+        }
+
+        if (!currentSet.id) {
+          setMessage({ type: "error", text: "Please save the set first" });
+          setTimeout(() => setMessage(null), 5000);
+          return;
+        }
+
+        setMessage({ type: "success", text: `Updating ${cards.length} base cards...` });
+
+        // Update base cards via API
+        try {
+          const response = await fetch('/api/sets/update-base-serials', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              setId: currentSet.id,
+              cards: cards,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || 'Failed to update base cards');
+          }
+
+          setMessage({ type: "success", text: `✓ Updated ${data.updated} base cards` });
+          setTimeout(() => setMessage(null), 3000);
+
+          // Refresh card count
+          await refreshSetCardCount(currentSet.id);
+        } catch (error) {
+          console.error('Failed to update base cards:', error);
+          setMessage({
+            type: 'error',
+            text: error instanceof Error ? error.message : 'Failed to update base cards',
+          });
+          setTimeout(() => setMessage(null), 5000);
+        }
+
+        return;
+      }
+
+      // Check if first line matches a known parallel from this set (variable parallel update)
       const matchedParallel = currentSet.parallels?.find(p =>
         firstLine && p.toLowerCase().includes(firstLine.toLowerCase())
       );
