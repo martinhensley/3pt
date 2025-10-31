@@ -16,6 +16,20 @@ interface CardData {
   printRun?: number;
 }
 
+// Helper function to generate numbered display string
+function generateNumberedString(serialNumber: string | null, printRun: number | null): string | null {
+  if (printRun === 1) {
+    return '1 of 1';
+  }
+  if (serialNumber) {
+    return serialNumber;
+  }
+  if (printRun) {
+    return `/${printRun}`;
+  }
+  return null;
+}
+
 // POST - Create cards for a set (for all parallels or with individual serial numbers)
 export async function POST(request: NextRequest) {
   try {
@@ -94,6 +108,10 @@ export async function POST(request: NextRequest) {
           // Otherwise, use the first parallel in the array (for variable parallel checklists)
           const parallelType = parallels && parallels.length > 0 ? parallels[0] : null;
 
+          const serialNumber = cardData.serialNumber || null;
+          const printRun = cardData.printRun || null;
+          const numbered = generateNumberedString(serialNumber, printRun);
+
           const card = await prisma.card.create({
             data: {
               slug,
@@ -102,9 +120,10 @@ export async function POST(request: NextRequest) {
               cardNumber: cardData.cardNumber,
               variant: cardData.variant || null,
               parallelType: parallelType,
-              serialNumber: cardData.serialNumber || null,
-              printRun: cardData.printRun || null,
-              isNumbered: cardData.printRun ? true : false,
+              serialNumber: serialNumber,
+              printRun: printRun,
+              isNumbered: printRun ? true : false,
+              numbered: numbered,
               setId: setId,
             },
           });
@@ -190,6 +209,7 @@ export async function POST(request: NextRequest) {
             // For variable parallels, leave serial numbers empty
             const serialNumber = isVariableParallel ? null : parallelSerialNumber;
             const printRun = isVariableParallel ? null : parallelPrintRun;
+            const numbered = generateNumberedString(serialNumber, printRun);
 
             // Create the card
             const card = await prisma.card.create({
@@ -203,6 +223,7 @@ export async function POST(request: NextRequest) {
                 serialNumber: serialNumber,
                 printRun: printRun,
                 isNumbered: printRun ? true : false,
+                numbered: numbered,
                 setId: setId,
               },
             });

@@ -13,6 +13,20 @@ interface CardData {
   printRun?: number;
 }
 
+// Helper function to generate numbered display string
+function generateNumberedString(serialNumber: string | null, printRun: number | null): string | null {
+  if (printRun === 1) {
+    return '1 of 1';
+  }
+  if (serialNumber) {
+    return serialNumber;
+  }
+  if (printRun) {
+    return `/${printRun}`;
+  }
+  return null;
+}
+
 // POST - Update existing base cards with serial numbers
 export async function POST(request: NextRequest) {
   try {
@@ -62,13 +76,18 @@ export async function POST(request: NextRequest) {
           continue;
         }
 
-        // Update the card with serial number and print run
+        // Update the card with serial number, print run, and numbered
+        const serialNumber = cardData.serialNumber || null;
+        const printRun = cardData.printRun || null;
+        const numbered = generateNumberedString(serialNumber, printRun);
+
         await prisma.card.update({
           where: { id: existingCard.id },
           data: {
-            serialNumber: cardData.serialNumber || null,
-            printRun: cardData.printRun || null,
-            isNumbered: cardData.printRun ? true : false,
+            serialNumber: serialNumber,
+            printRun: printRun,
+            isNumbered: printRun ? true : false,
+            numbered: numbered,
           },
         });
 

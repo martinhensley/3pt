@@ -79,6 +79,7 @@ model Card {
   serialNumber          String?  // Serial number if numbered (e.g., "123/299")
   isNumbered            Boolean  @default(false)
   printRun              Int?     // Total print run (e.g., 299 for /299)
+  numbered              String?  // Display string for numbering (e.g., "1 of 1", "/99", "/199")
   rarity                String?  // Rarity level (base, rare, super_rare, ultra_rare, one_of_one)
   finish                String?  // Card finish (refractor, chrome, matte, glossy, holographic)
   hasAutograph          Boolean  @default(false)
