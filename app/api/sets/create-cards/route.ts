@@ -185,6 +185,22 @@ export async function POST(request: NextRequest) {
 
         for (const cardData of cards) {
           try {
+            // For variable parallels, try to extract serial number from player name
+            // Format: "Player Name, Team /XX"
+            let cardSerialNumber = parallelSerialNumber;
+            let cardPrintRun = parallelPrintRun;
+            let cleanPlayerName = cardData.playerName;
+
+            if (isVariableParallel && cardData.playerName) {
+              const serialMatch = cardData.playerName.match(/\/(\d+)\s*$/);
+              if (serialMatch) {
+                cardPrintRun = parseInt(serialMatch[1], 10);
+                cardSerialNumber = `/${cardPrintRun}`;
+                // Remove the serial number from player name
+                cleanPlayerName = cardData.playerName.replace(/\s*\/\d+\s*$/, '').trim();
+              }
+            }
+
             // Generate slug for this card
             const slug = generateCardSlug(
               set.release.manufacturer.name,
@@ -192,9 +208,9 @@ export async function POST(request: NextRequest) {
               set.release.year || '',
               set.name,
               cardData.cardNumber,
-              cardData.playerName,
+              cleanPlayerName,
               parallelType,
-              parallelPrintRun
+              cardPrintRun
             );
 
             // Check if card already exists
@@ -207,17 +223,16 @@ export async function POST(request: NextRequest) {
               continue; // Skip if card already exists
             }
 
-            // For standard parallels, use the parallel's fixed print run
-            // For variable parallels, leave serial numbers empty
-            const serialNumber = isVariableParallel ? null : parallelSerialNumber;
-            const printRun = isVariableParallel ? null : parallelPrintRun;
+            // Use extracted serial number for variable parallels, or parallel's fixed value
+            const serialNumber = cardSerialNumber;
+            const printRun = cardPrintRun;
             const numbered = generateNumberedString(serialNumber, printRun);
 
             // Create the card
             const card = await prisma.card.create({
               data: {
                 slug,
-                playerName: cardData.playerName,
+                playerName: cleanPlayerName,
                 team: cardData.team || null,
                 cardNumber: cardData.cardNumber,
                 variant: cardData.variant || null,
