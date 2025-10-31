@@ -278,51 +278,51 @@ export default function CardDetailPage() {
             <h2 className="text-2xl font-black text-gray-900 mb-6">Card Details</h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <div className="text-sm text-gray-600 mb-1">Player</div>
-                <div className="text-lg font-bold text-gray-900">{card.playerName || '—'}</div>
+                <span className="text-sm text-gray-600">Player: </span>
+                <span className="text-lg font-bold text-gray-900">{card.playerName || '—'}</span>
               </div>
               <div>
-                <div className="text-sm text-gray-600 mb-1">Team</div>
-                <div className="text-lg font-bold text-gray-900">{card.team || '—'}</div>
+                <span className="text-sm text-gray-600">Team: </span>
+                <span className="text-lg font-bold text-gray-900">{card.team || '—'}</span>
               </div>
               <div>
-                <div className="text-sm text-gray-600 mb-1">Card Number</div>
-                <div className="text-lg font-bold text-gray-900">{card.cardNumber || '—'}</div>
+                <span className="text-sm text-gray-600">Card Number: </span>
+                <span className="text-lg font-bold text-gray-900">{card.cardNumber || '—'}</span>
               </div>
               {card.variant && (
                 <div>
-                  <div className="text-sm text-gray-600 mb-1">Variant</div>
-                  <div className="text-lg font-bold text-gray-900">{formatParallelName(card.variant)}</div>
+                  <span className="text-sm text-gray-600">Variant: </span>
+                  <span className="text-lg font-bold text-gray-900">{formatParallelName(card.variant)}</span>
                 </div>
               )}
               {card.parallelType && (
                 <div>
-                  <div className="text-sm text-gray-600 mb-1">Parallel</div>
-                  <div className="text-lg font-bold text-gray-900">{formatParallelName(card.parallelType.replace(/\s*–\s*/g, ' '))}</div>
+                  <span className="text-sm text-gray-600">Parallel: </span>
+                  <span className="text-lg font-bold text-gray-900">{formatParallelName(card.parallelType.replace(/\s*–\s*/g, ' '))}</span>
                 </div>
               )}
               {card.numbered && (
                 <div>
-                  <div className="text-sm text-gray-600 mb-1">Serial Numbered</div>
-                  <div className="text-lg font-bold text-gray-900">{card.numbered}</div>
+                  <span className="text-sm text-gray-600">Serial Numbered: </span>
+                  <span className="text-lg font-bold text-gray-900">{card.numbered}</span>
                 </div>
               )}
               {card.rarity && (
                 <div>
-                  <div className="text-sm text-gray-600 mb-1">Rarity</div>
-                  <div className="text-lg font-bold text-gray-900 capitalize">{card.rarity.replace(/_/g, ' ')}</div>
+                  <span className="text-sm text-gray-600">Rarity: </span>
+                  <span className="text-lg font-bold text-gray-900 capitalize">{card.rarity.replace(/_/g, ' ')}</span>
                 </div>
               )}
               {card.finish && (
                 <div>
-                  <div className="text-sm text-gray-600 mb-1">Finish</div>
-                  <div className="text-lg font-bold text-gray-900 capitalize">{card.finish}</div>
+                  <span className="text-sm text-gray-600">Finish: </span>
+                  <span className="text-lg font-bold text-gray-900 capitalize">{card.finish}</span>
                 </div>
               )}
               {card.colorVariant && (
                 <div>
-                  <div className="text-sm text-gray-600 mb-1">Color</div>
-                  <div className="text-lg font-bold text-gray-900 capitalize">{card.colorVariant}</div>
+                  <span className="text-sm text-gray-600">Color: </span>
+                  <span className="text-lg font-bold text-gray-900 capitalize">{card.colorVariant}</span>
                 </div>
               )}
             </div>
