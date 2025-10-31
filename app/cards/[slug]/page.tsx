@@ -206,17 +206,11 @@ export default function CardDetailPage() {
                 {card.playerName || 'Unknown Player'}
               </h1>
 
-              <div className="text-xl mb-2">
+              <div className="text-xl">
                 {card.set.release.year && <span className="text-white/90">{card.set.release.year} </span>}
                 {card.set.release.manufacturer.name} {card.set.release.name}
                 {card.set.name && card.set.name.toLowerCase() !== 'base set' && ` - ${card.set.name}`}
               </div>
-
-              {card.team && (
-                <div className="text-lg">
-                  {card.team}
-                </div>
-              )}
             </div>
 
             {/* White Details Section */}
