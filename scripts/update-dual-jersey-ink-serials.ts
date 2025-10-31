@@ -57,9 +57,9 @@ async function updateDualJerseyInkSerials() {
   let updatedCount = 0;
 
   for (const data of cardData) {
-    // Find the BASE card by card number and player name (parallelType: null)
+    // Find the BASE card by card number and player name (parallelType: null or 'Base')
     const card = set.cards.find(
-      (c) => c.cardNumber === data.cardNumber && c.playerName === data.playerName && c.parallelType === null
+      (c) => c.cardNumber === data.cardNumber && c.playerName === data.playerName && (c.parallelType === null || c.parallelType === 'Base')
     );
 
     if (!card) {
@@ -67,13 +67,24 @@ async function updateDualJerseyInkSerials() {
       continue;
     }
 
-    // Update the card with serial number and print run
+    // Generate numbered display string
+    let numbered: string | null = null;
+    if (data.printRun === 1) {
+      numbered = '1 of 1';
+    } else if (data.serialNumber) {
+      numbered = data.serialNumber;
+    } else if (data.printRun) {
+      numbered = `/${data.printRun}`;
+    }
+
+    // Update the card with serial number, print run, and numbered
     await prisma.card.update({
       where: { id: card.id },
       data: {
         serialNumber: data.serialNumber,
         printRun: data.printRun,
         isNumbered: data.printRun ? true : false,
+        numbered: numbered,
       },
     });
 
