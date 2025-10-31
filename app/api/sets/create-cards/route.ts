@@ -164,6 +164,15 @@ export async function POST(request: NextRequest) {
         // Determine if this is a variable parallel (has "or fewer" in name)
         const isVariableParallel = parallelType.toLowerCase().includes('or fewer');
 
+        // Skip variable parallels when auto-populating from ALL set parallels
+        // Variable parallels should only be created when explicitly selected with specific checklist
+        // If parallels array was explicitly provided (user clicked a specific parallel), allow it
+        // If no parallels array (auto-creating from set.parallels), skip variable ones
+        if (isVariableParallel && (!parallels || parallels.length === 0)) {
+          console.log(`Skipping variable parallel "${parallelType}" - requires specific checklist`);
+          continue;
+        }
+
         // Extract print run from parallel name for standard parallels
         let parallelPrintRun: number | null = null;
         let parallelSerialNumber: string | null = null;
