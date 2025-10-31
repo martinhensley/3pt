@@ -604,8 +604,7 @@ export default function EditReleasePage() {
       const firstLine = lines[0];
       const secondLine = lines[1];
 
-      // Check if first line matches a known parallel from this set
-      const currentSet = editedSets[index];
+      // Check if first line matches a known parallel from this set (currentSet already declared above)
       const matchedParallel = currentSet.parallels?.find(p =>
         firstLine && p.toLowerCase().includes(firstLine.toLowerCase())
       );
