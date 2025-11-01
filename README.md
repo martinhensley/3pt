@@ -1,13 +1,13 @@
 # footy.bot - Soccer Card Information Platform
 
-A modern platform for soccer card enthusiasts at footy.bot. Features AI-powered data curation and analysis using Claude to deliver world-class insights, comprehensive card databases, and expert-level content for collectors and investors.
+footy.bot is an information platform for soccer (footy) cards. Featuring hand crafted data curation assisted by AI to organize checklists, sales, and grading information at scale globally. footy.bot publishes daily at footy.bot and at Facebook, Instagram, TikTok, and X.
 
 ## Features
 
-- **AI-Curated Data & Analysis**: Advanced AI assists in curating structured card data, analyzing market trends, and creating world-class content that elevates collector knowledge
+- **Hand-Crafted Data Curation**: AI-assisted data organization for checklists, sales, and grading information at global scale
 - **Hierarchical Data Model**: Manufacturers → Releases → Sets → Cards
-- **Multi-Document Analysis**: Upload PDFs, CSVs, images, and HTML files for comprehensive release analysis
 - **Card Library Management**: Build and manage a complete soccer card database
+- **Content Publishing**: Create and manage blog posts about releases, sets, cards, and industry news
 - **Admin Portal**: Secure interface for content and data management
 - **SEO Optimized**: Dynamic metadata, sitemap, structured data, and Open Graph tags
 - **Responsive Design**: Mobile-friendly interface with footy.bot branding (Green #005031 & Orange #F47322)
@@ -50,24 +50,214 @@ Open [http://localhost:3000](http://localhost:3000) to view the site.
 
 ### Admin Access
 
-Navigate to [http://localhost:3000/fa/login](http://localhost:3000/fa/login)
+Navigate to [http://localhost:3000/admin](http://localhost:3000/admin)
 
 Login credentials are configured in your environment variables.
 
 ## Database Schema
 
-### Hierarchical Structure
+### Complete Entity-Relationship Diagram
+
 ```
-Manufacturer
-  └── Release (year, name)
-       └── Set (name, totalCards)
-            └── Card (playerName, team, cardNumber, variant)
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                         CORE HIERARCHY                                        │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────┐
+│  Manufacturer   │
+│─────────────────│
+│ id              │◄────┐
+│ name            │     │
+│ createdAt       │     │
+│ updatedAt       │     │
+└─────────────────┘     │
+                        │ 1:N
+                   ┌────┴──────────────┐
+                   │     Release       │
+                   │───────────────────│
+                   │ id                │◄────┐
+                   │ name              │     │
+                   │ year              │     │
+                   │ slug              │     │
+                   │ description       │     │
+                   │ releaseDate       │     │
+                   │ sellSheetText     │     │
+                   │ sourceFiles       │     │
+                   │ manufacturerId    │     │
+                   │ createdAt         │     │
+                   │ updatedAt         │     │
+                   └───────────────────┘     │ 1:N
+                                        ┌────┴──────────────┐
+                                        │       Set         │
+                                        │───────────────────│
+                                        │ id                │◄────┐
+                                        │ name              │     │
+                                        │ isBaseSet         │     │
+                                        │ releaseId         │     │
+                                        │ totalCards        │     │
+                                        │ parallels  (JSON) │     │
+                                        │ createdAt         │     │
+                                        │ updatedAt         │     │
+                                        └───────────────────┘     │ 1:N
+                                                             ┌────┴──────────────────┐
+                                                             │       Card            │
+                                                             │───────────────────────│
+                                                             │ id                    │
+                                                             │ slug                  │
+                                                             │ playerName            │
+                                                             │ team                  │
+                                                             │ cardNumber            │
+                                                             │ variant               │
+                                                             │ parallelType          │
+                                                             │ serialNumber          │
+                                                             │ isNumbered            │
+                                                             │ printRun              │
+                                                             │ numbered              │
+                                                             │ rarity                │
+                                                             │ finish                │
+                                                             │ hasAutograph          │
+                                                             │ hasMemorabilia        │
+                                                             │ specialFeatures       │
+                                                             │ colorVariant          │
+                                                             │ detectionConfidence   │
+                                                             │ detectionMethods      │
+                                                             │ detectedText          │
+                                                             │ imageFront            │
+                                                             │ imageBack             │
+                                                             │ footyNotes            │
+                                                             │ setId                 │
+                                                             │ createdAt             │
+                                                             │ updatedAt             │
+                                                             └───────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                         CONTENT & MEDIA                                       │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+                          ┌───────────────────────┐
+                          │        Post           │
+                          │───────────────────────│
+                          │ id                    │
+                          │ title                 │
+                          │ slug                  │
+                          │ content               │
+                          │ excerpt               │
+                          │ type                  │──────┐ PostType ENUM:
+                          │ published             │      │ - NEWS
+                          │ releaseId  (optional) │──┐   │ - REVIEW
+                          │ setId      (optional) │──┼───│ - GUIDE
+                          │ cardId     (optional) │──┼───│ - ANALYSIS
+                          │ authorId              │  │   │ - GENERAL
+                          │ createdAt             │  │   └────────────
+                          │ updatedAt             │  │
+                          └───────────────────────┘  │
+                                   │                 │ Optional References:
+                                   │ 1:N             │ Post can reference
+                                   ▼                 │ Release, Set, or Card
+                          ┌───────────────────────┐  │
+                          │       Image           │◄─┼──┐
+                          │───────────────────────│  │  │
+                          │ id                    │  │  │
+                          │ url                   │  │  │
+                          │ caption               │  │  │ Images can belong to:
+                          │ order                 │  │  │ - Release
+                          │ releaseId  (optional) │──┘  │ - Set
+                          │ setId      (optional) │─────┘ - Card
+                          │ cardId     (optional) │─────┐ - Post
+                          │ postId     (optional) │──┐  │
+                          │ createdAt             │  │  │
+                          └───────────────────────┘  │  │
+                                                     ▼  ▼
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                      SOURCE DOCUMENT MANAGEMENT                               │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+                     ┌──────────────────────────────┐
+                     │      SourceDocument          │
+                     │──────────────────────────────│
+                     │ id                           │
+                     │ filename                     │
+                     │ displayName                  │
+                     │ blobUrl                      │
+                     │ mimeType                     │
+                     │ fileSize                     │
+                     │ documentType                 │──────┐ DocumentType ENUM:
+                     │ tags          (String[])     │      │ - SELL_SHEET
+                     │ extractedText                │      │ - CHECKLIST
+                     │ uploadedById                 │      │ - PRESS_RELEASE
+                     │ uploadedAt                   │      │ - PRICE_GUIDE
+                     │ lastUsedAt                   │      │ - IMAGE
+                     │ usageCount                   │      │ - OTHER
+                     │ description                  │      └────────────
+                     │ createdAt                    │
+                     │ updatedAt                    │
+                     └──────────────────────────────┘
+                              │           │
+                              │ N:N       │ N:N
+                              ▼           ▼
+           ┌──────────────────────────┐  ┌──────────────────────────┐
+           │ ReleaseSourceDocument    │  │  PostSourceDocument      │
+           │──────────────────────────│  │──────────────────────────│
+           │ id                       │  │ id                       │
+           │ releaseId                │  │ postId                   │
+           │ documentId               │  │ documentId               │
+           │ usageContext             │  │ usageContext             │
+           │ linkedAt                 │  │ linkedAt                 │
+           │ linkedById               │  │ linkedById               │
+           └──────────────────────────┘  └──────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                         AUTHENTICATION                                        │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+                          ┌───────────────────────┐
+                          │        User           │
+                          │───────────────────────│
+                          │ id                    │
+                          │ username              │  Note: Authentication is
+                          │ password              │  handled by neon_auth
+                          │ createdAt             │  .admin_users table.
+                          │ updatedAt             │  This model kept for
+                          └───────────────────────┘  future use.
 ```
 
-### Additional Models
-- **User**: Admin authentication
-- **Post**: Blog posts (can reference Release, Set, or Card)
-- **PostImage**: Images associated with posts
+### Key Relationships
+
+**Hierarchical Data Flow:**
+- Manufacturer → Release → Set → Card
+- Each level provides context for AI analysis and URL structure
+
+**Content Linking:**
+- Posts can reference Release, Set, or Card (optional)
+- Images can belong to Release, Set, Card, or Post
+- Source Documents can be linked to Releases or Posts
+
+**Serial Number Handling:**
+- `serialNumber`: Raw format (e.g., "/49", "1/1")
+- `printRun`: Numeric value (e.g., 49, 1)
+- `numbered`: Display format (e.g., "/49", "1 of 1")
+- `isNumbered`: Boolean flag for numbered cards
+
+**Parallel/Variation System:**
+- `parallelType`: Specific parallel name (e.g., "Gold Refractor", "Base")
+- `variant`: Basic variant designation
+- `specialFeatures`: Array of special attributes (rookie, insert, short_print)
+- `colorVariant`: Color designation (gold, red, blue, etc.)
+
+### Data Integrity
+
+**Cascading Deletes:**
+- Deleting a Manufacturer cascades to all Releases
+- Deleting a Release cascades to all Sets
+- Deleting a Set cascades to all Cards
+- Deleting a Post/Release/Set/Card cascades to associated Images
+
+**Unique Constraints:**
+- Card slugs must be unique (includes print run for serial numbered cards)
+- Manufacturer names must be unique
+- Release slugs must be unique
+- Post slugs must be unique
 
 ## Key Features
 
@@ -202,7 +392,6 @@ footy/
 │   │   └── parallels/[parallel]/ # Parallel/variation pages
 │   ├── card/[slug]/        # Card detail pages
 │   ├── posts/[slug]/       # Post pages
-│   ├── fa/                 # Legacy admin redirect
 │   ├── globals.css         # Global styles
 │   ├── layout.tsx          # Root layout with metadata
 │   ├── page.tsx            # Homepage
@@ -306,6 +495,12 @@ npx prisma generate
 - Never commit .env files
 - Implement rate limiting for APIs
 - Validate all user inputs
+
+## Roadmap / TODO
+
+### Future Features
+- **Sales Data Collection**: Aggregate and track historical sales data from major marketplaces (eBay, PWCC, Goldin, etc.) to provide market insights and pricing trends
+- **Comps (Comparable Valuations)**: Feature-as-a-service component providing third-party valuation services with comparable sales data, market analysis, and automated valuation models for grading companies and auction houses
 
 ## License
 
