@@ -8,7 +8,7 @@ import {
   createReleaseWithSets,
   addCardsToSet,
 } from "@/lib/database";
-import { extractImagesFromPDF, filterImagesBySize } from "@/lib/pdfImageExtractor";
+import { renderPDFPagesToImages } from "@/lib/pdfImageExtractor";
 import { put } from "@vercel/blob";
 import path from "path";
 import { tmpdir } from "os";
@@ -99,18 +99,16 @@ export async function POST(request: NextRequest) {
             const tempPdfPath = path.join(tempDir, `temp-${Date.now()}.pdf`);
             await writeFile(tempPdfPath, pdfBuffer);
 
-            // Extract images from PDF
-            const extractedImages = await extractImagesFromPDF(tempPdfPath);
-            console.log(`Found ${extractedImages.length} images in PDF`);
+            // Render PDF pages as high-quality images
+            const renderedPages = await renderPDFPagesToImages(tempPdfPath, {
+              scale: 3.0, // High quality rendering (3x resolution)
+            });
+            console.log(`Rendered ${renderedPages.length} PDF pages as images`);
 
-            // Filter to get substantial images (min 200x200)
-            const filteredImages = filterImagesBySize(extractedImages, 200, 200);
-            console.log(`${filteredImages.length} images after filtering`);
-
-            // Upload each image to Vercel Blob
-            for (let imgIndex = 0; imgIndex < filteredImages.length; imgIndex++) {
-              const image = filteredImages[imgIndex];
-              const filename = `release-image-p${image.pageNumber}-${imgIndex}.${image.format}`;
+            // Upload each rendered page to Vercel Blob
+            for (let imgIndex = 0; imgIndex < renderedPages.length; imgIndex++) {
+              const image = renderedPages[imgIndex];
+              const filename = `release-page-${image.pageNumber}.${image.format}`;
 
               try {
                 const blob = await put(filename, image.buffer, {

@@ -1,6 +1,7 @@
 import { PDFDocument } from 'pdf-lib';
 import { readFile } from 'fs/promises';
 import sharp from 'sharp';
+import { pdf } from 'pdf-to-img';
 
 export interface ExtractedImage {
   buffer: Buffer;
@@ -250,4 +251,74 @@ export function getLargestImages(images: ExtractedImage[], count: number = 5): E
   return images
     .sort((a, b) => (b.width * b.height) - (a.width * a.height))
     .slice(0, count);
+}
+
+/**
+ * Render PDF pages as high-quality images
+ * This produces screenshot-quality images of entire pages instead of extracting compressed embedded images
+ * @param pdfPath - Path to the PDF file
+ * @param options - Rendering options
+ * @returns Array of rendered page images with metadata
+ */
+export async function renderPDFPagesToImages(
+  pdfPath: string,
+  options: {
+    scale?: number; // Scale factor for rendering (default: 3.0 for high quality)
+    format?: 'png' | 'jpeg'; // Output format (default: 'png')
+    maxPages?: number; // Maximum number of pages to render (default: all)
+  } = {}
+): Promise<ExtractedImage[]> {
+  const { scale = 3.0, maxPages } = options;
+
+  try {
+    console.log(`Rendering PDF pages at scale ${scale}x`);
+
+    // Convert PDF pages to images using pdf-to-img
+    const document = await pdf(pdfPath, {
+      scale, // Higher scale = higher quality (3.0 = 3x resolution)
+    });
+
+    const renderedImages: ExtractedImage[] = [];
+    let pageNum = 0;
+
+    // Iterate through all pages
+    for await (const image of document) {
+      pageNum++;
+
+      // Stop if we've hit the max pages limit
+      if (maxPages && pageNum > maxPages) {
+        break;
+      }
+
+      try {
+        console.log(`Rendering page ${pageNum}...`);
+
+        // pdf-to-img returns a Uint8Array (PNG format by default)
+        const imageBuffer = Buffer.from(image);
+
+        // Get image metadata
+        const metadata = await sharp(imageBuffer).metadata();
+
+        renderedImages.push({
+          buffer: imageBuffer,
+          format: 'png',
+          width: metadata.width || 0,
+          height: metadata.height || 0,
+          pageNumber: pageNum,
+          index: 0, // Only one image per page when rendering
+        });
+
+        console.log(`  Rendered page ${pageNum}: ${metadata.width}x${metadata.height}`);
+      } catch (pageError) {
+        console.warn(`Error rendering page ${pageNum}:`, pageError);
+        // Continue to next page
+      }
+    }
+
+    console.log(`Successfully rendered ${renderedImages.length} pages from PDF`);
+    return renderedImages;
+  } catch (error) {
+    console.error('Error rendering PDF pages:', error);
+    throw new Error(`Failed to render PDF pages: ${error instanceof Error ? error.message : String(error)}`);
+  }
 }

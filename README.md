@@ -2,6 +2,12 @@
 
 footy.bot is an information platform for soccer (footy) cards. Featuring hand crafted data curation assisted by AI to organize checklists, sales, and grading information at scale globally. footy.bot publishes daily at footy.bot and at Facebook, Instagram, TikTok, and X.
 
+## Roadmap / TODO
+
+### Future Features
+- **Sales Data Collection**: Aggregate and track historical sales data from major marketplaces (eBay, PWCC, Goldin, etc.) to provide market insights and pricing trends
+- **Comps (Comparable Valuations)**: Feature-as-a-service component providing third-party valuation services with comparable sales data, market analysis, and automated valuation models for grading companies and auction houses
+
 ## Features
 
 - **Hand-Crafted Data Curation**: AI-assisted data organization for checklists, sales, and grading information at global scale
@@ -259,45 +265,6 @@ Login credentials are configured in your environment variables.
 - Release slugs must be unique
 - Post slugs must be unique
 
-## Key Features
-
-### 1. Analyze Release
-Upload multiple documents (PDFs, CSVs, images, URLs) about a release:
-- Extracts manufacturer, release name, year
-- Identifies all sets within the release
-- Optionally extracts card checklists
-- Creates hierarchical database records
-- Generates blog post (optional)
-
-### 2. Analyze Set
-Add sets to existing releases:
-- Select parent release from dropdown
-- Upload set documents (checklists, sell sheets)
-- Extracts individual cards from checklists
-- Creates set and card records
-- Generates blog post (optional)
-
-### 3. Analyze Card
-Add individual cards to sets:
-- Select release → set from dropdowns
-- Upload card images (front/back)
-- AI analyzes with context from set/release
-- Creates card database record
-- Generates blog post (optional)
-
-### 4. Manage Posts
-- View all posts (published and drafts)
-- Edit post content, title, excerpt
-- Manage images
-- Publish/unpublish posts
-- Delete posts
-
-### 5. Generate Posts
-Create general content using AI:
-- Enter topic or idea
-- AI generates full blog post
-- Review and edit before publishing
-
 ## API Endpoints
 
 ### Analysis
@@ -495,12 +462,6 @@ npx prisma generate
 - Never commit .env files
 - Implement rate limiting for APIs
 - Validate all user inputs
-
-## Roadmap / TODO
-
-### Future Features
-- **Sales Data Collection**: Aggregate and track historical sales data from major marketplaces (eBay, PWCC, Goldin, etc.) to provide market insights and pricing trends
-- **Comps (Comparable Valuations)**: Feature-as-a-service component providing third-party valuation services with comparable sales data, market analysis, and automated valuation models for grading companies and auction houses
 
 ## License
 

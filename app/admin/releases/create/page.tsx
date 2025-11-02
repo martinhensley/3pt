@@ -727,7 +727,13 @@ export default function CreateReleasePage() {
                         </p>
                         <div className="grid grid-cols-4 gap-2">
                           {extractedImages.map((imageUrl, idx) => (
-                            <div key={idx} className="relative aspect-square border-2 border-green-300 rounded-lg overflow-hidden bg-white">
+                            <a
+                              key={idx}
+                              href={imageUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="relative aspect-square border-2 border-green-300 rounded-lg overflow-hidden bg-white hover:border-green-500 transition-colors cursor-pointer"
+                            >
                               <img
                                 src={imageUrl}
                                 alt={`Extracted image ${idx + 1}`}
@@ -736,7 +742,7 @@ export default function CreateReleasePage() {
                               <div className="absolute bottom-0 left-0 right-0 bg-green-900/80 text-white text-xs text-center py-1">
                                 Image {idx + 1}
                               </div>
-                            </div>
+                            </a>
                           ))}
                         </div>
                       </div>
@@ -1079,7 +1085,7 @@ export default function CreateReleasePage() {
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                       </svg>
-                      {regeneratingDescription ? "Regenerating..." : "AI Regenerate"}
+                      {regeneratingDescription ? "Regenerating..." : "Regenerate Description"}
                     </button>
                   </div>
                   <textarea
