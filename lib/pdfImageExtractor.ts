@@ -1,7 +1,6 @@
 import { PDFDocument } from 'pdf-lib';
 import { readFile } from 'fs/promises';
 import sharp from 'sharp';
-import { pdf } from 'pdf-to-img';
 
 export interface ExtractedImage {
   buffer: Buffer;
@@ -272,6 +271,9 @@ export async function renderPDFPagesToImages(
 
   try {
     console.log(`Rendering PDF pages at scale ${scale}x`);
+
+    // Dynamically import pdf-to-img to avoid bundling issues with Next.js
+    const { pdf } = await import('pdf-to-img');
 
     // Convert PDF pages to images using pdf-to-img
     const document = await pdf(pdfPath, {

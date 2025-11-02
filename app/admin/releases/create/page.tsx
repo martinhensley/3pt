@@ -251,6 +251,96 @@ export default function CreateReleasePage() {
     setEditedSets(updatedSets);
   };
 
+  // Unified parser for full set data including name, card count, parallels, and checklist
+  const parseFullSetData = (text: string) => {
+    const lines = text.split('\n');
+    let setName = '';
+    let totalCards = '';
+    const parallels: string[] = [];
+    const cards: CardInfo[] = [];
+
+    let inParallelsSection = false;
+    let inChecklistSection = false;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+
+      const lowerLine = line.toLowerCase();
+
+      // Extract set name from first line or lines containing "checklist" or "set"
+      if (!setName && (lowerLine.includes('checklist') || lowerLine.includes('set')) && !lowerLine.startsWith('parallel')) {
+        // Extract set name, removing "checklist" suffix
+        setName = line.replace(/checklist/i, '').trim();
+        continue;
+      }
+
+      // Extract card count (e.g., "200 cards." or "#200 cards")
+      if (lowerLine.match(/^#?\d+\s+cards?\.?$/)) {
+        totalCards = line.replace(/^#/, '').replace(/\s+cards?\.?/i, '').trim();
+        continue;
+      }
+
+      // Detect parallels section
+      if (lowerLine === 'parallels:') {
+        inParallelsSection = true;
+        inChecklistSection = false;
+        continue;
+      }
+
+      // Detect section headers that end the parallels section
+      if (inParallelsSection && (lowerLine.includes('rated rookie') || lowerLine.includes('checklist') || /^\d+\s+[A-Z]/.test(line))) {
+        inParallelsSection = false;
+        inChecklistSection = true;
+      }
+
+      // Parse parallels
+      if (inParallelsSection && line && !lowerLine.startsWith('parallel')) {
+        parallels.push(line);
+        continue;
+      }
+
+      // Parse cards - only lines that start with a number followed by a space and letter
+      if (/^\d+\s+[A-Za-z]/.test(line)) {
+        inChecklistSection = true;
+        inParallelsSection = false;
+
+        // Try CSV format first: "1,Player Name,Team"
+        if (line.includes(',')) {
+          const parts = line.split(',').map(p => p.trim());
+          if (parts.length >= 2 && /^\d+$/.test(parts[0])) {
+            cards.push({
+              cardNumber: parts[0],
+              playerName: parts[1],
+              team: parts[2] || undefined,
+              setName: setName || 'Base Set',
+            });
+            continue;
+          }
+        }
+
+        // Try space-separated format: "1 Player Name, Team"
+        const match = line.match(/^(\d+)\.?\s+([^,]+)(?:,\s*(.+))?/);
+        if (match) {
+          const [, num, name, tm] = match;
+          cards.push({
+            cardNumber: num.trim(),
+            playerName: name.trim(),
+            team: tm?.trim(),
+            setName: setName || 'Base Set',
+          });
+        }
+      }
+    }
+
+    return {
+      setName: setName || '',
+      totalCards,
+      parallels,
+      cards,
+    };
+  };
+
   const parseChecklistText = (text: string, setName: string): CardInfo[] => {
     const cards: CardInfo[] = [];
     const lines = text.split('\n').filter(line => line.trim());
@@ -267,10 +357,11 @@ export default function CreateReleasePage() {
     }
 
     for (let i = startIndex; i < lines.length; i++) {
-      const line = lines[i];
+      const line = lines[i].trim();
 
-      // Skip lines that don't start with a number or are section headers
-      if (!/^\d/.test(line.trim())) {
+      // Skip lines that don't start with a number followed by space and letter
+      // This prevents "#200 cards" from being parsed as a card
+      if (!/^\d+\s+[A-Za-z]/.test(line)) {
         continue;
       }
 
@@ -331,6 +422,20 @@ export default function CreateReleasePage() {
       console.error("Failed to parse checklist file:", error);
       alert("Failed to parse checklist file. Please check the format.");
     }
+  };
+
+  const handleFullSetPaste = (index: number, text: string) => {
+    const parsed = parseFullSetData(text);
+
+    const updatedSets = [...editedSets];
+    updatedSets[index] = {
+      ...updatedSets[index],
+      name: parsed.setName || updatedSets[index].name,
+      totalCards: parsed.totalCards || String(parsed.cards.length),
+      features: parsed.parallels.length > 0 ? parsed.parallels : updatedSets[index].features,
+      cards: parsed.cards.length > 0 ? parsed.cards : updatedSets[index].cards,
+    };
+    setEditedSets(updatedSets);
   };
 
   const handleChecklistPaste = (index: number, text: string) => {
@@ -833,181 +938,109 @@ export default function CreateReleasePage() {
                             </button>
                           </div>
 
-                          <input
-                            type="text"
-                            value={set.totalCards || ""}
-                            onChange={(e) => handleUpdateSet(idx, "totalCards", e.target.value)}
-                            placeholder="Total Cards (optional)"
-                            className="w-full px-2 py-1 text-xs border border-gray-300 rounded bg-white text-gray-900 focus:ring-1 focus:ring-blue-500 mb-2"
-                          />
-                          <textarea
-                            value={set.description || ""}
-                            onChange={(e) => handleUpdateSet(idx, "description", e.target.value)}
-                            placeholder="Description (optional, 3-5 sentences)"
-                            rows={2}
-                            className="w-full px-2 py-1 text-xs border border-gray-300 rounded bg-white text-gray-900 focus:ring-1 focus:ring-blue-500 mb-2"
-                          />
-
-                          {/* Checklist Upload/Paste Section */}
+                          {/* Unified Set Data Input Section */}
                           <div className="border-t border-gray-200 pt-2 mt-2">
                             <p className="text-xs font-semibold text-gray-700 mb-2">
-                              Add Checklist (optional):
+                              Paste Set Data:
                             </p>
-                            <div className="flex flex-col gap-2">
-                              <div className="flex items-center gap-2">
-                                <label className="flex-1">
-                                  <input
-                                    type="file"
-                                    accept=".txt,.csv,.pdf"
-                                    onChange={(e) => {
-                                      const file = e.target.files?.[0];
-                                      if (file) handleChecklistUpload(idx, file);
-                                    }}
-                                    className="hidden"
-                                  />
-                                  <div className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded border border-gray-300 cursor-pointer text-center transition-colors">
-                                    Upload File (TXT, CSV, PDF)
-                                  </div>
-                                </label>
-                              </div>
-                              <details className="text-xs">
-                                <summary className="cursor-pointer text-blue-600 hover:underline">
-                                  Or paste checklist text
-                                </summary>
-                                <textarea
-                                  placeholder="Paste checklist here (e.g., &apos;1 Player Name, Team&apos;)"
-                                  rows={4}
-                                  onChange={(e) => {
-                                    if (e.target.value.trim()) {
-                                      handleChecklistPaste(idx, e.target.value);
-                                      e.target.value = ''; // Clear after processing
-                                    }
-                                  }}
-                                  className="w-full px-2 py-1 mt-2 text-xs border border-gray-300 rounded bg-white text-gray-900 focus:ring-1 focus:ring-blue-500"
-                                />
-                                <p className="text-xs text-gray-500 mt-1">
-                                  Format: &quot;1 Kylian Mbappe, France&quot; (one per line)
-                                </p>
-                              </details>
-                            </div>
+                            <p className="text-xs text-gray-500 mb-2">
+                              Paste complete set information including set name, card count, parallels, and checklist. The system will automatically extract all information.
+                            </p>
+                            <textarea
+                              placeholder={`Example format:
+Base Set Checklist
+200 cards.
+
+Parallels:
+Cubic
+Diamond
+Silver
+Teal – /199
+Blue – /49
+
+1 Player Name, Team
+2 Player Name, Team
+...`}
+                              rows={8}
+                              onChange={(e) => {
+                                if (e.target.value.trim()) {
+                                  handleFullSetPaste(idx, e.target.value);
+                                  e.target.value = ''; // Clear after processing
+                                }
+                              }}
+                              className="w-full px-3 py-2 text-xs border border-gray-300 rounded bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 font-mono"
+                            />
+                            <p className="text-xs text-gray-500 mt-1 italic">
+                              Paste will auto-extract: Set name, card count, parallels list, and full checklist
+                            </p>
                           </div>
 
-                          {set.cards && set.cards.length > 0 && (
+                          {(set.cards && set.cards.length > 0) || (set.features && set.features.length > 0) ? (
                             <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded">
                               <div className="flex items-center justify-between gap-2 mb-1">
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center gap-2 flex-wrap">
                                   <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                   </svg>
                                   <span className="text-xs font-semibold text-green-700">
-                                    Checklist loaded: {set.cards.length} cards
+                                    Loaded:
                                   </span>
+                                  {set.cards && set.cards.length > 0 && (
+                                    <span className="text-xs bg-green-100 px-2 py-0.5 rounded">
+                                      {set.cards.length} cards
+                                    </span>
+                                  )}
+                                  {set.features && set.features.length > 0 && (
+                                    <span className="text-xs bg-purple-100 px-2 py-0.5 rounded">
+                                      {set.features.length} parallels
+                                    </span>
+                                  )}
                                 </div>
                                 <button
                                   type="button"
-                                  onClick={() => handleClearChecklist(idx)}
-                                  className="px-2 py-0.5 text-xs bg-red-100 hover:bg-red-200 text-red-700 rounded transition-colors"
-                                  title="Clear checklist"
-                                >
-                                  Clear
-                                </button>
-                              </div>
-                              <details className="text-xs">
-                                <summary className="cursor-pointer text-green-600 hover:underline">
-                                  View cards
-                                </summary>
-                                <div className="mt-2 max-h-40 overflow-y-auto space-y-1">
-                                  {set.cards.map((card, cardIdx) => (
-                                    <div key={cardIdx} className="text-xs text-gray-700">
-                                      #{card.cardNumber} {card.playerName}
-                                      {card.team && ` (${card.team})`}
-                                    </div>
-                                  ))}
-                                </div>
-                              </details>
-                            </div>
-                          )}
-
-                          {/* Parallels/Variations Upload/Paste Section */}
-                          <div className="border-t border-gray-200 pt-2 mt-2">
-                            <p className="text-xs font-semibold text-gray-700 mb-2">
-                              Add Parallels/Variations (optional):
-                            </p>
-                            <div className="flex flex-col gap-2">
-                              <div className="flex items-center gap-2">
-                                <label className="flex-1">
-                                  <input
-                                    type="file"
-                                    accept=".txt,.csv"
-                                    onChange={(e) => {
-                                      const file = e.target.files?.[0];
-                                      if (file) handleParallelsUpload(idx, file);
-                                    }}
-                                    className="hidden"
-                                  />
-                                  <div className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded border border-gray-300 cursor-pointer text-center transition-colors">
-                                    Upload File (TXT, CSV)
-                                  </div>
-                                </label>
-                              </div>
-                              <details className="text-xs">
-                                <summary className="cursor-pointer text-blue-600 hover:underline">
-                                  Or paste parallels text
-                                </summary>
-                                <textarea
-                                  placeholder="Paste parallels here (one per line)"
-                                  rows={4}
-                                  onChange={(e) => {
-                                    if (e.target.value.trim()) {
-                                      handleParallelsPaste(idx, e.target.value);
-                                      e.target.value = ''; // Clear after processing
-                                    }
+                                  onClick={() => {
+                                    handleClearChecklist(idx);
+                                    handleClearParallels(idx);
                                   }}
-                                  className="w-full px-2 py-1 mt-2 text-xs border border-gray-300 rounded bg-white text-gray-900 focus:ring-1 focus:ring-blue-500"
-                                />
-                                <p className="text-xs text-gray-500 mt-1">
-                                  Format: &quot;Gold – /10&quot; or &quot;Black – 1/1&quot; (one per line)
-                                </p>
-                              </details>
-                            </div>
-                          </div>
-
-                          {set.features && set.features.length > 0 && (
-                            <div className="mt-2 p-2 bg-purple-50 border border-purple-200 rounded">
-                              <div className="flex items-center justify-between gap-2 mb-1">
-                                <div className="flex items-center gap-1">
-                                  <svg className="w-3 h-3 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M3 12v3c0 1.657 3.134 3 7 3s7-1.343 7-3v-3c0 1.657-3.134 3-7 3s-7-1.343-7-3z" />
-                                    <path d="M3 7v3c0 1.657 3.134 3 7 3s7-1.343 7-3V7c0 1.657-3.134 3-7 3S3 8.657 3 7z" />
-                                    <path d="M17 5c0 1.657-3.134 3-7 3S3 6.657 3 5s3.134-3 7-3 7 1.343 7 3z" />
-                                  </svg>
-                                  <span className="text-xs font-semibold text-purple-700">
-                                    Parallels loaded: {set.features.length}
-                                  </span>
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={() => handleClearParallels(idx)}
                                   className="px-2 py-0.5 text-xs bg-red-100 hover:bg-red-200 text-red-700 rounded transition-colors"
-                                  title="Clear parallels"
+                                  title="Clear all data"
                                 >
-                                  Clear
+                                  Clear All
                                 </button>
                               </div>
-                              <details className="text-xs">
-                                <summary className="cursor-pointer text-purple-600 hover:underline">
-                                  View parallels
-                                </summary>
-                                <div className="mt-2 max-h-40 overflow-y-auto space-y-1">
-                                  {set.features.map((parallel, parallelIdx) => (
-                                    <div key={parallelIdx} className="text-xs text-gray-700">
-                                      • {parallel}
+                              <div className="space-y-2">
+                                {set.cards && set.cards.length > 0 && (
+                                  <details className="text-xs">
+                                    <summary className="cursor-pointer text-green-600 hover:underline">
+                                      View cards
+                                    </summary>
+                                    <div className="mt-2 max-h-40 overflow-y-auto space-y-1">
+                                      {set.cards.map((card, cardIdx) => (
+                                        <div key={cardIdx} className="text-xs text-gray-700">
+                                          #{card.cardNumber} {card.playerName}
+                                          {card.team && ` (${card.team})`}
+                                        </div>
+                                      ))}
                                     </div>
-                                  ))}
-                                </div>
-                              </details>
+                                  </details>
+                                )}
+                                {set.features && set.features.length > 0 && (
+                                  <details className="text-xs">
+                                    <summary className="cursor-pointer text-purple-600 hover:underline">
+                                      View parallels
+                                    </summary>
+                                    <div className="mt-2 max-h-40 overflow-y-auto space-y-1">
+                                      {set.features.map((parallel, parallelIdx) => (
+                                        <div key={parallelIdx} className="text-xs text-gray-700">
+                                          • {parallel}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </details>
+                                )}
+                              </div>
                             </div>
-                          )}
+                          ) : null}
                         </li>
                       );
                       })}
@@ -1073,7 +1106,7 @@ export default function CreateReleasePage() {
                           Description
                         </label>
                         <p className="text-xs text-gray-500">
-                          5-15 sentence summary displayed in previews
+                          7-21 sentence summary displayed in previews
                         </p>
                       </div>
                     </div>

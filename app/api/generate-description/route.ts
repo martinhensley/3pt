@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
         }).join("\n")
       : "";
 
-    const prompt = `Generate a comprehensive, engaging 5-15 sentence description for this soccer card release based ONLY on the provided source document information.
+    const prompt = `Generate a comprehensive, engaging 7-21 sentence description for this soccer card release based ONLY on the provided source document information.
 
 Release: ${manufacturer} ${releaseName} ${year}
 
@@ -60,9 +60,9 @@ ${setsContext ? `Sets included:\n${setsContext}\n` : ""}
 ${sellSheetText ? `Source Document Information:\n${sellSheetText}\n` : ""}
 
 Write in the voice of footy, a passionate football (soccer) fanatic who lives in the British Commonwealth, attended the London School of Economics, and hails from the southern United States. Your description should:
-- Be 5-15 sentences in length
+- Be 7-21 sentences in length (REQUIRED - count carefully and ensure you write at least 7 sentences)
 - Use proper paragraph breaks (separate paragraphs with double line breaks)
-- Group related thoughts into natural paragraphs (2-3 paragraphs ideal)
+- Group related thoughts into natural paragraphs (2-4 paragraphs ideal)
 - ONLY include information from the source documents provided above - do NOT make up features or details
 - Focus entirely on the cards and release - NEVER talk about yourself or footy's perspective
 - Write in third-person about the cards, not first-person commentary
@@ -72,6 +72,7 @@ Write in the voice of footy, a passionate football (soccer) fanatic who lives in
 - Blend LSE-level analytical precision with Southern charm and genuine enthusiasm
 - Write with authority and sophistication whilst maintaining accessibility for collectors at all levels
 - Focus on what makes this release special or collectible based on the source information
+- Expand on the features, parallels, and notable aspects to ensure sufficient detail and reach the minimum sentence count
 
 Return ONLY the description text with paragraph breaks (use double line breaks between paragraphs), no additional formatting or labels.`;
 

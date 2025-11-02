@@ -1533,6 +1533,9 @@ export default function EditReleasePage() {
               <label className="block font-semibold text-gray-900 mb-2">
                 Description:
               </label>
+              <p className="text-xs text-gray-500 mb-2">
+                7-21 sentence summary displayed in previews
+              </p>
               <textarea
                 value={editedDescription.replace(/<[^>]*>/g, '')} // Strip HTML tags
                 onChange={(e) => setEditedDescription(e.target.value)}
