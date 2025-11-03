@@ -23,6 +23,7 @@ interface SetInfo {
   id?: string;
   name: string;
   isBaseSet: boolean;
+  type?: 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other'; // Set type for slug generation
   totalCards?: string;
   parallels?: string[];
   cards?: CardInfo[];
@@ -85,6 +86,8 @@ export default function EditReleasePage() {
   const [descriptionFile, setDescriptionFile] = useState<File | null>(null);
   const [sourceFiles, setSourceFiles] = useState<SourceFile[]>([]);
   const [uploadingFile, setUploadingFile] = useState(false);
+  const [creatingMultipleSets, setCreatingMultipleSets] = useState(false);
+  const [setCreationProgress, setSetCreationProgress] = useState<{current: number; total: number; currentSetName: string} | null>(null);
 
   // Release data
   const [release, setRelease] = useState<Release | null>(null);
@@ -125,25 +128,8 @@ export default function EditReleasePage() {
       setEditedDescription(data.description || "");
       setSourceFiles(data.sourceFiles as SourceFile[] || []);
 
-      // Transform sets data
-      const transformedSets: SetInfo[] = data.sets.map((set: { id: string; name: string; isBaseSet: boolean; totalCards: string | null; parallels: string[] | null; cards: { id: string; playerName: string | null; team: string | null; cardNumber: string | null; variant: string | null }[] }) => ({
-        id: set.id,
-        name: set.name,
-        isBaseSet: set.isBaseSet,
-        totalCards: set.totalCards || "",
-        parallels: set.parallels || [],
-        cards: set.cards.map((card: { id: string; playerName: string | null; team: string | null; cardNumber: string | null; variant: string | null }) => ({
-          id: card.id,
-          playerName: card.playerName || "",
-          team: card.team || "",
-          cardNumber: card.cardNumber || "",
-          variant: card.variant || "",
-        })),
-        isNew: false,
-        isDeleted: false,
-      }));
-
-      setEditedSets(transformedSets);
+      // Initialize sets as empty - sets will be added via "+ Add Set" button
+      setEditedSets([]);
     } catch (error) {
       console.error("Failed to fetch release:", error);
       setMessage({
@@ -252,6 +238,18 @@ export default function EditReleasePage() {
           firstLine.includes('subject') || firstLine.includes('number') ||
           firstLine.includes('name')) {
         startIndex = 1; // Skip header row
+      }
+    }
+
+    // Check for metadata lines like "200 cards" or "200 cards."
+    // These should be skipped, not parsed as card entries
+    while (startIndex < lines.length) {
+      const line = lines[startIndex].trim();
+      // Match patterns like "200 cards", "200 cards.", "X cards", etc.
+      if (/^\d+\s+cards?\.?$/i.test(line)) {
+        startIndex++; // Skip this metadata line
+      } else {
+        break; // Start parsing from here
       }
     }
 
@@ -429,6 +427,106 @@ export default function EditReleasePage() {
     };
   };
 
+  /**
+   * Parse set data and generate multiple Set objects (one base + one per parallel)
+   * This implements the parallel-as-set architecture
+   */
+  const parseSetDataIntoMultipleSets = (
+    text: string,
+    setType: 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other'
+  ): Array<{
+    name: string;
+    type: 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other';
+    slug: string;
+    totalCards: string;
+    parallels: string[]; // Always empty - deprecated field
+    cards: CardInfo[];
+    isParallel: boolean;
+    baseSetName: string;
+    printRun?: string;
+    parallelName?: string;
+    parentSetId?: string; // 'PLACEHOLDER' for parallels, undefined for parent
+  }> | null => {
+    if (!release) return null;
+
+    // Parse using existing logic
+    const parsed = parseCompleteSetData(text);
+    if (!parsed) return null;
+
+    const { name: rawSetName, totalCards, standardParallels, cards } = parsed;
+
+    // Clean up set name - remove "Checklist", "Set", etc.
+    let cleanedSetName = rawSetName
+      .replace(/\bset\s+checklist\b/gi, '')  // Remove "Set Checklist"
+      .replace(/\bchecklist\b/gi, '')        // Remove "Checklist"
+      .replace(/\bbase\s+set\b/gi, 'Base')   // "Base Set" → "Base"
+      .trim();
+
+    // If name is empty after cleaning, default to set type
+    if (!cleanedSetName) cleanedSetName = setType;
+
+    // Import slug generator
+    const { generateSetSlug } = require('@/lib/slugGenerator');
+
+    // Strip year from release name if it exists
+    const cleanReleaseName = release.name.replace(/^\d{4}(-\d{2,4})?\s+/i, '');
+
+    const sets: Array<{
+      name: string;
+      type: 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other';
+      slug: string;
+      totalCards: string;
+      parallels: string[];
+      cards: CardInfo[];
+      isParallel: boolean;
+      baseSetName: string;
+      printRun?: string;
+      parallelName?: string;
+      parentSetId?: string;
+    }> = [];
+
+    // 1. Create parent set with cards
+    sets.push({
+      name: cleanedSetName,
+      type: setType,
+      slug: generateSetSlug(release.year || '', cleanReleaseName, cleanedSetName, setType),
+      totalCards,
+      parallels: [], // Deprecated - no longer used
+      cards: cards,  // Cards only stored on parent
+      isParallel: false,
+      baseSetName: cleanedSetName,
+      parentSetId: undefined, // Explicitly undefined for parent
+    });
+
+    // 2. Create child parallel sets WITHOUT cards (they inherit from parent)
+    for (const parallel of standardParallels) {
+      // Extract print run if present: "Electric Etch Orange /149" → "/149"
+      const printRunMatch = parallel.match(/\/\d+/);
+      const printRun = printRunMatch ? printRunMatch[0] : undefined;
+
+      // Clean parallel name (remove print run and trailing text like "or fewer")
+      const cleanParallelName = parallel
+        .replace(/\s*\/\d+.*$/,  '') // Remove "/149 or fewer"
+        .trim();
+
+      sets.push({
+        name: cleanParallelName, // Just the parallel name (not "Base Electric Etch Orange")
+        type: setType,
+        slug: generateSetSlug(release.year || '', cleanReleaseName, cleanedSetName, setType, cleanParallelName),
+        totalCards,
+        parallels: [], // Deprecated
+        cards: [], // NO cards for parallels - they reference parent's cards
+        isParallel: true,
+        baseSetName: cleanedSetName,
+        printRun: printRun,
+        parallelName: cleanParallelName,
+        parentSetId: 'PLACEHOLDER', // Will be replaced with actual parent ID after creation
+      });
+    }
+
+    return sets;
+  };
+
   const handleChecklistUpload = async (index: number, file: File) => {
     try {
       setLoading(true);
@@ -492,47 +590,72 @@ export default function EditReleasePage() {
   };
 
   const createCardsInDatabase = async (setId: string, cards: CardInfo[], parallels: string[], manualSerialMode: boolean = false) => {
-    try {
-      const response = await fetch('/api/sets/create-cards', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          setId,
-          cards,
-          parallels,
-          manualSerialMode,
-        }),
-      });
+    // Retry logic to handle Next.js compilation delays on first access
+    const maxRetries = 3;
+    let lastError: Error | null = null;
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to create cards');
-      }
-
-      if (manualSerialMode) {
-        setMessage({
-          type: 'success',
-          text: `Created ${data.created} cards with individual serial numbers (${data.skipped} skipped as duplicates)`,
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const response = await fetch('/api/sets/create-cards', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            setId,
+            cards,
+            parallels,
+            manualSerialMode,
+          }),
         });
-      } else {
-        setMessage({
-          type: 'success',
-          text: `Created ${data.created} cards across ${data.parallelsProcessed} parallels (${data.skipped} skipped as duplicates)`,
-        });
-      }
-      setTimeout(() => setMessage(null), 5000);
 
-      // Refresh just the card count for this set (don't reload entire page)
-      await refreshSetCardCount(setId);
-    } catch (error) {
-      console.error('Failed to create cards in database:', error);
-      setMessage({
-        type: 'error',
-        text: error instanceof Error ? error.message : 'Failed to create cards in database',
-      });
-      setTimeout(() => setMessage(null), 5000);
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to create cards');
+        }
+
+        // Success - process the response
+        lastError = null;
+        return await processCardCreationResponse(data, manualSerialMode, setId);
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error));
+        console.error(`Attempt ${attempt} failed:`, lastError.message);
+
+        // If this is a fetch failure and not the last attempt, retry
+        if (attempt < maxRetries && lastError.message.includes('fetch')) {
+          const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000); // Exponential backoff, max 5s
+          console.log(`Retrying in ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+
+        // If it's not a fetch error or last attempt, throw immediately
+        if (!lastError.message.includes('fetch') || attempt === maxRetries) {
+          throw lastError;
+        }
+      }
     }
+
+    // If we get here, all retries failed
+    throw lastError || new Error('Failed to create cards after multiple attempts');
+  };
+
+  // Helper function to process the API response
+  const processCardCreationResponse = async (data: any, manualSerialMode: boolean, setId: string) => {
+    if (manualSerialMode) {
+      setMessage({
+        type: 'success',
+        text: `Created ${data.created} cards with individual serial numbers (${data.skipped} skipped as duplicates)`,
+      });
+    } else {
+      setMessage({
+        type: 'success',
+        text: `Created ${data.created} cards across ${data.parallelsProcessed} parallels (${data.skipped} skipped as duplicates)`,
+      });
+    }
+    setTimeout(() => setMessage(null), 5000);
+
+    // Refresh just the card count for this set (don't reload entire page)
+    await refreshSetCardCount(setId);
   };
 
   const handleChecklistPaste = async (index: number, text: string) => {
@@ -720,100 +843,142 @@ export default function EditReleasePage() {
       }
 
       // Standard mode: try parsing as complete set data (with name, parallels, cards)
-      const completeData = parseCompleteSetData(text);
+      // Use new parallel-as-set architecture
+      const setType = editedSets[index].type || 'Base';
+      const multiSetData = parseSetDataIntoMultipleSets(text, setType);
 
-      if (completeData && completeData.cards.length > 0) {
-        // Complete format detected - update name, parallels, cards, and totalCards (auto-counted from checklist)
-        const updatedSets = [...editedSets];
+      if (multiSetData && multiSetData.length > 0) {
+        // Multiple sets will be created (one base + one per parallel)
+        const baseSet = multiSetData[0];
+        const parallelSets = multiSetData.slice(1);
 
-        // Combine all parallels (standard + variable) for storage
-        // Prepend set name to each parallel for full naming
-        const setNamePrefix = completeData.name;
-        const rawParallels = [
-          ...completeData.standardParallels.map(p => `${setNamePrefix} ${p}`),
-          ...completeData.variableParallels.map(p => `${setNamePrefix} ${p.name} /${p.maxPrintRun} or fewer`)
-        ];
+        // Set loading states
+        setCreatingMultipleSets(true);
+        setSetCreationProgress({ current: 0, total: multiSetData.length, currentSetName: '' });
 
-        // Normalize /1 to "1 of 1" and sort by print run
-        const normalizedParallels = rawParallels.map(normalizeParallelName);
-        const allParallels = sortParallelsByPrintRun(normalizedParallels);
+        setMessage({
+          type: "success",
+          text: `Creating ${multiSetData.length} sets: 1 base + ${parallelSets.length} parallels with ${baseSet.cards.length} cards each...`
+        });
 
-        console.log('🔍 Combined parallels for storage:', allParallels);
-        console.log('🔍 About to save set with parallels:', allParallels);
+        console.log(`📦 Creating ${multiSetData.length} sets:`, multiSetData.map(s => s.name));
 
-        updatedSets[index] = {
-          ...updatedSets[index],
-          name: completeData.name,
-          totalCards: String(completeData.cards.length), // Always use actual count
-          parallels: allParallels.length > 0 ? allParallels : updatedSets[index].parallels,
-          cards: completeData.cards,
-        };
+        try {
+          // STEP 1: Create parent set FIRST
+          const parentSetData = multiSetData[0]; // First item is always parent
 
-        // Variable parallels are stored within the base set, not as separate sets
-        // They will be displayed as parallel badges on the set page
+          setSetCreationProgress({
+            current: 1,
+            total: multiSetData.length,
+            currentSetName: `${parentSetData.name} (parent)`
+          });
 
-        // Now update state with all changes at once
-        setEditedSets(updatedSets);
+          console.log(`📤 Creating parent set: ${parentSetData.name}`);
 
-        const details = [];
-        details.push(`${completeData.cards.length} cards`);
-        if (completeData.standardParallels.length > 0) {
-          details.push(`${completeData.standardParallels.length} standard parallels`);
-        }
-        if (completeData.variableParallels.length > 0) {
-          details.push(`${completeData.variableParallels.length} variable parallels`);
-        }
+          const parentResponse = await fetch('/api/sets', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: parentSetData.name,
+              type: parentSetData.type,
+              totalCards: parentSetData.totalCards,
+              parallels: [], // Empty - deprecated field
+              releaseId: release!.id,
+              parentSetId: null, // Explicitly null for parent sets
+            }),
+          });
 
-        setMessage({ type: "success", text: `Successfully loaded "${completeData.name}" with ${details.join(', ')}. Saving to database...` });
+          if (!parentResponse.ok) {
+            const errorData = await parentResponse.json();
+            throw new Error(`Failed to create parent set "${parentSetData.name}": ${errorData.error || 'Unknown error'}`);
+          }
 
-        // If this is a new set, save it first to get an ID
-        if (updatedSets[index].isNew && !updatedSets[index].id) {
-          try {
-            console.log('📤 Sending to API - parallels:', allParallels);
+          const parentSet = await parentResponse.json();
+          console.log(`✅ Created parent set: ${parentSetData.name} (ID: ${parentSet.id}, slug: ${parentSet.slug})`);
+
+          // STEP 2: Create cards ONLY for parent set
+          console.log(`📤 Creating ${parentSetData.cards.length} cards for parent set: ${parentSetData.name}`);
+
+          await createCardsInDatabase(
+            parentSet.id,
+            parentSetData.cards,
+            [], // No parallels - cards are just base cards
+            false
+          );
+
+          console.log(`✅ Created ${parentSetData.cards.length} cards for parent set`);
+
+          // STEP 3: Create child parallel sets with parentSetId
+          const parallelSets = multiSetData.slice(1); // All except first
+          const createdSets: Array<{ id: string; name: string; slug: string }> = [
+            { id: parentSet.id, name: parentSetData.name, slug: parentSet.slug }
+          ];
+
+          for (let i = 0; i < parallelSets.length; i++) {
+            const parallelData = parallelSets[i];
+
+            // Update progress
+            setSetCreationProgress({
+              current: i + 2, // +2 because parent is 1
+              total: multiSetData.length,
+              currentSetName: `${parallelData.name} (parallel ${i + 1}/${parallelSets.length})`
+            });
+
+            console.log(`📤 Creating parallel set ${i + 1}/${parallelSets.length}: ${parallelData.name}`);
+
             const response = await fetch('/api/sets', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                name: completeData.name,
-                isBaseSet: updatedSets[index].isBaseSet,
-                totalCards: completeData.totalCards,
-                parallels: allParallels, // Use combined parallels (standard + variable)
+                name: parallelData.name,
+                type: parallelData.type,
+                totalCards: parallelData.totalCards,
+                parallels: [], // Empty - deprecated field
                 releaseId: release!.id,
+                parentSetId: parentSet.id, // Link to parent
               }),
             });
 
             if (!response.ok) {
-              throw new Error('Failed to create set');
+              const errorData = await response.json();
+              throw new Error(`Failed to create parallel set "${parallelData.name}": ${errorData.error || 'Unknown error'}`);
             }
 
-            const newSet = await response.json();
-            console.log('📥 Received from API - newSet:', newSet);
-            console.log('📥 newSet.parallels:', newSet.parallels);
-            updatedSets[index] = {
-              ...updatedSets[index],
-              id: newSet.id,
-              isNew: false,
-            };
+            const newParallelSet = await response.json();
+            createdSets.push({ id: newParallelSet.id, name: parallelData.name, slug: newParallelSet.slug });
+            console.log(`✅ Created parallel set: ${parallelData.name} (slug: ${newParallelSet.slug})`);
 
-            // Update state with saved set ID
-            setEditedSets(updatedSets);
-          } catch (error) {
-            setMessage({ type: 'error', text: 'Failed to save set to database' });
-            console.error('Error saving set:', error);
-            return;
+            // NO cards created for parallels - they reference parent's cards
           }
-        }
 
-        // Create cards in database now that we have a set ID
-        // If there are variable parallels, the base set also uses manual serial mode
-        const useManualSerialMode = completeData.variableParallels.length > 0;
-        if (updatedSets[index].id) {
-          await createCardsInDatabase(
-            updatedSets[index].id!,
-            completeData.cards,
-            completeData.standardParallels,
-            useManualSerialMode
-          );
+          // Update the UI state with the base set info
+          const updatedSets = [...editedSets];
+          updatedSets[index] = {
+            ...updatedSets[index],
+            id: createdSets[0].id, // Base set ID
+            name: createdSets[0].name,
+            totalCards: baseSet.totalCards,
+            isNew: false,
+          };
+          setEditedSets(updatedSets);
+
+          setMessage({
+            type: "success",
+            text: `✅ Successfully created ${createdSets.length} sets with ${baseSet.cards.length} cards each! Refresh the page to see all sets.`
+          });
+          setTimeout(() => setMessage(null), 8000);
+
+        } catch (error) {
+          console.error('Error creating sets:', error);
+          setMessage({
+            type: 'error',
+            text: error instanceof Error ? error.message : 'Failed to create sets'
+          });
+          setTimeout(() => setMessage(null), 5000);
+        } finally {
+          // Clear loading states
+          setCreatingMultipleSets(false);
+          setSetCreationProgress(null);
         }
 
         return;
@@ -1073,11 +1238,19 @@ export default function EditReleasePage() {
       setUploadingFile(true);
       setMessage(null);
 
+      // Determine if this is an image file
+      const imageExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+      const fileExtension = file.name.split('.').pop()?.toLowerCase();
+      const isImage = fileExtension && imageExtensions.includes(fileExtension);
+
       const formData = new FormData();
       formData.append("file", file);
       formData.append("releaseId", release.id);
 
-      const response = await fetch("/api/uploads/release-files", {
+      // Use appropriate endpoint based on file type
+      const endpoint = isImage ? "/api/uploads/release-images" : "/api/uploads/release-files";
+
+      const response = await fetch(endpoint, {
         method: "POST",
         body: formData,
       });
@@ -1088,10 +1261,15 @@ export default function EditReleasePage() {
 
       const fileData = await response.json();
 
-      // Add to sourceFiles array
-      setSourceFiles([...sourceFiles, fileData]);
+      if (isImage) {
+        // Reload the page to show the new image in the Images section
+        window.location.reload();
+      } else {
+        // Add to sourceFiles array
+        setSourceFiles([...sourceFiles, fileData]);
+      }
 
-      setMessage({ type: "success", text: `File "${file.name}" uploaded successfully` });
+      setMessage({ type: "success", text: `${isImage ? 'Image' : 'File'} "${file.name}" uploaded successfully` });
       setTimeout(() => setMessage(null), 3000);
     } catch (error) {
       console.error("Failed to upload file:", error);
@@ -1179,6 +1357,7 @@ export default function EditReleasePage() {
               body: JSON.stringify({
                 name: set.name,
                 isBaseSet: set.isBaseSet,
+                type: set.type || 'Base', // Include set type for slug generation
                 totalCards: set.totalCards || null,
                 releaseId: release.id,
                 parallels: set.parallels || [],
@@ -1406,7 +1585,7 @@ export default function EditReleasePage() {
             </div>
             <div className="pt-2 border-t border-blue-300">
               <p className="text-gray-800">
-                <span className="font-semibold">Full Release:</span> {editedYear} {editedReleaseName}
+                <span className="font-semibold">Full Release:</span> {editedYear} {editedManufacturer} {editedReleaseName}
               </p>
             </div>
             <p className="text-gray-800">
@@ -1547,13 +1726,13 @@ export default function EditReleasePage() {
           </div>
         </div>
 
-        {/* Source Files Section */}
+        {/* Source Documents and Images Section */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Source Files
+            Source Documents and Images
           </h3>
           <p className="text-sm text-gray-600 mb-4">
-            Upload sell sheets, checklists, PDFs, or other documents used for reference when creating content
+            Upload source documents (release PDFs, checklists, sell sheets) used to generate the release for AI functionality and data reference, and images (JPG, PNG, WebP, GIF) to display in the release's image carousel
           </p>
 
           <div className="space-y-4">
@@ -1562,7 +1741,7 @@ export default function EditReleasePage() {
               <label className="flex-1">
                 <input
                   type="file"
-                  accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.csv"
+                  accept=".pdf,.png,.jpg,.jpeg,.webp,.gif,.txt,.csv"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) {
@@ -1639,73 +1818,52 @@ export default function EditReleasePage() {
               </div>
             )}
 
-            {sourceFiles.length === 0 && (
+            {sourceFiles.length === 0 && (!release?.images || release.images.length === 0) && (
               <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
                 <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
-                <p className="mt-2 text-sm text-gray-500">No files uploaded yet</p>
+                <p className="mt-2 text-sm text-gray-500">No documents or images uploaded yet</p>
               </div>
             )}
-          </div>
-        </div>
-
-        {/* Release Images Section */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Release Images
-          </h3>
-          <p className="text-sm text-gray-600 mb-4">
-            Upload images to display in the release&apos;s image carousel (JPG, PNG, WebP)
-          </p>
-
-          <div className="space-y-4">
-            {/* Upload Section */}
-            <div className="flex items-center gap-3">
-              <label className="flex-1">
-                <input
-                  type="file"
-                  accept=".jpg,.jpeg,.png,.webp,.gif"
-                  multiple
-                  onChange={(e) => {
-                    const files = e.target.files;
-                    if (files) {
-                      // Handle multiple file uploads here
-                      Array.from(files).forEach(file => {
-                        // TODO: Implement image upload logic
-                        console.log('Upload image:', file.name);
-                      });
-                      e.target.value = ""; // Reset input
-                    }
-                  }}
-                  className="text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200"
-                />
-              </label>
-            </div>
 
             {/* Display existing images */}
-            {release && release.images && release.images.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {release.images.map((image) => (
-                  <div key={image.id} className="relative group">
-                    <img
-                      src={image.url}
-                      alt={image.caption || "Release image"}
-                      className="w-full h-48 object-cover rounded-lg border border-gray-200"
-                    />
-                    {image.caption && (
-                      <p className="text-xs text-gray-600 mt-1 truncate">{image.caption}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
-                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <p className="mt-2 text-sm text-gray-500">No images uploaded yet</p>
-                <p className="text-xs text-gray-400 mt-1">Images will be displayed in the release&apos;s image carousel</p>
+            {release && release.images && release.images.length > 0 && (
+              <div>
+                <h4 className="text-sm font-semibold text-gray-900 mb-3 mt-6">Release Images</h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {release.images.map((image) => (
+                    <div key={image.id} className="relative group">
+                      <img
+                        src={image.url}
+                        alt={image.caption || "Release image"}
+                        className="w-full h-48 object-cover rounded-lg border border-gray-200"
+                      />
+                      {image.caption && (
+                        <p className="text-xs text-gray-600 mt-1 truncate">{image.caption}</p>
+                      )}
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          if (!confirm("Are you sure you want to delete this image?")) return;
+                          try {
+                            const response = await fetch(`/api/uploads/release-images?imageId=${image.id}`, {
+                              method: "DELETE",
+                            });
+                            if (!response.ok) throw new Error("Failed to delete image");
+                            window.location.reload();
+                          } catch (error) {
+                            console.error("Failed to delete image:", error);
+                            alert("Failed to delete image");
+                          }
+                        }}
+                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 text-xs bg-red-600 hover:bg-red-700 text-white rounded"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -1725,7 +1883,7 @@ export default function EditReleasePage() {
             <button
               type="button"
               onClick={() => handleAddSet(true)}
-              className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors flex items-center gap-1.5"
+              className="px-3 py-1.5 bg-footy-green hover:bg-green-700 text-white text-sm rounded-lg transition-colors flex items-center gap-1.5"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -2054,6 +2212,31 @@ export default function EditReleasePage() {
                         </div>
                       ) : (
                         <div className="flex flex-col gap-2">
+                          {/* Set Type Selector */}
+                          <div className="mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Set Type
+                            </label>
+                            <select
+                              value={set.type || 'Base'}
+                              onChange={(e) => {
+                                const newSets = [...editedSets];
+                                newSets[idx] = {
+                                  ...newSets[idx],
+                                  type: e.target.value as 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other'
+                                };
+                                setEditedSets(newSets);
+                              }}
+                              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500"
+                            >
+                              <option value="Base">Base Set</option>
+                              <option value="Autograph">Autograph</option>
+                              <option value="Memorabilia">Memorabilia</option>
+                              <option value="Insert">Insert</option>
+                              <option value="Other">Other</option>
+                            </select>
+                          </div>
+
                           <details className="text-sm" open>
                             <summary className="cursor-pointer text-blue-600 hover:underline font-medium">
                               📋 Paste set data
@@ -2070,8 +2253,38 @@ export default function EditReleasePage() {
                                     e.target.value = ''; // Clear after processing
                                   }
                                 }}
-                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 font-mono"
+                                disabled={creatingMultipleSets}
+                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 font-mono disabled:opacity-50 disabled:cursor-not-allowed"
                               />
+
+                              {/* Progress indicator */}
+                              {creatingMultipleSets && setCreationProgress && (
+                                <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                  <div className="flex items-center gap-3">
+                                    <div className="inline-block animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                                    <div className="flex-1">
+                                      <div className="text-sm font-semibold text-blue-900 mb-1">
+                                        Creating sets... ({setCreationProgress.current}/{setCreationProgress.total})
+                                      </div>
+                                      {setCreationProgress.currentSetName && (
+                                        <div className="text-xs text-blue-700">
+                                          {setCreationProgress.currentSetName}
+                                        </div>
+                                      )}
+                                      {/* Progress bar */}
+                                      <div className="mt-2 w-full bg-blue-200 rounded-full h-2">
+                                        <div
+                                          className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                          style={{
+                                            width: `${(setCreationProgress.current / setCreationProgress.total) * 100}%`
+                                          }}
+                                        ></div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+
                               <p className="text-xs text-gray-500 mt-1 italic">
                                 {set.manualSerialMode
                                   ? "Format: Card# Player, Team /serial (one per line)"
