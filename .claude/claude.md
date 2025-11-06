@@ -258,9 +258,18 @@ return (
 ## URL Slug Conventions
 
 ### Card Slugs
-Format: `{year}-{release}-{set}-{cardNumber}-{player}-{parallel}`
 
-Example: `2024-25-donruss-soccer-optic-1-matt-turner-gold-power-1-of-1`
+**Base Card Format:** `{year}-{release}-{set}-{cardNumber}-{player}-{printRun}`
+- Example: `2024-25-obsidian-soccer-obsidian-base-1-jude-bellingham-145`
+
+**Parallel Card Format:** `{year}-{release}-{cardNumber}-{player}-{parallelName}-{printRun}`
+- Example: `2024-25-obsidian-soccer-1-jude-bellingham-electric-etch-marble-flood-8`
+- **Note:** Set name is excluded for parallel cards since parallel name is more specific
+
+**Key Rules:**
+1. **Parallel cards exclude the base set name** from slugs to avoid redundancy
+2. **Print runs are not duplicated** - if the parallel name ends with the print run, it's not added again
+3. **1/1 cards** use special formatting (see below)
 
 ### Special Cases
 
@@ -310,6 +319,58 @@ const displayName = setName
 - **Database:** `"Base Set"`
 - **URLs:** `"base"` (keep "Base")
 - **Display:** `"Base"` (keep "Base")
+
+### Card Slug Generation Logic
+
+**Location:** `/lib/slugGenerator.ts` - `generateCardSlug()` function
+
+**Implementation Details:**
+
+1. **Parallel Card Detection:**
+   - A card is considered a parallel if the variant differs from the set name
+   - Parallel cards have the set name excluded from the slug
+   - Example: Variant "Electric Etch Marble Flood 8" != Set "Obsidian Base" → parallel card
+
+2. **Print Run Deduplication:**
+   - Checks if variant already ends with the print run number
+   - Prevents duplicate print runs (e.g., `-8-8` becomes `-8`)
+   - Example: Variant "Electric Etch Marble Flood 8" with printRun=8 → only includes `-8` once
+
+3. **1/1 Card Handling:**
+   - Converts "1/1" or "1 of 1" to "1-of-1" format
+   - Detects if variant ends with "1-of-1" and printRun is 1
+   - Prevents adding extra `-1` to the slug
+
+**Code Reference:**
+```typescript
+// lib/slugGenerator.ts:117-167
+const isParallelCard = processedVariant &&
+  processedVariant.toLowerCase() !== setName.toLowerCase() &&
+  !processedVariant.toLowerCase().includes('base');
+
+const variantEndsWithPrintRun = processedVariant && printRun && (
+  processedVariant.trim().endsWith(` ${printRun}`) ||
+  (printRun === 1 && processedVariant.trim().endsWith('1-of-1'))
+);
+
+const parts = [
+  year,
+  releaseName,
+  isParallelCard ? null : setName,  // Exclude setName for parallels
+  cardNumber,
+  playerName,
+  processedVariant,
+  (printRun && !variantEndsWithPrintRun) ? printRun.toString() : null
+].filter(Boolean);
+```
+
+**Examples:**
+- Parallel: `generateCardSlug('Panini', 'Obsidian Soccer', '2024-25', 'Obsidian Base', '1', 'Jude Bellingham', 'Electric Etch Marble Flood 8', 8)`
+  → `2024-25-obsidian-soccer-1-jude-bellingham-electric-etch-marble-flood-8`
+- Base: `generateCardSlug('Panini', 'Obsidian Soccer', '2024-25', 'Obsidian Base', '1', 'Jude Bellingham', null, 145)`
+  → `2024-25-obsidian-soccer-obsidian-base-1-jude-bellingham-145`
+- 1/1: `generateCardSlug('Panini', 'Obsidian Soccer', '2024-25', 'Obsidian Base', '1', 'Jude Bellingham', 'Gold Power 1/1', 1)`
+  → `2024-25-obsidian-soccer-1-jude-bellingham-gold-power-1-of-1`
 
 ### Set Slugs
 Format: `{year}-{release}-{setName}`

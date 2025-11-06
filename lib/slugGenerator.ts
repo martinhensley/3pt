@@ -102,11 +102,17 @@ export function generateSetSlug(
 
 /**
  * Generate a URL-friendly slug from card information
- * Format: year-release-set-cardnumber-playername-variant-printrun
- * Example: "2024-25-donruss-soccer-optic-2-malik-tillman-green-5-49"
  *
- * Special handling for 1/1 cards (chase/grail cards):
- * - "1/1" or "1 of 1" -> "1-of-1" in slugs
+ * Format for base cards: year-release-set-cardnumber-playername
+ * Example: "2024-25-donruss-soccer-optic-2-malik-tillman"
+ *
+ * Format for parallel cards: year-release-cardnumber-playername-parallelname
+ * Example: "2024-25-obsidian-soccer-1-jude-bellingham-electric-etch-marble-flood-8"
+ *
+ * Special handling:
+ * - For parallel cards, the set name is excluded (parallel name is more specific)
+ * - 1/1 cards: "1/1" or "1 of 1" -> "1-of-1" in slugs
+ * - Print runs: Not added if already present at the end of variant
  */
 export function generateCardSlug(
   manufacturer: string,
@@ -125,14 +131,32 @@ export function generateCardSlug(
         .replace(/\b1\s*of\s*1\b/gi, '1-of-1')  // Match "1 of 1", etc.
     : null;
 
+  // Check if the variant already ends with the print run number
+  // If so, don't add the print run again to avoid duplicates like "-8-8"
+  // Also handle 1/1 cards - if variant ends with "1-of-1" and printRun is 1, don't add it
+  const variantEndsWithPrintRun = processedVariant && printRun && (
+    processedVariant.trim().endsWith(` ${printRun}`) ||
+    (printRun === 1 && processedVariant.trim().endsWith('1-of-1'))
+  );
+
+  // Detect if this is a parallel card by checking if variant is different from setName
+  // For parallel cards, we exclude the setName to avoid redundancy
+  // e.g., "2024-25-obsidian-soccer-1-jude-bellingham-electric-etch-marble-flood-8"
+  // instead of "2024-25-obsidian-soccer-base-1-jude-bellingham-electric-etch-marble-flood-8"
+  const isParallelCard = processedVariant &&
+    processedVariant.toLowerCase() !== setName.toLowerCase() &&
+    !processedVariant.toLowerCase().includes('base');
+
   const parts = [
     year,
     releaseName,
-    setName,
+    // Only include setName for base cards, not for parallels
+    isParallelCard ? null : setName,
     cardNumber,
     playerName,
     processedVariant,
-    printRun ? printRun.toString() : null
+    // Only add print run if it's not already at the end of the variant
+    (printRun && !variantEndsWithPrintRun) ? printRun.toString() : null
   ].filter(Boolean);
 
   return parts
