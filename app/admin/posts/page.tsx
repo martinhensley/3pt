@@ -163,7 +163,7 @@ export default function ManagePostsPage() {
             className={`mb-6 p-4 rounded-lg ${
               message.type === "success"
                 ? "bg-green-50 text-green-800"
-                : "bg-red-50 text-red-800"
+                : "bg-orange-50 text-orange-800"
             }`}
           >
             {message.text}
@@ -269,10 +269,10 @@ export default function ManagePostsPage() {
                               post.type === "RELEASE"
                                 ? "bg-green-100 text-green-800"
                                 : post.type === "SET"
-                                ? "bg-blue-100 text-blue-800"
+                                ? "bg-green-100 text-green-800"
                                 : post.type === "CARD"
                                 ? "bg-orange-100 text-orange-800"
-                                : "bg-purple-100 text-purple-800"
+                                : "bg-green-100 text-green-800"
                             }`}
                           >
                             {post.type}
@@ -309,7 +309,7 @@ export default function ManagePostsPage() {
                       </button>
                       <button
                         onClick={() => router.push(`/admin/posts/edit/${post.id}`)}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                        className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm font-medium"
                       >
                         Edit Post
                       </button>
@@ -333,7 +333,7 @@ export default function ManagePostsPage() {
                       </button>
                       <button
                         onClick={() => handleDelete(post.id)}
-                        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-medium"
+                        className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium"
                       >
                         Delete
                       </button>

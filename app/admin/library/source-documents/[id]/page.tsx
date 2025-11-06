@@ -156,9 +156,9 @@ export default function SourceDocumentDetailPage() {
   // Get color for document type
   const getDocTypeColor = (type: DocumentType) => {
     const colors = {
-      SELL_SHEET: "bg-blue-100 text-blue-800",
+      SELL_SHEET: "bg-green-100 text-green-800",
       CHECKLIST: "bg-green-100 text-green-800",
-      PRESS_RELEASE: "bg-purple-100 text-purple-800",
+      PRESS_RELEASE: "bg-green-100 text-green-800",
       PRICE_GUIDE: "bg-yellow-100 text-yellow-800",
       IMAGE: "bg-pink-100 text-pink-800",
       OTHER: "bg-gray-100 text-gray-800",
@@ -210,7 +210,7 @@ export default function SourceDocumentDetailPage() {
       </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-orange-50 border border-orange-200 text-orange-800 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         )}
@@ -277,7 +277,7 @@ export default function SourceDocumentDetailPage() {
                     <button
                       onClick={handleSave}
                       disabled={saving}
-                      className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                      className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
                     >
                       {saving ? "Saving..." : "Save"}
                     </button>
@@ -292,7 +292,7 @@ export default function SourceDocumentDetailPage() {
                     </button>
                     <button
                       onClick={handleDelete}
-                      className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                      className="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
                     >
                       Delete
                     </button>

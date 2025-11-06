@@ -147,7 +147,7 @@ export default function AdminDashboard() {
                       <span className={`text-xs font-semibold px-2 py-1 rounded ${
                         activity.action === "created"
                           ? "bg-green-100 text-green-700"
-                          : "bg-blue-100 text-blue-700"
+                          : "bg-green-100 text-green-700"
                       }`}>
                         {activity.action === "created" ? "New" : "Edited"}
                       </span>

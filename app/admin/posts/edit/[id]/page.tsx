@@ -222,7 +222,7 @@ export default function EditPostPage() {
             className={`mb-6 p-4 rounded-lg ${
               message.type === "success"
                 ? "bg-green-50 text-green-800"
-                : "bg-red-50 text-red-800"
+                : "bg-orange-50 text-orange-800"
             }`}
           >
             {message.text}
@@ -238,10 +238,10 @@ export default function EditPostPage() {
                 post.type === "RELEASE"
                   ? "bg-green-100 text-green-800"
                   : post.type === "SET"
-                  ? "bg-blue-100 text-blue-800"
+                  ? "bg-green-100 text-green-800"
                   : post.type === "CARD"
                   ? "bg-orange-100 text-orange-800"
-                  : "bg-purple-100 text-purple-800"
+                  : "bg-green-100 text-green-800"
               }`}
             >
               {post.type}
@@ -341,7 +341,7 @@ export default function EditPostPage() {
                     ) : (
                       <button
                         onClick={() => handleRemoveImage(image.id)}
-                        className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-2 right-2 bg-orange-500 text-white p-2 rounded-lg hover:bg-orange-600 opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         Remove
                       </button>

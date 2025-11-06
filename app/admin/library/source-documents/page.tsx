@@ -148,9 +148,9 @@ export default function SourceDocumentsPage() {
   // Get color for document type
   const getDocTypeColor = (type: DocumentType) => {
     const colors = {
-      SELL_SHEET: "bg-blue-100 text-blue-800",
+      SELL_SHEET: "bg-green-100 text-green-800",
       CHECKLIST: "bg-green-100 text-green-800",
-      PRESS_RELEASE: "bg-purple-100 text-purple-800",
+      PRESS_RELEASE: "bg-green-100 text-green-800",
       PRICE_GUIDE: "bg-yellow-100 text-yellow-800",
       IMAGE: "bg-pink-100 text-pink-800",
       OTHER: "bg-gray-100 text-gray-800",
@@ -175,15 +175,15 @@ export default function SourceDocumentsPage() {
       </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-orange-50 border border-orange-200 text-orange-800 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         )}
 
         {/* Controls */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-blue-800">
+          <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <p className="text-sm text-green-800">
               <strong>Note:</strong> Documents are automatically added to this library when uploaded during release or post creation.
               This library is for viewing and managing your source documents.
             </p>
@@ -307,7 +307,7 @@ export default function SourceDocumentsPage() {
                         e.stopPropagation();
                         handleDelete(doc.id);
                       }}
-                      className="bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 transition-colors text-sm"
+                      className="bg-orange-100 text-orange-700 px-4 py-2 rounded-lg hover:bg-orange-200 transition-colors text-sm"
                     >
                       Delete
                     </button>

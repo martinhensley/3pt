@@ -23,14 +23,16 @@ interface SetInfo {
   id?: string;
   name: string;
   isBaseSet: boolean;
-  type?: 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other'; // Set type for slug generation
   totalCards?: string;
+  printRun?: number | null; // Print run for parallel sets (e.g., 44 for "/44")
   parallels?: string[];
   cards?: CardInfo[];
   isNew?: boolean;
   isDeleted?: boolean;
   manualSerialMode?: boolean;
   selectedParallel?: string; // Which parallel the user is currently adding cards for
+  parentSetId?: string | null; // Reference to parent set
+  parallelSets?: SetInfo[]; // Child parallel sets (for parent sets)
 }
 
 interface SourceFile {
@@ -56,6 +58,7 @@ interface Release {
     isBaseSet: boolean;
     totalCards: string | null;
     parallels: string[] | null;
+    parentSetId: string | null;
     cards: Array<{
       id: string;
       playerName: string | null;
@@ -64,6 +67,14 @@ interface Release {
       variant: string | null;
       parallelType: string | null;
       serialNumber: string | null;
+    }>;
+    parallelSets?: Array<{
+      id: string;
+      name: string;
+      isBaseSet: boolean;
+      totalCards: string | null;
+      printRun: number | null;
+      parentSetId: string | null;
     }>;
   }>;
   images?: Array<{
@@ -86,8 +97,6 @@ export default function EditReleasePage() {
   const [descriptionFile, setDescriptionFile] = useState<File | null>(null);
   const [sourceFiles, setSourceFiles] = useState<SourceFile[]>([]);
   const [uploadingFile, setUploadingFile] = useState(false);
-  const [creatingMultipleSets, setCreatingMultipleSets] = useState(false);
-  const [setCreationProgress, setSetCreationProgress] = useState<{current: number; total: number; currentSetName: string} | null>(null);
 
   // Release data
   const [release, setRelease] = useState<Release | null>(null);
@@ -128,8 +137,41 @@ export default function EditReleasePage() {
       setEditedDescription(data.description || "");
       setSourceFiles(data.sourceFiles as SourceFile[] || []);
 
-      // Initialize sets as empty - sets will be added via "+ Add Set" button
-      setEditedSets([]);
+      // Transform sets data - only show parent sets at top level
+      // Child parallel sets are nested under their parent's parallelSets array
+      const transformedSets: SetInfo[] = data.sets
+        .filter((set: any) => set.parentSetId === null) // Only parent sets at top level
+        .map((set: any) => ({
+          id: set.id,
+          name: set.name,
+          isBaseSet: set.isBaseSet,
+          totalCards: set.totalCards || "",
+          parallels: set.parallels || [],
+          parentSetId: null,
+          cards: set.cards.map((card: any) => ({
+            id: card.id,
+            playerName: card.playerName || "",
+            team: card.team || "",
+            cardNumber: card.cardNumber || "",
+            variant: card.variant || "",
+          })),
+          parallelSets: set.parallelSets?.map((parallel: any) => ({
+            id: parallel.id,
+            name: parallel.name,
+            isBaseSet: parallel.isBaseSet,
+            totalCards: parallel.totalCards || "",
+            printRun: parallel.printRun,
+            parallels: [],
+            parentSetId: parallel.parentSetId,
+            cards: [], // Parallel sets inherit parent's cards
+            isNew: false,
+            isDeleted: false,
+          })) || [],
+          isNew: false,
+          isDeleted: false,
+        }));
+
+      setEditedSets(transformedSets);
     } catch (error) {
       console.error("Failed to fetch release:", error);
       setMessage({
@@ -238,18 +280,6 @@ export default function EditReleasePage() {
           firstLine.includes('subject') || firstLine.includes('number') ||
           firstLine.includes('name')) {
         startIndex = 1; // Skip header row
-      }
-    }
-
-    // Check for metadata lines like "200 cards" or "200 cards."
-    // These should be skipped, not parsed as card entries
-    while (startIndex < lines.length) {
-      const line = lines[startIndex].trim();
-      // Match patterns like "200 cards", "200 cards.", "X cards", etc.
-      if (/^\d+\s+cards?\.?$/i.test(line)) {
-        startIndex++; // Skip this metadata line
-      } else {
-        break; // Start parsing from here
       }
     }
 
@@ -427,106 +457,6 @@ export default function EditReleasePage() {
     };
   };
 
-  /**
-   * Parse set data and generate multiple Set objects (one base + one per parallel)
-   * This implements the parallel-as-set architecture
-   */
-  const parseSetDataIntoMultipleSets = (
-    text: string,
-    setType: 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other'
-  ): Array<{
-    name: string;
-    type: 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other';
-    slug: string;
-    totalCards: string;
-    parallels: string[]; // Always empty - deprecated field
-    cards: CardInfo[];
-    isParallel: boolean;
-    baseSetName: string;
-    printRun?: string;
-    parallelName?: string;
-    parentSetId?: string; // 'PLACEHOLDER' for parallels, undefined for parent
-  }> | null => {
-    if (!release) return null;
-
-    // Parse using existing logic
-    const parsed = parseCompleteSetData(text);
-    if (!parsed) return null;
-
-    const { name: rawSetName, totalCards, standardParallels, cards } = parsed;
-
-    // Clean up set name - remove "Checklist", "Set", etc.
-    let cleanedSetName = rawSetName
-      .replace(/\bset\s+checklist\b/gi, '')  // Remove "Set Checklist"
-      .replace(/\bchecklist\b/gi, '')        // Remove "Checklist"
-      .replace(/\bbase\s+set\b/gi, 'Base')   // "Base Set" → "Base"
-      .trim();
-
-    // If name is empty after cleaning, default to set type
-    if (!cleanedSetName) cleanedSetName = setType;
-
-    // Import slug generator
-    const { generateSetSlug } = require('@/lib/slugGenerator');
-
-    // Strip year from release name if it exists
-    const cleanReleaseName = release.name.replace(/^\d{4}(-\d{2,4})?\s+/i, '');
-
-    const sets: Array<{
-      name: string;
-      type: 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other';
-      slug: string;
-      totalCards: string;
-      parallels: string[];
-      cards: CardInfo[];
-      isParallel: boolean;
-      baseSetName: string;
-      printRun?: string;
-      parallelName?: string;
-      parentSetId?: string;
-    }> = [];
-
-    // 1. Create parent set with cards
-    sets.push({
-      name: cleanedSetName,
-      type: setType,
-      slug: generateSetSlug(release.year || '', cleanReleaseName, cleanedSetName, setType),
-      totalCards,
-      parallels: [], // Deprecated - no longer used
-      cards: cards,  // Cards only stored on parent
-      isParallel: false,
-      baseSetName: cleanedSetName,
-      parentSetId: undefined, // Explicitly undefined for parent
-    });
-
-    // 2. Create child parallel sets WITHOUT cards (they inherit from parent)
-    for (const parallel of standardParallels) {
-      // Extract print run if present: "Electric Etch Orange /149" → "/149"
-      const printRunMatch = parallel.match(/\/\d+/);
-      const printRun = printRunMatch ? printRunMatch[0] : undefined;
-
-      // Clean parallel name (remove print run and trailing text like "or fewer")
-      const cleanParallelName = parallel
-        .replace(/\s*\/\d+.*$/,  '') // Remove "/149 or fewer"
-        .trim();
-
-      sets.push({
-        name: cleanParallelName, // Just the parallel name (not "Base Electric Etch Orange")
-        type: setType,
-        slug: generateSetSlug(release.year || '', cleanReleaseName, cleanedSetName, setType, cleanParallelName),
-        totalCards,
-        parallels: [], // Deprecated
-        cards: [], // NO cards for parallels - they reference parent's cards
-        isParallel: true,
-        baseSetName: cleanedSetName,
-        printRun: printRun,
-        parallelName: cleanParallelName,
-        parentSetId: 'PLACEHOLDER', // Will be replaced with actual parent ID after creation
-      });
-    }
-
-    return sets;
-  };
-
   const handleChecklistUpload = async (index: number, file: File) => {
     try {
       setLoading(true);
@@ -590,72 +520,47 @@ export default function EditReleasePage() {
   };
 
   const createCardsInDatabase = async (setId: string, cards: CardInfo[], parallels: string[], manualSerialMode: boolean = false) => {
-    // Retry logic to handle Next.js compilation delays on first access
-    const maxRetries = 3;
-    let lastError: Error | null = null;
+    try {
+      const response = await fetch('/api/sets/create-cards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          setId,
+          cards,
+          parallels,
+          manualSerialMode,
+        }),
+      });
 
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        const response = await fetch('/api/sets/create-cards', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            setId,
-            cards,
-            parallels,
-            manualSerialMode,
-          }),
-        });
+      const data = await response.json();
 
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error || 'Failed to create cards');
-        }
-
-        // Success - process the response
-        lastError = null;
-        return await processCardCreationResponse(data, manualSerialMode, setId);
-      } catch (error) {
-        lastError = error instanceof Error ? error : new Error(String(error));
-        console.error(`Attempt ${attempt} failed:`, lastError.message);
-
-        // If this is a fetch failure and not the last attempt, retry
-        if (attempt < maxRetries && lastError.message.includes('fetch')) {
-          const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000); // Exponential backoff, max 5s
-          console.log(`Retrying in ${delay}ms...`);
-          await new Promise(resolve => setTimeout(resolve, delay));
-          continue;
-        }
-
-        // If it's not a fetch error or last attempt, throw immediately
-        if (!lastError.message.includes('fetch') || attempt === maxRetries) {
-          throw lastError;
-        }
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create cards');
       }
-    }
 
-    // If we get here, all retries failed
-    throw lastError || new Error('Failed to create cards after multiple attempts');
-  };
+      if (manualSerialMode) {
+        setMessage({
+          type: 'success',
+          text: `Created ${data.created} cards with individual serial numbers (${data.skipped} skipped as duplicates)`,
+        });
+      } else {
+        setMessage({
+          type: 'success',
+          text: `Created ${data.created} cards across ${data.parallelsProcessed} parallels (${data.skipped} skipped as duplicates)`,
+        });
+      }
+      setTimeout(() => setMessage(null), 5000);
 
-  // Helper function to process the API response
-  const processCardCreationResponse = async (data: any, manualSerialMode: boolean, setId: string) => {
-    if (manualSerialMode) {
+      // Refresh just the card count for this set (don't reload entire page)
+      await refreshSetCardCount(setId);
+    } catch (error) {
+      console.error('Failed to create cards in database:', error);
       setMessage({
-        type: 'success',
-        text: `Created ${data.created} cards with individual serial numbers (${data.skipped} skipped as duplicates)`,
+        type: 'error',
+        text: error instanceof Error ? error.message : 'Failed to create cards in database',
       });
-    } else {
-      setMessage({
-        type: 'success',
-        text: `Created ${data.created} cards across ${data.parallelsProcessed} parallels (${data.skipped} skipped as duplicates)`,
-      });
+      setTimeout(() => setMessage(null), 5000);
     }
-    setTimeout(() => setMessage(null), 5000);
-
-    // Refresh just the card count for this set (don't reload entire page)
-    await refreshSetCardCount(setId);
   };
 
   const handleChecklistPaste = async (index: number, text: string) => {
@@ -843,142 +748,150 @@ export default function EditReleasePage() {
       }
 
       // Standard mode: try parsing as complete set data (with name, parallels, cards)
-      // Use new parallel-as-set architecture
-      const setType = editedSets[index].type || 'Base';
-      const multiSetData = parseSetDataIntoMultipleSets(text, setType);
+      const completeData = parseCompleteSetData(text);
 
-      if (multiSetData && multiSetData.length > 0) {
-        // Multiple sets will be created (one base + one per parallel)
-        const baseSet = multiSetData[0];
-        const parallelSets = multiSetData.slice(1);
+      if (completeData && completeData.cards.length > 0) {
+        // Complete format detected - update name, parallels, cards, and totalCards (auto-counted from checklist)
+        const updatedSets = [...editedSets];
 
-        // Set loading states
-        setCreatingMultipleSets(true);
-        setSetCreationProgress({ current: 0, total: multiSetData.length, currentSetName: '' });
+        // Combine all parallels (standard + variable) for storage
+        // Prepend set name to each parallel for full naming
+        const setNamePrefix = completeData.name;
+        const rawParallels = [
+          ...completeData.standardParallels.map(p => `${setNamePrefix} ${p}`),
+          ...completeData.variableParallels.map(p => `${setNamePrefix} ${p.name} /${p.maxPrintRun} or fewer`)
+        ];
 
-        setMessage({
-          type: "success",
-          text: `Creating ${multiSetData.length} sets: 1 base + ${parallelSets.length} parallels with ${baseSet.cards.length} cards each...`
-        });
+        // Normalize /1 to "1 of 1" and sort by print run
+        const normalizedParallels = rawParallels.map(normalizeParallelName);
+        const allParallels = sortParallelsByPrintRun(normalizedParallels);
 
-        console.log(`📦 Creating ${multiSetData.length} sets:`, multiSetData.map(s => s.name));
+        console.log('🔍 Combined parallels for storage:', allParallels);
+        console.log('🔍 About to save set with parallels:', allParallels);
 
-        try {
-          // STEP 1: Create parent set FIRST
-          const parentSetData = multiSetData[0]; // First item is always parent
+        updatedSets[index] = {
+          ...updatedSets[index],
+          name: completeData.name,
+          totalCards: String(completeData.cards.length), // Always use actual count
+          parallels: allParallels.length > 0 ? allParallels : updatedSets[index].parallels,
+          cards: completeData.cards,
+        };
 
-          setSetCreationProgress({
-            current: 1,
-            total: multiSetData.length,
-            currentSetName: `${parentSetData.name} (parent)`
-          });
+        // Variable parallels are stored within the base set, not as separate sets
+        // They will be displayed as parallel badges on the set page
 
-          console.log(`📤 Creating parent set: ${parentSetData.name}`);
+        // Now update state with all changes at once
+        setEditedSets(updatedSets);
 
-          const parentResponse = await fetch('/api/sets', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              name: parentSetData.name,
-              type: parentSetData.type,
-              totalCards: parentSetData.totalCards,
-              parallels: [], // Empty - deprecated field
-              releaseId: release!.id,
-              parentSetId: null, // Explicitly null for parent sets
-            }),
-          });
+        const details = [];
+        details.push(`${completeData.cards.length} cards`);
+        if (completeData.standardParallels.length > 0) {
+          details.push(`${completeData.standardParallels.length} standard parallels`);
+        }
+        if (completeData.variableParallels.length > 0) {
+          details.push(`${completeData.variableParallels.length} variable parallels`);
+        }
 
-          if (!parentResponse.ok) {
-            const errorData = await parentResponse.json();
-            throw new Error(`Failed to create parent set "${parentSetData.name}": ${errorData.error || 'Unknown error'}`);
-          }
+        setMessage({ type: "success", text: `Successfully loaded "${completeData.name}" with ${details.join(', ')}. Saving to database...` });
 
-          const parentSet = await parentResponse.json();
-          console.log(`✅ Created parent set: ${parentSetData.name} (ID: ${parentSet.id}, slug: ${parentSet.slug})`);
-
-          // STEP 2: Create cards ONLY for parent set
-          console.log(`📤 Creating ${parentSetData.cards.length} cards for parent set: ${parentSetData.name}`);
-
-          await createCardsInDatabase(
-            parentSet.id,
-            parentSetData.cards,
-            [], // No parallels - cards are just base cards
-            false
-          );
-
-          console.log(`✅ Created ${parentSetData.cards.length} cards for parent set`);
-
-          // STEP 3: Create child parallel sets with parentSetId
-          const parallelSets = multiSetData.slice(1); // All except first
-          const createdSets: Array<{ id: string; name: string; slug: string }> = [
-            { id: parentSet.id, name: parentSetData.name, slug: parentSet.slug }
-          ];
-
-          for (let i = 0; i < parallelSets.length; i++) {
-            const parallelData = parallelSets[i];
-
-            // Update progress
-            setSetCreationProgress({
-              current: i + 2, // +2 because parent is 1
-              total: multiSetData.length,
-              currentSetName: `${parallelData.name} (parallel ${i + 1}/${parallelSets.length})`
-            });
-
-            console.log(`📤 Creating parallel set ${i + 1}/${parallelSets.length}: ${parallelData.name}`);
-
+        // If this is a new set, save it first to get an ID
+        if (updatedSets[index].isNew && !updatedSets[index].id) {
+          try {
+            console.log('📤 Sending to API - parallels:', allParallels);
             const response = await fetch('/api/sets', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                name: parallelData.name,
-                type: parallelData.type,
-                totalCards: parallelData.totalCards,
-                parallels: [], // Empty - deprecated field
+                name: completeData.name,
+                isBaseSet: updatedSets[index].isBaseSet,
+                totalCards: completeData.totalCards,
+                parallels: allParallels, // Use combined parallels (standard + variable)
                 releaseId: release!.id,
-                parentSetId: parentSet.id, // Link to parent
               }),
             });
 
             if (!response.ok) {
-              const errorData = await response.json();
-              throw new Error(`Failed to create parallel set "${parallelData.name}": ${errorData.error || 'Unknown error'}`);
+              throw new Error('Failed to create set');
             }
 
-            const newParallelSet = await response.json();
-            createdSets.push({ id: newParallelSet.id, name: parallelData.name, slug: newParallelSet.slug });
-            console.log(`✅ Created parallel set: ${parallelData.name} (slug: ${newParallelSet.slug})`);
+            const newSet = await response.json();
+            console.log('📥 Received from API - newSet:', newSet);
+            console.log('📥 newSet.parallels:', newSet.parallels);
+            updatedSets[index] = {
+              ...updatedSets[index],
+              id: newSet.id,
+              isNew: false,
+            };
 
-            // NO cards created for parallels - they reference parent's cards
+            // Update state with saved set ID
+            setEditedSets(updatedSets);
+          } catch (error) {
+            setMessage({ type: 'error', text: 'Failed to save set to database' });
+            console.error('Error saving set:', error);
+            return;
+          }
+        }
+
+        // Create cards in database now that we have a set ID
+        // If there are variable parallels, the base set also uses manual serial mode
+        const useManualSerialMode = completeData.variableParallels.length > 0;
+        if (updatedSets[index].id) {
+          await createCardsInDatabase(
+            updatedSets[index].id!,
+            completeData.cards,
+            completeData.standardParallels,
+            useManualSerialMode
+          );
+
+          // Create child parallel sets for standard parallels (those without "or fewer")
+          // Standard parallels inherit the parent's checklist automatically
+          if (completeData.standardParallels.length > 0) {
+            setMessage({ type: "success", text: `Creating ${completeData.standardParallels.length} parallel sets that inherit checklist...` });
+
+            for (const parallelName of completeData.standardParallels) {
+              try {
+                // Extract print run from parallel name (e.g., "Electric Etch Red Pulsar /44" → 44)
+                const printRunMatch = parallelName.match(/\/(\d+)(?:\s|$)/);
+                const printRun = printRunMatch ? parseInt(printRunMatch[1], 10) : null;
+
+                const response = await fetch('/api/sets', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    name: `${completeData.name} ${parallelName}`,
+                    type: updatedSets[index].isBaseSet ? 'Base' : 'Other',
+                    totalCards: completeData.totalCards,
+                    printRun: printRun, // Store the print run number
+                    releaseId: release!.id,
+                    parentSetId: updatedSets[index].id, // Link to parent set for checklist inheritance
+                    parallels: null, // Parallel sets don't have sub-parallels
+                  }),
+                });
+
+                if (!response.ok) {
+                  console.error(`Failed to create parallel set: ${parallelName}`);
+                }
+              } catch (error) {
+                console.error(`Error creating parallel set ${parallelName}:`, error);
+              }
+            }
+
+            setMessage({
+              type: "success",
+              text: `✓ Created parent set with ${completeData.cards.length} cards and ${completeData.standardParallels.length} parallel sets that inherit the checklist`
+            });
+            setTimeout(() => setMessage(null), 5000);
           }
 
-          // Update the UI state with the base set info
-          const updatedSets = [...editedSets];
-          updatedSets[index] = {
-            ...updatedSets[index],
-            id: createdSets[0].id, // Base set ID
-            name: createdSets[0].name,
-            totalCards: baseSet.totalCards,
-            isNew: false,
-          };
-          setEditedSets(updatedSets);
-
-          setMessage({
-            type: "success",
-            text: `✅ Successfully created ${createdSets.length} sets with ${baseSet.cards.length} cards each! Refresh the page to see all sets.`
-          });
-          setTimeout(() => setMessage(null), 8000);
-
-        } catch (error) {
-          console.error('Error creating sets:', error);
-          setMessage({
-            type: 'error',
-            text: error instanceof Error ? error.message : 'Failed to create sets'
-          });
-          setTimeout(() => setMessage(null), 5000);
-        } finally {
-          // Clear loading states
-          setCreatingMultipleSets(false);
-          setSetCreationProgress(null);
+          // Create stub sets for variable parallels (those with "or fewer")
+          // These need their own explicit checklist
+          if (completeData.variableParallels.length > 0) {
+            createVariableParallelSets(
+              index,
+              completeData.name,
+              completeData.variableParallels
+            );
+          }
         }
 
         return;
@@ -1145,23 +1058,6 @@ export default function EditReleasePage() {
     }
   };
 
-  const handleParallelsPaste = (index: number, text: string) => {
-    const { standardParallels, variableParallels } = parseParallelsText(text);
-
-    const updatedSets = [...editedSets];
-    updatedSets[index] = {
-      ...updatedSets[index],
-      parallels: standardParallels,
-    };
-    setEditedSets(updatedSets);
-
-    // If there are variable parallels, create stub sets for them
-    if (variableParallels.length > 0) {
-      const baseSetName = updatedSets[index].name;
-      createVariableParallelSets(index, baseSetName, variableParallels);
-    }
-  };
-
   const handleClearParallels = (index: number) => {
     const updatedSets = [...editedSets];
     updatedSets[index] = {
@@ -1238,19 +1134,11 @@ export default function EditReleasePage() {
       setUploadingFile(true);
       setMessage(null);
 
-      // Determine if this is an image file
-      const imageExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
-      const fileExtension = file.name.split('.').pop()?.toLowerCase();
-      const isImage = fileExtension && imageExtensions.includes(fileExtension);
-
       const formData = new FormData();
       formData.append("file", file);
       formData.append("releaseId", release.id);
 
-      // Use appropriate endpoint based on file type
-      const endpoint = isImage ? "/api/uploads/release-images" : "/api/uploads/release-files";
-
-      const response = await fetch(endpoint, {
+      const response = await fetch("/api/uploads/release-files", {
         method: "POST",
         body: formData,
       });
@@ -1261,15 +1149,10 @@ export default function EditReleasePage() {
 
       const fileData = await response.json();
 
-      if (isImage) {
-        // Reload the page to show the new image in the Images section
-        window.location.reload();
-      } else {
-        // Add to sourceFiles array
-        setSourceFiles([...sourceFiles, fileData]);
-      }
+      // Add to sourceFiles array
+      setSourceFiles([...sourceFiles, fileData]);
 
-      setMessage({ type: "success", text: `${isImage ? 'Image' : 'File'} "${file.name}" uploaded successfully` });
+      setMessage({ type: "success", text: `File "${file.name}" uploaded successfully` });
       setTimeout(() => setMessage(null), 3000);
     } catch (error) {
       console.error("Failed to upload file:", error);
@@ -1357,7 +1240,6 @@ export default function EditReleasePage() {
               body: JSON.stringify({
                 name: set.name,
                 isBaseSet: set.isBaseSet,
-                type: set.type || 'Base', // Include set type for slug generation
                 totalCards: set.totalCards || null,
                 releaseId: release.id,
                 parallels: set.parallels || [],
@@ -1505,7 +1387,7 @@ export default function EditReleasePage() {
       <div className="min-h-screen bg-gray-50">
         <AdminHeader />
         <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="bg-red-50 text-red-800 p-4 rounded-lg">
+          <div className="bg-orange-50 text-orange-800 p-4 rounded-lg">
             Release not found
           </div>
         </div>
@@ -1532,7 +1414,7 @@ export default function EditReleasePage() {
             className={`mb-6 p-4 rounded-lg ${
               message.type === "success"
                 ? "bg-green-50 text-green-800"
-                : "bg-red-50 text-red-800"
+                : "bg-orange-50 text-orange-800"
             }`}
           >
             {message.text}
@@ -1540,8 +1422,8 @@ export default function EditReleasePage() {
         )}
 
         {/* Release Information */}
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 mb-6">
-          <h3 className="text-lg font-semibold text-blue-900 mb-4">
+        <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6 mb-6">
+          <h3 className="text-lg font-semibold text-green-900 mb-4">
             Release Information
           </h3>
           <div className="space-y-4 text-sm">
@@ -1583,9 +1465,9 @@ export default function EditReleasePage() {
                 />
               </div>
             </div>
-            <div className="pt-2 border-t border-blue-300">
+            <div className="pt-2 border-t border-green-300">
               <p className="text-gray-800">
-                <span className="font-semibold">Full Release:</span> {editedYear} {editedManufacturer} {editedReleaseName}
+                <span className="font-semibold">Full Release:</span> {editedYear} {editedReleaseName}
               </p>
             </div>
             <p className="text-gray-800">
@@ -1675,7 +1557,7 @@ export default function EditReleasePage() {
                             e.target.value = "";
                           }
                         }}
-                        className="text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
+                        className="text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-green-700 hover:file:bg-green-200"
                         disabled={uploadingFile}
                       />
                     </label>
@@ -1712,9 +1594,6 @@ export default function EditReleasePage() {
               <label className="block font-semibold text-gray-900 mb-2">
                 Description:
               </label>
-              <p className="text-xs text-gray-500 mb-2">
-                7-21 sentence summary displayed in previews
-              </p>
               <textarea
                 value={editedDescription.replace(/<[^>]*>/g, '')} // Strip HTML tags
                 onChange={(e) => setEditedDescription(e.target.value)}
@@ -1726,13 +1605,13 @@ export default function EditReleasePage() {
           </div>
         </div>
 
-        {/* Source Documents and Images Section */}
+        {/* Source Files Section */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Source Documents and Images
+            Source Files
           </h3>
           <p className="text-sm text-gray-600 mb-4">
-            Upload source documents (release PDFs, checklists, sell sheets) used to generate the release for AI functionality and data reference, and images (JPG, PNG, WebP, GIF) to display in the release's image carousel
+            Upload sell sheets, checklists, PDFs, or other documents used for reference when creating content
           </p>
 
           <div className="space-y-4">
@@ -1741,7 +1620,7 @@ export default function EditReleasePage() {
               <label className="flex-1">
                 <input
                   type="file"
-                  accept=".pdf,.png,.jpg,.jpeg,.webp,.gif,.txt,.csv"
+                  accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.csv"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) {
@@ -1749,7 +1628,7 @@ export default function EditReleasePage() {
                       e.target.value = ""; // Reset input
                     }
                   }}
-                  className="text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
+                  className="text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-green-700 hover:file:bg-green-200"
                   disabled={uploadingFile}
                 />
               </label>
@@ -1773,11 +1652,11 @@ export default function EditReleasePage() {
                       {/* File Icon */}
                       <div className="flex-shrink-0">
                         {file.type === "pdf" ? (
-                          <svg className="w-8 h-8 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                          <svg className="w-8 h-8 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
                           </svg>
                         ) : file.type.match(/^(png|jpg|jpeg|webp)$/) ? (
-                          <svg className="w-8 h-8 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                          <svg className="w-8 h-8 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
                           </svg>
                         ) : (
@@ -1800,14 +1679,14 @@ export default function EditReleasePage() {
                         href={file.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-3 py-1.5 text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors font-medium"
+                        className="px-3 py-1.5 text-xs bg-green-100 hover:bg-green-200 text-green-700 rounded-lg transition-colors font-medium"
                       >
                         View
                       </a>
                       <button
                         type="button"
                         onClick={() => handleDeleteFile(file.url)}
-                        className="px-3 py-1.5 text-xs bg-red-100 hover:bg-red-200 text-red-700 rounded-lg transition-colors font-medium"
+                        className="px-3 py-1.5 text-xs bg-orange-100 hover:bg-orange-200 text-orange-700 rounded-lg transition-colors font-medium"
                         disabled={loading}
                       >
                         Delete
@@ -1818,52 +1697,73 @@ export default function EditReleasePage() {
               </div>
             )}
 
-            {sourceFiles.length === 0 && (!release?.images || release.images.length === 0) && (
+            {sourceFiles.length === 0 && (
               <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
                 <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
-                <p className="mt-2 text-sm text-gray-500">No documents or images uploaded yet</p>
+                <p className="mt-2 text-sm text-gray-500">No files uploaded yet</p>
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Release Images Section */}
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Release Images
+          </h3>
+          <p className="text-sm text-gray-600 mb-4">
+            Upload images to display in the release&apos;s image carousel (JPG, PNG, WebP)
+          </p>
+
+          <div className="space-y-4">
+            {/* Upload Section */}
+            <div className="flex items-center gap-3">
+              <label className="flex-1">
+                <input
+                  type="file"
+                  accept=".jpg,.jpeg,.png,.webp,.gif"
+                  multiple
+                  onChange={(e) => {
+                    const files = e.target.files;
+                    if (files) {
+                      // Handle multiple file uploads here
+                      Array.from(files).forEach(file => {
+                        // TODO: Implement image upload logic
+                        console.log('Upload image:', file.name);
+                      });
+                      e.target.value = ""; // Reset input
+                    }
+                  }}
+                  className="text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-green-700 hover:file:bg-green-200"
+                />
+              </label>
+            </div>
 
             {/* Display existing images */}
-            {release && release.images && release.images.length > 0 && (
-              <div>
-                <h4 className="text-sm font-semibold text-gray-900 mb-3 mt-6">Release Images</h4>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {release.images.map((image) => (
-                    <div key={image.id} className="relative group">
-                      <img
-                        src={image.url}
-                        alt={image.caption || "Release image"}
-                        className="w-full h-48 object-cover rounded-lg border border-gray-200"
-                      />
-                      {image.caption && (
-                        <p className="text-xs text-gray-600 mt-1 truncate">{image.caption}</p>
-                      )}
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          if (!confirm("Are you sure you want to delete this image?")) return;
-                          try {
-                            const response = await fetch(`/api/uploads/release-images?imageId=${image.id}`, {
-                              method: "DELETE",
-                            });
-                            if (!response.ok) throw new Error("Failed to delete image");
-                            window.location.reload();
-                          } catch (error) {
-                            console.error("Failed to delete image:", error);
-                            alert("Failed to delete image");
-                          }
-                        }}
-                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 text-xs bg-red-600 hover:bg-red-700 text-white rounded"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  ))}
-                </div>
+            {release && release.images && release.images.length > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {release.images.map((image) => (
+                  <div key={image.id} className="relative group">
+                    <img
+                      src={image.url}
+                      alt={image.caption || "Release image"}
+                      className="w-full h-48 object-cover rounded-lg border border-gray-200"
+                    />
+                    {image.caption && (
+                      <p className="text-xs text-gray-600 mt-1 truncate">{image.caption}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <p className="mt-2 text-sm text-gray-500">No images uploaded yet</p>
+                <p className="text-xs text-gray-400 mt-1">Images will be displayed in the release&apos;s image carousel</p>
               </div>
             )}
           </div>
@@ -1883,7 +1783,7 @@ export default function EditReleasePage() {
             <button
               type="button"
               onClick={() => handleAddSet(true)}
-              className="px-3 py-1.5 bg-footy-green hover:bg-green-700 text-white text-sm rounded-lg transition-colors flex items-center gap-1.5"
+              className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg transition-colors flex items-center gap-1.5"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -1924,7 +1824,7 @@ export default function EditReleasePage() {
                           <button
                             type="button"
                             onClick={() => handleRemoveSet(idx)}
-                            className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex-shrink-0"
+                            className="px-3 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors flex-shrink-0"
                             title="Remove set"
                             disabled={loading}
                           >
@@ -1939,16 +1839,16 @@ export default function EditReleasePage() {
 
                     {/* Show indicator if this is a variable parallel set (manual serial mode) */}
                     {set.manualSerialMode && (
-                      <div className="border-t border-gray-300 pt-3 mt-3 bg-blue-50 rounded-lg p-3 -mx-1">
+                      <div className="border-t border-gray-300 pt-3 mt-3 bg-green-50 rounded-lg p-3 -mx-1">
                         <div className="flex items-start gap-2">
-                          <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-5 h-5 text-green-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                           <div className="flex-1">
-                            <div className="text-sm font-medium text-blue-900">
+                            <div className="text-sm font-medium text-green-900">
                               Variable Serial Number Mode
                             </div>
-                            <div className="text-xs text-blue-700 mt-1">
+                            <div className="text-xs text-green-700 mt-1">
                               This parallel set has unique serial numbers per card. Paste checklist with format: &ldquo;Card# Player, Team /serial&rdquo;
                             </div>
                           </div>
@@ -1968,110 +1868,6 @@ export default function EditReleasePage() {
                           <p className="text-xs text-gray-600 italic mb-3">
                             Click a parallel to add/view cards for that specific parallel.
                           </p>
-
-                          {/* Base Set Section */}
-                          <details className="border border-gray-300 rounded-lg bg-gray-50">
-                            <summary className="cursor-pointer p-3 hover:bg-gray-100 transition-colors">
-                              <div className="flex items-center gap-2 select-none">
-                                <span className="text-xs font-bold text-footy-green bg-white px-2 py-1 rounded border border-footy-green">
-                                  BASE
-                                </span>
-                                <span className="text-sm font-semibold text-gray-900 flex-grow">
-                                  {set.name} (Base Set)
-                                </span>
-                                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-medium">
-                                  {release?.sets?.find(s => s.id === set.id)?.cards?.filter(c => c.parallelType === null || c.parallelType === 'Base').length || 0} cards
-                                </span>
-                              </div>
-                            </summary>
-
-                            <div className="p-3 border-t border-gray-300 bg-white space-y-3">
-                              {/* Update Base Cards Section */}
-                              <div className="border border-blue-200 rounded-lg p-3 bg-blue-50">
-                                <label className="text-xs font-semibold text-gray-700 block mb-2">
-                                  Update Base Set Serial Numbers:
-                                </label>
-                                <textarea
-                                  id={`textarea-base-${set.id || idx}`}
-                                  placeholder="Paste base checklist with serials: 'Card# Player, Team /serial' (e.g., '10 Douglas Costa /12')"
-                                  rows={3}
-                                  className="w-full px-3 py-2 text-xs border border-gray-300 rounded bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 font-mono"
-                                />
-                                <div className="flex items-center justify-between mt-2">
-                                  <p className="text-xs text-gray-500 italic">
-                                    Format: {set.name}\n## cards\nCard# Player, Team /serial
-                                  </p>
-                                  <button
-                                    type="button"
-                                    onClick={async () => {
-                                      const textarea = document.getElementById(`textarea-base-${set.id || idx}`) as HTMLTextAreaElement;
-                                      const text = textarea?.value.trim();
-
-                                      if (!text) {
-                                        setMessage({ type: "error", text: "Please paste base checklist data first" });
-                                        setTimeout(() => setMessage(null), 3000);
-                                        return;
-                                      }
-
-                                      if (!set.id) {
-                                        setMessage({ type: "error", text: "Please save the set first" });
-                                        setTimeout(() => setMessage(null), 3000);
-                                        return;
-                                      }
-
-                                      // Parse base checklist
-                                      const cards = parseCardsWithSerialNumbers(text, set.name);
-
-                                      if (cards.length === 0) {
-                                        setMessage({ type: "error", text: "No cards found in base checklist" });
-                                        setTimeout(() => setMessage(null), 5000);
-                                        return;
-                                      }
-
-                                      setMessage({ type: "success", text: `Updating ${cards.length} base cards...` });
-
-                                      // Update base cards via API
-                                      try {
-                                        const response = await fetch('/api/sets/update-base-serials', {
-                                          method: 'POST',
-                                          headers: { 'Content-Type': 'application/json' },
-                                          body: JSON.stringify({
-                                            setId: set.id,
-                                            cards: cards,
-                                          }),
-                                        });
-
-                                        const data = await response.json();
-
-                                        if (!response.ok) {
-                                          throw new Error(data.error || 'Failed to update base cards');
-                                        }
-
-                                        setMessage({ type: "success", text: `✓ Updated ${data.updated} base cards` });
-                                        setTimeout(() => setMessage(null), 3000);
-
-                                        // Clear textarea
-                                        textarea.value = '';
-
-                                        // Refresh card count
-                                        await refreshSetCardCount(set.id);
-                                      } catch (error) {
-                                        console.error('Failed to update base cards:', error);
-                                        setMessage({
-                                          type: 'error',
-                                          text: error instanceof Error ? error.message : 'Failed to update base cards',
-                                        });
-                                        setTimeout(() => setMessage(null), 5000);
-                                      }
-                                    }}
-                                    className="px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition-colors"
-                                  >
-                                    Update Base Cards
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </details>
                           {sortParallelsByPrintRun(set.parallels).map((parallel, pIdx) => {
                             // Check if this parallel has "or fewer" indicating variable serial numbers
                             const hasVariableSerials = parallel.toLowerCase().includes('or fewer');
@@ -2097,7 +1893,7 @@ export default function EditReleasePage() {
                                         Variable Serials
                                       </span>
                                     )}
-                                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-medium">
+                                    <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full font-medium">
                                       {cardCount} card{cardCount !== 1 ? 's' : ''}
                                     </span>
                                   </div>
@@ -2105,7 +1901,7 @@ export default function EditReleasePage() {
 
                                 <div className="p-3 border-t border-gray-300 bg-white space-y-3">
                                   {/* Add Cards Section */}
-                                  <div className="border border-blue-200 rounded-lg p-3 bg-blue-50">
+                                  <div className="border border-green-200 rounded-lg p-3 bg-green-50">
                                     <label className="text-xs font-semibold text-gray-700 block mb-2">
                                       Add Cards to {parallel}:
                                     </label>
@@ -2212,33 +2008,8 @@ export default function EditReleasePage() {
                         </div>
                       ) : (
                         <div className="flex flex-col gap-2">
-                          {/* Set Type Selector */}
-                          <div className="mb-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Set Type
-                            </label>
-                            <select
-                              value={set.type || 'Base'}
-                              onChange={(e) => {
-                                const newSets = [...editedSets];
-                                newSets[idx] = {
-                                  ...newSets[idx],
-                                  type: e.target.value as 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other'
-                                };
-                                setEditedSets(newSets);
-                              }}
-                              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500"
-                            >
-                              <option value="Base">Base Set</option>
-                              <option value="Autograph">Autograph</option>
-                              <option value="Memorabilia">Memorabilia</option>
-                              <option value="Insert">Insert</option>
-                              <option value="Other">Other</option>
-                            </select>
-                          </div>
-
                           <details className="text-sm" open>
-                            <summary className="cursor-pointer text-blue-600 hover:underline font-medium">
+                            <summary className="cursor-pointer text-green-600 hover:underline font-medium">
                               📋 Paste set data
                             </summary>
                             <div className="mt-2">
@@ -2253,38 +2024,8 @@ export default function EditReleasePage() {
                                     e.target.value = ''; // Clear after processing
                                   }
                                 }}
-                                disabled={creatingMultipleSets}
-                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 font-mono disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 font-mono"
                               />
-
-                              {/* Progress indicator */}
-                              {creatingMultipleSets && setCreationProgress && (
-                                <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                                  <div className="flex items-center gap-3">
-                                    <div className="inline-block animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-                                    <div className="flex-1">
-                                      <div className="text-sm font-semibold text-blue-900 mb-1">
-                                        Creating sets... ({setCreationProgress.current}/{setCreationProgress.total})
-                                      </div>
-                                      {setCreationProgress.currentSetName && (
-                                        <div className="text-xs text-blue-700">
-                                          {setCreationProgress.currentSetName}
-                                        </div>
-                                      )}
-                                      {/* Progress bar */}
-                                      <div className="mt-2 w-full bg-blue-200 rounded-full h-2">
-                                        <div
-                                          className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                                          style={{
-                                            width: `${(setCreationProgress.current / setCreationProgress.total) * 100}%`
-                                          }}
-                                        ></div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-
                               <p className="text-xs text-gray-500 mt-1 italic">
                                 {set.manualSerialMode
                                   ? "Format: Card# Player, Team /serial (one per line)"
@@ -2312,7 +2053,7 @@ export default function EditReleasePage() {
                               </span>
                             )}
                             {set.parallels && set.parallels.length > 0 && (
-                              <span className="text-xs bg-purple-100 px-2 py-0.5 rounded">
+                              <span className="text-xs bg-green-100 px-2 py-0.5 rounded">
                                 {set.parallels.length} parallels
                               </span>
                             )}
@@ -2323,7 +2064,7 @@ export default function EditReleasePage() {
                               handleClearChecklist(idx);
                               handleClearParallels(idx);
                             }}
-                            className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 text-red-700 rounded transition-colors"
+                            className="px-2 py-1 text-xs bg-orange-100 hover:bg-orange-200 text-orange-700 rounded transition-colors"
                             title="Clear all data"
                           >
                             Clear All
@@ -2347,7 +2088,7 @@ export default function EditReleasePage() {
                           )}
                           {set.parallels && set.parallels.length > 0 && (
                             <details className="text-sm">
-                              <summary className="cursor-pointer text-purple-600 hover:underline">
+                              <summary className="cursor-pointer text-green-600 hover:underline">
                                 View parallels ({set.parallels.length})
                               </summary>
                               <div className="mt-2 max-h-40 overflow-y-auto space-y-1">
@@ -2363,35 +2104,82 @@ export default function EditReleasePage() {
                       </div>
                     ) : null}
 
-                    {/* Manual Parallels Editor (Optional - for separate parallels editing) */}
-                    <div className="border-t border-gray-200 pt-3 mt-3">
-                      <details className="text-sm">
-                        <summary className="cursor-pointer text-gray-600 hover:text-gray-800 hover:underline">
-                          ⚙️ Manual parallels editor (optional)
-                        </summary>
-                        <div className="mt-2 flex flex-col gap-2">
-                          <p className="text-xs text-gray-500 italic">
-                            Use this only if you need to add/edit parallels separately from the complete format above.
-                          </p>
-                          <textarea
-                            placeholder="Paste parallels here (one per line)&#10;&#10;Example:&#10;Electric Etch Orange /75&#10;Electric Etch Red /50"
-                            rows={4}
-                            onChange={(e) => {
-                              if (e.target.value.trim()) {
-                                handleParallelsPaste(idx, e.target.value);
-                                e.target.value = ''; // Clear after processing
-                              }
-                            }}
-                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 font-mono"
-                          />
+                    {/* Nested Parallel Sets Display */}
+                    {set.parallelSets && set.parallelSets.length > 0 && (
+                      <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                        <h4 className="text-sm font-semibold text-green-900 mb-2 flex items-center gap-2">
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                          </svg>
+                          Parallel Sets ({set.parallelSets.length})
+                        </h4>
+                        <p className="text-xs text-green-700 mb-3">
+                          These parallel sets inherit the checklist from the parent &quot;{set.name}&quot; set
+                        </p>
+                        <div className="space-y-2">
+                          {set.parallelSets.map((parallel, pIdx) => {
+                            // Extract just the parallel name (remove parent set name)
+                            const parallelDisplayName = parallel.name.replace(set.name, '').trim();
+
+                            return (
+                            <div key={parallel.id || pIdx} className="bg-white border border-green-200 rounded-lg p-3">
+                              <div className="flex items-center justify-between">
+                                <div className="flex-1">
+                                  <div className="font-medium text-sm text-gray-900">
+                                    {parallelDisplayName}
+                                    {parallel.printRun && (
+                                      <span className="ml-2 text-green-600 font-semibold">
+                                        /{parallel.printRun}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="text-xs text-gray-600 mt-1">
+                                    {parallel.totalCards} cards • Inherits parent checklist
+                                  </div>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={async () => {
+                                    if (confirm(`Delete parallel set "${parallel.name}"?`)) {
+                                      try {
+                                        const response = await fetch(`/api/sets?id=${parallel.id}`, {
+                                          method: 'DELETE',
+                                        });
+                                        if (response.ok) {
+                                          setMessage({ type: 'success', text: `Deleted "${parallel.name}"` });
+                                          setTimeout(() => setMessage(null), 3000);
+                                          // Refresh the page data
+                                          await fetchRelease();
+                                        } else {
+                                          throw new Error('Failed to delete parallel set');
+                                        }
+                                      } catch (error) {
+                                        console.error('Failed to delete parallel set:', error);
+                                        setMessage({ type: 'error', text: 'Failed to delete parallel set' });
+                                        setTimeout(() => setMessage(null), 5000);
+                                      }
+                                    }
+                                  }}
+                                  className="px-2 py-1 text-xs bg-orange-100 hover:bg-orange-200 text-orange-700 rounded transition-colors"
+                                  title="Delete parallel set"
+                                >
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                </button>
+                              </div>
+                            </div>
+                            );
+                          })}
                         </div>
-                      </details>
-                    </div>
                       </div>
                     )}
-                      </div>
-                  );
-                })}
+
+                  </div>
+                )}
+              </div>
+            );
+          })}
             </div>
           ) : (
             <p className="text-sm text-gray-500 italic text-center py-4">

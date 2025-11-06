@@ -141,15 +141,15 @@ export default function ChecklistsLibraryPage() {
       </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-orange-50 border border-orange-200 text-orange-800 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         )}
 
         {/* Controls */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-blue-800">
+          <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <p className="text-sm text-green-800">
               <strong>Note:</strong> Checklists are automatically added to this library when uploaded during release or set creation.
               Each checklist is associated with a specific set.
             </p>

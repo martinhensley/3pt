@@ -447,7 +447,7 @@ export default function BulkScanPage() {
                           <span className="text-green-600">✓</span>
                         )}
                         {card.status === 'error' && (
-                          <span className="text-red-600" title={card.error}>
+                          <span className="text-orange-600" title={card.error}>
                             Error
                           </span>
                         )}

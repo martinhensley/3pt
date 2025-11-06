@@ -185,6 +185,36 @@ export default function CreateReleasePage() {
       setAnalyzing(true);
       setError(null);
 
+      // Auto-upload any pending images before creating the release
+      let finalImageUrls = uploadedImageUrls;
+      if (imageFiles.length > 0 && uploadedImageUrls.length === 0) {
+        console.log('Auto-uploading images before creating release...');
+        setUploadingImages(true);
+
+        const urls: string[] = [];
+        for (const file of imageFiles) {
+          const formData = new FormData();
+          formData.append('file', file);
+
+          const uploadResponse = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+          });
+
+          if (!uploadResponse.ok) {
+            throw new Error(`Failed to upload ${file.name}`);
+          }
+
+          const { url } = await uploadResponse.json();
+          urls.push(url);
+        }
+
+        finalImageUrls = urls;
+        setUploadedImageUrls(urls);
+        setUploadingImages(false);
+        console.log(`Auto-uploaded ${urls.length} images`);
+      }
+
       // Create release with the analyzed data
       const response = await fetch('/api/releases/analyze', {
         method: 'POST',
@@ -192,7 +222,7 @@ export default function CreateReleasePage() {
         body: JSON.stringify({
           fileUrl: documentFileUrl,
           mimeType: documentMimeType,
-          uploadedImages: uploadedImageUrls,
+          uploadedImages: finalImageUrls,
           createRelease: true,
         }),
       });
@@ -211,6 +241,7 @@ export default function CreateReleasePage() {
       console.error('Error:', err);
       setError(err instanceof Error ? err.message : 'An error occurred');
       setAnalyzing(false);
+      setUploadingImages(false);
     }
   };
 
@@ -243,9 +274,6 @@ export default function CreateReleasePage() {
                     </svg>
                     <p className="mb-2 text-sm text-gray-700 font-semibold">
                       {uploading ? 'Processing document...' : 'footy is analyzing...'}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {uploading ? 'Reading file content' : 'Extracting release information'}
                     </p>
                   </>
                 ) : documentFile ? (
@@ -280,8 +308,8 @@ export default function CreateReleasePage() {
           </div>
 
           {error && (
-            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-md">
-              <p className="text-sm text-red-600">{error}</p>
+            <div className="mt-4 p-4 bg-orange-50 border border-orange-200 rounded-md">
+              <p className="text-sm text-orange-600">{error}</p>
             </div>
           )}
         </div>
@@ -355,16 +383,16 @@ export default function CreateReleasePage() {
             <div className="bg-white rounded-lg shadow-md p-6 mb-6">
               <h3 className="text-lg font-semibold mb-3">Source Documents and Images</h3>
               <p className="text-sm text-gray-600 mb-4">
-                The source document used to generate this release is shown below. Upload images (JPG, PNG, WebP, GIF) of the release for the image carousel - these can be sell sheet pages, product photos, or any visuals you want to display.
+                The source document used to generate this release is shown below. Upload images (JPG, PNG, WebP, GIF) of the release for the image carousel - these can be sell sheet pages, product photos, or any visuals you want to display. Images will be automatically uploaded when you create the release.
               </p>
 
               <div className="space-y-6">
                 {/* Source Document Display */}
                 {documentFile && documentFileUrl && (
-                  <div className="border-2 border-blue-300 rounded-lg p-4 bg-blue-50">
+                  <div className="border-2 border-footy-green/30 rounded-lg p-4 bg-footy-green/5">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-8 h-8 text-footy-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                         <div>
@@ -376,7 +404,7 @@ export default function CreateReleasePage() {
                         href={documentFileUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
+                        className="px-4 py-2 bg-footy-orange text-white text-sm rounded-md hover:bg-footy-orange/90"
                       >
                         View PDF
                       </a>
@@ -402,9 +430,17 @@ export default function CreateReleasePage() {
                       disabled={imageFiles.length === 0 || uploadingImages}
                       className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed whitespace-nowrap"
                     >
-                      {uploadingImages ? 'Uploading...' : 'Upload Images'}
+                      {uploadingImages ? 'Uploading...' : 'Upload Now (Optional)'}
                     </button>
                   </div>
+
+                  {imageFiles.length > 0 && uploadedImageUrls.length === 0 && (
+                    <div className="mt-4 p-3 bg-footy-green/10 border border-footy-green/30 rounded-md">
+                      <p className="text-sm text-footy-green">
+                        {imageFiles.length} image{imageFiles.length !== 1 ? 's' : ''} selected. Will be uploaded automatically when you create the release.
+                      </p>
+                    </div>
+                  )}
 
                   {uploadedImageUrls.length > 0 && (
                     <div className="mt-4">

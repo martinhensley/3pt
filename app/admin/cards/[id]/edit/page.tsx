@@ -354,7 +354,7 @@ export default function EditCardPage() {
                 </label>
                 <div className="flex gap-2 flex-wrap">
                   {card.hasAutograph && (
-                    <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
+                    <span className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
                       Autograph
                     </span>
                   )}

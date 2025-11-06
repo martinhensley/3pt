@@ -678,7 +678,7 @@ export default function CreateCardPage() {
                               ? 'text-green-600'
                               : card.confidence >= 50
                               ? 'text-yellow-600'
-                              : 'text-red-600'
+                              : 'text-orange-600'
                           }`}
                         >
                           {card.confidence}%
