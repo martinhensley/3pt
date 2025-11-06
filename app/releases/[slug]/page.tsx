@@ -34,13 +34,16 @@ interface Card {
   imageBack: string | null;
 }
 
-interface Set {
+interface CardSet {
   id: string;
   name: string;
+  slug: string;
+  type: 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other';
   isBaseSet: boolean;
   description: string | null;
   totalCards: string | null;
   parallels: string[] | null;
+  parallelSets?: CardSet[];
   cards: Card[];
 }
 
@@ -55,7 +58,7 @@ interface Release {
     name: string;
   };
   images: Image[];
-  sets: Set[];
+  sets: CardSet[];
 }
 
 interface CarouselImage {
@@ -70,6 +73,7 @@ export default function ReleasePage() {
   const [release, setRelease] = useState<Release | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [expandedTypes, setExpandedTypes] = useState<globalThis.Set<string>>(new globalThis.Set(['Base', 'Insert'])); // Base and Insert expanded by default
 
   useEffect(() => {
     // Fetch release data directly from Release model
@@ -104,7 +108,7 @@ export default function ReleasePage() {
     }
     // Create a post-like object for keyword extraction using release data
     const postLike = {
-      title: `${release.year} ${release.name}`,
+      title: `${release.year} ${release.manufacturer.name} ${release.name}`,
       content: `${release.manufacturer.name} ${release.name} ${release.year || ''} trading cards`,
       excerpt: `${release.manufacturer.name} ${release.name} ${release.year || ''} soccer card release`,
       type: 'NEWS',
@@ -210,6 +214,32 @@ export default function ReleasePage() {
     setCurrentImageIndex((prev) => (prev - 1 + carouselImages.length) % carouselImages.length);
   };
 
+  const toggleSetType = (type: string) => {
+    const newExpanded = new Set(expandedTypes);
+    if (newExpanded.has(type)) {
+      newExpanded.delete(type);
+    } else {
+      newExpanded.add(type);
+    }
+    setExpandedTypes(newExpanded);
+  };
+
+  // Group sets by type
+  const setsByType = useMemo(() => {
+    if (!release?.sets) return new Map();
+
+    const grouped = new Map<string, CardSet[]>();
+    release.sets.forEach(set => {
+      const type = set.type || 'Other';
+      if (!grouped.has(type)) {
+        grouped.set(type, []);
+      }
+      grouped.get(type)!.push(set);
+    });
+
+    return grouped;
+  }, [release]);
+
   if (!release && !loading) {
     notFound();
   }
@@ -273,7 +303,7 @@ export default function ReleasePage() {
             items={[
               { label: "Home", href: "/" },
               {
-                label: `${release.year || ""} ${release.manufacturer.name} ${release.name}`.trim(),
+                label: `${release.year} ${release.manufacturer.name} ${release.name}`,
                 href: `/releases/${release.slug}`,
               },
             ]}
@@ -289,8 +319,7 @@ export default function ReleasePage() {
                 </span>
                 <span className="text-white/80">•</span>
                 <h1 className="text-3xl md:text-4xl font-black leading-tight">
-                  {release.year && <span className="text-white/90">{release.year} </span>}
-                  {release.manufacturer?.name} {release.name}
+                  {release.year} {release.manufacturer.name} {release.name}
                 </h1>
               </div>
             </div>
@@ -374,82 +403,203 @@ export default function ReleasePage() {
             {/* Sets */}
             <div className="p-8 pt-6 border-t border-white/20">
               {release.sets && release.sets.length > 0 && (
-                <div>
-                  <div className="bg-white/5 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10">
-                    {/* Header Row */}
-                    <div className="grid grid-cols-3 gap-4 px-4 py-3 bg-white/10 border-b border-white/20">
-                      <div className="font-bold text-sm uppercase tracking-wide text-white/90">Set Name</div>
-                      <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Parallels</div>
-                      <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Cards</div>
-                    </div>
+                <div className="space-y-3">
+                  {/* Combined Base & Insert Section */}
+                  {(() => {
+                    const baseSets = setsByType.get('Base') || [];
+                    const insertSets = setsByType.get('Insert') || [];
+                    const combinedSets = [...baseSets, ...insertSets];
 
-                    {[...release.sets].sort((a, b) => {
-                      // Base sets first, then others
-                      if (a.isBaseSet && !b.isBaseSet) return -1;
-                      if (!a.isBaseSet && b.isBaseSet) return 1;
-                      return 0;
-                    }).map((set, idx) => {
-                    // Always prefer totalCards if set, as it represents unique base cards
-                    // set.cards.length includes all parallel variations
-                    const setCardCount = set.totalCards ? parseInt(set.totalCards) : (set.cards?.length || 0);
-                    const setParallelCount = Array.isArray(set.parallels) ? set.parallels.length : 0;
+                    if (combinedSets.length > 0) {
+                      const isBaseExpanded = expandedTypes.has('Base');
+                      const isInsertExpanded = expandedTypes.has('Insert');
 
-                    // Clean display name: remove "Base" from Optic sets, keep it for others
-                    const displayName = set.name
-                      .replace(/\boptic\s+base\s+set\b/gi, 'Optic') // Optic Base Set -> Optic
-                      .replace(/\boptic\s+base\b/gi, 'Optic') // Optic Base -> Optic
-                      .replace(/\bbase\s+optic\b/gi, 'Optic') // Base Optic -> Optic
-                      .replace(/\bsets?\b/gi, '') // Remove "set/sets"
-                      .trim();
+                      return (
+                        <div className="bg-white/5 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10">
+                          {/* Header Row - Always Visible */}
+                          <div className="grid grid-cols-3 gap-4 px-4 py-3 bg-white/10">
+                            <div className="font-bold text-sm uppercase tracking-wide text-white/90">Set Name</div>
+                            <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Parallels</div>
+                            <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Cards</div>
+                          </div>
 
-                    // Gradient colors - cycle through different gradients
-                    const gradients = [
-                      'from-blue-500/20 to-cyan-500/20',
-                      'from-purple-500/20 to-pink-500/20',
-                      'from-orange-500/20 to-red-500/20',
-                      'from-green-500/20 to-emerald-500/20',
-                      'from-indigo-500/20 to-purple-500/20',
-                    ];
-                    const gradient = gradients[idx % gradients.length];
+                          {/* Base Section */}
+                          {baseSets.length > 0 && (
+                            <>
+                              {/* Base Label Row */}
+                              <div className="w-full px-4 py-3 bg-blue-500/20 border-t border-white/10">
+                                <span className="font-bold text-lg text-blue-200">Base</span>
+                              </div>
 
-                    // Generate set slug: year-release-set
-                    // Special handling: Only remove "Base" from Optic sets
-                    // For regular Base Set, keep "Base" in the slug
-                    const cleanSetName = set.name
-                      .replace(/\boptic\s+base\s+set\b/gi, 'Optic') // Optic Base Set -> Optic
-                      .replace(/\boptic\s+base\b/gi, 'Optic') // Optic Base -> Optic
-                      .replace(/\bbase\s+optic\b/gi, 'Optic') // Base Optic -> Optic
-                      .replace(/\bbase\s+set\b/gi, 'Base') // Base Set -> Base (keep "Base")
-                      .replace(/\bsets?\b/gi, '') // Remove remaining "set/sets"
-                      .trim();
-                    const setSlug = `${release.year || ''}-${release.name}-${cleanSetName}`
-                      .toLowerCase()
-                      .replace(/\s+/g, '-')
-                      .replace(/[^a-z0-9-]/g, '')
-                      .replace(/-+/g, '-')
-                      .replace(/^-|-$/g, '');
+                              {baseSets.map((set: CardSet, idx: number) => {
+                                const setCardCount = set.totalCards ? parseInt(set.totalCards) : (set.cards?.length || 0);
+                                const setParallelCount = set.parallelSets?.length || (Array.isArray(set.parallels) ? set.parallels.length : 0);
+
+                                const displayName = set.name
+                                  .replace(/\boptic\s+base\s+set\b/gi, 'Optic')
+                                  .replace(/\boptic\s+base\b/gi, 'Optic')
+                                  .replace(/\bbase\s+optic\b/gi, 'Optic')
+                                  .replace(/\bsets?\b/gi, '')
+                                  .trim();
+
+                                const gradients = [
+                                  'from-blue-500/20 to-cyan-500/20',
+                                  'from-purple-500/20 to-pink-500/20',
+                                  'from-orange-500/20 to-red-500/20',
+                                  'from-green-500/20 to-emerald-500/20',
+                                  'from-indigo-500/20 to-purple-500/20',
+                                ];
+                                const gradient = gradients[idx % gradients.length];
+
+                                return (
+                                  <Link
+                                    key={set.id}
+                                    href={`/sets/${set.slug}`}
+                                    className={`grid grid-cols-3 gap-4 px-4 py-3 bg-gradient-to-r ${gradient} hover:from-white/20 hover:to-white/10 transition-all duration-200 border-t border-white/10 cursor-pointer`}
+                                  >
+                                    <div className="font-semibold text-white hover:underline">{displayName}</div>
+                                    <div className="text-center">
+                                      <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-white font-bold text-sm">
+                                        {setParallelCount > 0 ? setParallelCount : '—'}
+                                      </span>
+                                    </div>
+                                    <div className="text-center">
+                                      <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-white font-bold text-sm">
+                                        {setCardCount > 0 ? setCardCount.toLocaleString() : '—'}
+                                      </span>
+                                    </div>
+                                  </Link>
+                                );
+                              })}
+                            </>
+                          )}
+
+                          {/* Insert Section */}
+                          {insertSets.length > 0 && (
+                            <>
+                              {/* Insert Label Row */}
+                              <div className="w-full px-4 py-3 bg-green-500/20 border-t border-white/10">
+                                <span className="font-bold text-lg text-green-200">Insert</span>
+                              </div>
+
+                              {insertSets.map((set: CardSet, idx: number) => {
+                                const setCardCount = set.totalCards ? parseInt(set.totalCards) : (set.cards?.length || 0);
+                                const setParallelCount = set.parallelSets?.length || (Array.isArray(set.parallels) ? set.parallels.length : 0);
+
+                                const displayName = set.name
+                                  .replace(/\boptic\s+base\s+set\b/gi, 'Optic')
+                                  .replace(/\boptic\s+base\b/gi, 'Optic')
+                                  .replace(/\bbase\s+optic\b/gi, 'Optic')
+                                  .replace(/\bsets?\b/gi, '')
+                                  .trim();
+
+                                const gradients = [
+                                  'from-blue-500/20 to-cyan-500/20',
+                                  'from-purple-500/20 to-pink-500/20',
+                                  'from-orange-500/20 to-red-500/20',
+                                  'from-green-500/20 to-emerald-500/20',
+                                  'from-indigo-500/20 to-purple-500/20',
+                                ];
+                                const gradient = gradients[idx % gradients.length];
+
+                                return (
+                                  <Link
+                                    key={set.id}
+                                    href={`/sets/${set.slug}`}
+                                    className={`grid grid-cols-3 gap-4 px-4 py-3 bg-gradient-to-r ${gradient} hover:from-white/20 hover:to-white/10 transition-all duration-200 border-t border-white/10 cursor-pointer`}
+                                  >
+                                    <div className="font-semibold text-white hover:underline">{displayName}</div>
+                                    <div className="text-center">
+                                      <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-white font-bold text-sm">
+                                        {setParallelCount > 0 ? setParallelCount : '—'}
+                                      </span>
+                                    </div>
+                                    <div className="text-center">
+                                      <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-white font-bold text-sm">
+                                        {setCardCount > 0 ? setCardCount.toLocaleString() : '—'}
+                                      </span>
+                                    </div>
+                                  </Link>
+                                );
+                              })}
+                            </>
+                          )}
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
+
+                  {/* Other Set Types - Separate Sections */}
+                  {['Autograph', 'Memorabilia', 'Other'].map(setType => {
+                    const setsOfType = setsByType.get(setType);
+                    if (!setsOfType || setsOfType.length === 0) return null;
+
+                    const typeColors: Record<string, { bg: string; text: string }> = {
+                      Autograph: { bg: 'bg-purple-500/20', text: 'text-purple-200' },
+                      Memorabilia: { bg: 'bg-orange-500/20', text: 'text-orange-200' },
+                      Other: { bg: 'bg-gray-500/20', text: 'text-gray-200' },
+                    };
+                    const colors = typeColors[setType] || typeColors.Other;
 
                     return (
-                      <Link
-                        key={set.id}
-                        href={`/sets/${setSlug}`}
-                        className={`grid grid-cols-3 gap-4 px-4 py-3 bg-gradient-to-r ${gradient} hover:from-white/20 hover:to-white/10 transition-all duration-200 border-b border-white/10 last:border-b-0 cursor-pointer`}
-                      >
-                        <div className="font-semibold text-white hover:underline">{displayName}</div>
-                        <div className="text-center">
-                          <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-white font-bold text-sm">
-                            {setParallelCount > 0 ? setParallelCount : '—'}
-                          </span>
+                      <div key={setType} className="bg-white/5 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10">
+                        {/* Header Row */}
+                        <div className="grid grid-cols-3 gap-4 px-4 py-3 bg-white/10">
+                          <div className="font-bold text-sm uppercase tracking-wide text-white/90">Set Name</div>
+                          <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Parallels</div>
+                          <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Cards</div>
                         </div>
-                        <div className="text-center">
-                          <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-white font-bold text-sm">
-                            {setCardCount > 0 ? setCardCount.toLocaleString() : '—'}
-                          </span>
+
+                        {/* Type Label Row */}
+                        <div className={`w-full px-4 py-3 ${colors.bg} border-t border-white/10`}>
+                          <span className={`font-bold text-lg ${colors.text}`}>{setType}</span>
                         </div>
-                      </Link>
+
+                        {/* Set Rows */}
+                        {setsOfType.map((set: CardSet, idx: number) => {
+                          const setCardCount = set.totalCards ? parseInt(set.totalCards) : (set.cards?.length || 0);
+                          const setParallelCount = set.parallelSets?.length || (Array.isArray(set.parallels) ? set.parallels.length : 0);
+
+                          const displayName = set.name
+                            .replace(/\boptic\s+base\s+set\b/gi, 'Optic')
+                            .replace(/\boptic\s+base\b/gi, 'Optic')
+                            .replace(/\bbase\s+optic\b/gi, 'Optic')
+                            .replace(/\bsets?\b/gi, '')
+                            .trim();
+
+                          const gradients = [
+                            'from-blue-500/20 to-cyan-500/20',
+                            'from-purple-500/20 to-pink-500/20',
+                            'from-orange-500/20 to-red-500/20',
+                            'from-green-500/20 to-emerald-500/20',
+                            'from-indigo-500/20 to-purple-500/20',
+                          ];
+                          const gradient = gradients[idx % gradients.length];
+
+                          return (
+                            <Link
+                              key={set.id}
+                              href={`/sets/${set.slug}`}
+                              className={`grid grid-cols-3 gap-4 px-4 py-3 bg-gradient-to-r ${gradient} hover:from-white/20 hover:to-white/10 transition-all duration-200 border-t border-white/10 cursor-pointer`}
+                            >
+                              <div className="font-semibold text-white hover:underline">{displayName}</div>
+                              <div className="text-center">
+                                <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-white font-bold text-sm">
+                                  {setParallelCount > 0 ? setParallelCount : '—'}
+                                </span>
+                              </div>
+                              <div className="text-center">
+                                <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-white font-bold text-sm">
+                                  {setCardCount > 0 ? setCardCount.toLocaleString() : '—'}
+                                </span>
+                              </div>
+                            </Link>
+                          );
+                        })}
+                      </div>
                     );
                   })}
-                  </div>
                 </div>
               )}
             </div>

@@ -51,7 +51,9 @@ export async function POST(request: NextRequest) {
         }).join("\n")
       : "";
 
-    const prompt = `Generate a comprehensive, engaging 7-21 sentence description for this soccer card release based ONLY on the provided source document information.
+    const prompt = `You MUST generate a description that is EXACTLY 7-21 sentences long. Count each sentence carefully before submitting.
+
+Generate a comprehensive, engaging description for this soccer card release based ONLY on the provided source document information.
 
 Release: ${manufacturer} ${releaseName} ${year}
 
@@ -59,26 +61,34 @@ ${setsContext ? `Sets included:\n${setsContext}\n` : ""}
 
 ${sellSheetText ? `Source Document Information:\n${sellSheetText}\n` : ""}
 
-Write in the voice of footy, a passionate football (soccer) fanatic who lives in the British Commonwealth, attended the London School of Economics, and hails from the southern United States. Your description should:
-- Be 7-21 sentences in length (REQUIRED - count carefully and ensure you write at least 7 sentences)
-- Use proper paragraph breaks (separate paragraphs with double line breaks)
-- Group related thoughts into natural paragraphs (2-4 paragraphs ideal)
-- ONLY include information from the source documents provided above - do NOT make up features or details
-- Focus entirely on the cards and release - NEVER talk about yourself or footy's perspective
-- Write in third-person about the cards, not first-person commentary
-- Capture the essence and appeal of this release for collectors
-- Highlight key features or notable aspects found in the source materials
-- Use Commonwealth English naturally (colour, favourite, whilst, analysed)
-- Blend LSE-level analytical precision with Southern charm and genuine enthusiasm
-- Write with authority and sophistication whilst maintaining accessibility for collectors at all levels
-- Focus on what makes this release special or collectible based on the source information
-- Expand on the features, parallels, and notable aspects to ensure sufficient detail and reach the minimum sentence count
+CRITICAL REQUIREMENT: Your response MUST contain a MINIMUM of 7 sentences and a MAXIMUM of 21 sentences. This is non-negotiable. Count your sentences before responding.
 
-Return ONLY the description text with paragraph breaks (use double line breaks between paragraphs), no additional formatting or labels.`;
+Write in the voice of footy, a passionate football (soccer) fanatic who lives in the British Commonwealth, attended the London School of Economics, and hails from the southern United States.
+
+Requirements (all mandatory):
+1. LENGTH: 7-21 sentences (count them! Less than 7 is unacceptable)
+2. PARAGRAPHS: Use proper paragraph breaks (separate with double line breaks). Group into 2-4 paragraphs
+3. CONTENT: ONLY use information from the source documents - do NOT fabricate details
+4. PERSPECTIVE: Third-person about the cards - NEVER first-person or about footy himself
+5. STYLE: Commonwealth English (colour, favourite, whilst, analysed)
+6. TONE: LSE-level analytical precision mixed with Southern charm and enthusiasm
+7. FOCUS: What makes this release special and collectible
+
+To meet the minimum 7 sentences, you should:
+- Describe the base set and its composition
+- Detail the parallel variations and their print runs
+- Highlight special insert sets or chase cards
+- Discuss the player selection and key subjects
+- Explain the appeal to collectors
+- Note any unique features or selling points
+- Comment on the overall value proposition
+
+Return ONLY the description text with paragraph breaks (double line breaks between paragraphs). No labels, no formatting, just the text.`;
 
     const result = await generateText({
-      model: anthropic("claude-3-haiku-20240307"),
+      model: anthropic("claude-3-5-sonnet-20241022"),
       prompt,
+      temperature: 0.25,
     });
 
     return NextResponse.json({

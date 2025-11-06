@@ -23,6 +23,7 @@ interface SetInfo {
   id?: string;
   name: string;
   isBaseSet: boolean;
+  type?: 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other'; // Set type
   totalCards?: string;
   printRun?: number | null; // Print run for parallel sets (e.g., 44 for "/44")
   parallels?: string[];
@@ -145,6 +146,7 @@ export default function EditReleasePage() {
           id: set.id,
           name: set.name,
           isBaseSet: set.isBaseSet,
+          type: set.type || 'Other',
           totalCards: set.totalCards || "",
           parallels: set.parallels || [],
           parentSetId: null,
@@ -159,6 +161,7 @@ export default function EditReleasePage() {
             id: parallel.id,
             name: parallel.name,
             isBaseSet: parallel.isBaseSet,
+            type: parallel.type || 'Other',
             totalCards: parallel.totalCards || "",
             printRun: parallel.printRun,
             parallels: [],
@@ -804,6 +807,7 @@ export default function EditReleasePage() {
               body: JSON.stringify({
                 name: completeData.name,
                 isBaseSet: updatedSets[index].isBaseSet,
+                type: updatedSets[index].type || (updatedSets[index].isBaseSet ? 'Base' : 'Other'),
                 totalCards: completeData.totalCards,
                 parallels: allParallels, // Use combined parallels (standard + variable)
                 releaseId: release!.id,
@@ -859,7 +863,7 @@ export default function EditReleasePage() {
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
                     name: `${completeData.name} ${parallelName}`,
-                    type: updatedSets[index].isBaseSet ? 'Base' : 'Other',
+                    type: updatedSets[index].type || (updatedSets[index].isBaseSet ? 'Base' : 'Other'),
                     totalCards: completeData.totalCards,
                     printRun: printRun, // Store the print run number
                     releaseId: release!.id,
@@ -1812,7 +1816,7 @@ export default function EditReleasePage() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                             </svg>
                           </button>
-                          <div className="flex-1">
+                          <div className="flex-1 space-y-2">
                             <input
                               type="text"
                               value={set.name}
@@ -1820,6 +1824,17 @@ export default function EditReleasePage() {
                               placeholder="Set Name (e.g., Base, Optic, Dual Jersey Ink, Color Blast)"
                               className="w-full px-3 py-2 font-semibold border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500"
                             />
+                            <select
+                              value={set.type || 'Other'}
+                              onChange={(e) => handleUpdateSet(idx, "type", e.target.value as 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other')}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 text-sm focus:ring-2 focus:ring-blue-500"
+                            >
+                              <option value="Base">Base</option>
+                              <option value="Insert">Insert</option>
+                              <option value="Autograph">Autograph</option>
+                              <option value="Memorabilia">Memorabilia</option>
+                              <option value="Other">Other</option>
+                            </select>
                           </div>
                           <button
                             type="button"

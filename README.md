@@ -25,9 +25,19 @@ footy.bot is an information platform for soccer (footy) cards. Featuring hand cr
 - **Styling**: Tailwind CSS v4
 - **Database**: PostgreSQL (Neon) with Prisma ORM
 - **Authentication**: NextAuth.js
-- **AI**: Anthropic Claude API (Claude 3.5 Sonnet)
+- **AI Orchestration**: Firebase Genkit (all AI operations use Genkit framework)
+- **AI Models**: Anthropic Claude 3.5 Sonnet (via Genkit)
 - **Image Processing**: Sharp
-- **Document Parsing**: pdf-parse, csv-parse
+- **Document Parsing**: pdfjs-dist, csv-parse
+
+### AI Integration Policy
+
+**IMPORTANT**: All AI operations in this project **MUST** use the [Firebase Genkit](https://github.com/firebase/genkit) framework. Direct SDK calls to AI providers (Anthropic, Google AI, etc.) are strictly prohibited.
+
+- All AI flows are defined in `/lib/genkit.ts`
+- Use `ai.defineFlow()` for reusable AI workflows
+- Test flows using the Genkit Dev UI: `npm run genkit`
+- See `.claude/claude.md` for detailed documentation
 
 ## Color Scheme
 
@@ -267,26 +277,175 @@ Login credentials are configured in your environment variables.
 
 ## API Endpoints
 
-### Analysis
-- `POST /api/analyze/release` - Analyze release documents
-- `POST /api/analyze/set` - Analyze set documents
-- `POST /api/analyze/card` - Analyze card images
+### Releases
+**GET** `/api/releases?slug={slug}`
+- Fetch release by slug with sets, manufacturer, and images
+- Returns: Release object with nested relationships
 
-### Library
-- `GET /api/library/manufacturers` - Get all manufacturers
-- `GET /api/library/releases` - Get all releases
-- `GET /api/library/sets?releaseId=` - Get sets for a release
+**POST** `/api/releases` (Auth required)
+- Create new release
+- Body: `{ name, year, manufacturerId, description?, releaseDate? }`
+- Auto-generates slug using `generateReleaseSlug()`
 
-### Content
-- `GET /api/posts` - Get all posts
-- `POST /api/posts` - Create new post
-- `PUT /api/posts` - Update post
-- `DELETE /api/posts?id=` - Delete post
-- `POST /api/upload` - Upload files (images, PDFs, CSVs)
+**PUT** `/api/releases` (Auth required)
+- Update existing release
+- Body: `{ id, name?, year?, description?, releaseDate? }`
+
+**DELETE** `/api/releases?id={id}` (Auth required)
+- Delete release and cascade to all sets/cards/images
+
+---
+
+### Sets
+**GET** `/api/sets?slug={slug}`
+- Fetch set by slug with cards, release, and parallel relationships
+- Returns: Set object with cards array
+
+**GET** `/api/sets?releaseId={releaseId}` (Auth required)
+- Fetch all sets for a release
+- Returns: Array of sets
+
+**GET** `/api/sets?id={id}` (Auth required)
+- Fetch set by ID with cards count
+- Returns: Set object
+
+**POST** `/api/sets` (Auth required)
+- Create new set
+- Body: `{ name, type, isBaseSet, totalCards?, releaseId, parallels?, parentSetId?, printRun?, description? }`
+- Auto-generates slug using `generateSetSlug()` with type prefixes:
+  - Base: `year-release-base-setname` (or just `year-release-setname` if name includes "base")
+  - Insert: `year-release-insert-setname`
+  - Autograph: `year-release-auto-setname`
+  - Memorabilia: `year-release-mem-setname`
+  - Other: `year-release-setname`
+- Parallel sets include parent name and print run in slug
+
+**PUT** `/api/sets` (Auth required)
+- Update existing set
+- Body: `{ id, name?, type?, totalCards?, parallels?, description? }`
+- Regenerates slug if name changes
+
+**DELETE** `/api/sets?setId={setId}` (Auth required)
+- Delete set and cascade to all cards
+
+---
+
+### Cards
+**GET** `/api/cards?slug={slug}`
+- Fetch card by slug with set, release, and images
+- Returns: Card object with nested relationships
+
+**GET** `/api/cards?id={id}`
+- Fetch card by ID
+- Returns: Card object
+
+**POST** `/api/cards` (Auth required)
+- Add cards to a set
+- Body: `{ setId, cards: [...] }`
+- Auto-generates slugs using `generateCardSlug()`
+- Slug format: `year-release-set-cardnumber-playername-variant-printrun`
+- Special handling for 1/1 cards: converts to "1-of-1" in slug
+
+**DELETE** `/api/cards?setId={setId}` (Auth required)
+- Delete all cards in a set
+- Returns: Count of deleted cards
+
+---
+
+### Posts
+**GET** `/api/posts?slug={slug}`
+- Fetch post by slug
+- Returns: Post object with optional release/set/card references
+
+**GET** `/api/posts` (Public)
+- Fetch all published posts
+- Returns: Array of posts ordered by creation date
+
+**POST** `/api/posts` (Auth required)
+- Create new post
+- Body: `{ title, content, excerpt?, type, published?, releaseId?, setId?, cardId? }`
+- Auto-generates slug from title
+
+**PUT** `/api/posts` (Auth required)
+- Update existing post
+- Body: `{ id, title?, content?, excerpt?, published? }`
+
+**DELETE** `/api/posts?id={id}` (Auth required)
+- Delete post and cascade to images
+
+---
+
+### Analysis (Genkit AI Flows)
+**POST** `/api/analyze/release`
+- Analyze release documents using Genkit AI flow
+- Body: `{ documentText }`
+- Returns: Structured release information (name, year, description, sets)
+
+**POST** `/api/generate-description`
+- Generate AI-assisted descriptions for releases
+- Body: `{ name, sellSheetText }`
+- Returns: Generated description text
+
+---
+
+### Uploads
+**POST** `/api/upload`
+- Upload images and documents
+- Supports: PNG, JPG, GIF, WebP, PDF, CSV
+- Returns: Public URL and metadata
+
+**POST** `/api/pdf-to-images`
+- Convert PDF pages to high-quality images
+- Body: `{ pdfUrl, releaseId }`
+- Returns: Array of image URLs
+
+**POST** `/api/uploads/release-images`
+- Upload and associate images with release
+- Body: FormData with images and releaseId
+- Returns: Array of created image records
+
+---
 
 ### SEO
-- `GET /sitemap.xml` - Dynamic sitemap
-- `GET /robots.txt` - Search engine directives
+**GET** `/sitemap.xml`
+- Dynamic sitemap with all releases, sets, cards, and posts
+- Updates automatically when content changes
+
+**GET** `/robots.txt`
+- Search engine directives
+
+---
+
+### URL Slug Conventions
+
+**Release Slugs:**
+- Format: `{year}-{manufacturer}-{name}`
+- Example: `2024-25-panini-obsidian-soccer`
+
+**Set Slugs:**
+- Base: `{year}-{release}-base-{setname}` or `{year}-{release}-{setname}`
+- Insert: `{year}-{release}-insert-{setname}`
+- Autograph: `{year}-{release}-auto-{setname}`
+- Memorabilia: `{year}-{release}-mem-{setname}`
+- Other: `{year}-{release}-{setname}`
+- Parallel: `{parent-slug}-{parallel-name}-{printrun}`
+- Examples:
+  - `2024-25-obsidian-soccer-obsidian-base`
+  - `2024-25-obsidian-soccer-insert-equinox`
+  - `2024-25-obsidian-soccer-obsidian-base-electric-etch-green-5`
+
+**Card Slugs:**
+- Format: `{year}-{release}-{set}-{cardnumber}-{player}-{parallel}`
+- 1/1 cards use "1-of-1" format
+- Examples:
+  - `2024-25-donruss-soccer-optic-1-jude-bellingham`
+  - `2024-25-donruss-soccer-optic-1-jude-bellingham-gold-power-1-of-1`
+
+**Special Handling:**
+- "Optic Base Set" → "optic" (base removed)
+- "Base Set" → "base" (base kept)
+- "1/1" or "1 of 1" → "1-of-1" in URLs
+- Print runs: " /5" → "-5" in URLs
 
 ## Standardized Page Layout
 

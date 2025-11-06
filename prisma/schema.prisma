@@ -54,16 +54,34 @@ model Release {
 model Set {
   id          String   @id @default(cuid())
   name        String
-  isBaseSet   Boolean  @default(false) // true for base sets, false for all others (autographs, inserts, memorabilia)
+  slug        String   @unique // URL-friendly slug - required for public access
+  type        SetType  @default(Other) // Base, Autograph, Memorabilia, Insert, or Other
+  isBaseSet   Boolean  @default(false) // Deprecated: use type field instead
   releaseId   String
   release     Release  @relation(fields: [releaseId], references: [id], onDelete: Cascade)
   totalCards  String?
-  parallels   Json?    // Array of {name: string, printRun: string}
+  printRun    Int?     // Standard print run for this set (e.g., 99 for "/99" parallels, null for unlimited base sets)
+  description String?  // Optional description for this set
+  parallels   Json?    // DEPRECATED: Array of {name: string, printRun: string} - use parallelSets relation instead
+
+  // Parent-child relationship for parallel sets
+  parentSetId String?  // Reference to parent set (null for parent sets)
+  parentSet   Set?     @relation("ParallelSets", fields: [parentSetId], references: [id], onDelete: Cascade)
+  parallelSets Set[]   @relation("ParallelSets") // Child parallel sets of this parent
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   cards       Card[]
   posts       Post[]   // Posts that reference this set
   images      Image[]
+}
+
+enum SetType {
+  Base
+  Autograph
+  Memorabilia
+  Insert
+  Other
 }
 
 model Card {

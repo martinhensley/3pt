@@ -33,7 +33,20 @@ interface Set {
   name: string;
   description: string | null;
   totalCards: string | null;
-  parallels: string[] | null;
+  printRun: number | null;
+  parentSetId: string | null;
+  parallels: string[] | null; // DEPRECATED - kept for backwards compatibility
+  parallelSets?: Array<{
+    id: string;
+    name: string;
+    slug: string;
+    printRun: number | null;
+  }>;
+  parentSet?: {
+    id: string;
+    name: string;
+    slug: string;
+  };
   cards: Card[];
   release: {
     id: string;
@@ -87,6 +100,11 @@ export default function SetPage() {
         .trim()
     : '';
 
+  // For parallel sets, include the print run in the display name
+  const displayNameWithPrintRun = set && set.parentSetId && set.printRun
+    ? `${displayName} /${set.printRun === 1 ? '1' : set.printRun}`
+    : displayName;
+
   // Extract keywords from set for dynamic ad queries - MUST be before conditional returns
   const adKeywords = useMemo(() => {
     if (!set) {
@@ -108,7 +126,10 @@ export default function SetPage() {
   }, [set, displayName]);
 
   const setCardCount = set?.cards?.length || (set?.totalCards ? parseInt(set.totalCards) : 0);
-  const setParallelCount = Array.isArray(set?.parallels) ? set.parallels.length : 0;
+  // Use parallelSets relation (new) if available, otherwise fall back to deprecated parallels field
+  const setParallelCount = (set?.parallelSets && set.parallelSets.length > 0)
+    ? set.parallelSets.length
+    : (Array.isArray(set?.parallels) ? set.parallels.length : 0);
 
   // Sort cards numerically by cardNumber
   const sortedCards = set?.cards ? [...set.cards].sort((a, b) => {
@@ -155,8 +176,18 @@ export default function SetPage() {
                 label: `${set.release.year || ""} ${set.release.name}`.trim(),
                 href: `/releases/${set.release.slug}`,
               },
+              // If this is a parallel set, include the parent set in breadcrumb
+              ...(set.parentSet ? [{
+                label: set.parentSet.name
+                  .replace(/\boptic\s+base\s+set\b/gi, 'Optic')
+                  .replace(/\boptic\s+base\b/gi, 'Optic')
+                  .replace(/\bbase\s+optic\b/gi, 'Optic')
+                  .replace(/\bsets?\b/gi, '')
+                  .trim(),
+                href: `/sets/${set.parentSet.slug}`,
+              }] : []),
               {
-                label: displayName,
+                label: displayNameWithPrintRun,
                 href: `/sets/${slug}`,
               },
             ]}
@@ -171,7 +202,7 @@ export default function SetPage() {
             <span className="text-white/80">•</span>
             <h1 className="text-3xl md:text-4xl font-black leading-tight">
               {set.release.year && <span className="text-white/90">{set.release.year} </span>}
-              {set.release.name} {displayName}
+              {set.release.name} {set.parentSet && `${set.parentSet.name.replace(/\boptic\s+base\s+set\b/gi, 'Optic').replace(/\bsets?\b/gi, '').trim()} `}{displayNameWithPrintRun}
             </h1>
           </div>
 
@@ -196,8 +227,8 @@ export default function SetPage() {
           )}
         </div>
 
-        {/* Parallels Section */}
-        {Array.isArray(set.parallels) && set.parallels.length > 0 && (
+        {/* Parallels Section - use parallelSets relation (new) or fallback to deprecated parallels field */}
+        {((set.parallelSets && set.parallelSets.length > 0) || (Array.isArray(set.parallels) && set.parallels.length > 0)) && (
           <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
             <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -206,31 +237,52 @@ export default function SetPage() {
               Parallels
             </h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {set.parallels.map((parallel: string, idx: number) => {
-                // Create simple parallel slug from parallel name
-                // e.g., "Argyle" -> "argyle", "Gold Prizm" -> "gold-prizm"
-                // Special case: "1/1" or "1 of 1" -> "1-of-1"
-                const parallelSlug = parallel
-                  .replace(/\b1\s*\/\s*1\b/gi, '1-of-1')  // "1/1" -> "1-of-1" BEFORE other replacements
-                  .replace(/\b1\s*of\s*1\b/gi, '1-of-1')  // "1 of 1" -> "1-of-1"
-                  .toLowerCase()
-                  .replace(/\s+/g, '-')
-                  .replace(/[^a-z0-9-]/g, '')
-                  .replace(/-+/g, '-')
-                  .replace(/^-|-$/g, '');
-
-                return (
+              {/* Use parallelSets if available (new parent-child architecture) */}
+              {set.parallelSets && set.parallelSets.length > 0 ? (
+                set.parallelSets.map((parallelSet) => (
                   <Link
-                    key={idx}
-                    href={`/sets/${slug}/parallels/${parallelSlug}`}
+                    key={parallelSet.id}
+                    href={`/sets/${parallelSet.slug}`}
                     className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border-2 border-white/20 hover:border-footy-orange hover:bg-footy-orange/20 hover:shadow-lg transition-all"
                   >
                     <div className="font-bold text-white">
-                      {formatParallelName(parallel)}
+                      {formatParallelName(parallelSet.name)}
+                      {parallelSet.printRun && (
+                        <span className="ml-2 text-sm font-normal text-white/80">
+                          /{parallelSet.printRun === 1 ? '1' : parallelSet.printRun}
+                        </span>
+                      )}
                     </div>
                   </Link>
-                );
-              })}
+                ))
+              ) : (
+                /* Fallback to deprecated parallels array */
+                set.parallels && set.parallels.map((parallel: string, idx: number) => {
+                  // Create simple parallel slug from parallel name
+                  // e.g., "Argyle" -> "argyle", "Gold Prizm" -> "gold-prizm"
+                  // Special case: "1/1" or "1 of 1" -> "1-of-1"
+                  const parallelSlug = parallel
+                    .replace(/\b1\s*\/\s*1\b/gi, '1-of-1')  // "1/1" -> "1-of-1" BEFORE other replacements
+                    .replace(/\b1\s*of\s*1\b/gi, '1-of-1')  // "1 of 1" -> "1-of-1"
+                    .toLowerCase()
+                    .replace(/\s+/g, '-')
+                    .replace(/[^a-z0-9-]/g, '')
+                    .replace(/-+/g, '-')
+                    .replace(/^-|-$/g, '');
+
+                  return (
+                    <Link
+                      key={idx}
+                      href={`/sets/${slug}/parallels/${parallelSlug}`}
+                      className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border-2 border-white/20 hover:border-footy-orange hover:bg-footy-orange/20 hover:shadow-lg transition-all"
+                    >
+                      <div className="font-bold text-white">
+                        {formatParallelName(parallel)}
+                      </div>
+                    </Link>
+                  );
+                })
+              )}
             </div>
           </div>
         )}
@@ -247,8 +299,25 @@ export default function SetPage() {
           {sortedCards && sortedCards.length > 0 ? (
             <div className="grid gap-3">
               {sortedCards.map((card) => {
-                // Use the card's slug from the database
-                const cardSlug = card.slug || '';
+                // For parallel sets, append the parallel name and print run to the base card slug
+                let cardSlug = card.slug || '';
+
+                if (set.parentSetId && set.printRun) {
+                  // Remove the existing slug's trailing part and append parallel info
+                  // Example: "2024-25-obsidian-soccer-obsidian-base-1-jude-bellingham"
+                  //       -> "2024-25-obsidian-soccer-obsidian-base-1-jude-bellingham-electric-etch-green-5"
+
+                  // Generate parallel slug suffix from set name and print run
+                  const parallelSuffix = `${set.name} /${set.printRun}`
+                    .toLowerCase()
+                    .replace(/\s*\/\s*(\d+)/g, '-$1')  // Convert " /5" to "-5"
+                    .replace(/\s+/g, '-')
+                    .replace(/[^a-z0-9-]/g, '')
+                    .replace(/-+/g, '-')
+                    .replace(/^-|-$/g, '');
+
+                  cardSlug = `${cardSlug}-${parallelSuffix}`;
+                }
 
                 return (
                   <Link
@@ -266,7 +335,14 @@ export default function SetPage() {
                       {card.playerName || 'Unknown Player'}
                     </div>
                     <div className="text-sm text-gray-600">
-                      {card.team && <span>{card.team}</span>}
+                      {card.team && (
+                        <span>
+                          {/* For parallel sets, replace the base print run with the parallel print run */}
+                          {set.parentSetId && set.printRun
+                            ? card.team.replace(/\/\d+$/, `/${set.printRun}`)
+                            : card.team}
+                        </span>
+                      )}
                       {card.variant && <span className="ml-2 text-purple-600">• {formatParallelName(card.variant)}</span>}
                     </div>
                   </div>

@@ -8,11 +8,6 @@ import {
   createReleaseWithSets,
   addCardsToSet,
 } from "@/lib/database";
-import { renderPDFPagesToImages } from "@/lib/pdfImageExtractor";
-import { put } from "@vercel/blob";
-import path from "path";
-import { tmpdir } from "os";
-import { writeFile, mkdir } from "fs/promises";
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -76,60 +71,9 @@ export async function POST(request: NextRequest) {
         filename: parsedDocuments[index]?.metadata?.filename,
       }));
 
-      // Extract images from PDF files and upload to Vercel Blob
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const parsedDoc = parsedDocuments[i];
-
-        if (file.type === 'pdf' || parsedDoc?.type === 'pdf') {
-          try {
-            console.log(`Extracting images from PDF: ${file.url}`);
-
-            // Download PDF to temp location
-            const tempDir = path.join(tmpdir(), 'footy-pdf-extraction');
-            await mkdir(tempDir, { recursive: true });
-
-            const response = await fetch(file.url);
-            if (!response.ok) {
-              console.warn(`Failed to download PDF: ${response.statusText}`);
-              continue;
-            }
-
-            const pdfBuffer = Buffer.from(await response.arrayBuffer());
-            const tempPdfPath = path.join(tempDir, `temp-${Date.now()}.pdf`);
-            await writeFile(tempPdfPath, pdfBuffer);
-
-            // Render PDF pages as high-quality images
-            const renderedPages = await renderPDFPagesToImages(tempPdfPath, {
-              scale: 3.0, // High quality rendering (3x resolution)
-            });
-            console.log(`Rendered ${renderedPages.length} PDF pages as images`);
-
-            // Upload each rendered page to Vercel Blob
-            for (let imgIndex = 0; imgIndex < renderedPages.length; imgIndex++) {
-              const image = renderedPages[imgIndex];
-              const filename = `release-page-${image.pageNumber}.${image.format}`;
-
-              try {
-                const blob = await put(filename, image.buffer, {
-                  access: 'public',
-                  contentType: `image/${image.format}`,
-                });
-
-                extractedImageUrls.push(blob.url);
-                console.log(`Uploaded image: ${blob.url}`);
-              } catch (uploadError) {
-                console.warn(`Failed to upload image ${filename}:`, uploadError);
-              }
-            }
-          } catch (extractError) {
-            console.warn(`Failed to extract images from PDF ${file.url}:`, extractError);
-            // Continue with other files
-          }
-        }
-      }
-
-      console.log(`Total extracted images: ${extractedImageUrls.length}`);
+      // Note: PDF image extraction has been removed
+      // Users should upload images separately via the image upload UI
+      console.log(`No automatic PDF image extraction - images should be uploaded separately`);
 
       // Analyze with AI
       analysis = await analyzeReleaseDocuments(parsedDocuments);

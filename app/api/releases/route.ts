@@ -21,12 +21,16 @@ export async function GET(request: NextRequest) {
             orderBy: { order: 'asc' }
           },
           sets: {
+            where: {
+              parentSetId: null, // ONLY show parent sets on release page (filter out parallel sets)
+            },
             include: {
               cards: {
                 orderBy: [
                   { cardNumber: 'asc' }
                 ]
               },
+              parallelSets: true, // Include count of child parallels
             },
             orderBy: {
               createdAt: 'asc'
@@ -44,21 +48,33 @@ export async function GET(request: NextRequest) {
 
       return NextResponse.json(release);
     } else if (id) {
-      // Fetch release by ID
+      // Fetch release by ID (for admin edit page - include ALL sets including parallels)
       const release = await prisma.release.findUnique({
         where: { id },
-        include: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          year: true,
+          description: true,
+          sourceFiles: true, // Include sourceFiles for Edit Release page
+          manufacturerId: true,
+          createdAt: true,
+          updatedAt: true,
           manufacturer: true,
           images: {
             orderBy: { order: 'asc' }
           },
           sets: {
+            // No parentSetId filter - show ALL sets for admin edit page
             include: {
               cards: {
                 orderBy: [
                   { cardNumber: 'asc' }
                 ]
               },
+              parallelSets: true, // Include child parallels
+              parentSet: true, // Include parent set reference
             },
             orderBy: {
               createdAt: 'asc'

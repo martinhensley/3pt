@@ -1,11 +1,113 @@
 # Footy.bot Development Documentation
 
 ## Table of Contents
-1. [Standardized Page Layout](#standardized-page-layout)
-2. [URL Slug Conventions](#url-slug-conventions)
-3. [Component Patterns](#component-patterns)
-4. [Database Schema](#database-schema)
-5. [Development Guidelines](#development-guidelines)
+1. [AI Integration Requirements](#ai-integration-requirements)
+2. [Standardized Page Layout](#standardized-page-layout)
+3. [URL Slug Conventions](#url-slug-conventions)
+4. [Component Patterns](#component-patterns)
+5. [Database Schema](#database-schema)
+6. [Development Guidelines](#development-guidelines)
+
+---
+
+## AI Integration Requirements
+
+### Genkit Framework Mandate
+
+**CRITICAL: All AI operations MUST use the Genkit framework.**
+
+This project uses [Firebase Genkit](https://github.com/firebase/genkit) as the unified AI orchestration layer. Direct SDK calls to AI providers (Anthropic, Google AI, etc.) are **strictly prohibited**.
+
+#### Why Genkit?
+
+1. **Unified Interface**: Single API for multiple AI providers
+2. **Type Safety**: Zod schema validation for all AI inputs/outputs
+3. **Flow Management**: Structured prompts and reusable AI workflows
+4. **Observability**: Built-in tracing and debugging via Genkit Dev UI
+5. **Version Control**: AI prompts are code, not scattered strings
+6. **Testing**: Flows can be tested in isolation
+
+#### Configuration
+
+All AI providers are configured in `/lib/genkit.ts`:
+
+```typescript
+export const ai = genkit({
+  plugins: [
+    anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }),
+  ],
+});
+```
+
+#### Creating AI Flows
+
+Define reusable AI workflows using `ai.defineFlow()`:
+
+```typescript
+export const analyzeReleaseFlow = ai.defineFlow(
+  {
+    name: 'analyzeRelease',
+    inputSchema: z.object({
+      documentText: z.string(),
+    }),
+    outputSchema: ReleaseInfoSchema,
+  },
+  async (input) => {
+    const { text } = await ai.generate({
+      model: claude35Sonnet,
+      output: { schema: ReleaseInfoSchema },
+      prompt: `Your prompt here...`,
+    });
+    return text;
+  }
+);
+```
+
+#### Using AI Flows
+
+Call flows from API routes or server components:
+
+```typescript
+import { analyzeReleaseFlow } from '@/lib/genkit';
+
+const result = await analyzeReleaseFlow({
+  documentText: extractedText,
+});
+```
+
+#### Prohibited Patterns
+
+**DO NOT** call AI provider SDKs directly:
+
+```typescript
+// ❌ WRONG - Direct Anthropic SDK usage
+import Anthropic from '@anthropic-ai/sdk';
+const anthropic = new Anthropic({ apiKey: '...' });
+const response = await anthropic.messages.create({...});
+
+// ❌ WRONG - Direct Google AI SDK usage
+import { GoogleGenerativeAI } from '@google/generative-ai';
+const genAI = new GoogleGenerativeAI(apiKey);
+const response = await model.generateContent({...});
+
+// ✅ CORRECT - Use Genkit flow
+import { analyzeReleaseFlow } from '@/lib/genkit';
+const result = await analyzeReleaseFlow({...});
+```
+
+#### Development Tools
+
+Run the Genkit Dev UI to inspect and test flows:
+
+```bash
+npm run genkit
+```
+
+This starts a web interface at http://localhost:4000 where you can:
+- View all defined flows
+- Test flows with sample inputs
+- Inspect AI responses and traces
+- Debug prompt performance
 
 ---
 
