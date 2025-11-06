@@ -35,7 +35,6 @@ interface Set {
   totalCards: string | null;
   printRun: number | null;
   parentSetId: string | null;
-  parallels: string[] | null; // DEPRECATED - kept for backwards compatibility
   parallelSets?: Array<{
     id: string;
     name: string;
@@ -126,10 +125,7 @@ export default function SetPage() {
   }, [set, displayName]);
 
   const setCardCount = set?.cards?.length || (set?.totalCards ? parseInt(set.totalCards) : 0);
-  // Use parallelSets relation (new) if available, otherwise fall back to deprecated parallels field
-  const setParallelCount = (set?.parallelSets && set.parallelSets.length > 0)
-    ? set.parallelSets.length
-    : (Array.isArray(set?.parallels) ? set.parallels.length : 0);
+  const setParallelCount = set?.parallelSets?.length || 0;
 
   // Sort cards numerically by cardNumber
   const sortedCards = set?.cards ? [...set.cards].sort((a, b) => {
@@ -227,8 +223,8 @@ export default function SetPage() {
           )}
         </div>
 
-        {/* Parallels Section - use parallelSets relation (new) or fallback to deprecated parallels field */}
-        {((set.parallelSets && set.parallelSets.length > 0) || (Array.isArray(set.parallels) && set.parallels.length > 0)) && (
+        {/* Parallels Section */}
+        {set.parallelSets && set.parallelSets.length > 0 && (
           <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
             <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -237,52 +233,22 @@ export default function SetPage() {
               Parallels
             </h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {/* Use parallelSets if available (new parent-child architecture) */}
-              {set.parallelSets && set.parallelSets.length > 0 ? (
-                set.parallelSets.map((parallelSet) => (
-                  <Link
-                    key={parallelSet.id}
-                    href={`/sets/${parallelSet.slug}`}
-                    className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border-2 border-white/20 hover:border-footy-orange hover:bg-footy-orange/20 hover:shadow-lg transition-all"
-                  >
-                    <div className="font-bold text-white">
-                      {formatParallelName(parallelSet.name)}
-                      {parallelSet.printRun && (
-                        <span className="ml-2 text-sm font-normal text-white/80">
-                          /{parallelSet.printRun === 1 ? '1' : parallelSet.printRun}
-                        </span>
-                      )}
-                    </div>
-                  </Link>
-                ))
-              ) : (
-                /* Fallback to deprecated parallels array */
-                set.parallels && set.parallels.map((parallel: string, idx: number) => {
-                  // Create simple parallel slug from parallel name
-                  // e.g., "Argyle" -> "argyle", "Gold Prizm" -> "gold-prizm"
-                  // Special case: "1/1" or "1 of 1" -> "1-of-1"
-                  const parallelSlug = parallel
-                    .replace(/\b1\s*\/\s*1\b/gi, '1-of-1')  // "1/1" -> "1-of-1" BEFORE other replacements
-                    .replace(/\b1\s*of\s*1\b/gi, '1-of-1')  // "1 of 1" -> "1-of-1"
-                    .toLowerCase()
-                    .replace(/\s+/g, '-')
-                    .replace(/[^a-z0-9-]/g, '')
-                    .replace(/-+/g, '-')
-                    .replace(/^-|-$/g, '');
-
-                  return (
-                    <Link
-                      key={idx}
-                      href={`/sets/${slug}/parallels/${parallelSlug}`}
-                      className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border-2 border-white/20 hover:border-footy-orange hover:bg-footy-orange/20 hover:shadow-lg transition-all"
-                    >
-                      <div className="font-bold text-white">
-                        {formatParallelName(parallel)}
-                      </div>
-                    </Link>
-                  );
-                })
-              )}
+              {set.parallelSets.map((parallelSet) => (
+                <Link
+                  key={parallelSet.id}
+                  href={`/sets/${parallelSet.slug}`}
+                  className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border-2 border-white/20 hover:border-footy-orange hover:bg-footy-orange/20 hover:shadow-lg transition-all"
+                >
+                  <div className="font-bold text-white">
+                    {formatParallelName(parallelSet.name)}
+                    {parallelSet.printRun && (
+                      <span className="ml-2 text-sm font-normal text-white/80">
+                        /{parallelSet.printRun === 1 ? '1' : parallelSet.printRun}
+                      </span>
+                    )}
+                  </div>
+                </Link>
+              ))}
             </div>
           </div>
         )}

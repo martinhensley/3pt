@@ -44,6 +44,7 @@ export function generateSetSlug(
     .replace(/\bbase\s+optic\b/gi, 'base')            // Base Optic -> base
     .replace(/\bbase\s+set\b/gi, 'base')              // Base Set -> base
     .replace(/\bsets?\b/gi, '')                        // Remove remaining "set/sets"
+    .replace(/\bchecklist\b/gi, '')                    // Remove "checklist"
     .trim();
 
   // Add type prefix (except for "Other")
@@ -72,12 +73,25 @@ export function generateSetSlug(
   // Clean parallel name if provided (handle 1/1 cards and print runs)
   const cleanParallelName = parallelName
     ? parallelName
-        .replace(/\b1\s*\/\s*1\b/gi, '1-of-1')  // Convert "1/1" to "1-of-1"
-        .replace(/\b1\s*of\s*1\b/gi, '1-of-1')  // Convert "1 of 1" to "1-of-1"
-        .replace(/\s*\/\s*(\d+)/g, '-$1')        // Convert " /44" to "-44"
+        .replace(/\bbase\s+set\s+checklist\b/gi, '')  // Remove "Base Set Checklist"
+        .replace(/\bchecklist\b/gi, '')                // Remove "checklist"
+        .replace(/\bbase\s+set\b/gi, '')               // Remove "Base Set"
+        .replace(/\b1\s*\/\s*1\b/gi, '1-of-1')        // Convert "1/1" to "1-of-1"
+        .replace(/\b1\s*of\s*1\b/gi, '1-of-1')        // Convert "1 of 1" to "1-of-1"
+        .replace(/\s*\/\s*(\d+)/g, '-$1')              // Convert " /44" to "-44"
+        .trim()
     : '';
 
-  const parts = [year, releaseName, typePrefix, cleanSetName, cleanParallelName].filter(Boolean);
+  // For parallel sets, include type prefix for non-Base sets only
+  // Base is the default, so no prefix needed
+  // But auto, insert, and memorabilia parallels need their type prefix
+  // e.g., "2024-25-obsidian-soccer-electric-etch-green-5" (base parallel, no prefix)
+  // e.g., "2024-25-obsidian-soccer-auto-electric-etch-green-5" (auto parallel, needs prefix)
+  const parts = cleanParallelName
+    ? (setType === 'Base' || setType === 'Other')
+      ? [year, releaseName, cleanParallelName]
+      : [year, releaseName, typePrefix, cleanParallelName]
+    : [year, releaseName, typePrefix, cleanSetName].filter(Boolean);
 
   return parts
     .join(' ')

@@ -55,7 +55,7 @@ model Set {
   id          String   @id @default(cuid())
   name        String
   slug        String   @unique // URL-friendly slug - required for public access
-  type        SetType  @default(Other) // Base, Autograph, Memorabilia, Insert, or Other
+  type        SetType  @default(Base) // Base, Autograph, Memorabilia, or Insert
   isBaseSet   Boolean  @default(false) // Deprecated: use type field instead
   releaseId   String
   release     Release  @relation(fields: [releaseId], references: [id], onDelete: Cascade)
@@ -81,7 +81,6 @@ enum SetType {
   Autograph
   Memorabilia
   Insert
-  Other
 }
 
 model Card {

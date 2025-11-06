@@ -23,7 +23,7 @@ interface SetInfo {
   id?: string;
   name: string;
   isBaseSet: boolean;
-  type?: 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other'; // Set type
+  type?: 'Base' | 'Autograph' | 'Memorabilia' | 'Insert'; // Set type
   totalCards?: string;
   printRun?: number | null; // Print run for parallel sets (e.g., 44 for "/44")
   parallels?: string[];
@@ -146,7 +146,7 @@ export default function EditReleasePage() {
           id: set.id,
           name: set.name,
           isBaseSet: set.isBaseSet,
-          type: set.type || 'Other',
+          type: set.type || 'Base',
           totalCards: set.totalCards || "",
           parallels: set.parallels || [],
           parentSetId: null,
@@ -161,7 +161,7 @@ export default function EditReleasePage() {
             id: parallel.id,
             name: parallel.name,
             isBaseSet: parallel.isBaseSet,
-            type: parallel.type || 'Other',
+            type: parallel.type || 'Base',
             totalCards: parallel.totalCards || "",
             printRun: parallel.printRun,
             parallels: [],
@@ -292,7 +292,7 @@ export default function EditReleasePage() {
       let playerName = '';
       let team = '';
 
-      // Try CSV format first: "1,Player Name,Team"
+      // Try CSV format first: "1,Player Name,Team /145" or "1,Player Name,Team"
       if (line.includes(',')) {
         const parts = line.split(',').map(p => p.trim());
         if (parts.length >= 2 && /^\d+$/.test(parts[0])) {
@@ -300,11 +300,20 @@ export default function EditReleasePage() {
           playerName = parts[1];
           team = parts[2] || '';
 
+          // Extract print run from team if present (e.g., "Real Madrid /145")
+          let printRun: number | undefined;
+          const printRunMatch = team.match(/(.+?)\s*\/\s*(\d+)$/);
+          if (printRunMatch) {
+            team = printRunMatch[1].trim();
+            printRun = parseInt(printRunMatch[2], 10);
+          }
+
           if (cardNumber && playerName) {
             cards.push({
               cardNumber,
               playerName,
               team: team || undefined,
+              printRun,
               setName: setName,
             });
             continue;
@@ -312,14 +321,27 @@ export default function EditReleasePage() {
         }
       }
 
-      // Try space-separated format: "1 Player Name, Team" or "1. Player Name, Team"
+      // Try space-separated format: "1 Player Name, Team /145" or "1. Player Name, Team"
       const match = line.match(/^(\d+)\.?\s+([^,]+)(?:,\s*(.+))?/);
       if (match) {
         const [, num, name, tm] = match;
+        let teamName = tm?.trim();
+        let printRun: number | undefined;
+
+        // Extract print run from team if present
+        if (teamName) {
+          const printRunMatch = teamName.match(/(.+?)\s*\/\s*(\d+)$/);
+          if (printRunMatch) {
+            teamName = printRunMatch[1].trim();
+            printRun = parseInt(printRunMatch[2], 10);
+          }
+        }
+
         cards.push({
           cardNumber: num.trim(),
           playerName: name.trim(),
-          team: tm?.trim(),
+          team: teamName,
+          printRun,
           setName: setName,
         });
       }
@@ -807,7 +829,7 @@ export default function EditReleasePage() {
               body: JSON.stringify({
                 name: completeData.name,
                 isBaseSet: updatedSets[index].isBaseSet,
-                type: updatedSets[index].type || (updatedSets[index].isBaseSet ? 'Base' : 'Other'),
+                type: updatedSets[index].type || (updatedSets[index].isBaseSet ? 'Base' : 'Insert'),
                 totalCards: completeData.totalCards,
                 parallels: allParallels, // Use combined parallels (standard + variable)
                 releaseId: release!.id,
@@ -863,7 +885,7 @@ export default function EditReleasePage() {
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
                     name: `${completeData.name} ${parallelName}`,
-                    type: updatedSets[index].type || (updatedSets[index].isBaseSet ? 'Base' : 'Other'),
+                    type: updatedSets[index].type || (updatedSets[index].isBaseSet ? 'Base' : 'Insert'),
                     totalCards: completeData.totalCards,
                     printRun: printRun, // Store the print run number
                     releaseId: release!.id,
@@ -1825,15 +1847,14 @@ export default function EditReleasePage() {
                               className="w-full px-3 py-2 font-semibold border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500"
                             />
                             <select
-                              value={set.type || 'Other'}
-                              onChange={(e) => handleUpdateSet(idx, "type", e.target.value as 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other')}
+                              value={set.type || 'Base'}
+                              onChange={(e) => handleUpdateSet(idx, "type", e.target.value as 'Base' | 'Autograph' | 'Memorabilia' | 'Insert')}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 text-sm focus:ring-2 focus:ring-blue-500"
                             >
                               <option value="Base">Base</option>
                               <option value="Insert">Insert</option>
                               <option value="Autograph">Autograph</option>
                               <option value="Memorabilia">Memorabilia</option>
-                              <option value="Other">Other</option>
                             </select>
                           </div>
                           <button
@@ -1878,7 +1899,8 @@ export default function EditReleasePage() {
                       </p>
 
                       {/* Show parallels with expandable sections for card management */}
-                      {set.parallels && set.parallels.length > 0 ? (
+                      {/* Only show legacy parallels array if parallelSets don't exist */}
+                      {set.parallels && set.parallels.length > 0 && (!set.parallelSets || set.parallelSets.length === 0) ? (
                         <div className="space-y-2">
                           <p className="text-xs text-gray-600 italic mb-3">
                             Click a parallel to add/view cards for that specific parallel.
@@ -2133,8 +2155,9 @@ export default function EditReleasePage() {
                         </p>
                         <div className="space-y-2">
                           {set.parallelSets.map((parallel, pIdx) => {
-                            // Extract just the parallel name (remove parent set name)
-                            const parallelDisplayName = parallel.name.replace(set.name, '').trim();
+                            // The parallel name already includes the print run (e.g., "Electric Etch Green /5")
+                            // so we don't need to append it again
+                            const parallelDisplayName = parallel.name;
 
                             return (
                             <div key={parallel.id || pIdx} className="bg-white border border-green-200 rounded-lg p-3">
@@ -2142,11 +2165,6 @@ export default function EditReleasePage() {
                                 <div className="flex-1">
                                   <div className="font-medium text-sm text-gray-900">
                                     {parallelDisplayName}
-                                    {parallel.printRun && (
-                                      <span className="ml-2 text-green-600 font-semibold">
-                                        /{parallel.printRun}
-                                      </span>
-                                    )}
                                   </div>
                                   <div className="text-xs text-gray-600 mt-1">
                                     {parallel.totalCards} cards • Inherits parent checklist

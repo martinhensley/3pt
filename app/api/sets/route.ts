@@ -59,11 +59,33 @@ export async function GET(request: NextRequest) {
       // If this is a parent set, fetch its own cards
       const setIdForCards = matchedSet.parentSetId || matchedSet.id;
 
+      // Build where clause for cards
+      const cardWhere: any = {
+        setId: setIdForCards,
+      };
+
+      // If parallelSlug is provided, we need to filter cards by parallel type
+      // The parallel slug needs to be converted back to the parallel name
+      let currentParallelName: string | undefined;
+      if (parallelSlug) {
+        // Convert slug back to parallel name
+        // e.g., "electric-etch-green-5" -> "Electric Etch Green /5"
+        const parallelNameFromSlug = parallelSlug
+          .split('-')
+          .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ')
+          // Handle print runs: if last segment is a number, convert it to "/N"
+          .replace(/\s(\d+)$/, ' /$1');
+
+        currentParallelName = parallelNameFromSlug;
+
+        // Filter cards by parallelType matching the parallel name
+        cardWhere.parallelType = parallelNameFromSlug;
+      }
+
       // Fetch cards
       const cards = await prisma.card.findMany({
-        where: {
-          setId: setIdForCards,
-        },
+        where: cardWhere,
         orderBy: [{ cardNumber: 'asc' }],
         include: {
           set: {
@@ -82,6 +104,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         ...matchedSet,
         cards: cards,
+        currentParallel: currentParallelName, // Include the parallel name for the frontend
       });
     }
 
@@ -173,7 +196,16 @@ export async function POST(request: NextRequest) {
       }
 
       // Build parallel name with print run: "Electric Etch Green /5" -> "electric-etch-green-5"
-      const parallelNameWithPrintRun = printRun ? `${name} /${printRun}` : name;
+      // First, strip any existing print run from the name (e.g., "Equinox Electric Etch Yellow /10" -> "Equinox Electric Etch Yellow")
+      const nameWithoutPrintRun = name.replace(/\s*\/\s*\d+\s*$/, '').trim();
+
+      // Strip parent set name from parallel name if it's at the beginning (e.g., "Equinox Electric Etch Yellow" -> "Electric Etch Yellow")
+      const parentSetName = parentSet.name;
+      const parallelNameOnly = nameWithoutPrintRun.startsWith(parentSetName)
+        ? nameWithoutPrintRun.substring(parentSetName.length).trim()
+        : nameWithoutPrintRun;
+
+      const parallelNameWithPrintRun = printRun ? `${parallelNameOnly} /${printRun}` : parallelNameOnly;
 
       // Generate slug with parent set name as base and parallel name
       slug = generateSetSlug(
@@ -290,9 +322,18 @@ export async function PUT(request: NextRequest) {
 
       if (existingSet.parentSetId && existingSet.parentSet) {
         // For parallel sets, include parent set name and parallel name with print run
+        // First, strip any existing print run from the name
+        const nameWithoutPrintRun = setName.replace(/\s*\/\s*\d+\s*$/, '').trim();
+
+        // Strip parent set name from parallel name if it's at the beginning
+        const parentSetName = existingSet.parentSet.name;
+        const parallelNameOnly = nameWithoutPrintRun.startsWith(parentSetName)
+          ? nameWithoutPrintRun.substring(parentSetName.length).trim()
+          : nameWithoutPrintRun;
+
         const parallelNameWithPrintRun = existingSet.printRun
-          ? `${setName} /${existingSet.printRun}`
-          : setName;
+          ? `${parallelNameOnly} /${existingSet.printRun}`
+          : parallelNameOnly;
 
         slug = generateSetSlug(
           existingSet.release.year || '',

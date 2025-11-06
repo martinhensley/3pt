@@ -237,7 +237,13 @@ export default function CardDetailPage() {
                 {card.parallelType && (
                   <div>
                     <span className="text-gray-600">Parallel: </span>
-                    <span className="font-bold text-gray-900">{formatParallelName(card.parallelType.replace(/\s*–\s*/g, ' '))}</span>
+                    <span className="font-bold text-gray-900">{formatParallelName(card.parallelType.replace(/\s*–\s*/g, ' ').replace(/\s*\/\s*\d+\s*$/, ''))}</span>
+                  </div>
+                )}
+                {card.printRun && (
+                  <div>
+                    <span className="text-gray-600">Print Run: </span>
+                    <span className="font-bold text-gray-900">/{card.printRun === 1 ? '1' : card.printRun}</span>
                   </div>
                 )}
                 {card.numbered && (
