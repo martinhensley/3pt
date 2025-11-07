@@ -90,18 +90,22 @@ export default function SetPage() {
   }, [slug]);
 
   // Clean display name: remove "Base" from Optic sets, keep it for others
+  // Also remove duplicate "Obsidian" if the release name already contains it
   const displayName = set?.name
     ? set.name
         .replace(/\boptic\s+base\s+set\b/gi, 'Optic') // Optic Base Set -> Optic
         .replace(/\boptic\s+base\b/gi, 'Optic') // Optic Base -> Optic
         .replace(/\bbase\s+optic\b/gi, 'Optic') // Base Optic -> Optic
         .replace(/\bsets?\b/gi, '') // Remove "set/sets"
+        // Remove duplicate "Obsidian" if release name contains it
+        .replace(new RegExp(`\\b${set.release.name.split(' ')[0]}\\b`, 'gi'), '')
         .trim()
     : '';
 
-  // For parallel sets, include the print run in the display name
+  // For parallel sets, check if print run is already in the name before appending
+  // Also check for "1 of 1" pattern for 1/1 cards
   const displayNameWithPrintRun = set && set.parentSetId && set.printRun
-    ? `${displayName} /${set.printRun === 1 ? '1' : set.printRun}`
+    ? (displayName.match(/\/\d+$/) || displayName.match(/\b1\s+of\s+1\b/i) ? displayName : `${displayName} /${set.printRun}`)
     : displayName;
 
   // Extract keywords from set for dynamic ad queries - MUST be before conditional returns
@@ -179,6 +183,8 @@ export default function SetPage() {
                   .replace(/\boptic\s+base\b/gi, 'Optic')
                   .replace(/\bbase\s+optic\b/gi, 'Optic')
                   .replace(/\bsets?\b/gi, '')
+                  // Remove duplicate release name from parent set
+                  .replace(new RegExp(`\\b${set.release.name.split(' ')[0]}\\b`, 'gi'), '')
                   .trim(),
                 href: `/sets/${set.parentSet.slug}`,
               }] : []),
@@ -198,7 +204,7 @@ export default function SetPage() {
             <span className="text-white/80">•</span>
             <h1 className="text-3xl md:text-4xl font-black leading-tight">
               {set.release.year && <span className="text-white/90">{set.release.year} </span>}
-              {set.release.name} {set.parentSet && `${set.parentSet.name.replace(/\boptic\s+base\s+set\b/gi, 'Optic').replace(/\bsets?\b/gi, '').trim()} `}{displayNameWithPrintRun}
+              {set.release.name} {displayNameWithPrintRun}
             </h1>
           </div>
 
@@ -207,10 +213,13 @@ export default function SetPage() {
               <div className="text-sm text-white/80 uppercase tracking-wide mb-1">Total Cards</div>
               <div className="text-3xl font-bold text-white">{setCardCount > 0 ? setCardCount.toLocaleString() : '—'}</div>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-              <div className="text-sm text-white/80 uppercase tracking-wide mb-1">Parallels</div>
-              <div className="text-3xl font-bold text-white">{setParallelCount > 0 ? setParallelCount : '—'}</div>
-            </div>
+            {/* Only show parallels count for base sets (not for parallel sets) */}
+            {!set.parentSetId && (
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                <div className="text-sm text-white/80 uppercase tracking-wide mb-1">Parallels</div>
+                <div className="text-3xl font-bold text-white">{setParallelCount > 0 ? setParallelCount : '—'}</div>
+              </div>
+            )}
           </div>
 
           {/* Set Description */}
@@ -233,22 +242,30 @@ export default function SetPage() {
               Parallels
             </h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {set.parallelSets.map((parallelSet) => (
-                <Link
-                  key={parallelSet.id}
-                  href={`/sets/${parallelSet.slug}`}
-                  className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border-2 border-white/20 hover:border-footy-orange hover:bg-footy-orange/20 hover:shadow-lg transition-all"
-                >
-                  <div className="font-bold text-white">
-                    {formatParallelName(parallelSet.name)}
-                    {parallelSet.printRun && (
-                      <span className="ml-2 text-sm font-normal text-white/80">
-                        /{parallelSet.printRun === 1 ? '1' : parallelSet.printRun}
-                      </span>
-                    )}
-                  </div>
-                </Link>
-              ))}
+              {set.parallelSets.map((parallelSet) => {
+                // Extract parallel name without print run
+                const parallelNameWithoutPrintRun = parallelSet.name.replace(/\s*\/\d+$/, '');
+                // Check if name already contains "1 of 1" pattern
+                const alreadyHasPrintRun = /\b1\s+of\s+1\b/i.test(parallelNameWithoutPrintRun);
+
+                return (
+                  <Link
+                    key={parallelSet.id}
+                    href={`/sets/${parallelSet.slug}`}
+                    className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border-2 border-white/20 hover:border-footy-orange hover:bg-footy-orange/20 hover:shadow-lg transition-all"
+                  >
+                    <div className="font-bold text-white">
+                      {formatParallelName(parallelNameWithoutPrintRun)}
+                      {/* Only show print run if not already in name (like "1 of 1") */}
+                      {parallelSet.printRun && !alreadyHasPrintRun && (
+                        <span className="ml-2 text-sm font-normal text-white/80">
+                          /{parallelSet.printRun === 1 ? '1' : parallelSet.printRun}
+                        </span>
+                      )}
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         )}
@@ -265,24 +282,40 @@ export default function SetPage() {
           {sortedCards && sortedCards.length > 0 ? (
             <div className="grid gap-3">
               {sortedCards.map((card) => {
-                // For parallel sets, append the parallel name and print run to the base card slug
+                // For parallel sets, generate the correct slug with parallel info
                 let cardSlug = card.slug || '';
 
-                if (set.parentSetId && set.printRun) {
-                  // Remove the existing slug's trailing part and append parallel info
-                  // Example: "2024-25-obsidian-soccer-obsidian-base-1-jude-bellingham"
-                  //       -> "2024-25-obsidian-soccer-obsidian-base-1-jude-bellingham-electric-etch-green-5"
+                if (set.parentSetId && set.printRun && set.parentSet) {
+                  // For parallel cards, we need to generate a slug that:
+                  // 1. Excludes the base set name (already handled by generateCardSlug)
+                  // 2. Includes the parallel name (from set.name)
+                  // 3. Doesn't duplicate the print run
 
-                  // Generate parallel slug suffix from set name and print run
-                  const parallelSuffix = `${set.name} /${set.printRun}`
+                  // Extract the parallel name from the set name (remove /## at end)
+                  const parallelName = set.name.replace(/\s*\/\d+$/, '');
+                  const printRunStr = set.printRun.toString();
+
+                  // Check if parallel name already ends with the print run
+                  const variantEndsWithPrintRun = parallelName.trim().endsWith(` ${printRunStr}`);
+                  const parallelWithPrintRun = variantEndsWithPrintRun
+                    ? parallelName
+                    : `${parallelName} ${printRunStr}`;
+
+                  // Generate new slug: year-release-cardnum-player-parallelname-printrun
+                  // This will automatically exclude "base" and handle print run correctly
+                  const parts = [
+                    set.release.year,
+                    set.release.name,
+                    card.cardNumber,
+                    card.playerName,
+                    parallelWithPrintRun
+                  ].filter(Boolean);
+
+                  cardSlug = parts
+                    .join(' ')
                     .toLowerCase()
-                    .replace(/\s*\/\s*(\d+)/g, '-$1')  // Convert " /5" to "-5"
-                    .replace(/\s+/g, '-')
-                    .replace(/[^a-z0-9-]/g, '')
-                    .replace(/-+/g, '-')
-                    .replace(/^-|-$/g, '');
-
-                  cardSlug = `${cardSlug}-${parallelSuffix}`;
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/^-+|-+$/g, '');
                 }
 
                 return (
@@ -300,16 +333,23 @@ export default function SetPage() {
                     <div className="font-bold text-lg text-footy-green">
                       {card.playerName || 'Unknown Player'}
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className="flex items-center gap-2 flex-wrap">
                       {card.team && (
-                        <span>
-                          {/* For parallel sets, replace the base print run with the parallel print run */}
-                          {set.parentSetId && set.printRun
-                            ? card.team.replace(/\/\d+$/, `/${set.printRun}`)
-                            : card.team}
-                        </span>
+                        <span className="text-sm text-gray-600">{card.team}</span>
                       )}
-                      {card.variant && <span className="ml-2 text-purple-600">• {formatParallelName(card.variant)}</span>}
+                      {/* Show print run badge - for parallel sets show set print run, otherwise show card print run */}
+                      {(set.parentSetId && set.printRun) ? (
+                        <span className="px-2 py-0.5 bg-orange-100 text-footy-orange text-xs rounded-full font-semibold">
+                          # /{set.printRun}
+                        </span>
+                      ) : card.printRun ? (
+                        <span className="px-2 py-0.5 bg-orange-100 text-footy-orange text-xs rounded-full font-semibold">
+                          # /{card.printRun}
+                        </span>
+                      ) : null}
+                      {card.variant && (
+                        <span className="text-sm text-footy-orange">• {formatParallelName(card.variant)}</span>
+                      )}
                     </div>
                   </div>
                   {(card.hasAutograph || card.hasMemorabilia || card.isNumbered) && (
