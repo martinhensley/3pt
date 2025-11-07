@@ -128,15 +128,40 @@ export default function SetPage() {
     return extractKeywordsFromPost(postLike as { title: string; content: string; excerpt: string; type: string });
   }, [set, displayName]);
 
-  const setCardCount = set?.cards?.length || (set?.totalCards ? parseInt(set.totalCards) : 0);
-  const setParallelCount = set?.parallelSets?.length || 0;
+  // For sets with mixed base + parallel cards, only count base cards
+  // Base cards have parallelType = "Base" or null
+  const baseCards = set?.cards?.filter(card =>
+    card.parallelType === 'Base' || card.parallelType === null
+  ) || [];
 
-  // Sort cards numerically by cardNumber
-  const sortedCards = set?.cards ? [...set.cards].sort((a, b) => {
+  // Get unique parallel types (excluding Base)
+  const uniqueParallels = set?.cards
+    ? Array.from(new Set(
+        set.cards
+          .map(card => card.parallelType)
+          .filter(type => type && type !== 'Base')
+      ))
+    : [];
+
+  const setCardCount = baseCards.length || (set?.totalCards ? parseInt(set.totalCards) : 0);
+  const setParallelCount = set?.parallelSets?.length || uniqueParallels.length;
+
+  // Sort cards numerically by cardNumber - only show base cards
+  const sortedCards = baseCards.length > 0 ? [...baseCards].sort((a, b) => {
     const numA = parseInt(a.cardNumber || '0');
     const numB = parseInt(b.cardNumber || '0');
     return numA - numB;
   }) : [];
+
+  // Create parallel sets list from unique parallel types (if no parallelSets exists)
+  const displayParallels = set?.parallelSets && set.parallelSets.length > 0
+    ? set.parallelSets
+    : uniqueParallels.map(parallelType => ({
+        id: `temp-${parallelType}`,
+        name: parallelType || '',
+        slug: '', // Will be generated on the fly
+        printRun: null,
+      }));
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
@@ -233,7 +258,7 @@ export default function SetPage() {
         </div>
 
         {/* Parallels Section */}
-        {set.parallelSets && set.parallelSets.length > 0 && (
+        {displayParallels && displayParallels.length > 0 && (
           <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
             <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -242,7 +267,7 @@ export default function SetPage() {
               Parallels
             </h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {set.parallelSets.map((parallelSet) => {
+              {displayParallels.map((parallelSet) => {
                 // Extract parallel name without print run
                 const parallelNameWithoutPrintRun = parallelSet.name.replace(/\s*\/\d+$/, '');
                 // Check if name already contains "1 of 1" pattern
