@@ -9,7 +9,6 @@ export default function CreateReleasePage() {
   const [documentFile, setDocumentFile] = useState<File | null>(null);
   const [documentFileUrl, setDocumentFileUrl] = useState<string>('');
   const [documentMimeType, setDocumentMimeType] = useState<string>('');
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
@@ -132,49 +131,50 @@ export default function CreateReleasePage() {
     }
   };
 
-  const handleImageFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
+  const handleImageFilesChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
       const files = Array.from(e.target.files);
-      setImageFiles(files);
+
+      // Immediately upload the selected files
+      try {
+        setUploadingImages(true);
+        setError(null);
+
+        const urls: string[] = [];
+        for (const file of files) {
+          const formData = new FormData();
+          formData.append('file', file);
+
+          const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+          });
+
+          if (!response.ok) {
+            throw new Error(`Failed to upload ${file.name}`);
+          }
+
+          const { url } = await response.json();
+          urls.push(url);
+        }
+
+        // Append to existing uploaded images
+        setUploadedImageUrls(prev => [...prev, ...urls]);
+        setUploadingImages(false);
+        console.log(`Uploaded ${urls.length} images`);
+
+        // Clear the file input so user can select more files
+        e.target.value = '';
+      } catch (err) {
+        console.error('Error uploading images:', err);
+        setError(err instanceof Error ? err.message : 'Failed to upload images');
+        setUploadingImages(false);
+      }
     }
   };
 
-  const handleUploadImages = async () => {
-    if (imageFiles.length === 0) {
-      setError('Please select at least one image');
-      return;
-    }
-
-    try {
-      setUploadingImages(true);
-      setError(null);
-
-      const urls: string[] = [];
-      for (const file of imageFiles) {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const response = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to upload ${file.name}`);
-        }
-
-        const { url } = await response.json();
-        urls.push(url);
-      }
-
-      setUploadedImageUrls(urls);
-      setUploadingImages(false);
-      console.log(`Uploaded ${urls.length} images`);
-    } catch (err) {
-      console.error('Error uploading images:', err);
-      setError(err instanceof Error ? err.message : 'Failed to upload images');
-      setUploadingImages(false);
-    }
+  const handleRemoveImage = (indexToRemove: number) => {
+    setUploadedImageUrls(prev => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
 
@@ -185,36 +185,6 @@ export default function CreateReleasePage() {
       setAnalyzing(true);
       setError(null);
 
-      // Auto-upload any pending images before creating the release
-      let finalImageUrls = uploadedImageUrls;
-      if (imageFiles.length > 0 && uploadedImageUrls.length === 0) {
-        console.log('Auto-uploading images before creating release...');
-        setUploadingImages(true);
-
-        const urls: string[] = [];
-        for (const file of imageFiles) {
-          const formData = new FormData();
-          formData.append('file', file);
-
-          const uploadResponse = await fetch('/api/upload', {
-            method: 'POST',
-            body: formData,
-          });
-
-          if (!uploadResponse.ok) {
-            throw new Error(`Failed to upload ${file.name}`);
-          }
-
-          const { url } = await uploadResponse.json();
-          urls.push(url);
-        }
-
-        finalImageUrls = urls;
-        setUploadedImageUrls(urls);
-        setUploadingImages(false);
-        console.log(`Auto-uploaded ${urls.length} images`);
-      }
-
       // Create release with the analyzed data
       const response = await fetch('/api/releases/analyze', {
         method: 'POST',
@@ -222,7 +192,7 @@ export default function CreateReleasePage() {
         body: JSON.stringify({
           fileUrl: documentFileUrl,
           mimeType: documentMimeType,
-          uploadedImages: finalImageUrls,
+          uploadedImages: uploadedImageUrls,
           createRelease: true,
         }),
       });
@@ -241,7 +211,6 @@ export default function CreateReleasePage() {
       console.error('Error:', err);
       setError(err instanceof Error ? err.message : 'An error occurred');
       setAnalyzing(false);
-      setUploadingImages(false);
     }
   };
 
@@ -415,49 +384,75 @@ export default function CreateReleasePage() {
                 {/* Image Upload Section */}
                 <div>
                   <h4 className="text-md font-semibold mb-3">Release Images for Carousel</h4>
-                  <div className="flex items-center gap-4">
+
+                  <div className="relative">
                     <input
+                      id="image-upload"
                       type="file"
                       accept="image/*"
                       multiple
                       onChange={handleImageFilesChange}
-                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
+                      className="hidden"
                       disabled={uploadingImages}
                     />
-
-                    <button
-                      onClick={handleUploadImages}
-                      disabled={imageFiles.length === 0 || uploadingImages}
-                      className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed whitespace-nowrap"
+                    <label
+                      htmlFor="image-upload"
+                      className={`flex items-center justify-center px-6 py-3 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                        uploadingImages
+                          ? 'border-gray-300 bg-gray-50 cursor-not-allowed'
+                          : 'border-green-400 bg-green-50 hover:bg-green-100 hover:border-green-500'
+                      }`}
                     >
-                      {uploadingImages ? 'Uploading...' : 'Upload Now (Optional)'}
-                    </button>
+                      {uploadingImages ? (
+                        <>
+                          <svg className="w-5 h-5 mr-2 text-green-600 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          <span className="text-sm font-medium text-gray-700">Uploading images...</span>
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                          </svg>
+                          <span className="text-sm font-medium text-green-700">
+                            {uploadedImageUrls.length > 0 ? 'Add More Images' : 'Choose Files'}
+                          </span>
+                        </>
+                      )}
+                    </label>
                   </div>
 
-                  {imageFiles.length > 0 && uploadedImageUrls.length === 0 && (
-                    <div className="mt-4 p-3 bg-footy-green/10 border border-footy-green/30 rounded-md">
-                      <p className="text-sm text-footy-green">
-                        {imageFiles.length} image{imageFiles.length !== 1 ? 's' : ''} selected. Will be uploaded automatically when you create the release.
-                      </p>
-                    </div>
-                  )}
+                  <p className="text-xs text-gray-500 mt-2">
+                    Images upload automatically when selected. You can add multiple images one at a time or select multiple files at once.
+                  </p>
 
                   {uploadedImageUrls.length > 0 && (
                     <div className="mt-4">
-                      <p className="text-sm text-green-600 font-medium mb-2">
+                      <p className="text-sm text-green-600 font-medium mb-3">
                         {uploadedImageUrls.length} image{uploadedImageUrls.length !== 1 ? 's' : ''} uploaded
                       </p>
                       <div className="grid grid-cols-4 gap-3">
                         {uploadedImageUrls.map((url, idx) => (
                           <div
                             key={idx}
-                            className="relative aspect-square border-2 border-green-300 rounded-lg overflow-hidden bg-white"
+                            className="relative aspect-square border-2 border-green-300 rounded-lg overflow-hidden bg-white group"
                           >
                             <img
                               src={url}
                               alt={`Upload ${idx + 1}`}
                               className="w-full h-full object-contain"
                             />
+                            <button
+                              onClick={() => handleRemoveImage(idx)}
+                              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                              title="Remove image"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
                           </div>
                         ))}
                       </div>
