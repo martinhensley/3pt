@@ -37,11 +37,12 @@ export function generateSetSlug(
   setType: 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other',
   parallelName?: string
 ): string {
-  // Clean set name: remove "Base" from Optic sets, keep it for others
+  // Clean set name: simplify base set names to avoid redundancy
   const cleanSetName = setName
     .replace(/\boptic\s+base\s+set\b/gi, 'base')      // Optic Base Set -> base
     .replace(/\boptic\s+base\b/gi, 'base')            // Optic Base -> base
     .replace(/\bbase\s+optic\b/gi, 'base')            // Base Optic -> base
+    .replace(/\bobsidian\s+base\b/gi, 'base')         // Obsidian Base -> base
     .replace(/\bbase\s+set\b/gi, 'base')              // Base Set -> base
     .replace(/\bsets?\b/gi, '')                        // Remove remaining "set/sets"
     .replace(/\bchecklist\b/gi, '')                    // Remove "checklist"
