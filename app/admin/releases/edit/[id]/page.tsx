@@ -1264,7 +1264,7 @@ export default function EditReleasePage() {
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 name: set.name,
-                isBaseSet: set.isBaseSet,
+                type: set.type || 'Base',
                 totalCards: set.totalCards || null,
                 releaseId: release.id,
                 parallels: set.parallels || [],
@@ -1316,7 +1316,7 @@ export default function EditReleasePage() {
               body: JSON.stringify({
                 id: set.id,
                 name: set.name,
-                isBaseSet: set.isBaseSet,
+                type: set.type || 'Base',
                 totalCards: set.totalCards || null,
                 parallels: set.parallels || [],
               }),
