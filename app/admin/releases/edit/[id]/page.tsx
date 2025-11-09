@@ -221,7 +221,7 @@ export default function EditReleasePage() {
 
   const handleUpdateSet = (index: number, field: keyof SetInfo, value: string) => {
     const updatedSets = [...editedSets];
-    if (field === "name" || field === "totalCards") {
+    if (field === "name" || field === "totalCards" || field === "type") {
       updatedSets[index] = { ...updatedSets[index], [field]: value };
       setEditedSets(updatedSets);
     }
