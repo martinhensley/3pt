@@ -780,11 +780,10 @@ export default function EditReleasePage() {
         const updatedSets = [...editedSets];
 
         // Combine all parallels (standard + variable) for storage
-        // Prepend set name to each parallel for full naming
-        const setNamePrefix = completeData.name;
+        // DO NOT prepend set name - parallel names should be clean (e.g., "Electric Etch Red Pulsar /44")
         const rawParallels = [
-          ...completeData.standardParallels.map(p => `${setNamePrefix} ${p}`),
-          ...completeData.variableParallels.map(p => `${setNamePrefix} ${p.name} /${p.maxPrintRun} or fewer`)
+          ...completeData.standardParallels,
+          ...completeData.variableParallels.map(p => `${p.name} /${p.maxPrintRun} or fewer`)
         ];
 
         // Normalize /1 to "1 of 1" and sort by print run
