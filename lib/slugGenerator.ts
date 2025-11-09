@@ -83,15 +83,14 @@ export function generateSetSlug(
         .trim()
     : '';
 
-  // For parallel sets, include type prefix for non-Base sets only
-  // Base is the default, so no prefix needed
-  // But auto, insert, and memorabilia parallels need their type prefix
-  // e.g., "2024-25-obsidian-soccer-electric-etch-green-5" (base parallel, no prefix)
-  // e.g., "2024-25-obsidian-soccer-auto-electric-etch-green-5" (auto parallel, needs prefix)
+  // For parallel sets, include set name and type prefix for non-Base sets
+  // Base parallels: no prefix or set name (e.g., "2024-25-obsidian-soccer-electric-etch-green-5")
+  // Insert parallels: include set name (e.g., "2024-25-obsidian-soccer-equinox-orange-99")
+  // Auto parallels: include set name (e.g., "2024-25-obsidian-soccer-dual-auto-orange-99")
   const parts = cleanParallelName
     ? (setType === 'Base' || setType === 'Other')
       ? [year, releaseName, cleanParallelName]
-      : [year, releaseName, typePrefix, cleanParallelName]
+      : [year, releaseName, cleanSetName, cleanParallelName]
     : [year, releaseName, typePrefix, cleanSetName].filter(Boolean);
 
   return parts
