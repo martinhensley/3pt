@@ -156,12 +156,18 @@ export default function SetPage() {
   // Create parallel sets list from unique parallel types (if no parallelSets exists)
   const displayParallels = set?.parallelSets && set.parallelSets.length > 0
     ? set.parallelSets
-    : uniqueParallels.map(parallelType => ({
-        id: `temp-${parallelType}`,
-        name: parallelType || '',
-        slug: '', // Will be generated on the fly
-        printRun: null,
-      }));
+    : uniqueParallels.map(parallelType => {
+        // Extract print run from parallel name if it exists (e.g., "/44" or "1/1")
+        const printRunMatch = (parallelType || '').match(/\/(\d+)$/);
+        const extractedPrintRun = printRunMatch ? parseInt(printRunMatch[1]) : null;
+
+        return {
+          id: `temp-${parallelType}`,
+          name: parallelType || '',
+          slug: '', // Will be generated on the fly
+          printRun: extractedPrintRun,
+        };
+      });
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
@@ -268,27 +274,35 @@ export default function SetPage() {
             </h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
               {displayParallels.map((parallelSet) => {
-                // Extract parallel name without print run
+                // Extract parallel name without print run (remove "/44" etc.)
                 const parallelNameWithoutPrintRun = parallelSet.name.replace(/\s*\/\d+$/, '');
-                // Check if name already contains "1 of 1" pattern
-                const alreadyHasPrintRun = /\b1\s+of\s+1\b/i.test(parallelNameWithoutPrintRun);
+                // Check if name already contains "1 of 1" pattern (already formatted)
+                const alreadyHas1of1 = /\b1\s+of\s+1\b/i.test(parallelNameWithoutPrintRun);
 
                 return (
-                  <Link
+                  <div
                     key={parallelSet.id}
-                    href={`/sets/${parallelSet.slug}`}
-                    className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border-2 border-white/20 hover:border-footy-orange hover:bg-footy-orange/20 hover:shadow-lg transition-all"
+                    className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border-2 border-white/20"
                   >
                     <div className="font-bold text-white">
                       {formatParallelName(parallelNameWithoutPrintRun)}
-                      {/* Only show print run if not already in name (like "1 of 1") */}
-                      {parallelSet.printRun && !alreadyHasPrintRun && (
+                      {/* Show print run if it exists and not already showing "1 of 1" */}
+                      {parallelSet.printRun && !alreadyHas1of1 && (
                         <span className="ml-2 text-sm font-normal text-white/80">
-                          /{parallelSet.printRun === 1 ? '1' : parallelSet.printRun}
+                          /{parallelSet.printRun}
                         </span>
                       )}
                     </div>
-                  </Link>
+                    {/* Show card count if available */}
+                    {parallelSet.slug && (
+                      <Link
+                        href={`/sets/${parallelSet.slug}`}
+                        className="text-sm text-white/60 hover:text-footy-orange transition-colors mt-1 inline-block"
+                      >
+                        View cards →
+                      </Link>
+                    )}
+                  </div>
                 );
               })}
             </div>
