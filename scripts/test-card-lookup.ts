@@ -1,26 +1,16 @@
 import { prisma } from '../lib/prisma';
 
 async function main() {
-  // Test the exact slug that should work
-  const slug = '2024-25-donruss-soccer-optic-200-mikayil-faye-gold-power-1of1';
+  // Test the exact slug from the screenshot
+  const slug = '2024-25-obsidian-soccer-lightning-strike-8-aleix-garcia-electric-etch-gold-flood-5';
 
-  console.log('Testing slug:', slug);
+  console.log('🔍 Testing card lookup for slug:', slug);
+  console.log('');
 
-  // Fetch all cards with their relationships - specifically from Optic set
-  const cards = await prisma.card.findMany({
-    where: {
-      cardNumber: '200',
-      playerName: {
-        contains: 'Faye',
-        mode: 'insensitive'
-      },
-      set: {
-        name: 'Optic',
-        release: {
-          year: '2024-25'
-        }
-      }
-    },
+  // Test 1: Direct slug lookup
+  console.log('Test 1: Direct slug lookup');
+  const cardBySlug = await prisma.card.findUnique({
+    where: { slug },
     include: {
       set: {
         include: {
@@ -32,49 +22,61 @@ async function main() {
         },
       },
     },
-    take: 5
   });
 
-  console.log('\nFound', cards.length, 'cards matching #200 Faye');
+  if (cardBySlug) {
+    console.log('✅ Card found by slug!');
+    console.log('  Player:', cardBySlug.playerName);
+    console.log('  Card #:', cardBySlug.cardNumber);
+    console.log('  Variant:', cardBySlug.variant);
+    console.log('  Parallel:', cardBySlug.parallelType);
+    console.log('  Set:', cardBySlug.set.name);
+  } else {
+    console.log('❌ Card NOT found by slug');
+  }
 
-  cards.forEach(c => {
-    const cleanSetName = c.set.name
-      .replace(/\boptic\s+base\s+set\b/gi, 'Optic')
-      .replace(/\boptic\s+base\b/gi, 'Optic')
-      .replace(/\bbase\s+set\b/gi, '')
-      .replace(/\bsets?\b/gi, '')
-      .trim();
+  console.log('');
 
-    const cardSlugParts = [
-      c.set.release.year,
-      c.set.release.name,
-      cleanSetName,
-      c.cardNumber || '',
-      c.playerName || 'unknown',
-    ];
-
-    if (c.parallelType && c.parallelType.toLowerCase() !== 'base') {
-      cardSlugParts.push(c.parallelType);
-    } else if (c.variant && c.variant.toLowerCase() !== 'base') {
-      cardSlugParts.push(c.variant);
-    }
-
-    const generatedSlug = cardSlugParts
-      .filter(Boolean)
-      .join('-')
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9-]/g, '')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '')
-      .replace(/1-of-1/g, '1of1');
-
-    console.log('\nCard:', c.playerName, '#' + c.cardNumber);
-    console.log('  Set:', c.set.name);
-    console.log('  ParallelType:', c.parallelType);
-    console.log('  Generated slug:', generatedSlug);
-    console.log('  Match?', generatedSlug === slug);
+  // Test 2: Search for Aleix Garcia cards
+  console.log('Test 2: Search for similar cards (Aleix Garcia)');
+  const similarCards = await prisma.card.findMany({
+    where: {
+      playerName: {
+        contains: 'Garcia',
+        mode: 'insensitive',
+      },
+    },
+    include: {
+      set: {
+        include: {
+          release: true,
+        },
+      },
+    },
+    take: 10,
   });
+
+  console.log(`Found ${similarCards.length} cards with "Garcia" in player name:`);
+  similarCards.forEach(c => {
+    console.log(`  - ${c.playerName} #${c.cardNumber} (${c.set.release.name}) - slug: ${c.slug || 'NO SLUG'}`);
+  });
+
+  console.log('');
+
+  // Test 3: Count cards with and without slugs
+  console.log('Test 3: Slug statistics');
+  const totalCards = await prisma.card.count();
+  const cardsWithSlugs = await prisma.card.count({
+    where: {
+      slug: {
+        not: null,
+      },
+    },
+  });
+
+  console.log(`Total cards: ${totalCards.toLocaleString()}`);
+  console.log(`Cards with slugs: ${cardsWithSlugs.toLocaleString()}`);
+  console.log(`Cards without slugs: ${(totalCards - cardsWithSlugs).toLocaleString()}`);
 }
 
 main()
