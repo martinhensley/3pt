@@ -2,11 +2,12 @@
 
 ## Table of Contents
 1. [AI Integration Requirements](#ai-integration-requirements)
-2. [Standardized Page Layout](#standardized-page-layout)
-3. [URL Slug Conventions](#url-slug-conventions)
-4. [Component Patterns](#component-patterns)
-5. [Database Schema](#database-schema)
-6. [Development Guidelines](#development-guidelines)
+2. [AI-Powered Excel Import Workflow](#ai-powered-excel-import-workflow)
+3. [Standardized Page Layout](#standardized-page-layout)
+4. [URL Slug Conventions](#url-slug-conventions)
+5. [Component Patterns](#component-patterns)
+6. [Database Schema](#database-schema)
+7. [Development Guidelines](#development-guidelines)
 
 ---
 
@@ -108,6 +109,341 @@ This starts a web interface at http://localhost:4000 where you can:
 - Test flows with sample inputs
 - Inspect AI responses and traces
 - Debug prompt performance
+
+---
+
+## AI-Powered Excel Import Workflow
+
+### Overview
+
+The application includes a sophisticated AI-powered workflow for importing complete card checklists from Excel files. This workflow uses Claude AI via Genkit to analyze checklist structure, identify sets and parallels, and automatically create the complete database hierarchy.
+
+**Location:** `/app/api/sets/import-excel/route.ts` (API endpoint) and `/components/ExcelImport.tsx` (UI component)
+
+### Why This Workflow?
+
+1. **Human-in-the-Loop**: User explicitly selects target release to prevent AI mistakes
+2. **Intelligent Structure Analysis**: AI identifies base sets, parallels, inserts, and relationships
+3. **Type Classification**: Automatically categorizes sets (Base, Insert, Autograph, Memorabilia)
+4. **Print Run Extraction**: Detects and assigns print runs from parallel names
+5. **Idempotent Operations**: Safe to run multiple times (duplicate detection prevents errors)
+6. **Real-time Feedback**: Progress counters show sets and cards being created
+
+### Workflow Steps
+
+#### 1. User Selects Target Release
+
+```tsx
+// Component: /components/ExcelImport.tsx
+<select
+  value={selectedReleaseId}
+  onChange={(e) => setSelectedReleaseId(e.target.value)}
+>
+  <option value="">-- Select a Release --</option>
+  {releases.map((release) => (
+    <option key={release.id} value={release.id}>
+      {release.year} {release.manufacturer.name} {release.name}
+    </option>
+  ))}
+</select>
+```
+
+**Why**: Prevents AI from auto-detecting the wrong release (critical lesson learned during development)
+
+#### 2. User Uploads Excel File
+
+- Supported formats: `.xls`, `.xlsx`
+- File is converted to Base64 for API transmission
+- Client-side validation ensures release is selected first
+
+#### 3. AI Analyzes Set Structure
+
+The API endpoint uses Claude via Genkit to analyze the checklist:
+
+```typescript
+// API: /app/api/sets/import-excel/route.ts
+const analysis = await analyzeChecklistFlow({
+  cards: allCards.map(card => ({
+    cardNumber: card['Card #'],
+    player: card['Player'],
+    team: card['Team'],
+    variant: card['Variant'] || card['Parallel'] || card['Type'],
+  })),
+});
+```
+
+**AI Tasks:**
+- Identifies the base set name
+- Detects all parallel variations
+- Groups parallels under parent base sets
+- Classifies set types (Base, Insert, Autograph, Memorabilia)
+- Extracts print runs from parallel names (e.g., "Electric Etch Marble Flood 8" → printRun: 8)
+
+#### 4. Creates Database Hierarchy
+
+**Parent Sets First:**
+```typescript
+// Creates or finds parent base set
+let parentSet = await prisma.set.findUnique({
+  where: { slug: parentSetSlug },
+});
+
+if (!parentSet) {
+  parentSet = await prisma.set.create({
+    data: {
+      name: baseSetInfo.name,
+      type: baseSetInfo.type,
+      releaseId: releaseId,
+      slug: parentSetSlug,
+      isBaseSet: true,
+      parallels: analysis.sets
+        .filter(s => s.isParallel && s.parentSetName === baseSetInfo.name)
+        .map(s => s.name),
+    },
+  });
+}
+```
+
+**Parallel Sets Second:**
+```typescript
+// Creates parallel sets linked to parent
+for (const parallelInfo of parallelsForThisBase) {
+  const parallelSet = await prisma.set.create({
+    data: {
+      name: parallelInfo.name,
+      type: parallelInfo.type,
+      releaseId: releaseId,
+      parentSetId: parentSet.id,
+      slug: parallelSetSlug,
+      isBaseSet: false,
+    },
+  });
+}
+```
+
+**Cards Last:**
+```typescript
+// Creates cards with duplicate checking
+const existingCard = await prisma.card.findUnique({
+  where: { slug },
+});
+
+if (!existingCard) {
+  await prisma.card.create({
+    data: {
+      playerName: card.Player,
+      team: card.Team,
+      cardNumber: card['Card #'],
+      variant: variant,
+      parallelType: parallelType,
+      printRun: printRun,
+      setId: targetSet.id,
+      slug: slug,
+      // ... other fields
+    },
+  });
+}
+```
+
+#### 5. Progress Feedback
+
+During import, animated counters show progress:
+
+```tsx
+// Estimated totals based on AI analysis
+const estimatedTotalSets = analysis.sets.length;
+const estimatedTotalCards = allCards.length;
+
+// Update every 200ms
+const progressInterval = setInterval(() => {
+  setProgressSets(prev => {
+    const next = prev + setsPerUpdate;
+    return next >= estimatedTotalSets ? estimatedTotalSets : next;
+  });
+  setProgressCards(prev => {
+    const next = prev + cardsPerUpdate;
+    return next >= estimatedTotalCards ? estimatedTotalCards : next;
+  });
+}, 200);
+```
+
+**Display:**
+```
+┌─────────────────┬─────────────────┐
+│ 47 Sets Created │ 1,234 Cards     │
+└─────────────────┴─────────────────┘
+```
+
+### Key Features
+
+#### Duplicate Detection (Idempotent)
+
+Every creation operation checks for existing records first:
+
+```typescript
+// Set duplicate check
+const existingSet = await prisma.set.findUnique({
+  where: { slug: setSlug },
+});
+
+if (existingSet) {
+  console.log(`⚠️  Set already exists: ${setName}`);
+  return existingSet; // Reuse existing
+}
+
+// Card duplicate check
+const existingCard = await prisma.card.findUnique({
+  where: { slug: cardSlug },
+});
+
+if (existingCard) {
+  console.log(`⚠️  Skipping duplicate card: ${playerName}`);
+  continue; // Skip creation
+}
+```
+
+**Result**: Safe to run the same import multiple times without errors.
+
+#### Smart Parallel Detection
+
+AI identifies parallels by analyzing patterns:
+
+- **Name patterns**: "Prizm", "Optic", "Gold", etc.
+- **Print run indicators**: "8", "25", "99", "1/1"
+- **Numbering format**: "/8", "/25", "1 of 1"
+- **Context clues**: Position in checklist, naming conventions
+
+#### Type Classification
+
+Sets are automatically categorized:
+
+```typescript
+enum SetType {
+  BASE = 'Base',
+  INSERT = 'Insert',
+  AUTOGRAPH = 'Autograph',
+  MEMORABILIA = 'Memorabilia',
+  OTHER = 'Other',
+}
+```
+
+**AI Detection Logic:**
+- Contains "Auto", "Signature", "Autograph" → `AUTOGRAPH`
+- Contains "Jersey", "Patch", "Relic", "Memorabilia" → `MEMORABILIA`
+- Contains "Insert" or is non-base parallel → `INSERT`
+- Is base set → `BASE`
+- Default → `OTHER`
+
+#### Print Run Extraction
+
+AI extracts print runs from parallel names:
+
+```typescript
+// Examples:
+"Electric Etch Marble Flood 8" → printRun: 8
+"Gold Power 25" → printRun: 25
+"Black 1/1" → printRun: 1
+"Aqua Wave 99" → printRun: 99
+```
+
+**Slug Deduplication:**
+Print runs aren't duplicated in slugs if already in the name:
+- `electric-etch-marble-flood-8` (NOT `electric-etch-marble-flood-8-8`)
+- `gold-power-25` (NOT `gold-power-25-25`)
+- `black-1-of-1` (NOT `black-1-of-1-1`)
+
+### Usage Example
+
+1. Navigate to admin page with Excel import component
+2. Select "2024-25 Panini Obsidian Soccer" from release dropdown
+3. Upload `2024-25-Panini-Obsidian-Soccer-Checklist.xlsx`
+4. Click "Import Checklist"
+5. Watch progress counters increment
+6. Receive summary: "Created 47 sets and 1,234 cards"
+
+### Error Handling
+
+**Duplicate Constraint Violations:**
+- Automatically detected and skipped
+- Logged with `⚠️` warnings
+- Does not stop import process
+
+**Missing Release:**
+- User must select release before upload
+- File upload disabled until release selected
+
+**Invalid Excel Format:**
+- Returns clear error message
+- Expected columns: `Card #`, `Player`, `Team`, `Variant`/`Parallel`/`Type`
+
+**AI Analysis Failures:**
+- Falls back to basic structure
+- Logs error for debugging
+- Continues with partial data
+
+### Testing the Workflow
+
+#### Dry Run Mode
+
+Test the AI analysis without creating data:
+
+```typescript
+const response = await fetch('/api/sets/import-excel', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    releaseId: 'xxx',
+    fileData: base64File,
+    dryRun: true, // Preview only
+  }),
+});
+```
+
+Returns analysis results without database changes.
+
+#### Genkit Dev UI
+
+Test the AI flow in isolation:
+
+```bash
+npm run genkit
+```
+
+Navigate to http://localhost:4000 and test `analyzeChecklistFlow` with sample card data.
+
+### Common Issues and Solutions
+
+**Issue:** "Sets created in wrong release"
+- **Solution:** Added release selector to prevent AI auto-detection errors
+- **Prevention:** User explicitly chooses target release first
+
+**Issue:** "Duplicate constraint errors"
+- **Solution:** Added `findUnique()` checks before all `create()` operations
+- **Prevention:** Import is now idempotent (safe to retry)
+
+**Issue:** "Print run showing twice (e.g., `/145`)"
+- **Solution:** Check if variant already ends with print run before appending
+- **Prevention:** Slug generation logic checks for duplicates
+
+**Issue:** "No progress feedback during long imports"
+- **Solution:** Added animated progress counters
+- **Prevention:** User sees real-time feedback during import
+
+### Related Files
+
+- **`/lib/genkit.ts`** - Defines `analyzeChecklistFlow` for AI analysis
+- **`/lib/slugGenerator.ts`** - Generates unique slugs for sets and cards
+- **`/lib/checklistParser.ts`** - Parses Excel files using `xlsx` library
+- **`/components/ExcelImport.tsx`** - UI component for file upload
+- **`/app/api/sets/import-excel/route.ts`** - API endpoint handling imports
+
+### Future Enhancements
+
+- **Image Upload**: Allow uploading card images alongside checklist
+- **Validation Report**: Show warnings for missing data before import
+- **Partial Import**: Allow importing specific sets instead of full checklist
+- **Rollback**: Add ability to undo an import if something goes wrong
+- **Batch Import**: Support importing multiple releases at once
 
 ---
 
@@ -454,9 +790,9 @@ Location: `/components/Breadcrumb.tsx`
 ### Hierarchy
 ```
 Manufacturer
-  └── Release (year, name, slug)
-       └── Set (name, totalCards, parallels[], isBaseSet)
-            └── Card (playerName, team, cardNumber, variant, parallelType, slug)
+  └── Release (year, name, slug, description, releaseDate, sourceFiles)
+       └── Set (name, slug, type, parentSet, parallelSets, printRun)
+            └── Card (playerName, team, cardNumber, variant, parallelType, printRun, slug)
 ```
 
 ### Key Models
@@ -464,28 +800,44 @@ Manufacturer
 #### Card
 ```prisma
 model Card {
-  id              String   @id @default(cuid())
-  slug            String   @unique
-  playerName      String?
-  team            String?
-  cardNumber      String?
-  variant         String?   // Base, Rookie, etc.
-  parallelType    String?   // Prizm, Optic, Gold, etc.
-  serialNumber    String?
-  isNumbered      Boolean  @default(false)
-  printRun        Int?
-  hasAutograph    Boolean  @default(false)
-  hasMemorabilia  Boolean  @default(false)
-  rarity          String?
-  finish          String?
-  colorVariant    String?
-  specialFeatures String[]
-  imageFront      String?
-  imageBack       String?
-  setId           String
-  set             Set      @relation(fields: [setId], references: [id])
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                    String   @id @default(cuid())
+  slug                  String?  @unique
+  playerName            String?
+  team                  String?
+  cardNumber            String?
+  variant               String?  // Basic variant name (e.g., "Refractor", "Chrome")
+
+  // Enhanced parallel/variation detection fields
+  parallelType          String?  // Specific parallel type (e.g., "Gold Refractor", "Red Wave")
+  serialNumber          String?  // Serial number if numbered (e.g., "123/299")
+  isNumbered            Boolean  @default(false)
+  printRun              Int?     // Total print run (e.g., 299 for /299)
+  numbered              String?  // Display string for numbering (e.g., "1 of 1", "/99", "/199")
+  rarity                String?  // Rarity level (base, rare, super_rare, ultra_rare, one_of_one)
+  finish                String?  // Card finish (refractor, chrome, matte, glossy, holographic)
+  hasAutograph          Boolean  @default(false)
+  hasMemorabilia        Boolean  @default(false)
+  specialFeatures       String[] // Array of special features (rookie, insert, short_print, etc.)
+  colorVariant          String?  // Color designation (gold, red, blue, green, orange, etc.)
+
+  // OCR and detection metadata
+  detectionConfidence   Int?     // AI confidence score (0-100)
+  detectionMethods      String[] // Methods used (ocr, visual, ai_analysis)
+  detectedText          String?  // Raw OCR text for reference
+
+  // Images
+  imageFront            String?  // Front image URL
+  imageBack             String?  // Back image URL
+
+  // Admin notes
+  footyNotes            String?  @db.Text // Internal notes about this card
+
+  setId                 String
+  set                   Set      @relation(fields: [setId], references: [id], onDelete: Cascade)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  posts                 Post[]   // Posts that reference this card
+  images                Image[]
 }
 ```
 
@@ -494,17 +846,133 @@ model Card {
 model Set {
   id          String   @id @default(cuid())
   name        String
-  description String?
-  totalCards  String?
-  isBaseSet   Boolean  @default(false)
-  parallels   String[] // Array of parallel names
+  slug        String   @unique // URL-friendly slug - required for public access
+  type        SetType  @default(Base) // Base, Autograph, Memorabilia, or Insert
+  isBaseSet   Boolean  @default(false) // Deprecated: use type field instead
   releaseId   String
-  release     Release  @relation(fields: [releaseId], references: [id])
-  cards       Card[]
+  release     Release  @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  totalCards  String?
+  printRun    Int?     // Standard print run for this set (e.g., 99 for "/99" parallels)
+  description String?  // Optional description for this set
+
+  // Source data for regeneration and reference
+  sourceText  String?  @db.Text // Original pasted checklist text (parent sets only)
+
+  parallels   Json?    // DEPRECATED: Array of {name: string, printRun: string}
+
+  // Parent-child relationship for parallel sets
+  parentSetId String?  // Reference to parent set (null for parent sets)
+  parentSet   Set?     @relation("ParallelSets", fields: [parentSetId], references: [id], onDelete: Cascade)
+  parallelSets Set[]   @relation("ParallelSets") // Child parallel sets of this parent
+
+  // Flags for parallel behavior
+  hasVariableChecklist Boolean @default(false) // True if parallels have different checklists
+  mirrorsParentChecklist Boolean @default(true) // True if parallel cards should mirror parent set
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  cards       Card[]
+  posts       Post[]   // Posts that reference this set
+  images      Image[]
+}
+
+enum SetType {
+  Base
+  Autograph
+  Memorabilia
+  Insert
 }
 ```
+
+#### Release
+```prisma
+model Release {
+  id             String          @id @default(cuid())
+  name           String
+  year           String?
+  slug           String          @unique
+  description    String?         // Brief summary displayed in previews
+  releaseDate    DateTime?       // Official release date
+
+  // Source files used for AI analysis
+  sellSheetText  String?         @db.Text // Extracted text from sell sheets
+  sourceFiles    Json?           // Array of {url, type, filename} for PDFs/images
+
+  manufacturerId String
+  manufacturer   Manufacturer    @relation(fields: [manufacturerId], references: [id], onDelete: Cascade)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  sets           Set[]
+  posts          Post[]
+  images         Image[]
+  sourceDocuments ReleaseSourceDocument[]
+}
+```
+
+#### Image
+```prisma
+model Image {
+  id        String   @id @default(cuid())
+  url       String
+  caption   String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  // Optional foreign keys - one of these will be set
+  releaseId String?
+  release   Release? @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+
+  setId     String?
+  set       Set?     @relation(fields: [setId], references: [id], onDelete: Cascade)
+
+  cardId    String?
+  card      Card?    @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  postId    String?
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+```
+
+### Important Schema Notes
+
+#### Set Parent-Child Relationships
+
+Sets use a self-referential relationship for parallel sets:
+
+```typescript
+// Parent set (e.g., "Obsidian Base")
+const parentSet = {
+  id: 'abc123',
+  name: 'Obsidian Base',
+  type: 'Base',
+  parentSetId: null,          // null indicates this is a parent
+  parallelSets: [child1, child2, ...] // Array of children
+};
+
+// Child parallel set (e.g., "Electric Etch Marble Flood 8")
+const parallelSet = {
+  id: 'xyz789',
+  name: 'Electric Etch Marble Flood 8',
+  type: 'Insert',
+  parentSetId: 'abc123',      // Points to parent
+  parallelSets: []            // Parallels don't have children
+};
+```
+
+#### Print Run Fields
+
+Print runs appear in multiple places:
+
+1. **Card.printRun** - Individual card print run (e.g., 8 for "/8")
+2. **Set.printRun** - Standard print run for all cards in set (e.g., 99 for all cards "/99")
+3. **Card.numbered** - Display string (e.g., "1 of 1", "/99")
+
+**Best Practice:** For parallel sets where all cards have the same print run, store in `Set.printRun`. For individual numbered cards, store in `Card.printRun`.
+
+#### Deprecated Fields
+
+- **Set.isBaseSet** - Deprecated, use `Set.type` instead
+- **Set.parallels** (Json) - Deprecated, use `Set.parallelSets` relation instead
 
 ---
 
@@ -580,6 +1048,36 @@ Before committing changes to page layouts:
 
 ## Recent Changes Log
 
+### November 2025 - AI Excel Import Workflow
+**Changes:**
+- Implemented AI-powered Excel checklist import workflow
+- Added release selector to prevent wrong release targeting
+- Added progress counters for real-time import feedback
+- Implemented duplicate detection for idempotent imports
+- Combined set tables into unified view on release pages
+- Fixed print run artifacts displaying incorrectly
+- Improved error handling for missing cards
+
+**Key Features Added:**
+- **Release Selector**: User must explicitly choose target release before import
+- **Progress Counters**: Animated counters show sets and cards being created
+- **Idempotent Operations**: Safe to run imports multiple times without errors
+- **Unified Tables**: All set types displayed in single table with section labels
+
+**Files Modified:**
+1. `/components/ExcelImport.tsx` - Added release selector and progress counters
+2. `/app/api/sets/import-excel/route.ts` - Added duplicate checking for all operations
+3. `/app/releases/[slug]/page.tsx` - Combined multiple tables into unified view
+4. `/app/sets/[slug]/page.tsx` - Removed duplicate print run badge
+5. `/app/cards/[slug]/page.tsx` - Improved 404 error handling
+6. `/README.md` - Documented AI Excel import workflow
+7. `/.claude/CLAUDE.md` - Documented AI Excel import workflow (this file)
+
+**Problem Solved:**
+- **Issue**: AI was adding sets/cards to wrong releases
+- **Solution**: Added human-in-the-loop release selection step
+- **Result**: User explicitly chooses target release, preventing AI mistakes
+
 ### October 2025 - Layout Standardization
 **Changes:**
 - Standardized all public pages to use three-column layout
@@ -627,4 +1125,48 @@ Before committing changes to page layouts:
 
 ---
 
-*Last Updated: October 29, 2025*
+## Recent Changes Log
+
+### November 9, 2025 - Donruss Soccer Import and Slug Generator Fix
+
+**Changes:**
+- Fixed `generateSetSlug()` function parameter order issue in import scripts
+- Successfully imported all 149 sets and 8,977 cards from 2024-25 Donruss Soccer Master tab
+- Reclassified "Rated Rookies" sets from Insert to Base type (Rated Rookies are special rookie base cards, not inserts)
+- Created utility scripts for data cleanup and verification
+
+**Key Fixes:**
+- **Slug Generator Bug**: The `import-donruss-soccer.ts` script was calling `generateSetSlug()` with outdated parameter order
+  - Old call: `generateSetSlug('Panini', 'Donruss Soccer', '2024-25', setName)`
+  - Correct signature: `generateSetSlug(year, releaseName, setName, setType, parallelName?)`
+  - Fixed call: `generateSetSlug('2024-25', 'Panini Donruss Soccer', setName, setType)`
+  - This bug caused all sets to generate the same slug, resulting in only 2 sets being created
+
+- **Rated Rookies Classification**: Updated `determineSetType()` to classify "Rated Rookies" as Base type
+  - Rated Rookies are NOT parallels or inserts - they are a special subset of base cards featuring notable rookies
+  - Updated 33 Rated Rookies sets (parent + all parallels) to type "Base"
+
+**Import Results:**
+- **35 Base Sets**: Base (2 entries), Rated Rookies + all parallels
+- **84 Insert Sets**: Animation, Craftsmen, Crunch Time, Kaboom, Kit Kings, Kit Series, Magicians, Net Marvels, Night Moves, Pitch Kings, Rookie Kings, The Rookies, Zero Gravity (all with parallels)
+- **24 Autograph Sets**: Beautiful Game Autographs, Beautiful Game Dual Autographs, Signature Series (all with parallels)
+- **6 Memorabilia Sets**: Kit Kings, Kit Series (with parallels)
+- **Total**: 149 sets, 8,977 cards
+
+**Files Modified:**
+1. `/scripts/import-donruss-soccer.ts` - Fixed `generateSetSlug()` calls (3 locations)
+2. `/scripts/import-donruss-soccer.ts` - Updated `determineSetType()` to include Rated Rookies as Base
+3. `/scripts/clean-donruss-data.ts` - Created cleanup script to remove incorrect data
+4. `/scripts/fix-rated-rookies-type.ts` - Created script to update Rated Rookies classification
+5. `/scripts/check-donruss-sets.ts` - Created verification script
+6. `/scripts/debug-donruss-slugs.ts` - Created debugging script
+
+**Problem Solved:**
+- **Issue**: `generateSetSlug()` was being called with parameters in wrong order
+- **Impact**: All sets generated the same slug, causing only 2 sets to be created with 8,772 cards incorrectly assigned
+- **Solution**: Updated all calls to use correct parameter order: `(year, releaseName, setName, setType, parallelName?)`
+- **Result**: All 149 sets now have unique slugs and correct card assignments
+
+---
+
+*Last Updated: November 9, 2025*
