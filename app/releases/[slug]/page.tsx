@@ -66,6 +66,12 @@ interface ReleaseSourceDocument {
   linkedAt: string;
 }
 
+interface SourceFile {
+  url: string;
+  type: string;
+  filename: string;
+}
+
 interface Release {
   id: string;
   name: string;
@@ -79,6 +85,7 @@ interface Release {
   images: Image[];
   sets: CardSet[];
   sourceDocuments?: ReleaseSourceDocument[];
+  sourceFiles?: SourceFile[] | any; // JSON field - can be array or null
 }
 
 interface CarouselImage {
@@ -502,7 +509,8 @@ export default function ReleasePage() {
           </div>
 
           {/* Source Documents Section */}
-          {release.sourceDocuments && release.sourceDocuments.length > 0 && (
+          {((release.sourceFiles && Array.isArray(release.sourceFiles) && release.sourceFiles.length > 0) ||
+            (release.sourceDocuments && release.sourceDocuments.length > 0)) && (
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
               <div className="bg-gradient-to-r from-footy-green to-green-700 px-6 py-4">
                 <h2 className="text-2xl font-bold text-white flex items-center gap-2">
@@ -513,7 +521,51 @@ export default function ReleasePage() {
                 </h2>
               </div>
               <div className="p-6 space-y-3">
-                {release.sourceDocuments.map((releaseDoc) => {
+                {/* Display sourceFiles (JSON field) */}
+                {release.sourceFiles && Array.isArray(release.sourceFiles) && release.sourceFiles.map((file, index) => {
+                  const fileExtension = file.filename?.split('.').pop()?.toUpperCase() || 'FILE';
+                  // Clean up the filename for display
+                  const displayName = file.filename?.replace(/^\d+-/, '') || 'Document';
+
+                  return (
+                    <a
+                      key={`sourcefile-${index}`}
+                      href={file.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:border-footy-green hover:bg-gray-50 transition-all duration-200 group"
+                    >
+                      {/* File Icon */}
+                      <div className="flex-shrink-0">
+                        <div className="w-12 h-12 bg-gradient-to-br from-footy-green to-green-700 rounded-lg flex items-center justify-center text-white font-bold text-xs group-hover:scale-110 transition-transform duration-200">
+                          {fileExtension}
+                        </div>
+                      </div>
+
+                      {/* Document Info */}
+                      <div className="flex-grow min-w-0">
+                        <h3 className="font-semibold text-gray-900 group-hover:text-footy-green transition-colors truncate">
+                          {displayName}
+                        </h3>
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                          <span className="inline-block px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                            {file.type === 'application/pdf' ? 'PDF' : file.type}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Download Icon */}
+                      <div className="flex-shrink-0">
+                        <svg className="w-5 h-5 text-gray-400 group-hover:text-footy-green transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      </div>
+                    </a>
+                  );
+                })}
+
+                {/* Display sourceDocuments (relation) */}
+                {release.sourceDocuments && release.sourceDocuments.map((releaseDoc) => {
                   const doc = releaseDoc.document;
                   const fileExtension = doc.filename.split('.').pop()?.toUpperCase() || 'FILE';
                   const fileSizeMB = (doc.fileSize / (1024 * 1024)).toFixed(2);

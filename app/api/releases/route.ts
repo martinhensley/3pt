@@ -49,6 +49,7 @@ export async function GET(request: NextRequest) {
             }
           },
         },
+        // Also select sourceFiles JSON field
       });
 
       if (!release) {
