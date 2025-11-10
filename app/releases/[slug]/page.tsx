@@ -85,7 +85,7 @@ interface Release {
   images: Image[];
   sets: CardSet[];
   sourceDocuments?: ReleaseSourceDocument[];
-  sourceFiles?: SourceFile[] | any; // JSON field - can be array or null
+  sourceFiles?: SourceFile[] | null; // JSON field - can be array or null
 }
 
 interface CarouselImage {
