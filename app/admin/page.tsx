@@ -246,20 +246,6 @@ export default function AdminDashboard() {
           </button>
 
           <button
-            onClick={() => router.push("/admin/cards/create")}
-            className="bg-gradient-to-r from-footy-orange to-orange-600 text-white p-6 rounded-xl hover:shadow-lg transition-all flex flex-col items-center gap-2"
-          >
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <span className="font-semibold">Scan Cards</span>
-            <span className="text-xs text-white/80 text-center">
-              Scan and analyze card images with AI
-            </span>
-          </button>
-
-          <button
             onClick={() => router.push("/admin/posts/create")}
             className="bg-gradient-to-r from-purple-500 to-purple-700 text-white p-6 rounded-xl hover:shadow-lg transition-all flex flex-col items-center gap-2"
           >
@@ -282,19 +268,6 @@ export default function AdminDashboard() {
             <span className="font-semibold">Manage Releases & Sets</span>
             <span className="text-xs text-white/80 text-center">
               Edit releases, sets, and cards
-            </span>
-          </button>
-
-          <button
-            onClick={() => router.push("/admin/cards")}
-            className="bg-gradient-to-r from-orange-400 to-orange-600 text-white p-6 rounded-xl hover:shadow-lg transition-all flex flex-col items-center gap-2"
-          >
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-            </svg>
-            <span className="font-semibold">Manage Card Images</span>
-            <span className="text-xs text-white/80 text-center">
-              Add and edit card images in checklist
             </span>
           </button>
 

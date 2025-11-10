@@ -37,6 +37,11 @@ model Release {
   description    String?         // Brief summary displayed in previews and on release page
   releaseDate    DateTime?       // Official release date for display (nullable for backwards compatibility)
 
+  // Approval workflow
+  isApproved     Boolean         @default(false) // Whether release is approved for public viewing
+  approvedAt     DateTime?       // When the release was approved
+  approvedBy     String?         // Email of admin who approved it
+
   // Source files used for AI analysis
   sellSheetText  String?         @db.Text // Extracted text from sell sheets for AI description generation
   sourceFiles    Json?           // Array of {url: string, type: string, filename: string} for uploaded PDFs/images
@@ -62,12 +67,20 @@ model Set {
   totalCards  String?
   printRun    Int?     // Standard print run for this set (e.g., 99 for "/99" parallels, null for unlimited base sets)
   description String?  // Optional description for this set
+
+  // Source data for regeneration and reference
+  sourceText  String?  @db.Text // Original pasted checklist text (parent sets only)
+
   parallels   Json?    // DEPRECATED: Array of {name: string, printRun: string} - use parallelSets relation instead
 
   // Parent-child relationship for parallel sets
   parentSetId String?  // Reference to parent set (null for parent sets)
   parentSet   Set?     @relation("ParallelSets", fields: [parentSetId], references: [id], onDelete: Cascade)
   parallelSets Set[]   @relation("ParallelSets") // Child parallel sets of this parent
+
+  // Flags for parallel behavior
+  hasVariableChecklist Boolean @default(false) // True if parallels have different checklists (e.g., "or fewer")
+  mirrorsParentChecklist Boolean @default(true) // True if parallel cards should mirror parent set's checklist
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

@@ -54,34 +54,11 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: "Set not found" }, { status: 404 });
       }
 
-      // Determine which set's cards to fetch
-      // If this is a parallel set (has parentSetId), fetch parent's cards
-      // If this is a parent set, fetch its own cards
-      const setIdForCards = matchedSet.parentSetId || matchedSet.id;
-
-      // Build where clause for cards
+      // Cards belong directly to the current set
+      // Each parallel set has its own cards
       const cardWhere: any = {
-        setId: setIdForCards,
+        setId: matchedSet.id,
       };
-
-      // If parallelSlug is provided, we need to filter cards by parallel type
-      // The parallel slug needs to be converted back to the parallel name
-      let currentParallelName: string | undefined;
-      if (parallelSlug) {
-        // Convert slug back to parallel name
-        // e.g., "electric-etch-green-5" -> "Electric Etch Green /5"
-        const parallelNameFromSlug = parallelSlug
-          .split('-')
-          .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(' ')
-          // Handle print runs: if last segment is a number, convert it to "/N"
-          .replace(/\s(\d+)$/, ' /$1');
-
-        currentParallelName = parallelNameFromSlug;
-
-        // Filter cards by parallelType matching the parallel name
-        cardWhere.parallelType = parallelNameFromSlug;
-      }
 
       // Fetch cards
       const cards = await prisma.card.findMany({
@@ -104,7 +81,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         ...matchedSet,
         cards: cards,
-        currentParallel: currentParallelName, // Include the parallel name for the frontend
       });
     }
 

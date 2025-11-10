@@ -85,16 +85,25 @@ export default function CardDetailPage() {
     fetch(`/api/cards?slug=${encodeURIComponent(slug)}`)
       .then((res) => {
         if (!res.ok) {
-          throw new Error('Card not found');
+          // Card not found - this is expected for non-existent cards
+          setCard(null);
+          setLoading(false);
+          return null;
         }
         return res.json();
       })
-      .then((cardData: Card) => {
-        setCard(cardData);
+      .then((cardData: Card | null) => {
+        if (cardData) {
+          setCard(cardData);
+        }
         setLoading(false);
       })
       .catch((error) => {
-        console.error("Failed to fetch card:", error);
+        // Only log unexpected errors
+        if (error.message !== 'Card not found') {
+          console.error("Failed to fetch card:", error);
+        }
+        setCard(null);
         setLoading(false);
       });
   }, [slug]);
@@ -240,15 +249,9 @@ export default function CardDetailPage() {
                     <span className="font-bold text-gray-900">{formatParallelName(card.parallelType.replace(/\s*–\s*/g, ' ').replace(/\s*\/\s*\d+\s*$/, ''))}</span>
                   </div>
                 )}
-                {card.printRun && (
-                  <div>
-                    <span className="text-gray-600">Print Run: </span>
-                    <span className="font-bold text-gray-900">/{card.printRun === 1 ? '1' : card.printRun}</span>
-                  </div>
-                )}
                 {card.numbered && (
                   <div>
-                    <span className="text-gray-600">Serial Numbered: </span>
+                    <span className="text-gray-600">Numbered: </span>
                     <span className="font-bold text-gray-900">{card.numbered}</span>
                   </div>
                 )}

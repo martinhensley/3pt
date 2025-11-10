@@ -14,6 +14,7 @@ import { formatParallelName } from "@/lib/formatters";
 
 interface Card {
   id: string;
+  slug: string;
   playerName: string | null;
   team: string | null;
   cardNumber: string | null;
@@ -205,39 +206,9 @@ export default function ParallelPage() {
                 // Generate individual card slug: year-releasename-setname-card#-player-parallel
                 // Special handling: Only remove "Base" from Optic sets
                 // For regular Base Set, keep "Base" in the slug
-                const cleanSetName = card.set.name
-                  .replace(/\boptic\s+base\s+set\b/gi, 'Optic') // Optic Base Set -> Optic
-                  .replace(/\boptic\s+base\b/gi, 'Optic') // Optic Base -> Optic
-                  .replace(/\bbase\s+optic\b/gi, 'Optic') // Base Optic -> Optic
-                  .replace(/\bbase\s+set\b/gi, 'Base') // Base Set -> Base (keep "Base")
-                  .replace(/\bsets?\b/gi, '') // Remove remaining "set/sets"
-                  .trim();
-                const slugParts = [
-                  card.set.release.year,
-                  card.set.release.name,
-                  cleanSetName,
-                  card.cardNumber || '',
-                  card.playerName || 'unknown',
-                ];
-
-                // Always add the parallel name from the URL since we're on a parallel page
-                // Use parallelName which is derived from the URL slug
-                if (parallelName && parallelName.toLowerCase() !== 'base' && parallelName.toLowerCase() !== 'optic') {
-                  slugParts.push(parallelName);
-                } else if (card.parallelType && card.parallelType.toLowerCase() !== 'base' && card.parallelType.toLowerCase() !== 'optic') {
-                  slugParts.push(card.parallelType);
-                } else if (card.variant && card.variant.toLowerCase() !== 'base') {
-                  slugParts.push(card.variant);
-                }
-
-                const cardSlug = slugParts
-                  .filter(Boolean)
-                  .join('-')
-                  .toLowerCase()
-                  .replace(/\s+/g, '-')
-                  .replace(/[^a-z0-9-]/g, '')
-                  .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
-                  .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+                // Use the card's actual slug from the database
+                // This was generated correctly during import using generateCardSlug()
+                const cardSlug = card.slug;
 
                 return (
                   <Link

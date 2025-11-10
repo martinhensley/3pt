@@ -48,6 +48,9 @@ interface Release {
   year: string;
   description: string | null;
   sourceFiles: SourceFile[] | null;
+  isApproved: boolean;
+  approvedAt: string | null;
+  approvedBy: string | null;
   manufacturerId: string;
   manufacturer: {
     id: string;

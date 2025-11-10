@@ -11,6 +11,10 @@ export async function GET(request: NextRequest) {
     const slug = searchParams.get("slug");
     const id = searchParams.get("id");
 
+    // Check if user is authenticated (for admin views)
+    const session = await getServerSession(authOptions);
+    const isAdmin = !!session?.user;
+
     if (slug) {
       // Fetch release by slug directly from Release model
       const release = await prisma.release.findUnique({
@@ -36,10 +40,26 @@ export async function GET(request: NextRequest) {
               createdAt: 'asc'
             }
           },
+          sourceDocuments: {
+            include: {
+              document: true
+            },
+            orderBy: {
+              linkedAt: 'desc'
+            }
+          },
         },
       });
 
       if (!release) {
+        return NextResponse.json(
+          { error: "Release not found" },
+          { status: 404 }
+        );
+      }
+
+      // Check if release is approved (unless admin)
+      if (!isAdmin && !release.isApproved) {
         return NextResponse.json(
           { error: "Release not found" },
           { status: 404 }
@@ -58,6 +78,9 @@ export async function GET(request: NextRequest) {
           year: true,
           description: true,
           sourceFiles: true, // Include sourceFiles for Edit Release page
+          isApproved: true,
+          approvedAt: true,
+          approvedBy: true,
           manufacturerId: true,
           createdAt: true,
           updatedAt: true,
@@ -94,6 +117,7 @@ export async function GET(request: NextRequest) {
     } else {
       // Fetch all releases
       const releases = await prisma.release.findMany({
+        where: isAdmin ? {} : { isApproved: true }, // Only show approved releases to public
         include: {
           manufacturer: true,
           images: {

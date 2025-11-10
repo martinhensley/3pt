@@ -128,11 +128,13 @@ export default function SetPage() {
     return extractKeywordsFromPost(postLike as { title: string; content: string; excerpt: string; type: string });
   }, [set, displayName]);
 
-  // For sets with mixed base + parallel cards, only count base cards
-  // Base cards have parallelType = "Base" or null
-  const baseCards = set?.cards?.filter(card =>
-    card.parallelType === 'Base' || card.parallelType === null
-  ) || [];
+  // For base sets with mixed base + parallel cards, only show base cards
+  // For parallel sets, show all cards (they all belong to that parallel)
+  const displayCards = set?.parentSetId
+    ? (set?.cards || []) // Parallel set: show all cards
+    : (set?.cards?.filter(card => // Base set: show only base cards
+        card.parallelType === 'Base' || card.parallelType === null
+      ) || []);
 
   // Get unique parallel types (excluding Base)
   const uniqueParallels = set?.cards
@@ -143,11 +145,11 @@ export default function SetPage() {
       ))
     : [];
 
-  const setCardCount = baseCards.length || (set?.totalCards ? parseInt(set.totalCards) : 0);
+  const setCardCount = displayCards.length || (set?.totalCards ? parseInt(set.totalCards) : 0);
   const setParallelCount = set?.parallelSets?.length || uniqueParallels.length;
 
-  // Sort cards numerically by cardNumber - only show base cards
-  const sortedCards = baseCards.length > 0 ? [...baseCards].sort((a, b) => {
+  // Sort cards numerically by cardNumber
+  const sortedCards = displayCards.length > 0 ? [...displayCards].sort((a, b) => {
     const numA = parseInt(a.cardNumber || '0');
     const numB = parseInt(b.cardNumber || '0');
     return numA - numB;
@@ -161,10 +163,22 @@ export default function SetPage() {
         const printRunMatch = (parallelType || '').match(/\/(\d+)$/);
         const extractedPrintRun = printRunMatch ? parseInt(printRunMatch[1]) : null;
 
+        // Generate parallel slug (just the parallel name part)
+        // This will be used in the path: /sets/{baseSetSlug}/parallels/{parallelSlug}
+        const parallelSlug = parallelType
+          ? parallelType
+              .toLowerCase()
+              .replace(/\b1\s*\/\s*1\b/gi, '1-of-1')        // Convert "1/1" to "1-of-1"
+              .replace(/\b1\s*of\s*1\b/gi, '1-of-1')        // Convert "1 of 1" to "1-of-1"
+              .replace(/\s*\/\s*(\d+)/g, '-$1')              // Convert " /44" to "-44"
+              .replace(/[^a-z0-9]+/g, '-')
+              .replace(/^-+|-+$/g, '')
+          : '';
+
         return {
           id: `temp-${parallelType}`,
           name: parallelType || '',
-          slug: '', // Will be generated on the fly
+          slug: parallelSlug,
           printRun: extractedPrintRun,
         };
       });
@@ -263,8 +277,8 @@ export default function SetPage() {
           )}
         </div>
 
-        {/* Parallels Section */}
-        {displayParallels && displayParallels.length > 0 && (
+        {/* Parallels Section - Only show for base sets, not for parallel sets */}
+        {!set?.parentSetId && displayParallels && displayParallels.length > 0 && (
           <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
             <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -296,7 +310,13 @@ export default function SetPage() {
                     {/* Show card count if available */}
                     {parallelSet.slug && (
                       <Link
-                        href={`/sets/${parallelSet.slug}`}
+                        href={
+                          // If this parallel has a full slug (from database), use it directly
+                          // Otherwise, use the parallels route structure
+                          set?.parallelSets && set.parallelSets.length > 0
+                            ? `/sets/${parallelSet.slug}`
+                            : `/sets/${slug}/parallels/${parallelSet.slug}`
+                        }
                         className="text-sm text-white/60 hover:text-footy-orange transition-colors mt-1 inline-block"
                       >
                         View cards →
@@ -321,41 +341,9 @@ export default function SetPage() {
           {sortedCards && sortedCards.length > 0 ? (
             <div className="grid gap-3">
               {sortedCards.map((card) => {
-                // For parallel sets, generate the correct slug with parallel info
-                let cardSlug = card.slug || '';
-
-                if (set.parentSetId && set.printRun && set.parentSet) {
-                  // For parallel cards, we need to generate a slug that:
-                  // 1. Excludes the base set name (already handled by generateCardSlug)
-                  // 2. Includes the parallel name (from set.name)
-                  // 3. Doesn't duplicate the print run
-
-                  // Extract the parallel name from the set name (remove /## at end)
-                  const parallelName = set.name.replace(/\s*\/\d+$/, '');
-                  const printRunStr = set.printRun.toString();
-
-                  // Check if parallel name already ends with the print run
-                  const variantEndsWithPrintRun = parallelName.trim().endsWith(` ${printRunStr}`);
-                  const parallelWithPrintRun = variantEndsWithPrintRun
-                    ? parallelName
-                    : `${parallelName} ${printRunStr}`;
-
-                  // Generate new slug: year-release-cardnum-player-parallelname-printrun
-                  // This will automatically exclude "base" and handle print run correctly
-                  const parts = [
-                    set.release.year,
-                    set.release.name,
-                    card.cardNumber,
-                    card.playerName,
-                    parallelWithPrintRun
-                  ].filter(Boolean);
-
-                  cardSlug = parts
-                    .join(' ')
-                    .toLowerCase()
-                    .replace(/[^a-z0-9]+/g, '-')
-                    .replace(/^-+|-+$/g, '');
-                }
+                // Use the card's slug from the database
+                // This was generated correctly during import using generateCardSlug()
+                const cardSlug = card.slug;
 
                 return (
                   <Link
@@ -376,22 +364,18 @@ export default function SetPage() {
                       {card.team && (
                         <span className="text-sm text-gray-600">{card.team}</span>
                       )}
-                      {/* Show print run badge - for parallel sets show set print run, otherwise show card print run */}
-                      {(set.parentSetId && set.printRun) ? (
-                        <span className="px-2 py-0.5 bg-orange-100 text-footy-orange text-xs rounded-full font-semibold">
-                          # /{set.printRun}
-                        </span>
-                      ) : card.printRun ? (
+                      {/* Show card-specific print run badge */}
+                      {card.printRun && (
                         <span className="px-2 py-0.5 bg-orange-100 text-footy-orange text-xs rounded-full font-semibold">
                           # /{card.printRun}
                         </span>
-                      ) : null}
+                      )}
                       {card.variant && (
                         <span className="text-sm text-footy-orange">• {formatParallelName(card.variant)}</span>
                       )}
                     </div>
                   </div>
-                  {(card.hasAutograph || card.hasMemorabilia || card.isNumbered) && (
+                  {(card.hasAutograph || card.hasMemorabilia) && (
                     <div className="flex gap-2 flex-wrap">
                       {card.hasAutograph && (
                         <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-semibold">
@@ -401,11 +385,6 @@ export default function SetPage() {
                       {card.hasMemorabilia && (
                         <span className="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-semibold">
                           MEM
-                        </span>
-                      )}
-                      {card.isNumbered && card.printRun && (
-                        <span className="px-3 py-1 bg-orange-100 text-orange-800 text-xs rounded-full font-semibold">
-                          /{card.printRun}
                         </span>
                       )}
                     </div>

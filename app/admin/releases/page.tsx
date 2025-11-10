@@ -13,6 +13,9 @@ interface Release {
   year: string | null;
   slug: string;
   createdAt: string;
+  isApproved: boolean;
+  approvedAt: string | null;
+  approvedBy: string | null;
   manufacturer: {
     id: string;
     name: string;
@@ -20,6 +23,7 @@ interface Release {
   sets: {
     id: string;
     name: string;
+    parentSetId: string | null;
     _count: {
       cards: number;
     };
@@ -90,6 +94,40 @@ export default function ManageReleasesPage() {
     }
   };
 
+  const handleApproval = async (releaseId: string, releaseName: string, currentStatus: boolean) => {
+    const action = currentStatus ? "unapprove" : "approve";
+    if (!confirm(`Are you sure you want to ${action} "${releaseName}"?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/releases/approve", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          releaseId,
+          approve: !currentStatus,
+        }),
+      });
+
+      if (response.ok) {
+        setMessage({
+          type: "success",
+          text: `Release ${action}d successfully!`,
+        });
+        fetchReleases();
+        setTimeout(() => setMessage(null), 3000);
+      } else {
+        throw new Error(`Failed to ${action} release`);
+      }
+    } catch {
+      setMessage({ type: "error", text: `Failed to ${action} release` });
+      setTimeout(() => setMessage(null), 3000);
+    }
+  };
+
   if (status === "loading" || loading) {
     return (
       <AdminLayout>
@@ -139,16 +177,28 @@ export default function ManageReleasesPage() {
           )}
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 mt-6">
             <div className="bg-gradient-to-r from-footy-green to-green-600 rounded-lg p-6 text-white">
               <div className="text-3xl font-bold">{filteredReleases.length}</div>
               <div className="text-sm opacity-90">Total Releases</div>
             </div>
             <div className="bg-gradient-to-r from-footy-green to-green-600 rounded-lg p-6 text-white">
               <div className="text-3xl font-bold">
-                {filteredReleases.reduce((sum, r) => sum + r.sets.length, 0)}
+                {filteredReleases.reduce(
+                  (sum, r) => sum + r.sets.filter(s => s.parentSetId === null).length,
+                  0
+                )}
               </div>
-              <div className="text-sm opacity-90">Total Sets</div>
+              <div className="text-sm opacity-90">Base Sets</div>
+            </div>
+            <div className="bg-gradient-to-r from-footy-green to-green-600 rounded-lg p-6 text-white">
+              <div className="text-3xl font-bold">
+                {filteredReleases.reduce(
+                  (sum, r) => sum + r.sets.filter(s => s.parentSetId !== null).length,
+                  0
+                )}
+              </div>
+              <div className="text-sm opacity-90">Parallel Sets</div>
             </div>
             <div className="bg-gradient-to-r from-footy-green to-green-600 rounded-lg p-6 text-white">
               <div className="text-3xl font-bold">
@@ -210,6 +260,21 @@ export default function ManageReleasesPage() {
                             {release.year}
                           </span>
                         )}
+                        {release.isApproved ? (
+                          <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold flex items-center gap-1">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            Approved
+                          </span>
+                        ) : (
+                          <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-semibold flex items-center gap-1">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Pending
+                          </span>
+                        )}
                       </div>
 
                       <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
@@ -253,10 +318,37 @@ export default function ManageReleasesPage() {
                       </Link>
                       <Link
                         href={`/admin/releases/edit/${release.id}`}
-                        className="px-4 py-2 bg-footy-green hover:bg-green-700 text-white rounded-lg transition-colors"
+                        className="px-4 py-2 bg-footy-green hover:bg-green-700 text-white rounded-lg transition-colors flex items-center gap-2"
                       >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
                         Edit
                       </Link>
+                      <button
+                        onClick={() => handleApproval(release.id, `${release.manufacturer.name} ${release.name}`, release.isApproved)}
+                        className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                          release.isApproved
+                            ? "bg-gray-600 hover:bg-gray-700 text-white"
+                            : "bg-blue-600 hover:bg-blue-700 text-white"
+                        }`}
+                      >
+                        {release.isApproved ? (
+                          <>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            Unapprove
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            Approve
+                          </>
+                        )}
+                      </button>
                       <button
                         onClick={() => handleDelete(release.id, `${release.manufacturer.name} ${release.name}`)}
                         className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors"

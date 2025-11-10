@@ -47,6 +47,25 @@ interface CardSet {
   cards: Card[];
 }
 
+interface SourceDocument {
+  id: string;
+  filename: string;
+  displayName: string;
+  blobUrl: string;
+  mimeType: string;
+  fileSize: number;
+  documentType: 'SELL_SHEET' | 'CHECKLIST' | 'PRESS_RELEASE' | 'PRICE_GUIDE' | 'IMAGE' | 'OTHER';
+  description: string | null;
+  uploadedAt: string;
+}
+
+interface ReleaseSourceDocument {
+  id: string;
+  document: SourceDocument;
+  usageContext: string | null;
+  linkedAt: string;
+}
+
 interface Release {
   id: string;
   name: string;
@@ -59,6 +78,7 @@ interface Release {
   };
   images: Image[];
   sets: CardSet[];
+  sourceDocuments?: ReleaseSourceDocument[];
 }
 
 interface CarouselImage {
@@ -400,142 +420,25 @@ export default function ReleasePage() {
               </div>
             )}
 
-            {/* Sets */}
+            {/* Sets - Single Combined Table */}
             <div className="p-8 pt-6 border-t border-white/20">
               {release.sets && release.sets.length > 0 && (
-                <div className="space-y-3">
-                  {/* Combined Base & Insert Section */}
-                  {(() => {
-                    const baseSets = setsByType.get('Base') || [];
-                    const insertSets = setsByType.get('Insert') || [];
-                    const combinedSets = [...baseSets, ...insertSets];
+                <div className="bg-white/5 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10">
+                  {/* Header Row - Always Visible */}
+                  <div className="grid grid-cols-3 gap-4 px-4 py-3 bg-white/10">
+                    <div className="font-bold text-sm uppercase tracking-wide text-white/90">Set Name</div>
+                    <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Parallels</div>
+                    <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Cards</div>
+                  </div>
 
-                    if (combinedSets.length > 0) {
-                      const isBaseExpanded = expandedTypes.has('Base');
-                      const isInsertExpanded = expandedTypes.has('Insert');
-
-                      return (
-                        <div className="bg-white/5 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10">
-                          {/* Header Row - Always Visible */}
-                          <div className="grid grid-cols-3 gap-4 px-4 py-3 bg-white/10">
-                            <div className="font-bold text-sm uppercase tracking-wide text-white/90">Set Name</div>
-                            <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Parallels</div>
-                            <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Cards</div>
-                          </div>
-
-                          {/* Base Section */}
-                          {baseSets.length > 0 && (
-                            <>
-                              {/* Base Label Row */}
-                              <div className="w-full px-4 py-3 bg-blue-500/20 border-t border-white/10">
-                                <span className="font-bold text-lg text-blue-200">Base</span>
-                              </div>
-
-                              {baseSets.map((set: CardSet, idx: number) => {
-                                const setCardCount = set.totalCards ? parseInt(set.totalCards) : (set.cards?.length || 0);
-                                const setParallelCount = set.parallelSets?.length || (Array.isArray(set.parallels) ? set.parallels.length : 0);
-
-                                const displayName = set.name
-                                  .replace(/\boptic\s+base\s+set\b/gi, 'Optic')
-                                  .replace(/\boptic\s+base\b/gi, 'Optic')
-                                  .replace(/\bbase\s+optic\b/gi, 'Optic')
-                                  .replace(/\bsets?\b/gi, '')
-                                  .trim();
-
-                                const gradients = [
-                                  'from-blue-500/20 to-cyan-500/20',
-                                  'from-purple-500/20 to-pink-500/20',
-                                  'from-orange-500/20 to-red-500/20',
-                                  'from-green-500/20 to-emerald-500/20',
-                                  'from-indigo-500/20 to-purple-500/20',
-                                ];
-                                const gradient = gradients[idx % gradients.length];
-
-                                return (
-                                  <Link
-                                    key={set.id}
-                                    href={`/sets/${set.slug}`}
-                                    className={`grid grid-cols-3 gap-4 px-4 py-3 bg-gradient-to-r ${gradient} hover:from-white/20 hover:to-white/10 transition-all duration-200 border-t border-white/10 cursor-pointer`}
-                                  >
-                                    <div className="font-semibold text-white hover:underline">{displayName}</div>
-                                    <div className="text-center">
-                                      <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-white font-bold text-sm">
-                                        {setParallelCount > 0 ? setParallelCount : '—'}
-                                      </span>
-                                    </div>
-                                    <div className="text-center">
-                                      <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-white font-bold text-sm">
-                                        {setCardCount > 0 ? setCardCount.toLocaleString() : '—'}
-                                      </span>
-                                    </div>
-                                  </Link>
-                                );
-                              })}
-                            </>
-                          )}
-
-                          {/* Insert Section */}
-                          {insertSets.length > 0 && (
-                            <>
-                              {/* Insert Label Row */}
-                              <div className="w-full px-4 py-3 bg-green-500/20 border-t border-white/10">
-                                <span className="font-bold text-lg text-green-200">Insert</span>
-                              </div>
-
-                              {insertSets.map((set: CardSet, idx: number) => {
-                                const setCardCount = set.totalCards ? parseInt(set.totalCards) : (set.cards?.length || 0);
-                                const setParallelCount = set.parallelSets?.length || (Array.isArray(set.parallels) ? set.parallels.length : 0);
-
-                                const displayName = set.name
-                                  .replace(/\boptic\s+base\s+set\b/gi, 'Optic')
-                                  .replace(/\boptic\s+base\b/gi, 'Optic')
-                                  .replace(/\bbase\s+optic\b/gi, 'Optic')
-                                  .replace(/\bsets?\b/gi, '')
-                                  .trim();
-
-                                const gradients = [
-                                  'from-blue-500/20 to-cyan-500/20',
-                                  'from-purple-500/20 to-pink-500/20',
-                                  'from-orange-500/20 to-red-500/20',
-                                  'from-green-500/20 to-emerald-500/20',
-                                  'from-indigo-500/20 to-purple-500/20',
-                                ];
-                                const gradient = gradients[idx % gradients.length];
-
-                                return (
-                                  <Link
-                                    key={set.id}
-                                    href={`/sets/${set.slug}`}
-                                    className={`grid grid-cols-3 gap-4 px-4 py-3 bg-gradient-to-r ${gradient} hover:from-white/20 hover:to-white/10 transition-all duration-200 border-t border-white/10 cursor-pointer`}
-                                  >
-                                    <div className="font-semibold text-white hover:underline">{displayName}</div>
-                                    <div className="text-center">
-                                      <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-white font-bold text-sm">
-                                        {setParallelCount > 0 ? setParallelCount : '—'}
-                                      </span>
-                                    </div>
-                                    <div className="text-center">
-                                      <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-white font-bold text-sm">
-                                        {setCardCount > 0 ? setCardCount.toLocaleString() : '—'}
-                                      </span>
-                                    </div>
-                                  </Link>
-                                );
-                              })}
-                            </>
-                          )}
-                        </div>
-                      );
-                    }
-                    return null;
-                  })()}
-
-                  {/* Other Set Types - Separate Sections */}
-                  {['Autograph', 'Memorabilia', 'Other'].map(setType => {
+                  {/* Render all set types in order */}
+                  {['Base', 'Insert', 'Autograph', 'Memorabilia', 'Other'].map(setType => {
                     const setsOfType = setsByType.get(setType);
                     if (!setsOfType || setsOfType.length === 0) return null;
 
                     const typeColors: Record<string, { bg: string; text: string }> = {
+                      Base: { bg: 'bg-blue-500/20', text: 'text-blue-200' },
+                      Insert: { bg: 'bg-green-500/20', text: 'text-green-200' },
                       Autograph: { bg: 'bg-purple-500/20', text: 'text-purple-200' },
                       Memorabilia: { bg: 'bg-orange-500/20', text: 'text-orange-200' },
                       Other: { bg: 'bg-gray-500/20', text: 'text-gray-200' },
@@ -543,14 +446,7 @@ export default function ReleasePage() {
                     const colors = typeColors[setType] || typeColors.Other;
 
                     return (
-                      <div key={setType} className="bg-white/5 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10">
-                        {/* Header Row */}
-                        <div className="grid grid-cols-3 gap-4 px-4 py-3 bg-white/10">
-                          <div className="font-bold text-sm uppercase tracking-wide text-white/90">Set Name</div>
-                          <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Parallels</div>
-                          <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Cards</div>
-                        </div>
-
+                      <div key={setType}>
                         {/* Type Label Row */}
                         <div className={`w-full px-4 py-3 ${colors.bg} border-t border-white/10`}>
                           <span className={`font-bold text-lg ${colors.text}`}>{setType}</span>
@@ -604,6 +500,87 @@ export default function ReleasePage() {
               )}
             </div>
           </div>
+
+          {/* Source Documents Section */}
+          {release.sourceDocuments && release.sourceDocuments.length > 0 && (
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
+              <div className="bg-gradient-to-r from-footy-green to-green-700 px-6 py-4">
+                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Source Documents
+                </h2>
+              </div>
+              <div className="p-6 space-y-3">
+                {release.sourceDocuments.map((releaseDoc) => {
+                  const doc = releaseDoc.document;
+                  const fileExtension = doc.filename.split('.').pop()?.toUpperCase() || 'FILE';
+                  const fileSizeMB = (doc.fileSize / (1024 * 1024)).toFixed(2);
+
+                  // Document type badge colors
+                  const typeColors: Record<string, { bg: string; text: string }> = {
+                    SELL_SHEET: { bg: 'bg-blue-100', text: 'text-blue-800' },
+                    CHECKLIST: { bg: 'bg-green-100', text: 'text-green-800' },
+                    PRESS_RELEASE: { bg: 'bg-purple-100', text: 'text-purple-800' },
+                    PRICE_GUIDE: { bg: 'bg-yellow-100', text: 'text-yellow-800' },
+                    IMAGE: { bg: 'bg-pink-100', text: 'text-pink-800' },
+                    OTHER: { bg: 'bg-gray-100', text: 'text-gray-800' },
+                  };
+                  const colors = typeColors[doc.documentType] || typeColors.OTHER;
+
+                  return (
+                    <a
+                      key={releaseDoc.id}
+                      href={doc.blobUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:border-footy-green hover:bg-gray-50 transition-all duration-200 group"
+                    >
+                      {/* File Icon */}
+                      <div className="flex-shrink-0">
+                        <div className="w-12 h-12 bg-gradient-to-br from-footy-green to-green-700 rounded-lg flex items-center justify-center text-white font-bold text-xs group-hover:scale-110 transition-transform duration-200">
+                          {fileExtension}
+                        </div>
+                      </div>
+
+                      {/* Document Info */}
+                      <div className="flex-grow min-w-0">
+                        <h3 className="font-semibold text-gray-900 group-hover:text-footy-green transition-colors truncate">
+                          {doc.displayName}
+                        </h3>
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                          <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${colors.bg} ${colors.text}`}>
+                            {doc.documentType.replace(/_/g, ' ')}
+                          </span>
+                          <span className="text-sm text-gray-500">
+                            {fileSizeMB} MB
+                          </span>
+                          {releaseDoc.usageContext && (
+                            <span className="text-sm text-gray-500 italic truncate">
+                              • {releaseDoc.usageContext}
+                            </span>
+                          )}
+                        </div>
+                        {doc.description && (
+                          <p className="text-sm text-gray-600 mt-1 line-clamp-1">
+                            {doc.description}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Download Icon */}
+                      <div className="flex-shrink-0">
+                        <svg className="w-5 h-5 text-gray-400 group-hover:text-footy-green transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           <EbayAdHorizontal
             query={adKeywords.relatedQuery}

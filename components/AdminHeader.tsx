@@ -67,12 +67,6 @@ export default function AdminHeader() {
             >
               Manage Releases
             </Link>
-            <Link
-              href="/admin/cards"
-              className="text-footy-orange hover:text-white transition-colors text-sm md:text-base font-bold"
-            >
-              Manage Cards
-            </Link>
             <button
               type="button"
               onClick={() => signOut()}

@@ -386,6 +386,25 @@ Login credentials are configured in your environment variables.
 - Body: `{ name, sellSheetText }`
 - Returns: Generated description text
 
+**POST** `/api/sets/import-excel` (Auth required)
+- **AI-Powered Excel Import Workflow**
+- Automatically imports complete checklists from Excel files
+- Body: `{ releaseId, fileData (base64), dryRun? }`
+- Workflow:
+  1. Parses Excel file and extracts all cards
+  2. Uses Claude AI via Genkit to analyze set structure
+  3. Identifies base sets and their parallel variations
+  4. Determines set types (Base, Insert, Autograph, Memorabilia)
+  5. Creates hierarchical structure: parent sets → parallel sets → cards
+  6. Handles duplicate detection (idempotent - safe to run multiple times)
+- Features:
+  - **Dry run mode**: Preview analysis before creating data
+  - **Smart parallel detection**: Groups parallels under parent sets
+  - **Type classification**: Auto-categorizes sets by type
+  - **Print run extraction**: Automatically detects and assigns print runs
+  - **Release selector**: User explicitly chooses target release (prevents wrong imports)
+- Returns: Import summary with counts of sets and cards created
+
 ---
 
 ### Uploads
