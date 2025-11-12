@@ -34,10 +34,19 @@ export async function POST(request: NextRequest) {
       console.log('Extracting text from PDF:', fileUrl);
       try {
         const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
+
+        // Disable worker to avoid version mismatch issues in serverless
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+
         const pdfResponse = await fetch(fileUrl);
         const pdfBuffer = await pdfResponse.arrayBuffer();
 
-        const loadingTask = pdfjsLib.getDocument({ data: pdfBuffer });
+        const loadingTask = pdfjsLib.getDocument({
+          data: pdfBuffer,
+          useWorkerFetch: false,
+          isEvalSupported: false,
+          useSystemFonts: true,
+        });
         const pdfDocument = await loadingTask.promise;
 
         let fullText = '';
