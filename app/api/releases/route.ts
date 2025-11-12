@@ -22,6 +22,9 @@ export async function GET(request: NextRequest) {
         include: {
           manufacturer: true,
           images: {
+            where: {
+              type: 'RELEASE'
+            },
             orderBy: { order: 'asc' }
           },
           sets: {
@@ -41,11 +44,11 @@ export async function GET(request: NextRequest) {
             }
           },
           sourceDocuments: {
-            include: {
-              document: true
+            where: {
+              entityType: 'RELEASE'
             },
             orderBy: {
-              linkedAt: 'desc'
+              createdAt: 'desc'
             }
           },
         },
@@ -88,6 +91,9 @@ export async function GET(request: NextRequest) {
           updatedAt: true,
           manufacturer: true,
           images: {
+            where: {
+              type: 'RELEASE'
+            },
             orderBy: { order: 'asc' }
           },
           sets: {
@@ -106,11 +112,11 @@ export async function GET(request: NextRequest) {
             }
           },
           sourceDocuments: {
-            include: {
-              document: true
+            where: {
+              entityType: 'RELEASE'
             },
             orderBy: {
-              linkedAt: 'desc'
+              createdAt: 'desc'
             }
           },
         },
@@ -131,6 +137,9 @@ export async function GET(request: NextRequest) {
         include: {
           manufacturer: true,
           images: {
+            where: {
+              type: 'RELEASE'
+            },
             orderBy: { order: 'asc' }
           },
           sets: {
@@ -141,9 +150,10 @@ export async function GET(request: NextRequest) {
             }
           },
         },
-        orderBy: {
-          createdAt: 'desc'
-        }
+        orderBy: [
+          { postDate: 'desc' }, // Sort by postDate first (chronological)
+          { createdAt: 'desc' } // Fall back to createdAt if postDate is null
+        ]
       });
 
       return NextResponse.json(releases);
@@ -165,7 +175,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, name, year, releaseDate, description, sourceFiles } = body;
+    const { id, name, year, releaseDate, description, sourceFiles, postDate } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -180,12 +190,16 @@ export async function PUT(request: NextRequest) {
         name,
         year,
         releaseDate: releaseDate || null,
+        postDate: postDate ? new Date(postDate) : null, // Allow admin to set custom postDate
         description: description || null,
         sourceFiles: sourceFiles || null,
       },
       include: {
         manufacturer: true,
         images: {
+          where: {
+            type: 'RELEASE'
+          },
           orderBy: { order: 'asc' }
         },
         sets: {

@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { analyzeReleaseFlow, generateDescriptionFlow } from '@/lib/genkit';
 import { prisma } from '@/lib/prisma';
+import { parseReleaseDateToPostDate } from '@/lib/formatters';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -34,9 +35,13 @@ export async function POST(request: NextRequest) {
       console.log('Extracting text from PDF:', fileUrl);
       try {
         const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
+        const path = await import('path');
+        const { fileURLToPath } = await import('url');
 
-        // Disable worker to avoid version mismatch issues in serverless
-        pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+        // Use the local worker file from node_modules
+        // This ensures version compatibility in serverless environments
+        const workerPath = path.resolve(process.cwd(), 'node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs');
+        pdfjsLib.GlobalWorkerOptions.workerSrc = workerPath;
 
         const pdfResponse = await fetch(fileUrl);
         const pdfBuffer = await pdfResponse.arrayBuffer();
@@ -116,6 +121,11 @@ export async function POST(request: NextRequest) {
           ]
         : null;
 
+      // Parse releaseDate string to postDate DateTime
+      const postDate = releaseInfo.releaseDate
+        ? parseReleaseDateToPostDate(releaseInfo.releaseDate)
+        : null;
+
       // Create release
       const release = await prisma.release.create({
         data: {
@@ -124,7 +134,8 @@ export async function POST(request: NextRequest) {
           year: releaseInfo.year,
           slug: releaseInfo.slug,
           description: descriptionResult.description,
-          releaseDate: releaseInfo.releaseDate ? new Date(releaseInfo.releaseDate) : null,
+          releaseDate: releaseInfo.releaseDate || null,
+          postDate: postDate,
           sellSheetText: extractedText,
           sourceFiles: sourceFiles || undefined,
         },
@@ -133,23 +144,13 @@ export async function POST(request: NextRequest) {
       // Create images from uploaded images
       if (uploadedImages.length > 0) {
         for (let i = 0; i < uploadedImages.length; i++) {
-          // Create the Image record
-          const image = await prisma.image.create({
+          await prisma.image.create({
             data: {
               url: uploadedImages[i],
               order: i,
               caption: null,
-            },
-          });
-
-          // Create the ReleaseImage junction record
-          await prisma.releaseImage.create({
-            data: {
+              type: 'RELEASE',
               releaseId: release.id,
-              imageId: image.id,
-              order: i,
-              caption: null,
-              linkedById: session.user.email || 'system',
             },
           });
         }

@@ -36,6 +36,7 @@ model Release {
   slug           String          @unique
   description    String?         // Brief summary displayed in previews and on release page
   releaseDate    String?         // Official release date as free-form string (e.g., "May 4, 2025" or "1978")
+  postDate       DateTime?       // Date for chronological ordering (auto-populated from releaseDate or manually set)
 
   // Approval workflow
   isApproved     Boolean         @default(false) // Whether release is approved for public viewing
@@ -52,8 +53,8 @@ model Release {
   updatedAt      DateTime        @updatedAt
   sets           Set[]
   posts          Post[]          // Posts that reference this release
-  images         ReleaseImage[]  // Changed to use junction table
-  sourceDocuments ReleaseSourceDocument[]
+  images         Image[]         // Direct relationship with type field
+  sourceDocuments SourceDocument[] // Direct relationship with entityType field
 }
 
 model Set {
@@ -86,7 +87,7 @@ model Set {
   updatedAt   DateTime @updatedAt
   cards       Card[]
   posts       Post[]   // Posts that reference this set
-  images      SetImage[] // Changed to use junction table
+  images      Image[]  // Direct relationship with type field
 }
 
 enum SetType {
@@ -134,7 +135,7 @@ model Card {
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
   posts                 Post[]   // Posts that reference this card
-  images                CardImage[] // Changed to use junction table
+  images                Image[]  // Direct relationship with type field
 }
 
 model Post {
@@ -145,6 +146,7 @@ model Post {
   excerpt     String?
   type        PostType
   published   Boolean     @default(false)
+  postDate    DateTime?   // Date for chronological ordering (defaults to createdAt, can be backdated)
   releaseId   String?
   release     Release?    @relation(fields: [releaseId], references: [id])
   setId       String?
@@ -154,23 +156,38 @@ model Post {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   authorId    String      // References neon_auth.admin_users.id (not enforced by FK)
-  images      PostImage[] // Changed to use junction table
-  sourceDocuments PostSourceDocument[]
+  images      Image[]     // Direct relationship with type field
+  sourceDocuments SourceDocument[] // Direct relationship with entityType field
 }
 
-// Unified image model - all entity relationships now use junction tables
+// Unified image model - direct foreign keys with type field
 model Image {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   url       String
   caption   String?
-  order     Int      @default(0)
-  createdAt DateTime @default(now())
+  order     Int       @default(0)
+  type      ImageType // What this image belongs to
+  createdAt DateTime  @default(now())
 
-  // All relationships now use junction tables for consistency
-  releases  ReleaseImage[]
-  sets      SetImage[]
-  cards     CardImage[]
-  posts     PostImage[]
+  // Foreign keys - only one will be set based on type
+  releaseId String?
+  release   Release?  @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+
+  setId     String?
+  set       Set?      @relation(fields: [setId], references: [id], onDelete: Cascade)
+
+  cardId    String?
+  card      Card?     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  postId    String?
+  post      Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+enum ImageType {
+  RELEASE    // Release product image
+  SET        // Set/insert image
+  CARD       // Individual card image
+  POST       // Post/article image
 }
 
 enum PostType {
@@ -183,38 +200,48 @@ enum PostType {
 
 // Source documents used for content creation (sell sheets, checklists, etc.)
 model SourceDocument {
-  id              String   @id @default(cuid())
+  id              String       @id @default(cuid())
 
   // File information
-  filename        String   // Original filename
-  displayName     String   // User-friendly name (editable)
-  blobUrl         String   // Vercel Blob storage URL
-  mimeType        String   // e.g., "application/pdf", "image/jpeg"
-  fileSize        Int      // Size in bytes
+  filename        String       // Original filename
+  displayName     String       // User-friendly name (editable)
+  blobUrl         String       // Vercel Blob storage URL
+  mimeType        String       // e.g., "application/pdf", "image/jpeg"
+  fileSize        Int          // Size in bytes
 
   // Classification
   documentType    DocumentType // SELL_SHEET, CHECKLIST, PRESS_RELEASE, etc.
-  tags            String[] // Searchable tags (e.g., ["2024", "Topps", "Chrome"])
+  entityType      SourceDocumentEntityType // What this document belongs to
+  tags            String[]     // Searchable tags (e.g., ["2024", "Topps", "Chrome"])
 
   // Content extraction
-  extractedText   String?  @db.Text // OCR/extracted text for search
+  extractedText   String?      @db.Text // OCR/extracted text for search
 
   // Metadata
-  uploadedById    String   // References neon_auth.admin_users.id
-  uploadedAt      DateTime @default(now())
-  lastUsedAt      DateTime? // Last time doc was linked to content
-  usageCount      Int      @default(0) // How many times it's been used
+  uploadedById    String       // References neon_auth.admin_users.id
+  uploadedAt      DateTime     @default(now())
+  lastUsedAt      DateTime?    // Last time doc was linked to content
+  usageCount      Int          @default(0) // How many times it's been used
+  usageContext    String?      // e.g., "Used for set descriptions"
 
   // Notes
-  description     String?  @db.Text // Admin notes about the document
+  description     String?      @db.Text // Admin notes about the document
 
   // Timestamps
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
 
-  // Relations
-  releases        ReleaseSourceDocument[]
-  posts           PostSourceDocument[]
+  // Foreign keys - only one will be set based on entityType
+  releaseId       String?
+  release         Release?     @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+
+  postId          String?
+  post            Post?        @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+enum SourceDocumentEntityType {
+  RELEASE  // Document for a release
+  POST     // Document for a post/article
 }
 
 enum DocumentType {
@@ -226,111 +253,4 @@ enum DocumentType {
   OTHER            // Other document types
 }
 
-// Links source documents to releases
-model ReleaseSourceDocument {
-  id              String          @id @default(cuid())
-  releaseId       String
-  release         Release         @relation(fields: [releaseId], references: [id], onDelete: Cascade)
-  documentId      String
-  document        SourceDocument  @relation(fields: [documentId], references: [id], onDelete: Cascade)
-
-  // Context for how this doc was used
-  usageContext    String?         // e.g., "Used for set descriptions", "Used for card list"
-  linkedAt        DateTime        @default(now())
-  linkedById      String          // Who linked it
-
-  @@unique([releaseId, documentId])
-}
-
-// Links source documents to posts
-model PostSourceDocument {
-  id              String          @id @default(cuid())
-  postId          String
-  post            Post            @relation(fields: [postId], references: [id], onDelete: Cascade)
-  documentId      String
-  document        SourceDocument  @relation(fields: [documentId], references: [id], onDelete: Cascade)
-
-  // Context for how this doc was used
-  usageContext    String?         // e.g., "Source for market analysis"
-  linkedAt        DateTime        @default(now())
-  linkedById      String          // Who linked it
-
-  @@unique([postId, documentId])
-}
-
-// Links images to posts with metadata
-model PostImage {
-  id              String          @id @default(cuid())
-  postId          String
-  post            Post            @relation(fields: [postId], references: [id], onDelete: Cascade)
-  imageId         String
-  image           Image           @relation(fields: [imageId], references: [id], onDelete: Cascade)
-
-  // Display properties
-  order           Int             @default(0) // Display order in post
-  caption         String?         // Override caption for this post context
-
-  // Metadata
-  linkedAt        DateTime        @default(now())
-  linkedById      String          // Who added this image
-
-  @@unique([postId, imageId])
-}
-
-// Links images to releases with metadata
-model ReleaseImage {
-  id              String          @id @default(cuid())
-  releaseId       String
-  release         Release         @relation(fields: [releaseId], references: [id], onDelete: Cascade)
-  imageId         String
-  image           Image           @relation(fields: [imageId], references: [id], onDelete: Cascade)
-
-  // Display properties
-  order           Int             @default(0) // Display order on release page
-  caption         String?         // Override caption for this release context
-
-  // Metadata
-  linkedAt        DateTime        @default(now())
-  linkedById      String          // Who added this image
-
-  @@unique([releaseId, imageId])
-}
-
-// Links images to sets with metadata
-model SetImage {
-  id              String          @id @default(cuid())
-  setId           String
-  set             Set             @relation(fields: [setId], references: [id], onDelete: Cascade)
-  imageId         String
-  image           Image           @relation(fields: [imageId], references: [id], onDelete: Cascade)
-
-  // Display properties
-  order           Int             @default(0) // Display order on set page
-  caption         String?         // Override caption for this set context
-
-  // Metadata
-  linkedAt        DateTime        @default(now())
-  linkedById      String          // Who added this image
-
-  @@unique([setId, imageId])
-}
-
-// Links images to cards with metadata
-model CardImage {
-  id              String          @id @default(cuid())
-  cardId          String
-  card            Card            @relation(fields: [cardId], references: [id], onDelete: Cascade)
-  imageId         String
-  image           Image           @relation(fields: [imageId], references: [id], onDelete: Cascade)
-
-  // Display properties
-  order           Int             @default(0) // Display order on card page
-  caption         String?         // Override caption for this card context
-  isFront         Boolean?        // True for front image, false for back, null for other views
-
-  // Metadata
-  linkedAt        DateTime        @default(now())
-  linkedById      String          // Who added this image
-
-  @@unique([cardId, imageId])
-}
+// Junction tables removed - using direct foreign keys with type fields instead

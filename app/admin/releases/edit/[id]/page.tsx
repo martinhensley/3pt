@@ -65,6 +65,7 @@ interface Release {
   name: string;
   year: string;
   releaseDate: string | null;
+  postDate: string | null;
   description: string | null;
   sourceFiles: SourceFile[] | null;
   sourceDocuments?: ReleaseSourceDocument[];
@@ -131,6 +132,7 @@ export default function EditReleasePage() {
   const [editedReleaseName, setEditedReleaseName] = useState("");
   const [editedYear, setEditedYear] = useState("");
   const [editedReleaseDate, setEditedReleaseDate] = useState("");
+  const [editedPostDate, setEditedPostDate] = useState("");
   const [editedDescription, setEditedDescription] = useState("");
   const [editedSets, setEditedSets] = useState<SetInfo[]>([]);
   const [collapsedSets, setCollapsedSets] = useState<Set<number>>(new Set()); // Track which sets are collapsed
@@ -161,6 +163,7 @@ export default function EditReleasePage() {
       setEditedReleaseName(data.name);
       setEditedYear(data.year);
       setEditedReleaseDate(data.releaseDate || "");
+      setEditedPostDate(data.postDate ? new Date(data.postDate).toISOString().split('T')[0] : "");
       setEditedDescription(data.description || "");
       setSourceFiles(data.sourceFiles as SourceFile[] || []);
 
@@ -1330,6 +1333,7 @@ export default function EditReleasePage() {
             name: editedReleaseName,
             year: editedYear,
             releaseDate: editedReleaseDate || null,
+            postDate: editedPostDate || null,
             description: editedDescription || null,
             sourceFiles: sourceFiles.length > 0 ? sourceFiles : null,
           }),
@@ -1596,6 +1600,20 @@ export default function EditReleasePage() {
                 />
                 <p className="text-xs text-gray-600 mt-1">
                   Can be specific (May 4, 2025) or vague (Spring 2025, 1978)
+                </p>
+              </div>
+              <div>
+                <label className="block font-semibold text-gray-900 mb-1">
+                  Post Date (for chronological ordering):
+                </label>
+                <input
+                  type="date"
+                  value={editedPostDate}
+                  onChange={(e) => setEditedPostDate(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <p className="text-xs text-gray-600 mt-1">
+                  Auto-populated from Release Date, can be manually adjusted for backdating
                 </p>
               </div>
             </div>
