@@ -134,7 +134,6 @@ footy/
 │   │   ├── cards/          # Card API
 │   │   ├── ebay/           # eBay API integration
 │   │   ├── library/        # Library endpoints
-│   │   ├── pdf-to-images/  # PDF conversion
 │   │   ├── posts/          # Post CRUD
 │   │   ├── releases/       # Release API
 │   │   ├── sets/           # Set API
@@ -606,11 +605,6 @@ All public-facing pages follow a **standardized three-column layout** to ensure 
 - Upload images and documents
 - Supports: PNG, JPG, GIF, WebP, PDF, CSV
 - Returns: Public URL and metadata
-
-**POST** `/api/pdf-to-images`
-- Convert PDF pages to high-quality images
-- Body: `{ pdfUrl, releaseId }`
-- Returns: Array of image URLs
 
 **POST** `/api/uploads/release-images`
 - Upload and associate images with release

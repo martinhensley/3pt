@@ -3,12 +3,14 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import * as xlsx from 'xlsx';
+import { put } from '@vercel/blob';
 import {
   analyzeExcelChecklistFlow,
   type ExcelCard,
   type BaseSet,
 } from '@/lib/genkit';
 import { generateSetSlug, generateCardSlug } from '@/lib/slugGenerator';
+import { DocumentType } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -218,7 +220,112 @@ export async function POST(request: NextRequest) {
 
     console.log(`\n✅ Found release: ${release.name}\n`);
 
-    // Step 5.5: Check for existing sets (conflict detection)
+    // Step 5.5: Save checklist to blob storage and create SourceDocument
+    if (!dryRun) {
+      console.log('📁 Saving checklist to library...');
+
+      // Generate filename
+      const timestamp = Date.now();
+      const year = new Date().getFullYear();
+      const month = String(new Date().getMonth() + 1).padStart(2, '0');
+      const sanitizedReleaseName = release.name
+        .replace(/[^a-z0-9]/gi, '-')
+        .toLowerCase();
+      const filename = `${release.year || year}-${sanitizedReleaseName}-checklist.xlsx`;
+      const blobPath = `checklists/${year}/${month}/${timestamp}-${filename}`;
+
+      // Get the file extension
+      const fileExtension = filename.split('.').pop() || 'xlsx';
+      const mimeType = fileExtension === 'csv'
+        ? 'text/csv'
+        : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+
+      try {
+        // Upload to Vercel Blob
+        const blob = await put(blobPath, buffer, {
+          access: 'public',
+          addRandomSuffix: false,
+        });
+
+        console.log(`  ✓ Uploaded checklist to: ${blob.url}`);
+
+        // Check if document already exists (by URL)
+        let sourceDocument = await prisma.sourceDocument.findFirst({
+          where: { blobUrl: blob.url }
+        });
+
+        if (!sourceDocument) {
+          // Generate tags
+          const tags: string[] = [];
+          if (release.year) tags.push(release.year);
+          if (release.manufacturer?.name) tags.push(release.manufacturer.name);
+          if (release.name) {
+            const keywords = release.name.split(/\s+/).filter((word: string) => word.length > 3);
+            tags.push(...keywords);
+          }
+          tags.push('checklist');
+
+          // Create source document
+          sourceDocument = await prisma.sourceDocument.create({
+            data: {
+              filename,
+              displayName: `${release.year} ${release.manufacturer?.name} ${release.name} Checklist`,
+              blobUrl: blob.url,
+              mimeType,
+              fileSize: buffer.length,
+              documentType: DocumentType.CHECKLIST,
+              tags: Array.from(new Set(tags)), // Remove duplicates
+              uploadedById: session.user.email || 'unknown',
+              usageCount: 1,
+              lastUsedAt: new Date(),
+            }
+          });
+
+          console.log(`  ✓ Created source document: ${sourceDocument.displayName}`);
+        } else {
+          // Update usage count
+          await prisma.sourceDocument.update({
+            where: { id: sourceDocument.id },
+            data: {
+              usageCount: { increment: 1 },
+              lastUsedAt: new Date(),
+            }
+          });
+          console.log(`  ℹ️  Source document already exists, updated usage count`);
+        }
+
+        // Check if link already exists
+        const existingLink = await prisma.releaseSourceDocument.findUnique({
+          where: {
+            releaseId_documentId: {
+              releaseId: release.id,
+              documentId: sourceDocument.id
+            }
+          }
+        });
+
+        if (!existingLink) {
+          // Link to release
+          await prisma.releaseSourceDocument.create({
+            data: {
+              releaseId: release.id,
+              documentId: sourceDocument.id,
+              usageContext: 'Checklist used for set and card creation',
+              linkedById: session.user.email || 'unknown',
+            }
+          });
+          console.log(`  ✓ Linked checklist to release\n`);
+        } else {
+          console.log(`  ℹ️  Checklist already linked to release\n`);
+        }
+
+      } catch (blobError) {
+        console.error('  ❌ Failed to save checklist to library:', blobError);
+        // Continue with import even if checklist save fails
+      }
+    }
+
+    // Step 5.6: Check for existing sets (conflict detection)
     if (!dryRun && !confirmOverwrite) {
       console.log('🔍 Checking for existing sets...\n');
       const cleanReleaseName = release.name.replace(/^\d{4}(-\d{2,4})?\s+/i, '');

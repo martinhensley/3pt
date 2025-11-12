@@ -76,31 +76,7 @@ export default function CreateReleasePage() {
 
       setUploading(false);
 
-      // Step 2: PDF to images conversion - disabled due to native dependency issues
-      // Images can be uploaded manually if needed
-      // if (file.type === 'application/pdf') {
-      //   console.log('Converting PDF pages to images...');
-      //   try {
-      //     const pdfToImagesResponse = await fetch('/api/pdf-to-images', {
-      //       method: 'POST',
-      //       headers: { 'Content-Type': 'application/json' },
-      //       body: JSON.stringify({ pdfUrl: fileUrl }),
-      //     });
-      //
-      //     if (pdfToImagesResponse.ok) {
-      //       const { imageUrls } = await pdfToImagesResponse.json();
-      //       console.log(`Extracted ${imageUrls.length} images from PDF`);
-      //       setUploadedImageUrls(imageUrls);
-      //     } else {
-      //       console.warn('PDF to images conversion failed, continuing without images');
-      //     }
-      //   } catch (pdfError) {
-      //     console.warn('PDF to images conversion error:', pdfError);
-      //     // Continue even if PDF conversion fails
-      //   }
-      // }
-
-      // Step 3: Analyze with Genkit (Claude Sonnet 4 will read the PDF directly)
+      // Step 2: Analyze with Genkit (Claude Sonnet 4 will read the PDF directly)
       console.log('Analyzing release with Claude Sonnet 4...');
       const analyzeResponse = await fetch('/api/releases/analyze', {
         method: 'POST',

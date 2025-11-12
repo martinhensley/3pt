@@ -208,7 +208,6 @@ export default function SourceDocumentsPage() {
               <option value="SELL_SHEET">Sell Sheets</option>
               <option value="CHECKLIST">Checklists</option>
               <option value="PRESS_RELEASE">Press Releases</option>
-              <option value="PRICE_GUIDE">Price Guides</option>
               <option value="IMAGE">Images</option>
               <option value="OTHER">Other</option>
             </select>
