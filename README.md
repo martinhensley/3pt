@@ -1,6 +1,6 @@
 # footy.bot
 
-A football (soccer) trading card management assistant with hand-curated card sets and sales data.
+A football (soccer) trading card management assistant with human-curated card sets and sales data.
 
 ## Roadmap / TODO
 
