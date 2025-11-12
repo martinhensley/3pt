@@ -1,20 +1,35 @@
-# footy.bot - Soccer Card Information Platform
-
-footy.bot is an information platform for soccer (footy) cards. Featuring hand crafted data curation assisted by AI to organize checklists, sales, and grading information at scale globally. footy.bot publishes daily at footy.bot and at Facebook, Instagram, TikTok, and X.
+# footy.bot - a football (soccer) trading card management assistant with hand-curated card sets and sales data
 
 ## Roadmap / TODO
 
 ### Future Features
 - **Sales Data Collection**: Aggregate and track historical sales data from major marketplaces (eBay, PWCC, Goldin, etc.) to provide market insights and pricing trends
 - **Comps (Comparable Valuations)**: Feature-as-a-service component providing third-party valuation services with comparable sales data, market analysis, and automated valuation models for grading companies and auction houses
+- **SEO Strategy & Optimization**: Once development slows and the app is ready for content production, focus on:
+  - Keyword research and targeting (primary: soccer card database, football trading cards; secondary: panini soccer cards, topps soccer cards)
+  - Content optimization for target keywords
+  - Link building and backlink strategy
+  - Performance optimization (Core Web Vitals)
+  - Advanced schema.org markup for rich snippets
+  - Content calendar for regular releases and guides
+
+## Security Notes
+
+**Production Security Checklist:**
+- Change default admin credentials immediately
+- Use strong, unique secrets for `NEXTAUTH_SECRET`
+- Keep all API keys secure and never commit `.env` files
+- Implement rate limiting for public APIs
+- Validate and sanitize all user inputs
+- Enable HTTPS only in production
+- Regularly update dependencies for security patches
+- Monitor for suspicious activity and unauthorized access
 
 ## Features
 
 - **Hand-Crafted Data Curation**: AI-assisted data organization for checklists, sales, and grading information at global scale
 - **Hierarchical Data Model**: Manufacturers → Releases → Sets → Cards
-- **Card Library Management**: Build and manage a complete soccer card database
 - **Content Publishing**: Create and manage blog posts about releases, sets, cards, and industry news
-- **Admin Portal**: Secure interface for content and data management
 - **SEO Optimized**: Dynamic metadata, sitemap, structured data, and Open Graph tags
 - **Responsive Design**: Mobile-friendly interface with footy.bot branding (Green #005031 & Orange #F47322)
 
@@ -30,16 +45,7 @@ footy.bot is an information platform for soccer (footy) cards. Featuring hand cr
 - **Image Processing**: Sharp
 - **Document Parsing**: pdfjs-dist, csv-parse
 
-### AI Integration Policy
-
-**IMPORTANT**: All AI operations in this project **MUST** use the [Firebase Genkit](https://github.com/firebase/genkit) framework. Direct SDK calls to AI providers (Anthropic, Google AI, etc.) are strictly prohibited.
-
-- All AI flows are defined in `/lib/genkit.ts`
-- Use `ai.defineFlow()` for reusable AI workflows
-- Test flows using the Genkit Dev UI: `npm run genkit`
-- See `.claude/claude.md` for detailed documentation
-
-## Color Scheme
+## Branding and Color Scheme
 
 - Footy Green: #005031
 - Footy Orange: #F47322
@@ -51,12 +57,21 @@ footy.bot is an information platform for soccer (footy) cards. Featuring hand cr
 
 - Node.js 20+
 - npm or yarn
+- PostgreSQL database (Neon recommended)
 
-### Installation
+### Development Setup
 
 ```bash
 # Install dependencies
 npm install
+
+# Set up environment variables (see Environment Variables section below)
+cp .env.example .env
+# Edit .env with your credentials
+
+# Run database migrations
+npx prisma migrate dev
+npx prisma generate
 
 # Run development server
 npm run dev
@@ -69,6 +84,154 @@ Open [http://localhost:3000](http://localhost:3000) to view the site.
 Navigate to [http://localhost:3000/admin](http://localhost:3000/admin)
 
 Login credentials are configured in your environment variables.
+
+### Database Migrations
+
+When updating the schema:
+
+```bash
+npx prisma migrate dev --name migration_name
+npx prisma generate
+```
+
+### Production Deployment (Vercel)
+
+1. Connect GitHub repository to Vercel
+2. Configure environment variables in Vercel dashboard
+3. Update `NEXTAUTH_URL` to production domain
+4. Vercel will automatically deploy on push to main branch
+
+**Production Checklist:**
+- Use PostgreSQL database (Neon recommended)
+- Ensure all API keys are securely configured
+- Update domain references to production URL
+- Change default admin credentials
+- Use strong secrets for NEXTAUTH_SECRET
+
+## Project Structure
+
+```
+footy/
+├── .claude/
+│   ├── CLAUDE.md           # Development documentation & patterns
+│   └── skills/             # Claude Code skills directory
+├── app/
+│   ├── admin/              # Admin portal
+│   │   ├── activity/       # Activity history
+│   │   ├── bulk-scan/      # Bulk card scanning
+│   │   ├── cards/          # Card management
+│   │   ├── library/        # Source document library
+│   │   │   ├── card-images/     # Card image uploads
+│   │   │   ├── checklists/      # Checklist documents
+│   │   │   └── source-documents/ # Source file management
+│   │   ├── posts/          # Post management
+│   │   └── releases/       # Release management
+│   ├── api/                # API routes
+│   │   ├── analyze/        # AI analysis endpoints
+│   │   ├── auth/           # NextAuth
+│   │   ├── cards/          # Card API
+│   │   ├── ebay/           # eBay API integration
+│   │   ├── library/        # Library endpoints
+│   │   ├── pdf-to-images/  # PDF conversion
+│   │   ├── posts/          # Post CRUD
+│   │   ├── releases/       # Release API
+│   │   ├── sets/           # Set API
+│   │   └── upload/         # File upload
+│   ├── cards/[slug]/       # Card detail pages
+│   ├── posts/[slug]/       # Post pages
+│   ├── releases/           # Release listing
+│   │   └── [slug]/         # Release detail pages
+│   ├── sets/[slug]/        # Set pages
+│   │   └── parallels/[parallel]/ # Parallel/variation pages
+│   ├── globals.css         # Global styles
+│   ├── layout.tsx          # Root layout with metadata
+│   ├── page.tsx            # Homepage
+│   ├── sitemap.ts          # Dynamic sitemap
+│   └── robots.ts           # Robots.txt
+├── components/
+│   ├── Breadcrumb.tsx      # Navigation breadcrumbs
+│   ├── EbayAd.tsx          # eBay affiliate ads
+│   ├── EntitySelectors.tsx # Release/Set dropdowns
+│   ├── ExcelImport.tsx     # Excel checklist importer
+│   ├── Footer.tsx          # Site footer
+│   ├── Header.tsx          # Site header (standardized)
+│   └── MultiFileUpload.tsx # Multi-file upload component
+├── lib/
+│   ├── ai.ts               # Claude AI integration (legacy)
+│   ├── auth.ts             # NextAuth config
+│   ├── checklistParser.ts  # Excel checklist parser
+│   ├── database.ts         # Database helpers
+│   ├── documentParser.ts   # PDF/CSV parsing
+│   ├── ebay.ts             # eBay API client
+│   ├── enhancedCardAnalysis.ts # AI card analysis
+│   ├── extractKeywords.ts  # Keyword extraction
+│   ├── formatters.ts       # Display formatting utilities
+│   ├── genkit.ts           # Firebase Genkit AI flows
+│   ├── neon-auth.ts        # Neon database auth
+│   ├── prisma.ts           # Database client
+│   └── slugGenerator.ts    # URL slug generation
+├── prisma/
+│   └── schema.prisma       # Database schema
+├── scripts/                # Data import/migration scripts
+└── public/
+    └── uploads/            # Uploaded files
+```
+
+## Standardized Page Layout
+
+All public-facing pages follow a **standardized three-column layout** to ensure consistent user experience:
+
+```tsx
+<div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+  <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
+    {/* Left Sidebar - eBay Ads */}
+    <aside className="hidden lg:block w-72 flex-shrink-0">
+      <EbayAd query="primary-keywords" limit={3} title="Ad Title" />
+    </aside>
+
+    {/* Main Content */}
+    <main className="flex-grow max-w-5xl space-y-6">
+      <Header rounded={true} /> {/* Always renders first */}
+
+      {loading ? (
+        <LoadingSpinner />
+      ) : !data ? (
+        <ErrorMessage />
+      ) : (
+        <>
+          <Breadcrumb items={[...]} />
+          {/* Content */}
+          <Footer rounded={true} />
+        </>
+      )}
+    </main>
+
+    {/* Right Sidebar - eBay Ads */}
+    <aside className="hidden lg:block w-72 flex-shrink-0">
+      <EbayAd query="secondary-keywords" limit={3} title="Ad Title" />
+    </aside>
+  </div>
+</div>
+```
+
+**Key Principles:**
+1. Header renders **immediately** before loading conditional (prevents resize)
+2. All three columns render **immediately** (sidebars + main)
+3. Same background gradient in **all states** (loading, error, content)
+4. No early returns - use conditional rendering instead
+5. Footer wraps inside content conditional, not outside
+
+**Pages Following This Pattern:**
+- `/` - Homepage
+- `/releases` - Release index
+- `/releases/[slug]` - Release detail pages
+- `/posts` - Post index
+- `/posts/[slug]` - Post detail pages
+- `/sets/[slug]` - Set detail pages
+- `/sets/[slug]/parallels/[parallel]` - Parallel pages
+- `/cards/[slug]` - Card detail pages
+
+**See `.claude/CLAUDE.md` for detailed documentation.**
 
 ## Database Schema
 
@@ -88,33 +251,44 @@ Login credentials are configured in your environment variables.
 │ updatedAt       │     │
 └─────────────────┘     │
                         │ 1:N
-                   ┌────┴──────────────┐
-                   │     Release       │
-                   │───────────────────│
-                   │ id                │◄────┐
-                   │ name              │     │
-                   │ year              │     │
-                   │ slug              │     │
-                   │ description       │     │
-                   │ releaseDate       │     │
-                   │ sellSheetText     │     │
-                   │ sourceFiles       │     │
-                   │ manufacturerId    │     │
-                   │ createdAt         │     │
-                   │ updatedAt         │     │
-                   └───────────────────┘     │ 1:N
-                                        ┌────┴──────────────┐
-                                        │       Set         │
-                                        │───────────────────│
-                                        │ id                │◄────┐
-                                        │ name              │     │
-                                        │ isBaseSet         │     │
-                                        │ releaseId         │     │
-                                        │ totalCards        │     │
-                                        │ parallels  (JSON) │     │
-                                        │ createdAt         │     │
-                                        │ updatedAt         │     │
-                                        └───────────────────┘     │ 1:N
+                   ┌────┴──────────────────┐
+                   │     Release           │
+                   │───────────────────────│
+                   │ id                    │◄────┐
+                   │ name                  │     │
+                   │ year                  │     │
+                   │ slug                  │     │
+                   │ description           │     │
+                   │ releaseDate           │     │
+                   │ isApproved            │     │ Approval workflow
+                   │ approvedAt            │     │ for public visibility
+                   │ approvedBy            │     │
+                   │ sellSheetText         │     │
+                   │ sourceFiles (JSON)    │     │
+                   │ manufacturerId        │     │
+                   │ createdAt             │     │
+                   │ updatedAt             │     │
+                   └───────────────────────┘     │ 1:N
+                                            ┌────┴──────────────────────┐
+                                            │       Set                 │
+                                            │───────────────────────────│
+                                            │ id                        │◄────┐
+                                            │ name                      │  │  │
+                                            │ slug                      │  │  │
+                                            │ type (SetType ENUM)       │──┼──┼── Base, Insert,
+                                            │ isBaseSet (deprecated)    │  │  │   Autograph, Memorabilia
+                                            │ releaseId                 │  │  │
+                                            │ totalCards                │  │  │
+                                            │ printRun                  │  │  │
+                                            │ description               │  │  │
+                                            │ sourceText                │  │  │
+                                            │ parallels (JSON, dep.)    │  │  │
+                                            │ parentSetId               │──┘  │ Parent-child
+                                            │ hasVariableChecklist      │     │ parallel relationship
+                                            │ mirrorsParentChecklist    │     │
+                                            │ createdAt                 │     │
+                                            │ updatedAt                 │     │
+                                            └───────────────────────────┘     │ 1:N
                                                              ┌────┴──────────────────┐
                                                              │       Card            │
                                                              │───────────────────────│
@@ -243,6 +417,24 @@ Login credentials are configured in your environment variables.
 **Hierarchical Data Flow:**
 - Manufacturer → Release → Set → Card
 - Each level provides context for AI analysis and URL structure
+
+**Release Approval Workflow:**
+- `isApproved`: Boolean flag controlling public visibility
+- `approvedAt`: Timestamp when release was approved
+- `approvedBy`: Email of admin who approved the release
+- Only approved releases are shown on public-facing pages
+
+**Parent-Child Parallel Sets:**
+- Sets can have a parent-child relationship via `parentSetId`
+- Parent sets (null `parentSetId`) contain the card checklist
+- Child parallel sets reference the parent's cards
+- Flags: `hasVariableChecklist`, `mirrorsParentChecklist`
+- Cards are stored once on parent, not duplicated per parallel
+
+**Set Types:**
+- `SetType` enum: Base, Insert, Autograph, Memorabilia
+- `isBaseSet` field is deprecated (use `type` instead)
+- Type affects slug generation and display categorization
 
 **Content Linking:**
 - Posts can reference Release, Set, or Card (optional)
@@ -474,104 +666,7 @@ The database uses a **parent-child model** for parallel sets:
 - **Cards stored once**: Cards exist only on parent sets, not duplicated for each parallel
 - **Query efficiency**: Simpler joins, fewer records, single source of truth
 
-See `.claude/claude.md` for detailed documentation on parallel set architecture, query patterns, and testing checklists.
-
-## Standardized Page Layout
-
-### Public Page Pattern
-All public-facing pages follow a **standardized three-column layout** to ensure consistent user experience:
-
-```tsx
-<div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-  <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
-    <aside className="hidden lg:block w-72 flex-shrink-0">
-      {/* Left Sidebar - eBay Ads */}
-    </aside>
-
-    <main className="flex-grow max-w-5xl space-y-6">
-      <Header rounded={true} /> {/* Always renders first */}
-
-      {loading ? (
-        <LoadingSpinner />
-      ) : !data ? (
-        <ErrorMessage />
-      ) : (
-        <>
-          <Breadcrumb items={[...]} />
-          {/* Content */}
-          <Footer rounded={true} />
-        </>
-      )}
-    </main>
-
-    <aside className="hidden lg:block w-72 flex-shrink-0">
-      {/* Right Sidebar - eBay Ads */}
-    </aside>
-  </div>
-</div>
-```
-
-**Key Principles:**
-1. Header renders **immediately** before loading conditional (prevents resize)
-2. All three columns render **immediately** (sidebars + main)
-3. Same background gradient in **all states** (loading, error, content)
-4. No early returns - use conditional rendering instead
-5. Footer wraps inside content conditional, not outside
-
-**See `.claude/claude.md` for detailed documentation.**
-
-## Project Structure
-
-```
-footy/
-├── .claude/
-│   └── claude.md           # Development documentation & patterns
-├── app/
-│   ├── admin/              # Admin portal
-│   │   ├── releases/       # Release management
-│   │   ├── posts/          # Post management
-│   │   ├── cards/          # Card creation
-│   │   ├── bulk-scan/      # Bulk card scanning
-│   │   └── activity/       # Activity history
-│   ├── api/                # API routes
-│   │   ├── analyze/        # AI analysis endpoints
-│   │   ├── library/        # Data retrieval endpoints
-│   │   ├── auth/           # NextAuth
-│   │   ├── posts/          # Post CRUD
-│   │   ├── cards/          # Card API
-│   │   ├── sets/           # Set API
-│   │   ├── releases/       # Release API
-│   │   └── upload/         # File upload
-│   ├── releases/[slug]/    # Release pages
-│   ├── sets/[slug]/        # Set pages
-│   │   └── parallels/[parallel]/ # Parallel/variation pages
-│   ├── card/[slug]/        # Card detail pages
-│   ├── posts/[slug]/       # Post pages
-│   ├── globals.css         # Global styles
-│   ├── layout.tsx          # Root layout with metadata
-│   ├── page.tsx            # Homepage
-│   ├── sitemap.ts          # Dynamic sitemap
-│   └── robots.ts           # Robots.txt
-├── components/
-│   ├── Header.tsx          # Site header (standardized)
-│   ├── Footer.tsx          # Site footer
-│   ├── Breadcrumb.tsx      # Navigation breadcrumbs
-│   ├── EbayAd.tsx          # eBay affiliate ads
-│   ├── EntitySelectors.tsx # Release/Set dropdowns
-│   └── MultiFileUpload.tsx # Multi-file upload component
-├── lib/
-│   ├── prisma.ts           # Database client
-│   ├── auth.ts             # NextAuth config
-│   ├── ai.ts               # Claude AI integration
-│   ├── database.ts         # Database helpers
-│   ├── documentParser.ts   # PDF/CSV parsing
-│   ├── formatters.ts       # Display formatting utilities
-│   └── slugGenerator.ts    # URL slug generation
-├── prisma/
-│   └── schema.prisma       # Database schema
-└── public/
-    └── uploads/            # Uploaded files
-```
+See `.claude/CLAUDE.md` for detailed documentation on parallel set architecture, query patterns, and testing checklists.
 
 ## Environment Variables
 
@@ -595,61 +690,6 @@ EBAY_CAMPAIGN_ID=
 EBAY_VERIFICATION_TOKEN=
 EBAY_DELETION_ENDPOINT_URL=
 ```
-
-## SEO Strategy
-
-### Current Implementation
-- Enhanced metadata (title, description, keywords)
-- Open Graph tags for social sharing
-- Twitter Cards
-- Dynamic sitemap generation
-- Robots.txt configuration
-- Schema.org structured data (Article, Organization)
-- Canonical URLs
-- Mobile optimization
-- Image optimization with Next.js Image component
-
-### Target Keywords
-- Primary: soccer card database, football trading cards, soccer card information
-- Secondary: panini soccer cards, topps soccer cards, soccer card sets
-- Long-tail: soccer card collector guide, new soccer card releases
-
-## Deployment
-
-### Vercel (Recommended)
-1. Connect GitHub repository to Vercel
-2. Configure environment variables
-3. Update `NEXTAUTH_URL` to production domain
-4. Deploy
-
-### Environment Setup
-- Use PostgreSQL database in production (Neon recommended)
-- Ensure all API keys are securely configured
-- Update domain references to production URL
-
-## Development
-
-### Adding New Features
-1. Update Prisma schema if needed
-2. Run `npx prisma generate` to update client
-3. Create/update API routes
-4. Update admin portal UI
-5. Test thoroughly
-
-### Database Migrations
-```bash
-npx prisma migrate dev --name migration_name
-npx prisma generate
-```
-
-## Security Notes
-
-- Change default admin credentials
-- Use strong secrets in production
-- Keep API keys secure
-- Never commit .env files
-- Implement rate limiting for APIs
-- Validate all user inputs
 
 ## License
 
