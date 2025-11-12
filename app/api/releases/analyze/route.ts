@@ -33,16 +33,12 @@ export async function POST(request: NextRequest) {
     if (fileUrl && mimeType === 'application/pdf') {
       console.log('Extracting text from PDF:', fileUrl);
       try {
-        // Dynamic require to avoid webpack bundling issues
-        const { PDFParse } = eval('require')('pdf-parse');
+        const pdfParse = (await import('pdf-parse')).default;
         const pdfResponse = await fetch(fileUrl);
         const pdfBuffer = await pdfResponse.arrayBuffer();
 
-        // Create parser instance with the PDF data
-        const parser = new PDFParse({ data: Buffer.from(pdfBuffer) });
-        await parser.load();
-        const pdfData = await parser.getText();
-        extractedText = pdfData.text; // Extract the text property from the result
+        const pdfData = await pdfParse(Buffer.from(pdfBuffer));
+        extractedText = pdfData.text;
         console.log('PDF text extracted, length:', extractedText.length);
       } catch (pdfError) {
         console.error('PDF text extraction failed:', pdfError);
@@ -116,12 +112,23 @@ export async function POST(request: NextRequest) {
       // Create images from uploaded images
       if (uploadedImages.length > 0) {
         for (let i = 0; i < uploadedImages.length; i++) {
-          await prisma.image.create({
+          // Create the Image record
+          const image = await prisma.image.create({
             data: {
-              releaseId: release.id,
               url: uploadedImages[i],
               order: i,
               caption: null,
+            },
+          });
+
+          // Create the ReleaseImage junction record
+          await prisma.releaseImage.create({
+            data: {
+              releaseId: release.id,
+              imageId: image.id,
+              order: i,
+              caption: null,
+              linkedById: session.user.email || 'system',
             },
           });
         }
