@@ -33,12 +33,24 @@ export async function POST(request: NextRequest) {
     if (fileUrl && mimeType === 'application/pdf') {
       console.log('Extracting text from PDF:', fileUrl);
       try {
-        const pdfParse = (await import('pdf-parse')).default;
+        const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
         const pdfResponse = await fetch(fileUrl);
         const pdfBuffer = await pdfResponse.arrayBuffer();
 
-        const pdfData = await pdfParse(Buffer.from(pdfBuffer));
-        extractedText = pdfData.text;
+        const loadingTask = pdfjsLib.getDocument({ data: pdfBuffer });
+        const pdfDocument = await loadingTask.promise;
+
+        let fullText = '';
+        for (let i = 1; i <= pdfDocument.numPages; i++) {
+          const page = await pdfDocument.getPage(i);
+          const textContent = await page.getTextContent();
+          const pageText = textContent.items
+            .map((item: any) => item.str)
+            .join(' ');
+          fullText += pageText + '\n';
+        }
+
+        extractedText = fullText;
         console.log('PDF text extracted, length:', extractedText.length);
       } catch (pdfError) {
         console.error('PDF text extraction failed:', pdfError);
