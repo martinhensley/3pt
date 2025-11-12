@@ -13,9 +13,6 @@ interface Release {
   year: string | null;
   slug: string;
   createdAt: string;
-  isApproved: boolean;
-  approvedAt: string | null;
-  approvedBy: string | null;
   manufacturer: {
     id: string;
     name: string;
@@ -90,40 +87,6 @@ export default function ManageReleasesPage() {
       }
     } catch {
       setMessage({ type: "error", text: "Failed to delete release" });
-      setTimeout(() => setMessage(null), 3000);
-    }
-  };
-
-  const handleApproval = async (releaseId: string, releaseName: string, currentStatus: boolean) => {
-    const action = currentStatus ? "unapprove" : "approve";
-    if (!confirm(`Are you sure you want to ${action} "${releaseName}"?`)) {
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/releases/approve", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          releaseId,
-          approve: !currentStatus,
-        }),
-      });
-
-      if (response.ok) {
-        setMessage({
-          type: "success",
-          text: `Release ${action}d successfully!`,
-        });
-        fetchReleases();
-        setTimeout(() => setMessage(null), 3000);
-      } else {
-        throw new Error(`Failed to ${action} release`);
-      }
-    } catch {
-      setMessage({ type: "error", text: `Failed to ${action} release` });
       setTimeout(() => setMessage(null), 3000);
     }
   };
@@ -260,21 +223,6 @@ export default function ManageReleasesPage() {
                             {release.year}
                           </span>
                         )}
-                        {release.isApproved ? (
-                          <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold flex items-center gap-1">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                            Approved
-                          </span>
-                        ) : (
-                          <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-semibold flex items-center gap-1">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Pending
-                          </span>
-                        )}
                       </div>
 
                       <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
@@ -325,30 +273,6 @@ export default function ManageReleasesPage() {
                         </svg>
                         Edit
                       </Link>
-                      <button
-                        onClick={() => handleApproval(release.id, `${release.manufacturer.name} ${release.name}`, release.isApproved)}
-                        className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
-                          release.isApproved
-                            ? "bg-gray-600 hover:bg-gray-700 text-white"
-                            : "bg-blue-600 hover:bg-blue-700 text-white"
-                        }`}
-                      >
-                        {release.isApproved ? (
-                          <>
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                            Unapprove
-                          </>
-                        ) : (
-                          <>
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                            Approve
-                          </>
-                        )}
-                      </button>
                       <button
                         onClick={() => handleDelete(release.id, `${release.manufacturer.name} ${release.name}`)}
                         className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors"

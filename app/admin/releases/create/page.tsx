@@ -14,6 +14,7 @@ export default function CreateReleasePage() {
   const [uploadingImages, setUploadingImages] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [editedReleaseDate, setEditedReleaseDate] = useState<string>('');
 
   const [analysisResult, setAnalysisResult] = useState<{
     releaseInfo: {
@@ -98,6 +99,7 @@ export default function CreateReleasePage() {
       console.log('Analysis complete:', result);
 
       setAnalysisResult(result);
+      setEditedReleaseDate(result.releaseInfo.releaseDate || '');
       setAnalyzing(false);
     } catch (err) {
       console.error('Error:', err);
@@ -106,7 +108,6 @@ export default function CreateReleasePage() {
       setAnalyzing(false);
     }
   };
-
   const handleImageFilesChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const files = Array.from(e.target.files);
@@ -152,7 +153,6 @@ export default function CreateReleasePage() {
   const handleRemoveImage = (indexToRemove: number) => {
     setUploadedImageUrls(prev => prev.filter((_, idx) => idx !== indexToRemove));
   };
-
 
   const handleCreateRelease = async () => {
     if (!analysisResult) return;
@@ -237,14 +237,14 @@ export default function CreateReleasePage() {
                     <p className="mb-2 text-sm text-gray-700 font-semibold">
                       Click to upload or drag and drop
                     </p>
-                    <p className="text-xs text-gray-500">PDF or TXT files (Claude 3.5 Sonnet will analyze directly)</p>
+                    <p className="text-xs text-gray-500">PDF or image files (Claude Sonnet 4 will analyze directly)</p>
                   </>
                 )}
               </div>
               <input
                 id="file-upload"
                 type="file"
-                accept=".txt,.pdf,text/plain,application/pdf"
+                accept=".pdf,application/pdf,image/*"
                 onChange={handleFileChange}
                 className="hidden"
                 disabled={uploading || analyzing}
@@ -306,10 +306,14 @@ export default function CreateReleasePage() {
                     </label>
                     <input
                       type="text"
-                      value={analysisResult.releaseInfo.releaseDate || 'Not specified'}
-                      readOnly
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50"
+                      value={editedReleaseDate}
+                      onChange={(e) => setEditedReleaseDate(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="e.g., May 4, 2025 or Spring 2025 or 1978"
                     />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Can be specific (May 4, 2025) or vague (Spring 2025, 1978)
+                    </p>
                   </div>
                 </div>
 
@@ -351,7 +355,7 @@ export default function CreateReleasePage() {
                         rel="noopener noreferrer"
                         className="px-4 py-2 bg-footy-orange text-white text-sm rounded-md hover:bg-footy-orange/90"
                       >
-                        View PDF
+                        View {documentFile.type.includes('pdf') ? 'PDF' : 'Image'}
                       </a>
                     </div>
                   </div>

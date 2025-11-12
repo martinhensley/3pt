@@ -41,12 +41,33 @@ interface SourceFile {
   type: string;
 }
 
+interface SourceDocument {
+  id: string;
+  filename: string;
+  displayName: string;
+  blobUrl: string;
+  mimeType: string;
+  fileSize: number;
+  documentType: 'SELL_SHEET' | 'CHECKLIST' | 'PRESS_RELEASE' | 'PRICE_GUIDE' | 'IMAGE' | 'OTHER';
+  description: string | null;
+  uploadedAt: string;
+}
+
+interface ReleaseSourceDocument {
+  id: string;
+  document: SourceDocument;
+  usageContext: string | null;
+  linkedAt: string;
+}
+
 interface Release {
   id: string;
   name: string;
   year: string;
+  releaseDate: string | null;
   description: string | null;
   sourceFiles: SourceFile[] | null;
+  sourceDocuments?: ReleaseSourceDocument[];
   isApproved: boolean;
   approvedAt: string | null;
   approvedBy: string | null;
@@ -100,6 +121,7 @@ export default function EditReleasePage() {
   const [descriptionFile, setDescriptionFile] = useState<File | null>(null);
   const [sourceFiles, setSourceFiles] = useState<SourceFile[]>([]);
   const [uploadingFile, setUploadingFile] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState(false);
 
   // Release data
   const [release, setRelease] = useState<Release | null>(null);
@@ -108,6 +130,7 @@ export default function EditReleasePage() {
   const [editedManufacturer, setEditedManufacturer] = useState("");
   const [editedReleaseName, setEditedReleaseName] = useState("");
   const [editedYear, setEditedYear] = useState("");
+  const [editedReleaseDate, setEditedReleaseDate] = useState("");
   const [editedDescription, setEditedDescription] = useState("");
   const [editedSets, setEditedSets] = useState<SetInfo[]>([]);
   const [collapsedSets, setCollapsedSets] = useState<Set<number>>(new Set()); // Track which sets are collapsed
@@ -137,6 +160,7 @@ export default function EditReleasePage() {
       setEditedManufacturer(data.manufacturer.name);
       setEditedReleaseName(data.name);
       setEditedYear(data.year);
+      setEditedReleaseDate(data.releaseDate || "");
       setEditedDescription(data.description || "");
       setSourceFiles(data.sourceFiles as SourceFile[] || []);
 
@@ -1220,6 +1244,73 @@ export default function EditReleasePage() {
     }
   };
 
+  const handleImageFilesChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!release || !e.target.files || e.target.files.length === 0) return;
+
+    const files = Array.from(e.target.files);
+
+    try {
+      setUploadingImages(true);
+      setMessage(null);
+
+      // Upload each file to blob storage
+      const urls: string[] = [];
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const uploadResponse = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error(`Failed to upload ${file.name}`);
+        }
+
+        const { url } = await uploadResponse.json();
+        urls.push(url);
+      }
+
+      // Save image records to database
+      const saveResponse = await fetch(`/api/releases/${release.id}/images`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageUrls: urls }),
+      });
+
+      if (!saveResponse.ok) {
+        throw new Error('Failed to save images to release');
+      }
+
+      const { images } = await saveResponse.json();
+
+      // Update local release state with new images
+      setRelease({
+        ...release,
+        images: [...(release.images || []), ...images],
+      });
+
+      setMessage({
+        type: "success",
+        text: `Successfully uploaded ${files.length} image${files.length > 1 ? 's' : ''}`
+      });
+      setTimeout(() => setMessage(null), 3000);
+
+      // Reset file input
+      e.target.value = "";
+    } catch (error) {
+      console.error('Failed to upload images:', error);
+      setMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Failed to upload images. Please try again."
+      });
+      setTimeout(() => setMessage(null), 5000);
+    } finally {
+      setUploadingImages(false);
+    }
+  };
+
   const handleSaveChanges = async () => {
     if (!release) return;
 
@@ -1238,6 +1329,7 @@ export default function EditReleasePage() {
             id: release.id,
             name: editedReleaseName,
             year: editedYear,
+            releaseDate: editedReleaseDate || null,
             description: editedDescription || null,
             sourceFiles: sourceFiles.length > 0 ? sourceFiles : null,
           }),
@@ -1491,6 +1583,21 @@ export default function EditReleasePage() {
                   placeholder="e.g., Donruss Soccer, Select, Prizm"
                 />
               </div>
+              <div>
+                <label className="block font-semibold text-gray-900 mb-1">
+                  Release Date:
+                </label>
+                <input
+                  type="text"
+                  value={editedReleaseDate}
+                  onChange={(e) => setEditedReleaseDate(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="e.g., May 4, 2025 or Spring 2025 or 1978"
+                />
+                <p className="text-xs text-gray-600 mt-1">
+                  Can be specific (May 4, 2025) or vague (Spring 2025, 1978)
+                </p>
+              </div>
             </div>
             <div className="pt-2 border-t border-green-300">
               <p className="text-gray-800">
@@ -1732,6 +1839,103 @@ export default function EditReleasePage() {
                 <p className="mt-2 text-sm text-gray-500">No files uploaded yet</p>
               </div>
             )}
+
+            {/* Source Documents (from SourceDocument table) */}
+            {release?.sourceDocuments && release.sourceDocuments.length > 0 && (
+              <div className="mt-6">
+                <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Documents from Document Library
+                </h4>
+                <div className="border border-gray-200 rounded-lg divide-y divide-gray-200 bg-gradient-to-br from-green-50 to-orange-50">
+                  {release.sourceDocuments.map((releaseDoc) => {
+                    const doc = releaseDoc.document;
+                    const fileSizeMB = (doc.fileSize / (1024 * 1024)).toFixed(2);
+                    const fileExtension = doc.filename.split('.').pop()?.toUpperCase() || 'FILE';
+
+                    // Document type badge colors
+                    const typeColors: Record<string, { bg: string; text: string }> = {
+                      SELL_SHEET: { bg: 'bg-blue-100', text: 'text-blue-800' },
+                      CHECKLIST: { bg: 'bg-green-100', text: 'text-green-800' },
+                      PRESS_RELEASE: { bg: 'bg-purple-100', text: 'text-purple-800' },
+                      PRICE_GUIDE: { bg: 'bg-yellow-100', text: 'text-yellow-800' },
+                      IMAGE: { bg: 'bg-pink-100', text: 'text-pink-800' },
+                      OTHER: { bg: 'bg-gray-100', text: 'text-gray-800' },
+                    };
+                    const colors = typeColors[doc.documentType] || typeColors.OTHER;
+
+                    return (
+                      <div key={releaseDoc.id} className="flex items-center justify-between p-3 hover:bg-green-100 transition-colors">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          {/* File Icon */}
+                          <div className="flex-shrink-0">
+                            <div className="w-10 h-10 bg-gradient-to-br from-footy-green to-green-700 rounded-lg flex items-center justify-center text-white font-bold text-xs">
+                              {fileExtension}
+                            </div>
+                          </div>
+
+                          {/* Document Info */}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900 truncate">{doc.displayName}</p>
+                            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                              <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${colors.bg} ${colors.text}`}>
+                                {doc.documentType.replace(/_/g, ' ')}
+                              </span>
+                              <span className="text-xs text-gray-500">{fileSizeMB} MB</span>
+                              {releaseDoc.usageContext && (
+                                <span className="text-xs text-gray-500 italic truncate">• {releaseDoc.usageContext}</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <a
+                            href={doc.blobUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-1.5 text-xs bg-orange-100 hover:bg-orange-200 text-orange-700 rounded-lg transition-colors font-medium"
+                          >
+                            View
+                          </a>
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              try {
+                                const response = await fetch(`/api/admin/library/source-documents/${doc.id}`, {
+                                  method: 'DELETE',
+                                });
+                                if (!response.ok) {
+                                  throw new Error('Failed to delete document');
+                                }
+                                setMessage({ type: 'success', text: 'Document deleted successfully' });
+                                setTimeout(() => setMessage(null), 3000);
+                                // Refresh release data
+                                fetchRelease();
+                              } catch (error) {
+                                console.error('Failed to delete document:', error);
+                                setMessage({ type: 'error', text: 'Failed to delete document' });
+                                setTimeout(() => setMessage(null), 3000);
+                              }
+                            }}
+                            className="px-3 py-1.5 text-xs bg-red-100 hover:bg-red-200 text-red-700 rounded-lg transition-colors font-medium"
+                            disabled={loading}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className="text-xs text-gray-500 mt-2 italic">
+                  These documents are managed in the Document Library and linked to this release. Deleting a document will remove it from the Document Library and all releases.
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -1752,20 +1956,20 @@ export default function EditReleasePage() {
                   type="file"
                   accept=".jpg,.jpeg,.png,.webp,.gif"
                   multiple
-                  onChange={(e) => {
-                    const files = e.target.files;
-                    if (files) {
-                      // Handle multiple file uploads here
-                      Array.from(files).forEach(file => {
-                        // TODO: Implement image upload logic
-                        console.log('Upload image:', file.name);
-                      });
-                      e.target.value = ""; // Reset input
-                    }
-                  }}
-                  className="text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-green-700 hover:file:bg-green-200"
+                  onChange={handleImageFilesChange}
+                  disabled={uploadingImages}
+                  className="text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-green-700 hover:file:bg-green-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
               </label>
+              {uploadingImages && (
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Uploading...
+                </div>
+              )}
             </div>
 
             {/* Display existing images */}

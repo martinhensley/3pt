@@ -1313,6 +1313,173 @@ Before committing changes to page layouts:
 - **Solution**: Updated all calls to use correct parameter order: `(year, releaseName, setName, setType, parallelName?)`
 - **Result**: All 149 sets now have unique slugs and correct card assignments
 
+### November 12, 2025 - Image Junction Tables & Database Reset
+
+**Changes:**
+- Migrated all image relationships from direct foreign keys to junction tables
+- Completed database reset and fresh start
+- Cleaned up one-off scripts (23 scripts archived, then deleted)
+- Updated schema for consistency across all entity-image relationships
+
+**Database Schema Changes:**
+
+**Before (Direct Foreign Keys):**
+```prisma
+model Image {
+  id        String   @id
+  url       String
+  caption   String?
+  order     Int
+
+  // Direct foreign keys (REMOVED)
+  releaseId String?
+  release   Release?
+  setId     String?
+  set       Set?
+  cardId    String?
+  card      Card?
+  postId    String?
+  post      Post?
+}
+```
+
+**After (Junction Tables):**
+```prisma
+// Image model - no direct foreign keys
+model Image {
+  id        String   @id
+  url       String
+  caption   String?
+  order     Int
+  createdAt DateTime
+
+  // All relationships via junction tables
+  releases  ReleaseImage[]
+  sets      SetImage[]
+  cards     CardImage[]
+  posts     PostImage[]
+}
+
+// Junction tables (one for each entity type)
+model ReleaseImage {
+  id         String   @id
+  releaseId  String
+  imageId    String
+  order      Int
+  caption    String?
+  linkedAt   DateTime
+  linkedById String
+  @@unique([releaseId, imageId])
+}
+
+model SetImage {
+  id         String   @id
+  setId      String
+  imageId    String
+  order      Int
+  caption    String?
+  linkedAt   DateTime
+  linkedById String
+  @@unique([setId, imageId])
+}
+
+model CardImage {
+  id         String   @id
+  cardId     String
+  imageId    String
+  order      Int
+  caption    String?
+  isFront    Boolean?  // Special field for front/back
+  linkedAt   DateTime
+  linkedById String
+  @@unique([cardId, imageId])
+}
+
+model PostImage {
+  id         String   @id
+  postId     String
+  imageId    String
+  order      Int
+  caption    String?
+  linkedAt   DateTime
+  linkedById String
+  @@unique([postId, imageId])
+}
+```
+
+**Benefits of Junction Tables:**
+1. **Consistency**: All entity-image relationships work the same way
+2. **Metadata**: Each relationship can have its own order, caption, linkedAt, linkedById
+3. **Flexibility**: Easy to add new relationship types in future
+4. **Audit Trail**: Track who linked images and when
+5. **Context-specific captions**: Same image can have different captions in different contexts
+
+**Migration Steps Taken:**
+1. Created PostImage junction table (first migration)
+2. Created ReleaseImage, SetImage, CardImage junction tables
+3. Removed all direct foreign keys from Image model
+4. Ran `npx prisma db push --accept-data-loss` (lost 2 orphaned post images)
+5. Executed full database reset with `delete-all-data.ts`
+
+**Database Reset:**
+- Deleted 45 blobs from Vercel Blob storage
+- Deleted 2 orphaned images
+- Deleted 1 post (Mallory Swanson post)
+- All tables emptied for fresh start
+
+**Script Cleanup:**
+Removed all one-off and completed migration scripts:
+
+**Deleted from root:**
+- `genkit-flows.ts` - Legacy Genkit flows
+- `test-genkit-workflow.ts` - Test workflow
+- `update_base_sets.ts` - One-off migration
+- `backfill_set_slugs.ts` - One-off migration
+- `check_sets.ts` - One-off check
+- `check_release_slug.ts` - One-off check
+- `check_obsidian_sets.ts` - One-off check
+- `migrate_parallel_slugs.ts` - One-off migration
+- `create_parallel_cards.ts` - One-off creation
+- `cleanup_equinox_parallels.ts` - One-off cleanup
+
+**Deleted from scripts/:**
+- `generate-release-description.ts` - No future use
+- `import-donruss-soccer.ts` - One-off import
+- `import-from-pdf-checklist.ts` - One-off import
+- `review-neon-auth.ts` - No future use
+- `migrate-source-documents.ts` - Completed
+- `migrate-post-images.ts` - Completed
+- `migrate-mallory-swanson-images.ts` - Completed
+- `migrate-orphaned-post-images.ts` - Completed
+- `fix-donruss-structure.ts` - Completed
+- `delete-donruss-release.ts` - Completed
+- `check-database-state.ts` - One-off
+- `check-donruss-source-files.ts` - One-off
+- `check-image-table-state.ts` - One-off
+- `check-post-table-state.ts` - One-off
+- `cleanup-orphaned-documents.ts` - Completed
+- `delete-release-blobs.ts` - Completed
+- `restore-donruss-documents.ts` - Completed
+- `autograph_counts.js` - One-off analysis
+
+**Remaining Scripts:**
+- `delete-all-data.ts` - Database reset utility (useful for dev)
+- `init-admin.ts` - Admin initialization (setup)
+- `setup-neon-auth.ts` - Auth setup (initial setup)
+- `SCRIPT_INVENTORY.md` - Documentation
+
+**Files Modified:**
+1. `prisma/schema.prisma` - Complete Image model restructure
+2. `scripts/delete-all-data.ts` - Created comprehensive cleanup script
+3. `scripts/SCRIPT_INVENTORY.md` - Documented script organization
+4. `.claude/CLAUDE.md` - This file (updated documentation)
+
+**Key Learnings:**
+- Junction tables provide better consistency than mixed direct FKs + junctions
+- Always use `--accept-data-loss` flag when migrating in development
+- Keep only essential scripts; delete one-offs immediately after use
+- Document major schema changes in detail
+
 ---
 
-*Last Updated: November 9, 2025*
+*Last Updated: November 12, 2025*

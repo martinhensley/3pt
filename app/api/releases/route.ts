@@ -77,6 +77,7 @@ export async function GET(request: NextRequest) {
           name: true,
           slug: true,
           year: true,
+          releaseDate: true,
           description: true,
           sourceFiles: true, // Include sourceFiles for Edit Release page
           isApproved: true,
@@ -102,6 +103,14 @@ export async function GET(request: NextRequest) {
             },
             orderBy: {
               createdAt: 'asc'
+            }
+          },
+          sourceDocuments: {
+            include: {
+              document: true
+            },
+            orderBy: {
+              linkedAt: 'desc'
             }
           },
         },
@@ -156,7 +165,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, name, year, description, sourceFiles } = body;
+    const { id, name, year, releaseDate, description, sourceFiles } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -170,6 +179,7 @@ export async function PUT(request: NextRequest) {
       data: {
         name,
         year,
+        releaseDate: releaseDate || null,
         description: description || null,
         sourceFiles: sourceFiles || null,
       },

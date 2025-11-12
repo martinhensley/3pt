@@ -111,8 +111,6 @@ export default function SourceDocumentsPage() {
 
   // Handle delete
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this document?")) return;
-
     try {
       const response = await fetch(`/api/admin/library/source-documents/${id}`, {
         method: "DELETE",
