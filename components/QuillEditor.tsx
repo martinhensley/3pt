@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Quill from "quill";
-import "quill/dist/quill.snow.css";
 
 interface QuillEditorProps {
   content: string;
@@ -16,45 +14,53 @@ export default function QuillEditor({
   placeholder = "Start writing...",
 }: QuillEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
-  const quillRef = useRef<Quill | null>(null);
+  const quillRef = useRef<any>(null);
   const isInitializedRef = useRef(false);
 
   useEffect(() => {
     // Prevent double initialization in StrictMode
     if (isInitializedRef.current) return;
 
-    if (editorRef.current && !quillRef.current) {
+    if (editorRef.current && !quillRef.current && typeof window !== 'undefined') {
       isInitializedRef.current = true;
 
-      // Initialize Quill
-      const quill = new Quill(editorRef.current, {
-        theme: "snow",
-        placeholder,
-        modules: {
-          toolbar: [
-            [{ header: [2, 3, 4, false] }],
-            ["bold", "italic", "underline", "strike"],
-            [{ list: "ordered" }, { list: "bullet" }],
-            [{ align: [] }],
-            ["link", "image"],
-            [{ color: [] }, { background: [] }],
-            ["clean"],
-          ],
-        },
+      // Dynamically import Quill only on the client side
+      import('quill').then((QuillModule) => {
+        const Quill = QuillModule.default;
+
+        // Dynamically import CSS
+        import('quill/dist/quill.snow.css');
+
+        // Initialize Quill
+        const quill = new Quill(editorRef.current!, {
+          theme: "snow",
+          placeholder,
+          modules: {
+            toolbar: [
+              [{ header: [2, 3, 4, false] }],
+              ["bold", "italic", "underline", "strike"],
+              [{ list: "ordered" }, { list: "bullet" }],
+              [{ align: [] }],
+              ["link", "image"],
+              [{ color: [] }, { background: [] }],
+              ["clean"],
+            ],
+          },
+        });
+
+        // Set initial content
+        if (content) {
+          quill.clipboard.dangerouslyPasteHTML(content);
+        }
+
+        // Handle text changes
+        quill.on("text-change", () => {
+          const html = quill.root.innerHTML;
+          onChange(html);
+        });
+
+        quillRef.current = quill;
       });
-
-      // Set initial content
-      if (content) {
-        quill.clipboard.dangerouslyPasteHTML(content);
-      }
-
-      // Handle text changes
-      quill.on("text-change", () => {
-        const html = quill.root.innerHTML;
-        onChange(html);
-      });
-
-      quillRef.current = quill;
     }
 
     return () => {
