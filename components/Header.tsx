@@ -37,10 +37,22 @@ export default function Header({ showBackButton = false, rounded = true, showAd 
         {/* Navigation menu */}
         <nav className="flex justify-center items-center gap-6 border-t border-green-600 pt-6">
           <Link
-            href="/"
+            href="/cards"
             className="text-green-100 hover:text-white transition-colors text-sm md:text-base font-medium"
           >
-            Home
+            Cards
+          </Link>
+          <Link
+            href="/checklists"
+            className="text-green-100 hover:text-white transition-colors text-sm md:text-base font-medium"
+          >
+            Checklists
+          </Link>
+          <Link
+            href="/comps"
+            className="text-green-100 hover:text-white transition-colors text-sm md:text-base font-medium"
+          >
+            Comps
           </Link>
           <Link
             href="/posts"
@@ -53,12 +65,6 @@ export default function Header({ showBackButton = false, rounded = true, showAd 
             className="text-green-100 hover:text-white transition-colors text-sm md:text-base font-medium"
           >
             Releases
-          </Link>
-          <Link
-            href="/cards"
-            className="text-green-100 hover:text-white transition-colors text-sm md:text-base font-medium"
-          >
-            Cards
           </Link>
         </nav>
       </div>
