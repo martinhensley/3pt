@@ -7,7 +7,7 @@ import AdminLayout from "@/components/AdminLayout";
 import Breadcrumb from "@/components/Breadcrumb";
 import AdminHeader from "@/components/AdminHeader";
 import Image from "next/image";
-import RichTextEditor from "@/components/RichTextEditor";
+import QuillEditor from "@/components/QuillEditor";
 
 interface Post {
   id: string;
@@ -300,7 +300,7 @@ export default function EditPostPage() {
             <label className="block text-sm font-semibold text-gray-900 mb-2">
               Content
             </label>
-            <RichTextEditor
+            <QuillEditor
               content={content}
               onChange={setContent}
               placeholder="Edit your post content..."
@@ -352,11 +352,14 @@ export default function EditPostPage() {
             </div>
           )}
 
-          {/* Add New Images */}
+          {/* Add New Featured/Gallery Images */}
           <div>
             <label className="block text-sm font-semibold text-gray-900 mb-2">
-              Add New Images
+              Add New Featured & Gallery Images
             </label>
+            <p className="text-xs text-gray-500 mb-2">
+              Upload images for the post thumbnail and gallery. These appear separately from inline images added via the editor.
+            </p>
             <input
               type="file"
               multiple

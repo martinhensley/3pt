@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import Breadcrumb from "@/components/Breadcrumb";
 import AdminHeader from "@/components/AdminHeader";
-import RichTextEditor from "@/components/RichTextEditor";
+import QuillEditor from "@/components/QuillEditor";
 
 export default function CreatePostPage() {
   const { data: session, status } = useSession();
@@ -377,7 +377,7 @@ export default function CreatePostPage() {
             <label className="block text-sm font-semibold text-gray-900 mb-2">
               Content <span className="text-orange-500">*</span>
             </label>
-            <RichTextEditor
+            <QuillEditor
               content={content}
               onChange={setContent}
               placeholder="Start writing your post content..."
@@ -387,11 +387,14 @@ export default function CreatePostPage() {
             </p>
           </div>
 
-          {/* Images */}
+          {/* Featured/Gallery Images */}
           <div>
             <label className="block text-sm font-semibold text-gray-900 mb-2">
-              Images (Optional)
+              Featured & Gallery Images (Optional)
             </label>
+            <p className="text-xs text-gray-500 mb-2">
+              Upload images for the post thumbnail and gallery. These appear separately from inline images added via the editor.
+            </p>
             <input
               type="file"
               multiple

@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import Breadcrumb from "@/components/Breadcrumb";
 import AdminHeader from "@/components/AdminHeader";
-// Removed RichTextEditor - using simple textarea instead
 
 interface CardInfo {
   id?: string;

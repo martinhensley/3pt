@@ -6,12 +6,13 @@ Import sets and cards from a release checklist file (Excel, CSV, etc.) into the 
 
 This skill guides the user through importing a complete card release checklist:
 
-1. **Fetch Available Releases** - Query the database for all releases and present them to the user
+1. **Fetch Available Releases** - Query the database for releases that don't have cards yet (need importing) and present them to the user
 2. **User Selects Release** - Show releases in a readable format and ask which one to import
 3. **Request Checklist File** - Ask user for the path to the checklist file
 4. **Detect Import Script** - Determine which import script to use based on release name
 5. **Run Import** - Execute the appropriate import script with progress monitoring
-6. **Report Results** - Display summary of sets and cards imported
+6. **Save to Library** - Upload checklist file and save as SourceDocument with documentType='CHECKLIST'
+7. **Report Results** - Display summary of sets, cards imported, and library confirmation
 
 ## User Interaction Flow
 
@@ -19,11 +20,11 @@ This skill guides the user through importing a complete card release checklist:
 🎯 Import Release Checklist
 
 Step 1: Select a release to import
-Available releases:
+Available releases (without cards):
   1. 2024-25 Panini Obsidian Soccer
   2. 2024-25 Panini Donruss Soccer
   3. 2023-24 Panini Prizm Soccer
-  ... (shows all available releases)
+  ... (shows only releases that need importing)
 
 Which release? (enter number or name): 1
 
@@ -46,10 +47,17 @@ Step 3: Running import...
 ### 1. Query Available Releases
 
 ```typescript
-// Fetch all releases from database
+// Fetch releases that don't have cards yet (need importing)
 const releases = await prisma.release.findMany({
   include: {
     manufacturer: true,
+    sets: {
+      include: {
+        _count: {
+          select: { cards: true }
+        }
+      }
+    }
   },
   orderBy: [
     { year: 'desc' },
@@ -57,8 +65,14 @@ const releases = await prisma.release.findMany({
   ],
 });
 
+// Filter to only releases without cards
+const releasesNeedingImport = releases.filter(release => {
+  const totalCards = release.sets.reduce((sum, set) => sum + set._count.cards, 0);
+  return totalCards === 0;
+});
+
 // Format for display
-releases.forEach((release, index) => {
+releasesNeedingImport.forEach((release, index) => {
   console.log(`  ${index + 1}. ${release.year} ${release.manufacturer.name} ${release.name}`);
 });
 ```
@@ -103,11 +117,36 @@ npx tsx scripts/imports/import-obsidian-from-excel.ts \
   --file=/path/to/checklist.xls
 ```
 
-### 5. Parse Results
+###5. Save Checklist to Library
+
+After successful import, save the checklist file to the library:
+
+```typescript
+// Create a SourceDocument record for the checklist
+await prisma.sourceDocument.create({
+  data: {
+    displayName: `${release.year} ${release.manufacturer.name} ${release.name} Checklist`,
+    filename: path.basename(checklistPath),
+    blobUrl: uploadedFileUrl, // Upload file to blob storage first
+    fileSize: fs.statSync(checklistPath).size,
+    mimeType: getMimeType(checklistPath),
+    documentType: 'CHECKLIST',
+    uploadedAt: new Date(),
+    releases: {
+      create: {
+        releaseId: release.id,
+      },
+    },
+  },
+});
+```
+
+### 6. Parse Results
 
 Extract and display:
 - Number of sets created
 - Number of cards imported
+- Checklist saved to library
 - Any errors or warnings
 - Link to view release in app
 
@@ -155,14 +194,14 @@ Allow optional flags:
 
 ### Database Queries
 ```typescript
-// Get available releases
-GET /api/releases?include=manufacturer
+// Get releases without cards (need importing)
+GET /api/releases?include=manufacturer,sets&needsImport=true
 
 // Verify release exists
 GET /api/releases/:slug
 
-// Check for existing sets
-GET /api/sets?releaseId=xxx&count=true
+// Check for existing cards in release
+GET /api/cards?releaseId=xxx&count=true
 ```
 
 ### Import Scripts
@@ -187,8 +226,9 @@ The import is considered successful when:
 3. ✅ AI successfully analyzes checklist structure
 4. ✅ Sets are created/found in database
 5. ✅ Cards are imported with correct relationships
-6. ✅ No critical errors occurred
-7. ✅ Summary statistics are displayed
+6. ✅ Checklist file is saved to library (SourceDocument table)
+7. ✅ No critical errors occurred
+8. ✅ Summary statistics are displayed
 
 ## Example Outputs
 
@@ -204,11 +244,14 @@ Results:
      - 2 base sets
      - 38 parallel sets
      - 7 insert sets
-  
+
   🎴 1,234 cards imported
      - 145 base cards
      - 1,089 parallel cards
-  
+
+  📚 Checklist saved to library
+     - Available at /admin/library/checklists
+
 View release: http://localhost:3000/releases/2024-25-panini-obsidian-soccer
 ```
 

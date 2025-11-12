@@ -41,15 +41,43 @@ export async function PUT(
       );
     }
 
-    // Prepare update data - only allow editing images and footyNotes
-    // All other fields are inherited from checklist
+    // Prepare update data
     const updateData: {
-      footyNotes: string | null;
+      playerName?: string | null;
+      team?: string | null;
+      cardNumber?: string | null;
+      variant?: string | null;
+      parallelType?: string | null;
+      serialNumber?: string | null;
+      isNumbered?: boolean;
+      printRun?: number | null;
+      numbered?: string | null;
+      rarity?: string | null;
+      finish?: string | null;
+      hasAutograph?: boolean;
+      hasMemorabilia?: boolean;
+      colorVariant?: string | null;
+      footyNotes?: string | null;
       imageFront?: string;
       imageBack?: string;
-    } = {
-      footyNotes: body.footyNotes || null,
-    };
+    } = {};
+
+    // Update all editable fields if provided
+    if (body.playerName !== undefined) updateData.playerName = body.playerName || null;
+    if (body.team !== undefined) updateData.team = body.team || null;
+    if (body.cardNumber !== undefined) updateData.cardNumber = body.cardNumber || null;
+    if (body.variant !== undefined) updateData.variant = body.variant || null;
+    if (body.parallelType !== undefined) updateData.parallelType = body.parallelType || null;
+    if (body.serialNumber !== undefined) updateData.serialNumber = body.serialNumber || null;
+    if (body.isNumbered !== undefined) updateData.isNumbered = Boolean(body.isNumbered);
+    if (body.printRun !== undefined) updateData.printRun = body.printRun || null;
+    if (body.numbered !== undefined) updateData.numbered = body.numbered || null;
+    if (body.rarity !== undefined) updateData.rarity = body.rarity || null;
+    if (body.finish !== undefined) updateData.finish = body.finish || null;
+    if (body.hasAutograph !== undefined) updateData.hasAutograph = Boolean(body.hasAutograph);
+    if (body.hasMemorabilia !== undefined) updateData.hasMemorabilia = Boolean(body.hasMemorabilia);
+    if (body.colorVariant !== undefined) updateData.colorVariant = body.colorVariant || null;
+    if (body.footyNotes !== undefined) updateData.footyNotes = body.footyNotes || null;
 
     // Handle image uploads if provided
     if (body.imageFront || body.imageBack) {

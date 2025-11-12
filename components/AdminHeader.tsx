@@ -53,7 +53,7 @@ export default function AdminHeader() {
               href="/admin"
               className="text-footy-orange hover:text-white transition-colors text-sm md:text-base font-bold"
             >
-              Admin Dashboard
+              Dashboard
             </Link>
             <Link
               href="/admin/posts"
@@ -66,6 +66,12 @@ export default function AdminHeader() {
               className="text-footy-orange hover:text-white transition-colors text-sm md:text-base font-bold"
             >
               Manage Releases
+            </Link>
+            <Link
+              href="/admin/cards"
+              className="text-footy-orange hover:text-white transition-colors text-sm md:text-base font-bold"
+            >
+              Manage Cards
             </Link>
             <button
               type="button"

@@ -607,6 +607,23 @@ return (
 2. **Print runs are not duplicated** - if the parallel name ends with the print run, it's not added again
 3. **1/1 cards** use special formatting (see below)
 
+### Set Slugs
+
+**Format:** `{year}-{release}-{type-prefix}-{setname}[-{parallel}]`
+
+**Type Prefixes:**
+- `Base` → `base` (or omit if setName already contains "base")
+- `Autograph` → `auto`
+- `Memorabilia` → `mem`
+- `Insert` → `insert`
+- `Other` → (no prefix)
+
+**Examples:**
+- Base: `2024-25-obsidian-soccer-obsidian-base`
+- Insert: `2024-25-obsidian-soccer-insert-equinox`
+- Autograph: `2024-25-obsidian-soccer-auto-dual-jersey-ink`
+- Parallel: `2024-25-obsidian-soccer-obsidian-base-electric-etch-green-5`
+
 ### Special Cases
 
 #### 1/1 Cards (Chase/Grail Cards)
@@ -655,6 +672,13 @@ const displayName = setName
 - **Database:** `"Base Set"`
 - **URLs:** `"base"` (keep "Base")
 - **Display:** `"Base"` (keep "Base")
+
+#### Print Runs in Parallels
+When a parallel name includes a print run indicator (e.g., "Electric Etch Orange /149"):
+- **Stored name:** Extract and clean the parallel name (e.g., "Electric Etch Orange")
+- **Set.printRun or Set.totalCards:** Store the print run separately
+- **Slug:** Include the print run number (e.g., `electric-etch-orange-149`)
+- **Display:** Show the full name with formatting (e.g., "Electric Etch Orange /149")
 
 ### Card Slug Generation Logic
 
@@ -717,6 +741,110 @@ Example: `2024-25-donruss-soccer-optic`
 Format: `{year}-{manufacturer}-{release}`
 
 Example: `2024-25-panini-donruss-soccer`
+
+---
+
+## Set & Parallel Architecture
+
+### Parent-Child Parallel Relationships
+
+The database uses a **parent-child model** for parallel sets:
+
+- **Parent Sets**: Base sets, insert sets, autograph sets, etc. that contain the actual card checklist
+- **Child Parallel Sets**: Variations of the parent set (e.g., "Electric Etch Orange", "Gold Power") that reference the parent's cards
+
+**Database Structure:**
+```typescript
+// Parent set (e.g., "Obsidian Base")
+const parentSet = {
+  id: 'abc123',
+  name: 'Obsidian Base',
+  type: 'Base',
+  parentSetId: null,          // null indicates this is a parent
+  parallelSets: [child1, child2, ...], // Array of children
+  cards: [card1, card2, ...]   // Cards stored here
+};
+
+// Child parallel set (e.g., "Electric Etch Orange")
+const parallelSet = {
+  id: 'xyz789',
+  name: 'Electric Etch Orange',
+  type: 'Base',
+  parentSetId: 'abc123',      // Points to parent
+  parallelSets: [],           // Parallels don't have children
+  cards: []                   // Empty - references parent's cards
+};
+```
+
+**Key Principles:**
+
+1. **Cards stored once**: Cards exist only on the parent set, not duplicated for each parallel
+2. **Release pages show parents only**: Only parent sets displayed on release pages (not child parallels)
+3. **Set pages show parallels**: Parent set pages display links to their child parallel sets
+4. **Parallel pages reference parent cards**: When viewing a parallel, the page fetches and displays the parent's cards
+
+**Query Pattern:**
+```typescript
+// Fetch set with parallel relationships
+const set = await prisma.set.findUnique({
+  where: { slug: params.slug },
+  include: {
+    cards: true,              // Cards (if parent)
+    parallelSets: true,       // Child parallels (if parent)
+    parentSet: {              // Parent info (if parallel)
+      include: { cards: true } // Parent's cards (if this is parallel)
+    }
+  }
+});
+
+// Display cards: use parent's cards if this is a parallel
+const cardsToDisplay = set.parentSetId
+  ? set.parentSet.cards
+  : set.cards;
+```
+
+**Benefits:**
+- **Storage efficiency**: Cards not duplicated across parallels
+- **Consistency**: Single source of truth for card data
+- **Maintainability**: Update cards in one place, reflects across all parallels
+- **Query performance**: Simpler joins, fewer records to fetch
+
+### Edge Cases to Handle
+
+1. **Sets with no parallels**: Create only 1 parent set, no children
+2. **Variable parallels**: Some parallels have player-specific print runs (e.g., "Messi /10, Ronaldo /25")
+3. **Cascading deletes**: Deleting parent should cascade delete children (handled by Prisma `onDelete: Cascade`)
+4. **Orphaned parallels**: Ensure parallel sets always have valid `parentSetId` reference
+
+### Testing Checklist for Parallel Sets
+
+When implementing or modifying parallel set functionality:
+
+**Database Level:**
+- [ ] Parent sets have `parentSetId = null`
+- [ ] Parallel sets have `parentSetId` pointing to valid parent
+- [ ] Cards only exist for parent sets
+- [ ] Slugs are unique and follow conventions
+- [ ] Cascading deletes work correctly
+
+**Release Page (`/releases/[slug]`):**
+- [ ] Only parent sets displayed
+- [ ] No parallel sets shown
+- [ ] Correct card counts
+- [ ] Set type badges display correctly (Base, Insert, Auto, Mem)
+
+**Set Detail Page (`/sets/[slug]`):**
+- [ ] Parent set shows list of parallels as links
+- [ ] Clicking parallel navigates to `/sets/{parallel-slug}`
+- [ ] Parallel page shows same checklist as parent
+- [ ] Parallel page shows link back to parent
+- [ ] Breadcrumbs work correctly for both parent and parallel
+
+**Admin Interface:**
+- [ ] Creating set with parallels creates parent + children
+- [ ] Cards only created for parent
+- [ ] Progress indicator shows accurate counts
+- [ ] Duplicate detection prevents errors on re-import
 
 ---
 
@@ -1047,6 +1175,24 @@ Before committing changes to page layouts:
 ---
 
 ## Recent Changes Log
+
+### November 11, 2025 - Documentation Consolidation
+**Changes:**
+- Consolidated parallel set architecture documentation from spec files into `.claude/CLAUDE.md`
+- Added comprehensive "Set & Parallel Architecture" section documenting parent-child relationships
+- Enhanced "URL Slug Conventions" with set slug formatting and type prefixes
+- Added testing checklists for parallel set functionality
+- Documented edge cases and query patterns
+
+**Sections Added:**
+- **Set & Parallel Architecture**: Parent-child model, database structure, query patterns, and benefits
+- **Edge Cases to Handle**: Sets without parallels, variable parallels, cascading deletes
+- **Testing Checklist for Parallel Sets**: Database, release page, set page, and admin interface tests
+
+**Files Consolidated:**
+- `/PARALLEL_AS_SET_SPEC.md` → Extracted slug conventions, type prefixes, and special cases
+- `/PARENT_CHILD_PARALLEL_TODO.md` → Extracted testing checklist and edge cases
+- Both spec files can now be deleted as content is preserved in permanent documentation
 
 ### November 2025 - AI Excel Import Workflow
 **Changes:**

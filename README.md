@@ -442,29 +442,39 @@ Login credentials are configured in your environment variables.
 - Example: `2024-25-panini-obsidian-soccer`
 
 **Set Slugs:**
-- Base: `{year}-{release}-base-{setname}` or `{year}-{release}-{setname}`
-- Insert: `{year}-{release}-insert-{setname}`
-- Autograph: `{year}-{release}-auto-{setname}`
-- Memorabilia: `{year}-{release}-mem-{setname}`
-- Other: `{year}-{release}-{setname}`
-- Parallel: `{parent-slug}-{parallel-name}-{printrun}`
+- Format: `{year}-{release}-{type-prefix}-{setname}[-{parallel}]`
+- Type prefixes: `base`, `insert`, `auto`, `mem` (or omit for Other)
 - Examples:
-  - `2024-25-obsidian-soccer-obsidian-base`
-  - `2024-25-obsidian-soccer-insert-equinox`
-  - `2024-25-obsidian-soccer-obsidian-base-electric-etch-green-5`
+  - Base: `2024-25-obsidian-soccer-obsidian-base`
+  - Insert: `2024-25-obsidian-soccer-insert-equinox`
+  - Autograph: `2024-25-obsidian-soccer-auto-dual-jersey-ink`
+  - Parallel: `2024-25-obsidian-soccer-obsidian-base-electric-etch-green-5`
 
 **Card Slugs:**
-- Format: `{year}-{release}-{set}-{cardnumber}-{player}-{parallel}`
+- Format: `{year}-{release}-{set}-{cardnumber}-{player}-{parallel}-{printrun}`
+- Parallel cards exclude base set name from slug
 - 1/1 cards use "1-of-1" format
 - Examples:
-  - `2024-25-donruss-soccer-optic-1-jude-bellingham`
-  - `2024-25-donruss-soccer-optic-1-jude-bellingham-gold-power-1-of-1`
+  - Base: `2024-25-obsidian-soccer-obsidian-base-1-jude-bellingham-145`
+  - Parallel: `2024-25-obsidian-soccer-1-jude-bellingham-electric-etch-orange-8`
+  - 1/1: `2024-25-obsidian-soccer-1-jude-bellingham-gold-power-1-of-1`
 
 **Special Handling:**
-- "Optic Base Set" → "optic" (base removed)
-- "Base Set" → "base" (base kept)
+- "Optic Base Set" → "optic" (base removed from slug)
+- "Base Set" → "base" (base kept in slug)
 - "1/1" or "1 of 1" → "1-of-1" in URLs
 - Print runs: " /5" → "-5" in URLs
+
+### Parent-Child Parallel Architecture
+
+The database uses a **parent-child model** for parallel sets:
+
+- **Parent Sets**: Base/Insert/Auto/Memorabilia sets containing the actual card checklist
+- **Child Parallel Sets**: Variations (e.g., "Electric Etch Orange", "Gold Power") that reference parent's cards
+- **Cards stored once**: Cards exist only on parent sets, not duplicated for each parallel
+- **Query efficiency**: Simpler joins, fewer records, single source of truth
+
+See `.claude/claude.md` for detailed documentation on parallel set architecture, query patterns, and testing checklists.
 
 ## Standardized Page Layout
 
