@@ -36,19 +36,24 @@ export async function POST(request: NextRequest) {
       try {
         const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
 
-        // Disable worker for serverless compatibility
-        // Workers don't work in Vercel serverless functions due to file system restrictions
-        // Setting workerSrc to false completely disables the worker
-        pdfjsLib.GlobalWorkerOptions.workerSrc = false as any;
+        // CRITICAL: Disable worker for serverless compatibility
+        // Set workerSrc to an empty data URL to prevent worker initialization
+        // This is the only method that works reliably in Vercel serverless
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'data:text/javascript;base64,';
 
         const pdfResponse = await fetch(fileUrl);
         const pdfBuffer = await pdfResponse.arrayBuffer();
 
         const loadingTask = pdfjsLib.getDocument({
           data: pdfBuffer,
+          standardFontDataUrl: undefined,
+          cMapUrl: undefined,
+          cMapPacked: false,
           useWorkerFetch: false,
           isEvalSupported: false,
           useSystemFonts: true,
+          disableFontFace: true,
+          verbosity: 0,
         });
         const pdfDocument = await loadingTask.promise;
 
