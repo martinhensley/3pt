@@ -81,12 +81,6 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) to view the site.
 
-### Admin Access
-
-Navigate to [http://localhost:3000/admin](http://localhost:3000/admin)
-
-Login credentials are configured in your environment variables.
-
 ### Database Migrations
 
 When updating the schema:
