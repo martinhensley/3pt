@@ -13,7 +13,8 @@ interface Release {
   name: string;
   slug: string;
   year: number | null;
-  description: string | null;
+  review: string | null;
+  reviewDate: string | null;
   releaseDate: string | null;
   createdAt: string;
   manufacturer: {
@@ -148,10 +149,10 @@ export default function Home() {
                         {title}
                       </h2>
 
-                      {release.description && (
+                      {release.review && (
                         <p className={`text-gray-600 mb-4 flex-grow ${
                           release.images[0] ? "line-clamp-3" : "line-clamp-[12]"
-                        }`}>{release.description}</p>
+                        }`}>{release.review}</p>
                       )}
 
                       <div className="mt-auto text-footy-orange font-semibold">

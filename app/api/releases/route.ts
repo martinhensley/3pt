@@ -81,7 +81,8 @@ export async function GET(request: NextRequest) {
           slug: true,
           year: true,
           releaseDate: true,
-          description: true,
+          review: true,
+          reviewDate: true,
           sourceFiles: true, // Include sourceFiles for Edit Release page
           isApproved: true,
           approvedAt: true,
@@ -175,7 +176,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, name, year, releaseDate, description, sourceFiles, postDate } = body;
+    const { id, name, year, releaseDate, review, reviewDate, sourceFiles, postDate } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -191,7 +192,8 @@ export async function PUT(request: NextRequest) {
         year,
         releaseDate: releaseDate || null,
         postDate: postDate ? new Date(postDate) : null, // Allow admin to set custom postDate
-        description: description || null,
+        review: review || null,
+        reviewDate: reviewDate ? new Date(reviewDate) : null,
         sourceFiles: sourceFiles || null,
       },
       include: {

@@ -36,7 +36,8 @@ export async function createReleaseWithSets(
     name: string;
     year?: string;
     slug: string;
-    description?: string;
+    review?: string;
+    reviewDate?: Date | null;
     releaseDate?: Date | null;
     sellSheetText?: string;
     sourceFiles?: Array<{ url: string; type: string; filename?: string }>;
@@ -52,7 +53,8 @@ export async function createReleaseWithSets(
       name: releaseData.name,
       year: releaseData.year,
       slug: releaseData.slug,
-      description: releaseData.description,
+      review: releaseData.review,
+      reviewDate: releaseData.reviewDate,
       releaseDate: releaseData.releaseDate,
       sellSheetText: releaseData.sellSheetText,
       sourceFiles: releaseData.sourceFiles,

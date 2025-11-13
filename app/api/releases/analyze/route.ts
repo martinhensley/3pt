@@ -98,7 +98,8 @@ export async function POST(request: NextRequest) {
           name: releaseInfo.releaseName, // Use releaseName (without year/manufacturer) instead of fullReleaseName
           year: releaseInfo.year,
           slug: releaseInfo.slug,
-          description: descriptionResult.description,
+          review: descriptionResult.description,
+          reviewDate: new Date(),
           releaseDate: releaseInfo.releaseDate || null,
           postDate: postDate,
           sellSheetText: sourceText,

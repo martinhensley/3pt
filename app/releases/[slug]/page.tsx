@@ -77,7 +77,8 @@ interface Release {
   name: string;
   year: string | null;
   slug: string;
-  description: string | null;
+  review: string | null;
+  reviewDate: string | null;
   createdAt: string;
   manufacturer: {
     name: string;
@@ -416,14 +417,37 @@ export default function ReleasePage() {
               </div>
             )}
 
-            {/* Description */}
-            {release.description && (
-              <div className="p-8 pt-6 space-y-4">
-                {release.description.split('\n\n').map((paragraph, idx) => (
-                  <p key={idx} className="text-lg text-white/90 leading-relaxed">
-                    {paragraph}
+            {/* Review */}
+            {release.review && (
+              <div className="p-8 pt-6">
+                {/* Review Header */}
+                <div className="mb-6">
+                  <p className="text-sm text-white/70 uppercase tracking-wide">
+                    {(() => {
+                      const reviewDate = release.reviewDate ? new Date(release.reviewDate) : null;
+                      const createdDate = new Date(release.createdAt);
+                      const daysDiff = reviewDate
+                        ? Math.floor((reviewDate.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24))
+                        : 0;
+                      const isUpdate = daysDiff > 7;
+                      const date = reviewDate || createdDate;
+                      const formattedDate = new Intl.DateTimeFormat('en-US', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                      }).format(date);
+                      return isUpdate ? `footy's update ${formattedDate}` : `footy's review ${formattedDate}`;
+                    })()}
                   </p>
-                ))}
+                </div>
+                {/* Review Content */}
+                <div className="space-y-4">
+                  {release.review.split('\n\n').map((paragraph, idx) => (
+                    <p key={idx} className="text-lg text-white/90 leading-relaxed">
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
               </div>
             )}
 

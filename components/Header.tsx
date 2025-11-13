@@ -43,16 +43,16 @@ export default function Header({ showBackButton = false, rounded = true, showAd 
             Cards
           </Link>
           <Link
-            href="/checklists"
-            className="text-green-100 hover:text-white transition-colors text-sm md:text-base font-medium"
-          >
-            Checklists
-          </Link>
-          <Link
             href="/comps"
             className="text-green-100 hover:text-white transition-colors text-sm md:text-base font-medium"
           >
             Comps
+          </Link>
+          <Link
+            href="/checklists"
+            className="text-green-100 hover:text-white transition-colors text-sm md:text-base font-medium"
+          >
+            Checklists
           </Link>
           <Link
             href="/posts"

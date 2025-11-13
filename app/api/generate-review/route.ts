@@ -51,9 +51,9 @@ export async function POST(request: NextRequest) {
         }).join("\n")
       : "";
 
-    const prompt = `You MUST generate a description that is EXACTLY 7-21 sentences long. Count each sentence carefully before submitting.
+    const prompt = `You MUST generate a review that is EXACTLY 7-21 sentences long. Count each sentence carefully before submitting.
 
-Generate a comprehensive, engaging description for this soccer card release based ONLY on the provided source document information.
+Generate a comprehensive, engaging review for this soccer card release based ONLY on the provided source document information.
 
 Release: ${manufacturer} ${releaseName} ${year}
 
@@ -83,7 +83,7 @@ To meet the minimum 7 sentences, you should:
 - Note any unique features or selling points
 - Comment on the overall value proposition
 
-Return ONLY the description text with paragraph breaks (double line breaks between paragraphs). No labels, no formatting, just the text.`;
+Return ONLY the review text with paragraph breaks (double line breaks between paragraphs). No labels, no formatting, just the text.`;
 
     const result = await generateText({
       model: anthropic("claude-3-5-sonnet-20241022"),
@@ -95,7 +95,7 @@ Return ONLY the description text with paragraph breaks (double line breaks betwe
       excerpt: result.text.trim(),
     });
   } catch (error) {
-    console.error("Description generation error:", error);
+    console.error("Review generation error:", error);
 
     const errorDetails = {
       message: error instanceof Error ? error.message : String(error),
@@ -106,7 +106,7 @@ Return ONLY the description text with paragraph breaks (double line breaks betwe
 
     return NextResponse.json(
       {
-        error: "Failed to generate description",
+        error: "Failed to generate review",
         details: errorDetails.message,
       },
       { status: 500 }

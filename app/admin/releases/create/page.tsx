@@ -33,7 +33,7 @@ export default function CreateReleasePage() {
         numbered: boolean;
       }>;
     };
-    description: string;
+    review: string;
   } | null>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -319,10 +319,10 @@ export default function CreateReleasePage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Description (AI Generated)
+                    Review (AI Generated)
                   </label>
                   <div className="px-4 py-3 border border-gray-300 rounded-md bg-gray-50 text-sm whitespace-pre-wrap">
-                    {analysisResult.description}
+                    {analysisResult.review}
                   </div>
                 </div>
               </div>
