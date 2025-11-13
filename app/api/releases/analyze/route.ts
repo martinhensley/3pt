@@ -35,13 +35,10 @@ export async function POST(request: NextRequest) {
       console.log('Extracting text from PDF:', fileUrl);
       try {
         const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
-        const path = await import('path');
-        const { fileURLToPath } = await import('url');
 
-        // Use the local worker file from node_modules
-        // This ensures version compatibility in serverless environments
-        const workerPath = path.resolve(process.cwd(), 'node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs');
-        pdfjsLib.GlobalWorkerOptions.workerSrc = workerPath;
+        // Disable worker for serverless compatibility
+        // Workers don't work in Vercel serverless functions due to file system restrictions
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '';
 
         const pdfResponse = await fetch(fileUrl);
         const pdfBuffer = await pdfResponse.arrayBuffer();
@@ -51,6 +48,7 @@ export async function POST(request: NextRequest) {
           useWorkerFetch: false,
           isEvalSupported: false,
           useSystemFonts: true,
+          disableWorker: true, // Force disable worker
         });
         const pdfDocument = await loadingTask.promise;
 
