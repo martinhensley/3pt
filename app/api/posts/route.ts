@@ -108,6 +108,7 @@ export async function POST(request: NextRequest) {
             imageUrls?.map((url: string, index: number) => ({
               url,
               order: index,
+              type: "POST", // Required: specify this is a post image
             })) || [],
         },
       },
@@ -233,6 +234,7 @@ export async function PUT(request: NextRequest) {
           create: newImageUrls.map((url: string, index: number) => ({
             url,
             order: maxOrder + index,
+            type: "POST", // Required: specify this is a post image
           })),
         } : undefined,
       },
