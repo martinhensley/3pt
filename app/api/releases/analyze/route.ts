@@ -32,23 +32,10 @@ export async function POST(request: NextRequest) {
     let extractedText = documentText;
 
     if (fileUrl && mimeType === 'application/pdf') {
-      console.log('Extracting text from PDF:', fileUrl);
-      try {
-        // Use pdf-parse instead of pdfjs-dist for serverless compatibility
-        // pdf-parse works better in Vercel serverless environments
-        const pdfParse = (await import('pdf-parse')).default;
-
-        const pdfResponse = await fetch(fileUrl);
-        const pdfBuffer = Buffer.from(await pdfResponse.arrayBuffer());
-
-        const pdfData = await pdfParse(pdfBuffer);
-        extractedText = pdfData.text;
-
-        console.log('PDF text extracted, length:', extractedText.length);
-      } catch (pdfError) {
-        console.error('PDF text extraction failed:', pdfError);
-        throw new Error(`Failed to extract text from PDF: ${pdfError instanceof Error ? pdfError.message : String(pdfError)}`);
-      }
+      console.log('Skipping PDF text extraction - not supported in serverless');
+      // PDF text extraction is unreliable in serverless environments
+      // Users should copy/paste text from PDFs instead
+      throw new Error('PDF text extraction is not currently supported. Please copy the text from your PDF and paste it into the text field instead.');
     }
 
     // Step 2: Analyze with Claude via Genkit
