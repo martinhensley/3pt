@@ -27,23 +27,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Step 1: Extract text from PDF if needed
-    console.log('Analyzing release with Genkit...');
-    let extractedText = documentText;
-
-    if (fileUrl && mimeType === 'application/pdf') {
-      console.log('Skipping PDF text extraction - not supported in serverless');
-      // PDF text extraction is unreliable in serverless environments
-      // Users should copy/paste text from PDFs instead
-      throw new Error('PDF text extraction is not currently supported. Please copy the text from your PDF and paste it into the text field instead.');
-    }
-
-    // Step 2: Analyze with Claude via Genkit
+    // Step 1: Analyze with Claude via Genkit
+    // Claude can read PDFs directly, so we pass the URL instead of extracting text
     console.log('Analyzing release with Claude via Genkit...');
     const releaseInfo = await analyzeReleaseFlow({
-      documentText: extractedText,
+      documentText: documentText || undefined,
+      documentUrl: fileUrl || undefined,
+      mimeType: mimeType || undefined,
     });
     console.log('Release analysis complete:', releaseInfo);
+
+    // For description generation, we need text - extract from PDF if needed
+    let sourceText = documentText;
+    if (!sourceText && fileUrl && mimeType === 'application/pdf') {
+      // Use the release info as a minimal source if no text provided
+      sourceText = `Release: ${releaseInfo.fullReleaseName}\nYear: ${releaseInfo.year}\nManufacturer: ${releaseInfo.manufacturer}`;
+    }
 
     // Step 3: Generate description with Claude via Genkit
     console.log('Generating description with Claude via Genkit...');

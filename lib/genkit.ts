@@ -27,11 +27,63 @@ export const analyzeReleaseFlow = ai.defineFlow(
   {
     name: 'analyzeRelease',
     inputSchema: z.object({
-      documentText: z.string().describe('Extracted text from the uploaded document'),
+      documentText: z.string().optional().describe('Extracted text from the uploaded document'),
+      documentUrl: z.string().optional().describe('URL to PDF document for Claude to read directly'),
+      mimeType: z.string().optional().describe('MIME type of the document'),
     }),
     outputSchema: ReleaseInfoSchema,
   },
   async (input) => {
+    // If we have a PDF URL, use Claude's native PDF reading capability
+    if (input.documentUrl && input.mimeType === 'application/pdf') {
+      const { output } = await ai.generate({
+        model: claude4Sonnet,
+        output: {
+          schema: ReleaseInfoSchema,
+        },
+        prompt: [
+          {
+            text: `You are analyzing a soccer card release document (sell sheet, catalog, etc.).
+
+Extract the following information from this PDF document:
+
+CRITICAL REQUIREMENTS:
+
+1. Full Release Name Format: MUST be "Year Manufacturer ReleaseName"
+   Examples:
+   - "2024-25 Panini Donruss Soccer"
+   - "2024-25 Topps Chrome UEFA Club Competitions"
+   - "2023-24 Panini Obsidian Soccer"
+
+2. Release date: Extract if explicitly mentioned (format: YYYY-MM-DD)
+
+3. Slug: Create a URL-friendly version of the full release name
+
+NOTE: Do NOT extract set information. Sets will be added later through the manage releases workflow.
+
+Return the extracted information in the specified schema format.`,
+          },
+          {
+            media: {
+              url: input.documentUrl,
+              contentType: input.mimeType,
+            },
+          },
+        ],
+      });
+
+      if (!output) {
+        throw new Error('Failed to generate release analysis from PDF');
+      }
+
+      return output;
+    }
+
+    // Otherwise use text-based analysis
+    if (!input.documentText) {
+      throw new Error('Either documentText or documentUrl must be provided');
+    }
+
     const { output } = await ai.generate({
       model: claude4Sonnet,
       output: {
