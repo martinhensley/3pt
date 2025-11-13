@@ -148,13 +148,19 @@ export default function ManagePostsPage() {
   return (
     <AdminLayout>
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-8 flex items-center justify-between">
           <Breadcrumb
             items={[
               { label: "Admin", href: "/admin" },
               { label: "Manage Posts", href: "/admin/posts" },
             ]}
           />
+          <button
+            onClick={() => router.push('/admin/posts/create')}
+            className="px-6 py-3 bg-footy-green text-white rounded-lg hover:bg-green-700 transition-colors font-semibold shadow-md hover:shadow-lg"
+          >
+            + Create Post
+          </button>
         </div>
 
         {/* Message */}

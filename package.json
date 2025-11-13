@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "genkit": "GENKIT_ENV=dev genkit start --port 4000 -- npx tsx genkit-flows.ts",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
@@ -12,23 +11,17 @@
     "init-admin": "tsx scripts/init-admin.ts"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^2.0.29",
+    "@ai-sdk/anthropic": "^2.0.44",
     "@anthropic-ai/sdk": "^0.65.0",
-    "@genkit-ai/ai": "^1.22.0",
-    "@genkit-ai/core": "^1.22.0",
-    "@genkit-ai/flow": "^0.5.17",
-    "@genkit-ai/googleai": "^1.22.0",
     "@prisma/client": "^6.17.1",
     "@tiptap/extension-placeholder": "^3.9.1",
     "@types/pdf-parse": "^1.1.5",
     "@vercel/blob": "^2.0.0",
-    "ai": "^5.0.71",
+    "ai": "^5.0.93",
     "bcryptjs": "^3.0.2",
     "canvas": "^3.2.0",
     "csv-parse": "^6.1.0",
     "dotenv": "^17.2.3",
-    "genkit": "^1.22.0",
-    "genkitx-anthropic": "^0.25.0",
     "next": "15.5.5",
     "next-auth": "^4.24.11",
     "pdf-lib": "^1.17.1",
@@ -41,7 +34,8 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "sharp": "^0.34.4",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

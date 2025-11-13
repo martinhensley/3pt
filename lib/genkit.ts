@@ -1,13 +1,16 @@
-import { genkit, z } from 'genkit';
-import { anthropic, claude4Sonnet } from 'genkitx-anthropic';
+/**
+ * AI Analysis Functions using Anthropic SDK
+ *
+ * This module provides AI-powered analysis functions for releases and descriptions.
+ * All functions use the Anthropic SDK directly for serverless compatibility.
+ */
 
-// Configure Genkit with Anthropic Claude
-export const ai = genkit({
-  plugins: [
-    anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
-    }),
-  ],
+import Anthropic from '@anthropic-ai/sdk';
+import { z } from 'zod';
+
+// Initialize Anthropic client
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
 // Define schema for release extraction
@@ -22,39 +25,73 @@ export const ReleaseInfoSchema = z.object({
 
 export type ReleaseInfo = z.infer<typeof ReleaseInfoSchema>;
 
-// Genkit flow for analyzing release documents (text-based)
-export const analyzeReleaseFlow = ai.defineFlow(
-  {
-    name: 'analyzeRelease',
-    inputSchema: z.object({
-      documentText: z.string().optional().describe('Extracted text from the uploaded document'),
-      documentUrl: z.string().optional().describe('URL to PDF document to download and analyze'),
-      mimeType: z.string().optional().describe('MIME type of the document'),
-    }),
-    outputSchema: ReleaseInfoSchema,
-  },
-  async (input) => {
-    // If we have a PDF URL, download it and convert to base64 for Claude
-    if (input.documentUrl && input.mimeType === 'application/pdf') {
-      // Download the PDF
-      const response = await fetch(input.documentUrl);
-      if (!response.ok) {
-        throw new Error(`Failed to download PDF: ${response.statusText}`);
+// Define schema for description generation
+export const DescriptionSchema = z.object({
+  description: z.string().describe('7-21 sentence description of the release'),
+});
+
+/**
+ * Analyze a release document and extract release information
+ */
+export async function analyzeRelease(input: {
+  documentText?: string;
+  documentUrl?: string;
+  mimeType?: string;
+}): Promise<ReleaseInfo> {
+  // If we have a document URL, download and analyze it
+  if (input.documentUrl && input.mimeType) {
+    console.log('📄 Processing document:', {
+      url: input.documentUrl,
+      mimeType: input.mimeType
+    });
+
+    // Download the document
+    const response = await fetch(input.documentUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to download document: ${response.statusText}`);
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+    const base64Data = Buffer.from(arrayBuffer).toString('base64');
+
+    // Build message content
+    const messageContent: Anthropic.MessageCreateParams['messages'][0]['content'] = [];
+
+    // For PDFs, use document type
+    if (input.mimeType === 'application/pdf') {
+      console.log('📝 Analyzing PDF document...');
+      messageContent.push({
+        type: 'document',
+        source: {
+          type: 'base64',
+          media_type: 'application/pdf',
+          data: base64Data,
+        },
+      });
+    } else {
+      // For images, normalize MIME type
+      let normalizedMimeType = input.mimeType;
+      if (normalizedMimeType === 'image/jpg') {
+        normalizedMimeType = 'image/jpeg';
       }
 
-      const arrayBuffer = await response.arrayBuffer();
-      const base64Data = Buffer.from(arrayBuffer).toString('base64');
-
-      const { output } = await ai.generate({
-        model: claude4Sonnet,
-        output: {
-          schema: ReleaseInfoSchema,
+      console.log('🖼️  Analyzing image document...');
+      messageContent.push({
+        type: 'image',
+        source: {
+          type: 'base64',
+          media_type: normalizedMimeType as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp',
+          data: base64Data,
         },
-        prompt: [
-          {
-            text: `You are analyzing a soccer card release document (sell sheet, catalog, etc.).
+      });
+    }
 
-Extract the following information from this PDF document:
+    // Add the analysis prompt
+    messageContent.push({
+      type: 'text',
+      text: `You are analyzing a soccer card release document (sell sheet, catalog, etc.).
+
+Extract the following information from this document and return it as a JSON object:
 
 CRITICAL REQUIREMENTS:
 
@@ -70,35 +107,57 @@ CRITICAL REQUIREMENTS:
 
 NOTE: Do NOT extract set information. Sets will be added later through the manage releases workflow.
 
-Return the extracted information in the specified schema format.`,
-          },
-          {
-            media: {
-              contentType: input.mimeType,
-              url: `data:${input.mimeType};base64,${base64Data}`,
-            },
-          },
-        ],
-      });
+Return ONLY a JSON object with this structure:
+{
+  "manufacturer": "string",
+  "releaseName": "string (without year/manufacturer)",
+  "year": "string (YYYY or YYYY-YY)",
+  "fullReleaseName": "string (Year Manufacturer ReleaseName)",
+  "slug": "string (url-friendly)",
+  "releaseDate": "string | null (YYYY-MM-DD format if found)"
+}`,
+    });
 
-      if (!output) {
-        throw new Error('Failed to generate release analysis from PDF');
-      }
+    // Call Anthropic API
+    const message = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4096,
+      messages: [
+        {
+          role: 'user',
+          content: messageContent,
+        },
+      ],
+    });
 
-      return output;
+    // Extract JSON from response
+    const textContent = message.content.find((block) => block.type === 'text');
+    if (!textContent || textContent.type !== 'text') {
+      throw new Error('No text content in Anthropic response');
     }
 
-    // Otherwise use text-based analysis
-    if (!input.documentText) {
-      throw new Error('Either documentText or documentUrl must be provided');
+    const jsonMatch = textContent.text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error('Could not extract JSON from Anthropic response');
     }
 
-    const { output } = await ai.generate({
-      model: claude4Sonnet,
-      output: {
-        schema: ReleaseInfoSchema,
-      },
-      prompt: `You are analyzing a soccer card release document (sell sheet, catalog, etc.).
+    const output = JSON.parse(jsonMatch[0]);
+    console.log('✅ Successfully analyzed document');
+    return ReleaseInfoSchema.parse(output);
+  }
+
+  // Otherwise use text-based analysis
+  if (!input.documentText) {
+    throw new Error('Either documentText or documentUrl must be provided');
+  }
+
+  const message = await anthropic.messages.create({
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 4096,
+    messages: [
+      {
+        role: 'user',
+        content: `You are analyzing a soccer card release document (sell sheet, catalog, etc.).
 
 Extract the following information from this document:
 
@@ -119,39 +178,49 @@ CRITICAL REQUIREMENTS:
 
 NOTE: Do NOT extract set information. Sets will be added later through the manage releases workflow.
 
-Return the extracted information in the specified schema format.`,
-    });
-
-    if (!output) {
-      throw new Error('Failed to generate release analysis');
-    }
-
-    return output;
-  }
-);
-
-// Define schema for description generation
-export const DescriptionSchema = z.object({
-  description: z.string().describe('7-21 sentence description of the release'),
-});
-
-// Genkit flow for generating release descriptions
-export const generateDescriptionFlow = ai.defineFlow(
-  {
-    name: 'generateDescription',
-    inputSchema: z.object({
-      release: ReleaseInfoSchema,
-      sourceText: z.string().describe('Original document text for reference'),
-    }),
-    outputSchema: DescriptionSchema,
-  },
-  async (input) => {
-    const { output } = await ai.generate({
-      model: claude4Sonnet,
-      output: {
-        schema: DescriptionSchema,
+Return ONLY a JSON object with this structure:
+{
+  "manufacturer": "string",
+  "releaseName": "string (without year/manufacturer)",
+  "year": "string (YYYY or YYYY-YY)",
+  "fullReleaseName": "string (Year Manufacturer ReleaseName)",
+  "slug": "string (url-friendly)",
+  "releaseDate": "string | null (YYYY-MM-DD format if found)"
+}`,
       },
-      prompt: `You MUST generate a description that is EXACTLY 7-21 sentences long. Count each sentence carefully before submitting.
+    ],
+  });
+
+  // Extract JSON from response
+  const textContent = message.content.find((block) => block.type === 'text');
+  if (!textContent || textContent.type !== 'text') {
+    throw new Error('No text content in Anthropic response');
+  }
+
+  const jsonMatch = textContent.text.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) {
+    throw new Error('Could not extract JSON from Anthropic response');
+  }
+
+  const output = JSON.parse(jsonMatch[0]);
+  console.log('✅ Successfully analyzed text');
+  return ReleaseInfoSchema.parse(output);
+}
+
+/**
+ * Generate a description for a release
+ */
+export async function generateDescription(input: {
+  release: ReleaseInfo;
+  sourceText: string;
+}): Promise<{ description: string }> {
+  const message = await anthropic.messages.create({
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 4096,
+    messages: [
+      {
+        role: 'user',
+        content: `You MUST generate a description that is EXACTLY 7-21 sentences long. Count each sentence carefully before submitting.
 
 Generate a comprehensive, engaging description for this soccer card release based ONLY on the provided source document information.
 
@@ -184,13 +253,22 @@ To meet the minimum 7 sentences, you should discuss:
 - The overall value proposition
 
 Return ONLY the description text with paragraph breaks (double line breaks between paragraphs). No labels, no formatting, just the text.`,
-    });
+      },
+    ],
+  });
 
-    if (!output) {
-      throw new Error('Failed to generate description');
-    }
-
-    return output;
+  // Extract text from response
+  const textContent = message.content.find((block) => block.type === 'text');
+  if (!textContent || textContent.type !== 'text') {
+    throw new Error('No text content in Anthropic response');
   }
-);
 
+  const description = textContent.text.trim();
+  console.log('✅ Successfully generated description');
+
+  return DescriptionSchema.parse({ description });
+}
+
+// Export legacy flow names for backward compatibility
+export const analyzeReleaseFlow = analyzeRelease;
+export const generateDescriptionFlow = generateDescription;

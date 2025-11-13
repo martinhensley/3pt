@@ -13,195 +13,150 @@
 
 ## AI Integration Requirements
 
-### Genkit Framework Mandate
+### Anthropic SDK for Serverless Compatibility
 
-**CRITICAL: All AI operations MUST use the Genkit framework.**
+**This project uses the [Anthropic SDK](https://github.com/anthropics/anthropic-sdk-typescript) directly for all AI operations.**
 
-This project uses [Firebase Genkit](https://github.com/firebase/genkit) as the unified AI orchestration layer. Direct SDK calls to AI providers (Anthropic, Google AI, etc.) are **strictly prohibited**.
-
-#### Why Genkit?
-
-1. **Unified Interface**: Single API for multiple AI providers
-2. **Type Safety**: Zod schema validation for all AI inputs/outputs
-3. **Flow Management**: Structured prompts and reusable AI workflows
-4. **Observability**: Built-in tracing and debugging via Genkit Dev UI
-5. **Version Control**: AI prompts are code, not scattered strings
-6. **Testing**: Flows can be tested in isolation
+The application is deployed serverless on Vercel with a database-as-a-service backend. All AI functionality uses the Anthropic SDK for maximum compatibility and minimal overhead.
 
 #### Configuration
 
-All AI providers are configured in `/lib/genkit.ts`:
+All AI functions are centralized in `/lib/genkit.ts` (legacy filename retained for backward compatibility):
 
 ```typescript
-export const ai = genkit({
-  plugins: [
-    anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }),
-  ],
+import Anthropic from '@anthropic-ai/sdk';
+import { z } from 'zod';
+
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
 });
 ```
 
-#### Creating AI Flows
+#### Creating AI Functions
 
-Define reusable AI workflows using `ai.defineFlow()`:
+Define reusable AI functions with Zod schema validation:
 
 ```typescript
-export const analyzeReleaseFlow = ai.defineFlow(
-  {
-    name: 'analyzeRelease',
-    inputSchema: z.object({
-      documentText: z.string(),
-    }),
-    outputSchema: ReleaseInfoSchema,
-  },
-  async (input) => {
-    const { text } = await ai.generate({
-      model: claude35Sonnet,
-      output: { schema: ReleaseInfoSchema },
-      prompt: `Your prompt here...`,
-    });
-    return text;
-  }
-);
+export const ReleaseInfoSchema = z.object({
+  manufacturer: z.string(),
+  releaseName: z.string(),
+  year: z.string(),
+  slug: z.string(),
+  // ... more fields
+});
+
+export type ReleaseInfo = z.infer<typeof ReleaseInfoSchema>;
+
+export async function analyzeRelease(input: {
+  documentText?: string;
+  documentUrl?: string;
+  mimeType?: string;
+}): Promise<ReleaseInfo> {
+  const message = await anthropic.messages.create({
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 4096,
+    messages: [
+      {
+        role: 'user',
+        content: `Your prompt here...`,
+      },
+    ],
+  });
+
+  // Extract and validate response
+  const output = JSON.parse(extractedJson);
+  return ReleaseInfoSchema.parse(output);
+}
 ```
 
-#### Using AI Flows
+#### Using AI Functions
 
-Call flows from API routes or server components:
+Call functions from API routes:
 
 ```typescript
-import { analyzeReleaseFlow } from '@/lib/genkit';
+import { analyzeRelease, generateDescription } from '@/lib/genkit';
 
-const result = await analyzeReleaseFlow({
+const result = await analyzeRelease({
   documentText: extractedText,
 });
 ```
 
-#### Prohibited Patterns
+#### PDF and Image Handling
 
-**DO NOT** call AI provider SDKs directly:
-
-```typescript
-// ❌ WRONG - Direct Anthropic SDK usage
-import Anthropic from '@anthropic-ai/sdk';
-const anthropic = new Anthropic({ apiKey: '...' });
-const response = await anthropic.messages.create({...});
-
-// ❌ WRONG - Direct Google AI SDK usage
-import { GoogleGenerativeAI } from '@google/generative-ai';
-const genAI = new GoogleGenerativeAI(apiKey);
-const response = await model.generateContent({...});
-
-// ✅ CORRECT - Use Genkit flow
-import { analyzeReleaseFlow } from '@/lib/genkit';
-const result = await analyzeReleaseFlow({...});
-```
-
-#### Development Tools
-
-Run the Genkit Dev UI to inspect and test flows:
-
-```bash
-npm run genkit
-```
-
-This starts a web interface at http://localhost:4000 where you can:
-- View all defined flows
-- Test flows with sample inputs
-- Inspect AI responses and traces
-- Debug prompt performance
-
-#### Genkit Documentation & Resources
-
-**Official Documentation:**
-- Main site: https://genkit.dev/
-- Getting Started: https://genkit.dev/docs/get-started/
-- Tutorials: https://genkit.dev/docs/tutorials/
-
-**Key Concepts:**
-
-1. **Flows**: Special functions with embedded observability, type safety, and tooling integration
-   - Deployable as HTTP endpoints
-   - Built-in tracing capabilities
-   - Schema-driven with Zod validation
-
-2. **Schema-Driven Development**:
-   - Define clear schemas using Zod for inputs/outputs
-   - Automatic type-safe validation
-   - Structured generation with schema references
-
-3. **Model Flexibility**:
-   - Plugin-based architecture (Anthropic, Google AI, OpenAI, etc.)
-   - Default model with per-request overrides
-   - Model-specific configurations (temperature, safety settings)
-
-4. **Media Handling**:
-   - **Images**: Use `media.url` with image URLs or base64 data URLs
-   - **PDFs**: Must convert to base64 data URLs (`data:application/pdf;base64,{data}`)
-   - **Critical**: Anthropic plugin requires base64 data URLs, not direct HTTP URLs
-   - **Pattern**: Download PDF → Convert to ArrayBuffer → Base64 encode → Pass as data URL
-
-**Common Patterns in This Project:**
+Claude supports PDFs and images via base64 encoding:
 
 ```typescript
-// Flow definition with schema
-export const myFlow = ai.defineFlow(
-  {
-    name: 'myFlow',
-    inputSchema: z.object({
-      text: z.string(),
-      url: z.string().optional(),
-    }),
-    outputSchema: MyOutputSchema,
-  },
-  async (input) => {
-    const { output } = await ai.generate({
-      model: claude4Sonnet,
-      output: { schema: MyOutputSchema },
-      prompt: [
-        { text: 'Your prompt here...' },
-        // For PDFs (if needed)
-        {
-          media: {
-            contentType: 'application/pdf',
-            url: 'data:application/pdf;base64,...',
-          },
-        },
-      ],
-    });
-    return output;
-  }
-);
-```
-
-**PDF Handling Example:**
-
-```typescript
-// Download PDF from URL
-const response = await fetch(pdfUrl);
+// Download file
+const response = await fetch(fileUrl);
 const arrayBuffer = await response.arrayBuffer();
 const base64Data = Buffer.from(arrayBuffer).toString('base64');
 
-// Pass to Claude via Genkit
-const { output } = await ai.generate({
-  model: claude4Sonnet,
-  output: { schema: MySchema },
-  prompt: [
-    { text: 'Analyze this PDF...' },
+// For PDFs
+const message = await anthropic.messages.create({
+  model: 'claude-sonnet-4-20250514',
+  max_tokens: 4096,
+  messages: [
     {
-      media: {
-        contentType: 'application/pdf',
-        url: `data:application/pdf;base64,${base64Data}`,
-      },
+      role: 'user',
+      content: [
+        {
+          type: 'document',
+          source: {
+            type: 'base64',
+            media_type: 'application/pdf',
+            data: base64Data,
+          },
+        },
+        {
+          type: 'text',
+          text: 'Analyze this PDF...',
+        },
+      ],
+    },
+  ],
+});
+
+// For images
+const message = await anthropic.messages.create({
+  model: 'claude-sonnet-4-20250514',
+  max_tokens: 4096,
+  messages: [
+    {
+      role: 'user',
+      content: [
+        {
+          type: 'image',
+          source: {
+            type: 'base64',
+            media_type: 'image/jpeg',
+            data: base64Data,
+          },
+        },
+        {
+          type: 'text',
+          text: 'Analyze this image...',
+        },
+      ],
     },
   ],
 });
 ```
 
-**Debugging Tips:**
-- Use Genkit Dev UI for visual flow inspection
-- Check token usage and latency in traces
-- Validate schema conformance
-- Test prompt variations
+#### Best Practices
+
+1. **Schema Validation**: Always use Zod schemas to validate AI outputs
+2. **Error Handling**: Wrap AI calls in try-catch blocks
+3. **Timeouts**: Set appropriate `maxDuration` in API routes (e.g., 300 seconds)
+4. **Token Limits**: Use appropriate `max_tokens` based on expected response size
+5. **Model Selection**: Use `claude-sonnet-4-20250514` for production workloads
+
+#### Environment Variables
+
+Required environment variable:
+
+```bash
+ANTHROPIC_API_KEY=your-api-key-here
+```
 
 ---
 
@@ -209,7 +164,7 @@ const { output } = await ai.generate({
 
 ### Overview
 
-The application includes a sophisticated AI-powered workflow for importing complete card checklists from Excel files. This workflow uses Claude AI via Genkit to analyze checklist structure, identify sets and parallels, and automatically create the complete database hierarchy.
+The application includes a sophisticated AI-powered workflow for importing complete card checklists from Excel files. This workflow uses Claude AI (via Anthropic SDK) to analyze checklist structure, identify sets and parallels, and automatically create the complete database hierarchy.
 
 **Location:** `/app/api/sets/import-excel/route.ts` (API endpoint) and `/components/ExcelImport.tsx` (UI component)
 

@@ -27,9 +27,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Step 1: Analyze with Claude via Genkit
+    // Step 1: Analyze with Claude (Anthropic SDK)
     // Claude can read PDFs directly, so we pass the URL instead of extracting text
-    console.log('Analyzing release with Claude via Genkit...');
+    console.log('Analyzing release with Claude (Anthropic SDK)...');
     const releaseInfo = await analyzeReleaseFlow({
       documentText: documentText || undefined,
       documentUrl: fileUrl || undefined,
@@ -44,11 +44,11 @@ export async function POST(request: NextRequest) {
       sourceText = `Release: ${releaseInfo.fullReleaseName}\nYear: ${releaseInfo.year}\nManufacturer: ${releaseInfo.manufacturer}`;
     }
 
-    // Step 3: Generate description with Claude via Genkit
-    console.log('Generating description with Claude via Genkit...');
+    // Step 3: Generate description with Claude (Anthropic SDK)
+    console.log('Generating description with Claude (Anthropic SDK)...');
     const descriptionResult = await generateDescriptionFlow({
       release: releaseInfo,
-      sourceText: extractedText,
+      sourceText: sourceText,
     });
     console.log('Description generated');
 
@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
           description: descriptionResult.description,
           releaseDate: releaseInfo.releaseDate || null,
           postDate: postDate,
-          sellSheetText: extractedText,
+          sellSheetText: sourceText,
           sourceFiles: sourceFiles || undefined,
         },
       });
