@@ -92,7 +92,15 @@ export default function CreatePostPage() {
       setContent(data.content || "");
       setExcerpt(data.excerpt || "");
 
-      setMessage({ type: "success", text: "Content generated successfully! Review and edit as needed." });
+      // Transfer AI reference images to Featured & Gallery Images
+      if (aiImages.length > 0) {
+        setImageFiles([...imageFiles, ...aiImages]);
+      }
+
+      setMessage({
+        type: "success",
+        text: `Content generated successfully! ${aiImages.length > 0 ? `${aiImages.length} reference image(s) added to gallery.` : ''} Review and edit as needed.`
+      });
 
       // Clear AI input fields
       setAiPrompt("");
