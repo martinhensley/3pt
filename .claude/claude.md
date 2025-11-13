@@ -110,6 +110,99 @@ This starts a web interface at http://localhost:4000 where you can:
 - Inspect AI responses and traces
 - Debug prompt performance
 
+#### Genkit Documentation & Resources
+
+**Official Documentation:**
+- Main site: https://genkit.dev/
+- Getting Started: https://genkit.dev/docs/get-started/
+- Tutorials: https://genkit.dev/docs/tutorials/
+
+**Key Concepts:**
+
+1. **Flows**: Special functions with embedded observability, type safety, and tooling integration
+   - Deployable as HTTP endpoints
+   - Built-in tracing capabilities
+   - Schema-driven with Zod validation
+
+2. **Schema-Driven Development**:
+   - Define clear schemas using Zod for inputs/outputs
+   - Automatic type-safe validation
+   - Structured generation with schema references
+
+3. **Model Flexibility**:
+   - Plugin-based architecture (Anthropic, Google AI, OpenAI, etc.)
+   - Default model with per-request overrides
+   - Model-specific configurations (temperature, safety settings)
+
+4. **Media Handling**:
+   - **Images**: Use `media.url` with image URLs or base64 data URLs
+   - **PDFs**: Must convert to base64 data URLs (`data:application/pdf;base64,{data}`)
+   - **Critical**: Anthropic plugin requires base64 data URLs, not direct HTTP URLs
+   - **Pattern**: Download PDF → Convert to ArrayBuffer → Base64 encode → Pass as data URL
+
+**Common Patterns in This Project:**
+
+```typescript
+// Flow definition with schema
+export const myFlow = ai.defineFlow(
+  {
+    name: 'myFlow',
+    inputSchema: z.object({
+      text: z.string(),
+      url: z.string().optional(),
+    }),
+    outputSchema: MyOutputSchema,
+  },
+  async (input) => {
+    const { output } = await ai.generate({
+      model: claude4Sonnet,
+      output: { schema: MyOutputSchema },
+      prompt: [
+        { text: 'Your prompt here...' },
+        // For PDFs (if needed)
+        {
+          media: {
+            contentType: 'application/pdf',
+            url: 'data:application/pdf;base64,...',
+          },
+        },
+      ],
+    });
+    return output;
+  }
+);
+```
+
+**PDF Handling Example:**
+
+```typescript
+// Download PDF from URL
+const response = await fetch(pdfUrl);
+const arrayBuffer = await response.arrayBuffer();
+const base64Data = Buffer.from(arrayBuffer).toString('base64');
+
+// Pass to Claude via Genkit
+const { output } = await ai.generate({
+  model: claude4Sonnet,
+  output: { schema: MySchema },
+  prompt: [
+    { text: 'Analyze this PDF...' },
+    {
+      media: {
+        contentType: 'application/pdf',
+        url: `data:application/pdf;base64,${base64Data}`,
+      },
+    },
+  ],
+});
+```
+
+**Debugging Tips:**
+- Use Genkit Dev UI for visual flow inspection
+- Check token usage and latency in traces
+- Validate schema conformance
+- Test prompt variations
+
 ---
 
 ## AI-Powered Excel Import Workflow
