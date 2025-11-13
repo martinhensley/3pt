@@ -38,7 +38,8 @@ export async function POST(request: NextRequest) {
 
         // Disable worker for serverless compatibility
         // Workers don't work in Vercel serverless functions due to file system restrictions
-        pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+        // Setting workerSrc to false completely disables the worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = false as any;
 
         const pdfResponse = await fetch(fileUrl);
         const pdfBuffer = await pdfResponse.arrayBuffer();
@@ -48,7 +49,6 @@ export async function POST(request: NextRequest) {
           useWorkerFetch: false,
           isEvalSupported: false,
           useSystemFonts: true,
-          disableWorker: true, // Force disable worker
         });
         const pdfDocument = await loadingTask.promise;
 
