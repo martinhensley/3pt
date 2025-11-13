@@ -28,14 +28,23 @@ export const analyzeReleaseFlow = ai.defineFlow(
     name: 'analyzeRelease',
     inputSchema: z.object({
       documentText: z.string().optional().describe('Extracted text from the uploaded document'),
-      documentUrl: z.string().optional().describe('URL to PDF document for Claude to read directly'),
+      documentUrl: z.string().optional().describe('URL to PDF document to download and analyze'),
       mimeType: z.string().optional().describe('MIME type of the document'),
     }),
     outputSchema: ReleaseInfoSchema,
   },
   async (input) => {
-    // If we have a PDF URL, use Claude's native PDF reading capability
+    // If we have a PDF URL, download it and convert to base64 for Claude
     if (input.documentUrl && input.mimeType === 'application/pdf') {
+      // Download the PDF
+      const response = await fetch(input.documentUrl);
+      if (!response.ok) {
+        throw new Error(`Failed to download PDF: ${response.statusText}`);
+      }
+
+      const arrayBuffer = await response.arrayBuffer();
+      const base64Data = Buffer.from(arrayBuffer).toString('base64');
+
       const { output } = await ai.generate({
         model: claude4Sonnet,
         output: {
@@ -65,8 +74,8 @@ Return the extracted information in the specified schema format.`,
           },
           {
             media: {
-              url: input.documentUrl,
               contentType: input.mimeType,
+              url: `data:${input.mimeType};base64,${base64Data}`,
             },
           },
         ],
