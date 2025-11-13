@@ -35,32 +35,12 @@ async function deleteAllData() {
     // Step 2: Delete all database records (in correct order due to foreign keys)
     console.log('\n📊 Step 2: Deleting all database records...\n');
 
-    // Junction tables first (no dependencies)
-    console.log('🗑️  Deleting junction tables...');
-    const postImages = await prisma.postImage.deleteMany({});
-    console.log(`   - PostImage: ${postImages.count} records`);
-
-    const releaseImages = await prisma.releaseImage.deleteMany({});
-    console.log(`   - ReleaseImage: ${releaseImages.count} records`);
-
-    const setImages = await prisma.setImage.deleteMany({});
-    console.log(`   - SetImage: ${setImages.count} records`);
-
-    const cardImages = await prisma.cardImage.deleteMany({});
-    console.log(`   - CardImage: ${cardImages.count} records`);
-
-    const postSourceDocs = await prisma.postSourceDocument.deleteMany({});
-    console.log(`   - PostSourceDocument: ${postSourceDocs.count} records`);
-
-    const releaseSourceDocs = await prisma.releaseSourceDocument.deleteMany({});
-    console.log(`   - ReleaseSourceDocument: ${releaseSourceDocs.count} records`);
-
-    // Images (no dependencies after junction tables deleted)
-    console.log('\n🗑️  Deleting images...');
+    // Images (dependent on Release, Set, Card, Post via foreign keys)
+    console.log('🗑️  Deleting images...');
     const images = await prisma.image.deleteMany({});
     console.log(`   - Image: ${images.count} records`);
 
-    // Source documents (no dependencies after junction tables deleted)
+    // Source documents (dependent on Release, Post via entityType)
     console.log('\n🗑️  Deleting source documents...');
     const sourceDocs = await prisma.sourceDocument.deleteMany({});
     console.log(`   - SourceDocument: ${sourceDocs.count} records`);
@@ -90,15 +70,9 @@ async function deleteAllData() {
     const manufacturers = await prisma.manufacturer.deleteMany({});
     console.log(`   - Manufacturer: ${manufacturers.count} records`);
 
-    // Users (legacy table, no dependencies)
-    console.log('\n🗑️  Deleting legacy users...');
-    const users = await prisma.user.deleteMany({});
-    console.log(`   - User: ${users.count} records`);
-
     console.log('\n✨ Database cleanup complete!');
     console.log('\n📊 Summary:');
     console.log(`   - Blobs deleted: ${deletedBlobCount}`);
-    console.log(`   - Junction records deleted: ${postImages.count + releaseImages.count + setImages.count + cardImages.count + postSourceDocs.count + releaseSourceDocs.count}`);
     console.log(`   - Images deleted: ${images.count}`);
     console.log(`   - Source documents deleted: ${sourceDocs.count}`);
     console.log(`   - Posts deleted: ${posts.count}`);
@@ -106,7 +80,6 @@ async function deleteAllData() {
     console.log(`   - Sets deleted: ${sets.count}`);
     console.log(`   - Releases deleted: ${releases.count}`);
     console.log(`   - Manufacturers deleted: ${manufacturers.count}`);
-    console.log(`   - Users deleted: ${users.count}`);
     console.log('\n🎉 Database is now empty and ready for fresh content!\n');
 
   } catch (error) {

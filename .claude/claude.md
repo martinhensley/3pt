@@ -1176,6 +1176,47 @@ Before committing changes to page layouts:
 
 ## Recent Changes Log
 
+### November 12, 2025 - Database Schema Cleanup & Checklists Feature
+
+**Changes:**
+- Removed legacy User table from public schema (authentication uses neon_auth.admin_users)
+- Added Checklists page with filtering by manufacturer, release, and set type
+- Fixed database cleanup script to remove references to non-existent junction tables
+- Updated delete-all-data script to reflect current schema architecture
+
+**Authentication Architecture:**
+- Verified authentication queries `neon_auth.admin_users` table (separate schema)
+- Removed unused `public.User` table from Prisma schema
+- Authentication remains fully functional via neon_auth integration
+
+**Checklists Feature:**
+- New `/checklists` route with filterable table of all card sets
+- Filters: search, manufacturer, release, and set type
+- Users can browse checklists without navigating manufacturer→release hierarchy
+- Direct links to set detail pages with full card checklists
+
+**Database Schema Updates:**
+- Architecture uses direct foreign keys with type discriminators (not junction tables)
+- Image model: `releaseId`, `setId`, `cardId`, `postId` with `type` field
+- SourceDocument model: `releaseId`, `postId` with `entityType` field
+- Confirmed no junction table models exist (e.g., ReleaseImage, PostImage)
+
+**Files Modified:**
+1. `prisma/schema.prisma` - Removed User model
+2. `scripts/delete-all-data.ts` - Removed User deletion and fixed junction table references
+3. `scripts/verify-auth-schema.ts` - Created verification script
+4. `app/api/checklists/route.ts` - New API endpoint for fetching filtered sets
+5. `app/api/checklists/filters/route.ts` - New API endpoint for filter options
+6. `app/checklists/page.tsx` - New checklists browser page
+7. `components/Header.tsx` - Added "Checklists" navigation link
+8. `.claude/CLAUDE.md` - This documentation update
+
+**Key Learnings:**
+- Always verify authentication is using correct schema before removing tables
+- Current schema uses simpler direct FK approach vs junction tables
+- TypeScript interfaces in frontend code may reference non-existent DB models
+- Database reset confirmed clean slate after removing legacy User table
+
 ### November 11, 2025 - Documentation Consolidation
 **Changes:**
 - Consolidated parallel set architecture documentation from spec files into `.claude/CLAUDE.md`
