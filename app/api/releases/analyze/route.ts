@@ -34,40 +34,16 @@ export async function POST(request: NextRequest) {
     if (fileUrl && mimeType === 'application/pdf') {
       console.log('Extracting text from PDF:', fileUrl);
       try {
-        const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
-
-        // CRITICAL: Disable worker for serverless compatibility
-        // Set workerSrc to an empty data URL to prevent worker initialization
-        // This is the only method that works reliably in Vercel serverless
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'data:text/javascript;base64,';
+        // Use pdf-parse instead of pdfjs-dist for serverless compatibility
+        // pdf-parse works better in Vercel serverless environments
+        const pdfParse = (await import('pdf-parse')).default;
 
         const pdfResponse = await fetch(fileUrl);
-        const pdfBuffer = await pdfResponse.arrayBuffer();
+        const pdfBuffer = Buffer.from(await pdfResponse.arrayBuffer());
 
-        const loadingTask = pdfjsLib.getDocument({
-          data: pdfBuffer,
-          standardFontDataUrl: undefined,
-          cMapUrl: undefined,
-          cMapPacked: false,
-          useWorkerFetch: false,
-          isEvalSupported: false,
-          useSystemFonts: true,
-          disableFontFace: true,
-          verbosity: 0,
-        });
-        const pdfDocument = await loadingTask.promise;
+        const pdfData = await pdfParse(pdfBuffer);
+        extractedText = pdfData.text;
 
-        let fullText = '';
-        for (let i = 1; i <= pdfDocument.numPages; i++) {
-          const page = await pdfDocument.getPage(i);
-          const textContent = await page.getTextContent();
-          const pageText = textContent.items
-            .map((item: any) => item.str)
-            .join(' ');
-          fullText += pageText + '\n';
-        }
-
-        extractedText = fullText;
         console.log('PDF text extracted, length:', extractedText.length);
       } catch (pdfError) {
         console.error('PDF text extraction failed:', pdfError);
