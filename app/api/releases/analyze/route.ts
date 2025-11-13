@@ -122,6 +122,42 @@ export async function POST(request: NextRequest) {
         console.log(`Created ${uploadedImages.length} image records for release`);
       }
 
+      // Create source document record if fileUrl was provided
+      if (fileUrl) {
+        try {
+          const filename = fileUrl.split('/').pop() || 'document';
+          const displayName = `${releaseInfo.manufacturer} ${releaseInfo.releaseName} ${releaseInfo.year}`;
+
+          // Determine document type based on mime type and context
+          let documentType = 'OTHER';
+          if (mimeType?.includes('pdf')) {
+            // Most PDFs for releases are sell sheets or checklists
+            documentType = filename.toLowerCase().includes('checklist') ? 'CHECKLIST' : 'SELL_SHEET';
+          } else if (mimeType?.includes('excel') || mimeType?.includes('spreadsheet') || mimeType?.includes('csv')) {
+            documentType = 'CHECKLIST';
+          }
+
+          await prisma.sourceDocument.create({
+            data: {
+              filename: filename,
+              displayName: displayName,
+              blobUrl: fileUrl,
+              mimeType: mimeType || 'application/octet-stream',
+              fileSize: 0, // We don't have size info at this point
+              documentType: documentType as any,
+              tags: [releaseInfo.year, releaseInfo.manufacturer, releaseInfo.releaseName],
+              extractedText: sourceText || null,
+              uploadedById: session.user.email || 'unknown',
+              releaseId: release.id,
+            },
+          });
+          console.log('Source document saved to library');
+        } catch (docError) {
+          console.error('Failed to save source document:', docError);
+          // Don't fail the whole request if source document save fails
+        }
+      }
+
       // Note: Sets will be added later via the manage releases workflow
       // Do not create sets during initial release creation
 

@@ -55,11 +55,13 @@ export default function ManageCardsPage() {
   const router = useRouter();
   const [cards, setCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [manufacturerFilter, setManufacturerFilter] = useState<string>("all");
   const [releaseFilter, setReleaseFilter] = useState<string>("all");
   const [setFilter, setSetFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<"player" | "number" | "created">("created");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -185,40 +187,59 @@ export default function ManageCardsPage() {
     })
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  const filteredCards = cards.filter((card) => {
-    // Manufacturer filter
-    if (manufacturerFilter !== "all" && card.set.release.manufacturer.name !== manufacturerFilter) {
-      return false;
-    }
+  // Filter and sort cards
+  const filteredAndSortedCards = cards
+    .filter((card) => {
+      // Manufacturer filter
+      if (manufacturerFilter !== "all" && card.set.release.manufacturer.name !== manufacturerFilter) {
+        return false;
+      }
 
-    // Release filter
-    if (releaseFilter !== "all" && card.set.release.id !== releaseFilter) {
-      return false;
-    }
+      // Release filter
+      if (releaseFilter !== "all" && card.set.release.id !== releaseFilter) {
+        return false;
+      }
 
-    // Set filter
-    if (setFilter !== "all" && card.set.id !== setFilter) {
-      return false;
-    }
+      // Set filter
+      if (setFilter !== "all" && card.set.id !== setFilter) {
+        return false;
+      }
 
-    // Type filter
-    if (typeFilter === "autograph" && !card.hasAutograph) return false;
-    if (typeFilter === "memorabilia" && !card.hasMemorabilia) return false;
-    if (typeFilter === "numbered" && !card.numbered) return false;
-    if (typeFilter === "parallel" && !card.parallelType) return false;
+      // Type filter
+      if (typeFilter === "autograph" && !card.hasAutograph) return false;
+      if (typeFilter === "memorabilia" && !card.hasMemorabilia) return false;
+      if (typeFilter === "numbered" && !card.numbered) return false;
+      if (typeFilter === "parallel" && !card.parallelType) return false;
 
-    // Search filter
-    if (searchTerm) {
-      const search = searchTerm.toLowerCase();
-      const playerMatch = card.playerName?.toLowerCase().includes(search);
-      const teamMatch = card.team?.toLowerCase().includes(search);
-      const numberMatch = card.cardNumber?.toLowerCase().includes(search);
-      const variantMatch = card.variant?.toLowerCase().includes(search);
-      return playerMatch || teamMatch || numberMatch || variantMatch;
-    }
+      // Search filter
+      if (searchQuery) {
+        const search = searchQuery.toLowerCase();
+        const playerMatch = card.playerName?.toLowerCase().includes(search);
+        const teamMatch = card.team?.toLowerCase().includes(search);
+        const numberMatch = card.cardNumber?.toLowerCase().includes(search);
+        const variantMatch = card.variant?.toLowerCase().includes(search);
+        return playerMatch || teamMatch || numberMatch || variantMatch;
+      }
 
-    return true;
-  });
+      return true;
+    })
+    .sort((a, b) => {
+      let comparison = 0;
+
+      switch (sortBy) {
+        case "player":
+          comparison = (a.playerName || "").localeCompare(b.playerName || "");
+          break;
+        case "number":
+          comparison = (a.cardNumber || "").localeCompare(b.cardNumber || "");
+          break;
+        case "created":
+          comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+          break;
+      }
+
+      return sortOrder === "asc" ? comparison : -comparison;
+    });
 
   return (
     <AdminLayout>
@@ -242,166 +263,154 @@ export default function ManageCardsPage() {
           </div>
         )}
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6 mt-6">
-          <div className="bg-gradient-to-r from-footy-green to-green-600 rounded-lg p-6 text-white">
-            <div className="text-3xl font-bold">{filteredCards.length}</div>
-            <div className="text-sm opacity-90">Total</div>
-          </div>
-          <div className="bg-gradient-to-r from-footy-green to-green-600 rounded-lg p-6 text-white">
-            <div className="text-3xl font-bold">
-              {filteredCards.filter((c) => getCardType(c) === "Base").length}
-            </div>
-            <div className="text-sm opacity-90">Base</div>
-          </div>
-          <div className="bg-gradient-to-r from-footy-green to-green-600 rounded-lg p-6 text-white">
-            <div className="text-3xl font-bold">
-              {filteredCards.filter((c) => getCardType(c) === "Autograph").length}
-            </div>
-            <div className="text-sm opacity-90">Auto</div>
-          </div>
-          <div className="bg-gradient-to-r from-footy-green to-green-600 rounded-lg p-6 text-white">
-            <div className="text-3xl font-bold">
-              {filteredCards.filter((c) => getCardType(c) === "Memorabilia").length}
-            </div>
-            <div className="text-sm opacity-90">Memo</div>
-          </div>
-          <div className="bg-gradient-to-r from-footy-green to-green-600 rounded-lg p-6 text-white">
-            <div className="text-3xl font-bold">
-              {filteredCards.filter((c) => getCardType(c) === "Insert").length}
-            </div>
-            <div className="text-sm opacity-90">Insert</div>
-          </div>
-        </div>
-
-        {/* Filters */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Search
-              </label>
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search by player, team, number..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
+        {/* Search, Filters, and Actions */}
+        <div className="mt-6 mb-6 space-y-4">
+          {/* Search Bar */}
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search cards by player, team, number, or variant..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-footy-green focus:border-transparent"
+            />
+            <svg
+              className="absolute left-3 top-3.5 w-5 h-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
               />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Manufacturer
-              </label>
-              <select
-                value={manufacturerFilter}
-                onChange={(e) => {
-                  setManufacturerFilter(e.target.value);
-                  setReleaseFilter("all");
-                  setSetFilter("all");
-                }}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
-              >
-                <option value="all">All Manufacturers</option>
-                {manufacturers.map((manufacturer) => (
-                  <option key={manufacturer} value={manufacturer}>
-                    {manufacturer}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Release
-              </label>
-              <select
-                value={releaseFilter}
-                onChange={(e) => {
-                  setReleaseFilter(e.target.value);
-                  setSetFilter("all");
-                }}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
-              >
-                <option value="all">All Releases</option>
-                {releases.map((release) => (
-                  <option key={release.id} value={release.id}>
-                    {release.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Set
-              </label>
-              <select
-                value={setFilter}
-                onChange={(e) => setSetFilter(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
-              >
-                <option value="all">All Sets</option>
-                {sets.map((set) => (
-                  <option key={set.id} value={set.id}>
-                    {set.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Type
-              </label>
-              <select
-                value={typeFilter}
-                onChange={(e) => setTypeFilter(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
-              >
-                <option value="all">All Types</option>
-                <option value="autograph">Autographs</option>
-                <option value="memorabilia">Memorabilia</option>
-                <option value="numbered">Numbered</option>
-                <option value="parallel">Parallels</option>
-              </select>
-            </div>
+            </svg>
           </div>
 
-          <div className="flex items-center justify-between">
+          {/* Filters and Sort */}
+          <div className="flex flex-wrap items-center gap-3">
+            <select
+              value={manufacturerFilter}
+              onChange={(e) => {
+                setManufacturerFilter(e.target.value);
+                setReleaseFilter("all");
+                setSetFilter("all");
+              }}
+              className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
+            >
+              <option value="all">All Manufacturers</option>
+              {manufacturers.map((manufacturer) => (
+                <option key={manufacturer} value={manufacturer}>
+                  {manufacturer}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={releaseFilter}
+              onChange={(e) => {
+                setReleaseFilter(e.target.value);
+                setSetFilter("all");
+              }}
+              className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
+            >
+              <option value="all">All Releases</option>
+              {releases.map((release) => (
+                <option key={release.id} value={release.id}>
+                  {release.name}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={setFilter}
+              onChange={(e) => setSetFilter(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
+            >
+              <option value="all">All Sets</option>
+              {sets.map((set) => (
+                <option key={set.id} value={set.id}>
+                  {set.name}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
+            >
+              <option value="all">All Types</option>
+              <option value="autograph">Autographs</option>
+              <option value="memorabilia">Memorabilia</option>
+              <option value="numbered">Numbered</option>
+              <option value="parallel">Parallels</option>
+            </select>
+
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as "player" | "number" | "created")}
+              className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
+            >
+              <option value="created">Sort by Date</option>
+              <option value="player">Sort by Player</option>
+              <option value="number">Sort by Number</option>
+            </select>
+
+            <button
+              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+              className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 hover:bg-gray-50 flex items-center gap-2"
+              title={sortOrder === "asc" ? "Ascending" : "Descending"}
+            >
+              {sortOrder === "asc" ? (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              )}
+              {sortOrder === "asc" ? "A-Z" : "Z-A"}
+            </button>
+
             <button
               onClick={() => {
-                setSearchTerm("");
+                setSearchQuery("");
                 setManufacturerFilter("all");
                 setReleaseFilter("all");
                 setSetFilter("all");
                 setTypeFilter("all");
                 setCurrentPage(1);
               }}
-              className="text-sm text-gray-600 hover:text-gray-900"
+              className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 hover:bg-gray-50"
             >
               Clear Filters
             </button>
-            <div className="text-sm text-gray-600">
-              Showing {filteredCards.length} cards (Page {currentPage} of {totalPages}, {totalCount.toLocaleString()} total)
-            </div>
+          </div>
+
+          {/* Results Count */}
+          <div className="text-sm text-gray-600">
+            Showing {filteredAndSortedCards.length} of {totalCount.toLocaleString()} cards
+            {totalPages > 1 && ` (Page ${currentPage} of ${totalPages})`}
           </div>
         </div>
       </div>
 
       {/* Cards List */}
       <div className="space-y-4">
-        {filteredCards.length === 0 ? (
+        {filteredAndSortedCards.length === 0 ? (
           <div className="text-center py-12 bg-gray-50 rounded-lg">
             <p className="text-gray-600">
-              {searchTerm || manufacturerFilter !== "all" || releaseFilter !== "all" || setFilter !== "all" || typeFilter !== "all"
-                ? "No cards found matching your filters."
+              {searchQuery || manufacturerFilter !== "all" || releaseFilter !== "all" || setFilter !== "all" || typeFilter !== "all"
+                ? "No cards match your filters. Try adjusting your search."
                 : "No cards found in the database."}
             </p>
           </div>
         ) : (
-          filteredCards.map((card) => {
+          filteredAndSortedCards.map((card) => {
             const cardName = `${card.playerName || "Unknown Player"}${
               card.cardNumber ? ` #${card.cardNumber}` : ""
             }${card.variant ? ` - ${card.variant}` : ""}`;
@@ -555,7 +564,7 @@ export default function ManageCardsPage() {
       </div>
 
       {/* Pagination Controls */}
-      {filteredCards.length > 0 && totalPages > 1 && (
+      {filteredAndSortedCards.length > 0 && totalPages > 1 && (
         <div className="mt-8 flex items-center justify-center gap-2">
           <button
             onClick={() => setCurrentPage(1)}

@@ -417,13 +417,38 @@ export default function CreateReleasePage() {
                         {uploadedImageUrls.map((url, idx) => (
                           <div
                             key={idx}
-                            className="relative aspect-square border-2 border-green-300 rounded-lg overflow-hidden bg-white group"
+                            draggable
+                            onDragStart={(e) => {
+                              e.dataTransfer.effectAllowed = 'move';
+                              e.dataTransfer.setData('text/plain', idx.toString());
+                            }}
+                            onDragOver={(e) => {
+                              e.preventDefault();
+                              e.dataTransfer.dropEffect = 'move';
+                            }}
+                            onDrop={(e) => {
+                              e.preventDefault();
+                              const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+                              const toIndex = idx;
+
+                              if (fromIndex === toIndex) return;
+
+                              const newUrls = [...uploadedImageUrls];
+                              const [movedUrl] = newUrls.splice(fromIndex, 1);
+                              newUrls.splice(toIndex, 0, movedUrl);
+
+                              setUploadedImageUrls(newUrls);
+                            }}
+                            className="relative aspect-square border-2 border-green-300 rounded-lg overflow-hidden bg-white group cursor-move hover:border-green-500 hover:shadow-lg transition-all"
                           >
                             <img
                               src={url}
                               alt={`Upload ${idx + 1}`}
                               className="w-full h-full object-contain"
                             />
+                            <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs py-1 text-center opacity-0 group-hover:opacity-100 transition-opacity">
+                              Drag to reorder
+                            </div>
                             <button
                               onClick={() => handleRemoveImage(idx)}
                               className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"

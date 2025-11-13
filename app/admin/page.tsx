@@ -199,7 +199,6 @@ export default function AdminDashboard() {
               </div>
             </>
           )}
-        </div>
 
         {/* Statistics Accordion */}
         {stats && (

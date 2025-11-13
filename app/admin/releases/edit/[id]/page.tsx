@@ -1993,16 +1993,118 @@ export default function EditReleasePage() {
             {/* Display existing images */}
             {release && release.images && release.images.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {release.images.map((image) => (
-                  <div key={image.id} className="relative group">
+                {release.images.map((image, index) => (
+                  <div
+                    key={image.id}
+                    className="relative group"
+                    draggable
+                    onDragStart={(e) => {
+                      e.dataTransfer.effectAllowed = 'move';
+                      e.dataTransfer.setData('text/plain', index.toString());
+                    }}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.dataTransfer.dropEffect = 'move';
+                    }}
+                    onDrop={async (e) => {
+                      e.preventDefault();
+                      const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+                      const toIndex = index;
+
+                      if (fromIndex === toIndex) return;
+
+                      // Reorder images in local state
+                      const newImages = [...release.images];
+                      const [movedImage] = newImages.splice(fromIndex, 1);
+                      newImages.splice(toIndex, 0, movedImage);
+
+                      // Update local state immediately
+                      setRelease({
+                        ...release,
+                        images: newImages
+                      });
+
+                      // Update order in database
+                      try {
+                        const imageOrders = newImages.map((img, idx) => ({
+                          id: img.id,
+                          order: idx
+                        }));
+
+                        const response = await fetch(`/api/releases/${release.id}/images`, {
+                          method: 'PUT',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ imageOrders }),
+                        });
+
+                        if (!response.ok) {
+                          throw new Error('Failed to update image order');
+                        }
+                      } catch (error) {
+                        console.error('Failed to update image order:', error);
+                        setMessage({
+                          type: 'error',
+                          text: 'Failed to update image order. Please try again.'
+                        });
+                        setTimeout(() => setMessage(null), 5000);
+                        // Refresh to get correct order from server
+                        fetchRelease();
+                      }
+                    }}
+                  >
                     <img
                       src={image.url}
                       alt={image.caption || "Release image"}
-                      className="w-full h-48 object-cover rounded-lg border border-gray-200"
+                      className="w-full h-48 object-cover rounded-lg border border-gray-200 cursor-move"
                     />
                     {image.caption && (
                       <p className="text-xs text-gray-600 mt-1 truncate">{image.caption}</p>
                     )}
+                    {/* Delete button */}
+                    <button
+                      onClick={async () => {
+                        if (!confirm('Are you sure you want to delete this image?')) return;
+
+                        try {
+                          const response = await fetch(`/api/releases/${release.id}/images?imageId=${image.id}`, {
+                            method: 'DELETE',
+                          });
+
+                          if (!response.ok) {
+                            throw new Error('Failed to delete image');
+                          }
+
+                          // Update local state
+                          setRelease({
+                            ...release,
+                            images: release.images.filter(img => img.id !== image.id)
+                          });
+
+                          setMessage({
+                            type: 'success',
+                            text: 'Image deleted successfully'
+                          });
+                          setTimeout(() => setMessage(null), 3000);
+                        } catch (error) {
+                          console.error('Failed to delete image:', error);
+                          setMessage({
+                            type: 'error',
+                            text: 'Failed to delete image. Please try again.'
+                          });
+                          setTimeout(() => setMessage(null), 5000);
+                        }
+                      }}
+                      className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                      title="Delete image"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                    {/* Drag handle indicator */}
+                    <div className="absolute top-2 left-2 bg-gray-800 bg-opacity-75 text-white rounded px-2 py-1 text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                      Drag to reorder
+                    </div>
                   </div>
                 ))}
               </div>
