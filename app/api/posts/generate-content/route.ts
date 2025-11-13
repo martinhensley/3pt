@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Prepare content for AI
-    const contentParts: Array<{ type: string; text?: string; image?: URL }> = [];
+    const contentParts: Array<any> = [];
 
     // Process images if provided
     if (imageFiles.length > 0) {
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
             const mimeType = file.type || "image/jpeg";
             contentParts.push({
               type: "image",
-              image: new URL(`data:${mimeType};base64,${base64}`),
+              image: `data:${mimeType};base64,${base64}`,
             });
           } else if (file.type === "application/pdf") {
             // For PDFs, save to temp file and add text description
