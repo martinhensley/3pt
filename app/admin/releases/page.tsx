@@ -37,6 +37,9 @@ export default function ManageReleasesPage() {
   const [releases, setReleases] = useState<Release[]>([]);
   const [loading, setLoading] = useState(true);
   const [manufacturerFilter, setManufacturerFilter] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [sortBy, setSortBy] = useState<"name" | "year" | "created">("name");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
@@ -110,12 +113,51 @@ export default function ManageReleasesPage() {
     new Set(releases.map((r) => r.manufacturer.name))
   ).sort();
 
-  const filteredReleases = releases.filter((release) => {
-    if (manufacturerFilter !== "all" && release.manufacturer.name !== manufacturerFilter) {
-      return false;
-    }
-    return true;
-  });
+  // Filter and sort releases
+  const filteredAndSortedReleases = releases
+    .filter((release) => {
+      // Manufacturer filter
+      if (manufacturerFilter !== "all" && release.manufacturer.name !== manufacturerFilter) {
+        return false;
+      }
+
+      // Search filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        const manufacturerName = release.manufacturer.name.toLowerCase();
+        const releaseName = release.name.toLowerCase();
+        const year = release.year?.toLowerCase() || "";
+        const fullName = `${manufacturerName} ${releaseName}`.toLowerCase();
+        const slug = release.slug.toLowerCase();
+
+        if (!manufacturerName.includes(query) &&
+            !releaseName.includes(query) &&
+            !year.includes(query) &&
+            !fullName.includes(query) &&
+            !slug.includes(query)) {
+          return false;
+        }
+      }
+
+      return true;
+    })
+    .sort((a, b) => {
+      let comparison = 0;
+
+      switch (sortBy) {
+        case "name":
+          comparison = `${a.manufacturer.name} ${a.name}`.localeCompare(`${b.manufacturer.name} ${b.name}`);
+          break;
+        case "year":
+          comparison = (a.year || "").localeCompare(b.year || "");
+          break;
+        case "created":
+          comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+          break;
+      }
+
+      return sortOrder === "asc" ? comparison : -comparison;
+    });
 
   return (
     <AdminLayout>
@@ -139,74 +181,103 @@ export default function ManageReleasesPage() {
             </div>
           )}
 
-          {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 mt-6">
-            <div className="bg-gradient-to-r from-footy-green to-green-600 rounded-lg p-6 text-white">
-              <div className="text-3xl font-bold">{filteredReleases.length}</div>
-              <div className="text-sm opacity-90">Total Releases</div>
+          {/* Search, Filters, and Actions */}
+          <div className="mt-6 mb-6 space-y-4">
+            {/* Search Bar */}
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search releases by name, manufacturer, or year..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-footy-green focus:border-transparent"
+              />
+              <svg
+                className="absolute left-3 top-3.5 w-5 h-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
             </div>
-            <div className="bg-gradient-to-r from-footy-green to-green-600 rounded-lg p-6 text-white">
-              <div className="text-3xl font-bold">
-                {filteredReleases.reduce(
-                  (sum, r) => sum + r.sets.filter(s => s.parentSetId === null).length,
-                  0
-                )}
-              </div>
-              <div className="text-sm opacity-90">Base Sets</div>
-            </div>
-            <div className="bg-gradient-to-r from-footy-green to-green-600 rounded-lg p-6 text-white">
-              <div className="text-3xl font-bold">
-                {filteredReleases.reduce(
-                  (sum, r) => sum + r.sets.filter(s => s.parentSetId !== null).length,
-                  0
-                )}
-              </div>
-              <div className="text-sm opacity-90">Parallel Sets</div>
-            </div>
-            <div className="bg-gradient-to-r from-footy-green to-green-600 rounded-lg p-6 text-white">
-              <div className="text-3xl font-bold">
-                {filteredReleases.reduce(
-                  (sum, r) => sum + r.sets.reduce((s, set) => s + set._count.cards, 0),
-                  0
-                )}
-              </div>
-              <div className="text-sm opacity-90">Total Cards</div>
-            </div>
-          </div>
 
-          {/* Filters and Actions */}
-          <div className="flex items-center justify-between gap-4 mb-6">
-            <select
-              value={manufacturerFilter}
-              onChange={(e) => setManufacturerFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
-            >
-              <option value="all">All Manufacturers</option>
-              {manufacturers.map((manufacturer) => (
-                <option key={manufacturer} value={manufacturer}>
-                  {manufacturer}
-                </option>
-              ))}
-            </select>
-            <Link
-              href="/admin/releases/create"
-              className="px-4 py-2 bg-footy-green hover:bg-green-700 text-white rounded-lg transition-colors"
-            >
-              Create New Release
-            </Link>
+            {/* Filters and Sort */}
+            <div className="flex flex-wrap items-center gap-3">
+              <select
+                value={manufacturerFilter}
+                onChange={(e) => setManufacturerFilter(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
+              >
+                <option value="all">All Manufacturers</option>
+                {manufacturers.map((manufacturer) => (
+                  <option key={manufacturer} value={manufacturer}>
+                    {manufacturer}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as "name" | "year" | "created")}
+                className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
+              >
+                <option value="name">Sort by Name</option>
+                <option value="year">Sort by Year</option>
+                <option value="created">Sort by Created Date</option>
+              </select>
+
+              <button
+                onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 hover:bg-gray-50 flex items-center gap-2"
+                title={sortOrder === "asc" ? "Ascending" : "Descending"}
+              >
+                {sortOrder === "asc" ? (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                )}
+                {sortOrder === "asc" ? "A-Z" : "Z-A"}
+              </button>
+
+              <div className="flex-grow"></div>
+
+              <Link
+                href="/admin/releases/create"
+                className="px-4 py-2 bg-footy-green hover:bg-green-700 text-white rounded-lg transition-colors"
+              >
+                Create New Release
+              </Link>
+            </div>
+
+            {/* Results Count */}
+            <div className="text-sm text-gray-600">
+              Showing {filteredAndSortedReleases.length} of {releases.length} releases
+            </div>
           </div>
         </div>
 
         {/* Releases List */}
         <div className="space-y-4">
-          {filteredReleases.length === 0 ? (
+          {filteredAndSortedReleases.length === 0 ? (
             <div className="text-center py-12 bg-gray-50 rounded-lg">
               <p className="text-gray-600">
-                No releases found. Create your first release to get started!
+                {searchQuery || manufacturerFilter !== "all"
+                  ? "No releases match your filters. Try adjusting your search."
+                  : "No releases found. Create your first release to get started!"}
               </p>
             </div>
           ) : (
-            filteredReleases.map((release) => (
+            filteredAndSortedReleases.map((release) => (
               <div
                 key={release.id}
                 className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"

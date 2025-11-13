@@ -29,6 +29,9 @@ export default function ManagePostsPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "published" | "draft">("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [sortBy, setSortBy] = useState<"title" | "created">("created");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
@@ -124,12 +127,44 @@ export default function ManagePostsPage() {
     }
   };
 
-  const filteredPosts = posts.filter((post) => {
-    if (filter === "published" && !post.published) return false;
-    if (filter === "draft" && post.published) return false;
-    if (typeFilter !== "all" && post.type !== typeFilter) return false;
-    return true;
-  });
+  // Filter and sort posts
+  const filteredAndSortedPosts = posts
+    .filter((post) => {
+      // Status filter
+      if (filter === "published" && !post.published) return false;
+      if (filter === "draft" && post.published) return false;
+
+      // Type filter
+      if (typeFilter !== "all" && post.type !== typeFilter) return false;
+
+      // Search filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        const title = post.title.toLowerCase();
+        const excerpt = (post.excerpt || "").toLowerCase();
+        const slug = post.slug.toLowerCase();
+
+        if (!title.includes(query) && !excerpt.includes(query) && !slug.includes(query)) {
+          return false;
+        }
+      }
+
+      return true;
+    })
+    .sort((a, b) => {
+      let comparison = 0;
+
+      switch (sortBy) {
+        case "title":
+          comparison = a.title.localeCompare(b.title);
+          break;
+        case "created":
+          comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+          break;
+      }
+
+      return sortOrder === "asc" ? comparison : -comparison;
+    });
 
   if (status === "loading" || loading) {
     return (
@@ -147,80 +182,64 @@ export default function ManagePostsPage() {
 
   return (
     <AdminLayout>
-        {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-8">
           <Breadcrumb
             items={[
               { label: "Admin", href: "/admin" },
               { label: "Manage Posts", href: "/admin/posts" },
             ]}
           />
-          <button
-            onClick={() => router.push('/admin/posts/create')}
-            className="px-6 py-3 bg-footy-green text-white rounded-lg hover:bg-green-700 transition-colors font-semibold shadow-md hover:shadow-lg"
-          >
-            + Create Post
-          </button>
-        </div>
 
-        {/* Message */}
-        {message && (
-          <div
-            className={`mb-6 p-4 rounded-lg ${
-              message.type === "success"
-                ? "bg-green-50 text-green-800"
-                : "bg-orange-50 text-orange-800"
-            }`}
-          >
-            {message.text}
-          </div>
-        )}
+          {message && (
+            <div
+              className={`p-4 rounded-lg mb-4 mt-6 ${
+                message.type === "success"
+                  ? "bg-green-100 text-green-800"
+                  : "bg-orange-100 text-orange-800"
+              }`}
+            >
+              {message.text}
+            </div>
+          )}
 
-        {/* Filters */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <div className="flex flex-wrap gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Status
-              </label>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setFilter("all")}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                    filter === "all"
-                      ? "bg-footy-green text-white"
-                      : "bg-gray-200 text-gray-700"
-                  }`}
-                >
-                  All ({posts.length})
-                </button>
-                <button
-                  onClick={() => setFilter("published")}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                    filter === "published"
-                      ? "bg-footy-green text-white"
-                      : "bg-gray-200 text-gray-700"
-                  }`}
-                >
-                  Published ({posts.filter(p => p.published).length})
-                </button>
-                <button
-                  onClick={() => setFilter("draft")}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                    filter === "draft"
-                      ? "bg-footy-green text-white"
-                      : "bg-gray-200 text-gray-700"
-                  }`}
-                >
-                  Drafts ({posts.filter(p => !p.published).length})
-                </button>
-              </div>
+          {/* Search, Filters, and Actions */}
+          <div className="mt-6 mb-6 space-y-4">
+            {/* Search Bar */}
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search posts by title, excerpt, or slug..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-footy-green focus:border-transparent"
+              />
+              <svg
+                className="absolute left-3 top-3.5 w-5 h-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
             </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Type
-              </label>
+            {/* Filters and Sort */}
+            <div className="flex flex-wrap items-center gap-3">
+              <select
+                value={filter}
+                onChange={(e) => setFilter(e.target.value as "all" | "published" | "draft")}
+                className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
+              >
+                <option value="all">All Status</option>
+                <option value="published">Published ({posts.filter(p => p.published).length})</option>
+                <option value="draft">Drafts ({posts.filter(p => !p.published).length})</option>
+              </select>
+
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
@@ -232,18 +251,62 @@ export default function ManagePostsPage() {
                 <option value="CARD">Cards</option>
                 <option value="GENERAL">General</option>
               </select>
+
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as "title" | "created")}
+                className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
+              >
+                <option value="created">Sort by Date</option>
+                <option value="title">Sort by Title</option>
+              </select>
+
+              <button
+                onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 hover:bg-gray-50 flex items-center gap-2"
+                title={sortOrder === "asc" ? "Ascending" : "Descending"}
+              >
+                {sortOrder === "asc" ? (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                )}
+                {sortOrder === "asc" ? "A-Z" : "Z-A"}
+              </button>
+
+              <div className="flex-grow"></div>
+
+              <button
+                onClick={() => router.push('/admin/posts/create')}
+                className="px-4 py-2 bg-footy-green hover:bg-green-700 text-white rounded-lg transition-colors"
+              >
+                Create New Post
+              </button>
+            </div>
+
+            {/* Results Count */}
+            <div className="text-sm text-gray-600">
+              Showing {filteredAndSortedPosts.length} of {posts.length} posts
             </div>
           </div>
         </div>
 
         {/* Posts List */}
         <div className="space-y-4">
-          {filteredPosts.length === 0 ? (
-            <div className="bg-white rounded-xl shadow-lg p-12 text-center">
-              <p className="text-gray-600">No posts found</p>
+          {filteredAndSortedPosts.length === 0 ? (
+            <div className="text-center py-12 bg-gray-50 rounded-lg">
+              <p className="text-gray-600">
+                {searchQuery || filter !== "all" || typeFilter !== "all"
+                  ? "No posts match your filters. Try adjusting your search."
+                  : "No posts found. Create your first post to get started!"}
+              </p>
             </div>
           ) : (
-            filteredPosts.map((post) => (
+            filteredAndSortedPosts.map((post) => (
               <div
                 key={post.id}
                 className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"

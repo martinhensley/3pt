@@ -93,10 +93,56 @@ export default function AdminDashboard() {
 
   return (
     <AdminLayout maxWidth="1600px">
-        {/* Recent Activity - Moved to top */}
-        {stats && stats.recentActivity && stats.recentActivity.length > 0 && (
-          <>
-            <div className="flex items-center justify-between mb-4">
+        <div className="mb-6">
+          {/* Quick Actions */}
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
+          <div className="grid md:grid-cols-3 gap-4">
+            <button
+              onClick={() => router.push("/admin/releases/create")}
+              className="bg-gradient-to-br from-green-500 via-footy-green to-green-700 text-white p-6 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all flex flex-col items-center gap-3"
+            >
+              <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              <span className="font-bold text-lg">Create Release</span>
+              <span className="text-xs text-white/80 text-center">
+                Add a new card product release
+              </span>
+            </button>
+
+            <button
+              onClick={() => router.push("/admin/posts/create")}
+              className="bg-gradient-to-br from-orange-500 via-footy-orange to-orange-700 text-white p-6 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all flex flex-col items-center gap-3"
+            >
+              <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              <span className="font-bold text-lg">Create Post</span>
+              <span className="text-xs text-white/80 text-center">
+                Write a new blog post or article
+              </span>
+            </button>
+
+            <button
+              onClick={() => router.push("/admin/cards/scan")}
+              className="bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-700 text-white p-6 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all flex flex-col items-center gap-3"
+            >
+              <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span className="font-bold text-lg">Scan Cards</span>
+              <span className="text-xs text-white/80 text-center">
+                Upload and identify card images
+              </span>
+            </button>
+          </div>
+        </div>
+
+          {/* Recent Activity */}
+          {stats && stats.recentActivity && stats.recentActivity.length > 0 && (
+            <>
+              <div className="flex items-center justify-between mb-4 mt-8">
               <h2 className="text-xl font-bold text-gray-900">
                 Recent Activity
               </h2>
@@ -150,9 +196,10 @@ export default function AdminDashboard() {
                   </div>
                 ))}
               </div>
-            </div>
-          </>
-        )}
+              </div>
+            </>
+          )}
+        </div>
 
         {/* Statistics Accordion */}
         {stats && (
