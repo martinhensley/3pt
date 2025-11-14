@@ -15,6 +15,17 @@ Complete REST API documentation with TypeScript examples, cURL commands, and req
 - Authentication and error handling
 - URL slug conventions
 
+### 📊 [Database Reference](./DATABASE.md)
+Complete database schema documentation with field definitions, relationships, and query patterns.
+
+**Covers:**
+- Detailed field descriptions for all models
+- Enum definitions (SetType, ImageType, PostType, etc.)
+- Parent-child parallel architecture
+- Common query patterns with Prisma examples
+- Data integrity rules and cascading deletes
+- Migration guide and deprecated fields
+
 ### 📘 [Project README](../README.md)
 Project overview, setup instructions, and quick start guide.
 
@@ -40,8 +51,10 @@ Internal development documentation and patterns.
 ## Quick Links
 
 ### Database
-- [Database Schema](../README.md#database-schema)
-- [Parent-Child Parallel Architecture](./API.md#parent-child-parallel-architecture)
+- [Database Schema Overview](../README.md#database-schema)
+- [Complete Database Reference](./DATABASE.md)
+- [Parent-Child Parallel Architecture](./DATABASE.md#parent-child-parallel-sets)
+- [Common Query Patterns](./DATABASE.md#common-query-patterns)
 - [URL Slug Conventions](./API.md#url-slug-conventions)
 
 ### Development

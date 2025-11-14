@@ -2,12 +2,11 @@
 
 ## Table of Contents
 1. [AI Integration Requirements](#ai-integration-requirements)
-2. [AI-Powered Excel Import Workflow](#ai-powered-excel-import-workflow)
-3. [Standardized Page Layout](#standardized-page-layout)
-4. [URL Slug Conventions](#url-slug-conventions)
-5. [Component Patterns](#component-patterns)
-6. [Database Schema](#database-schema)
-7. [Development Guidelines](#development-guidelines)
+2. [Standardized Page Layout](#standardized-page-layout)
+3. [URL Slug Conventions](#url-slug-conventions)
+4. [Component Patterns](#component-patterns)
+5. [Database Schema](#database-schema)
+6. [Development Guidelines](#development-guidelines)
 
 ---
 
@@ -157,341 +156,6 @@ Required environment variable:
 ```bash
 ANTHROPIC_API_KEY=your-api-key-here
 ```
-
----
-
-## AI-Powered Excel Import Workflow
-
-### Overview
-
-The application includes a sophisticated AI-powered workflow for importing complete card checklists from Excel files. This workflow uses Claude AI (via Anthropic SDK) to analyze checklist structure, identify sets and parallels, and automatically create the complete database hierarchy.
-
-**Location:** `/app/api/sets/import-excel/route.ts` (API endpoint) and `/components/ExcelImport.tsx` (UI component)
-
-### Why This Workflow?
-
-1. **Human-in-the-Loop**: User explicitly selects target release to prevent AI mistakes
-2. **Intelligent Structure Analysis**: AI identifies base sets, parallels, inserts, and relationships
-3. **Type Classification**: Automatically categorizes sets (Base, Insert, Autograph, Memorabilia)
-4. **Print Run Extraction**: Detects and assigns print runs from parallel names
-5. **Idempotent Operations**: Safe to run multiple times (duplicate detection prevents errors)
-6. **Real-time Feedback**: Progress counters show sets and cards being created
-
-### Workflow Steps
-
-#### 1. User Selects Target Release
-
-```tsx
-// Component: /components/ExcelImport.tsx
-<select
-  value={selectedReleaseId}
-  onChange={(e) => setSelectedReleaseId(e.target.value)}
->
-  <option value="">-- Select a Release --</option>
-  {releases.map((release) => (
-    <option key={release.id} value={release.id}>
-      {release.year} {release.manufacturer.name} {release.name}
-    </option>
-  ))}
-</select>
-```
-
-**Why**: Prevents AI from auto-detecting the wrong release (critical lesson learned during development)
-
-#### 2. User Uploads Excel File
-
-- Supported formats: `.xls`, `.xlsx`
-- File is converted to Base64 for API transmission
-- Client-side validation ensures release is selected first
-
-#### 3. AI Analyzes Set Structure
-
-The API endpoint uses Claude via Genkit to analyze the checklist:
-
-```typescript
-// API: /app/api/sets/import-excel/route.ts
-const analysis = await analyzeChecklistFlow({
-  cards: allCards.map(card => ({
-    cardNumber: card['Card #'],
-    player: card['Player'],
-    team: card['Team'],
-    variant: card['Variant'] || card['Parallel'] || card['Type'],
-  })),
-});
-```
-
-**AI Tasks:**
-- Identifies the base set name
-- Detects all parallel variations
-- Groups parallels under parent base sets
-- Classifies set types (Base, Insert, Autograph, Memorabilia)
-- Extracts print runs from parallel names (e.g., "Electric Etch Marble Flood 8" → printRun: 8)
-
-#### 4. Creates Database Hierarchy
-
-**Parent Sets First:**
-```typescript
-// Creates or finds parent base set
-let parentSet = await prisma.set.findUnique({
-  where: { slug: parentSetSlug },
-});
-
-if (!parentSet) {
-  parentSet = await prisma.set.create({
-    data: {
-      name: baseSetInfo.name,
-      type: baseSetInfo.type,
-      releaseId: releaseId,
-      slug: parentSetSlug,
-      isBaseSet: true,
-      parallels: analysis.sets
-        .filter(s => s.isParallel && s.parentSetName === baseSetInfo.name)
-        .map(s => s.name),
-    },
-  });
-}
-```
-
-**Parallel Sets Second:**
-```typescript
-// Creates parallel sets linked to parent
-for (const parallelInfo of parallelsForThisBase) {
-  const parallelSet = await prisma.set.create({
-    data: {
-      name: parallelInfo.name,
-      type: parallelInfo.type,
-      releaseId: releaseId,
-      parentSetId: parentSet.id,
-      slug: parallelSetSlug,
-      isBaseSet: false,
-    },
-  });
-}
-```
-
-**Cards Last:**
-```typescript
-// Creates cards with duplicate checking
-const existingCard = await prisma.card.findUnique({
-  where: { slug },
-});
-
-if (!existingCard) {
-  await prisma.card.create({
-    data: {
-      playerName: card.Player,
-      team: card.Team,
-      cardNumber: card['Card #'],
-      variant: variant,
-      parallelType: parallelType,
-      printRun: printRun,
-      setId: targetSet.id,
-      slug: slug,
-      // ... other fields
-    },
-  });
-}
-```
-
-#### 5. Progress Feedback
-
-During import, animated counters show progress:
-
-```tsx
-// Estimated totals based on AI analysis
-const estimatedTotalSets = analysis.sets.length;
-const estimatedTotalCards = allCards.length;
-
-// Update every 200ms
-const progressInterval = setInterval(() => {
-  setProgressSets(prev => {
-    const next = prev + setsPerUpdate;
-    return next >= estimatedTotalSets ? estimatedTotalSets : next;
-  });
-  setProgressCards(prev => {
-    const next = prev + cardsPerUpdate;
-    return next >= estimatedTotalCards ? estimatedTotalCards : next;
-  });
-}, 200);
-```
-
-**Display:**
-```
-┌─────────────────┬─────────────────┐
-│ 47 Sets Created │ 1,234 Cards     │
-└─────────────────┴─────────────────┘
-```
-
-### Key Features
-
-#### Duplicate Detection (Idempotent)
-
-Every creation operation checks for existing records first:
-
-```typescript
-// Set duplicate check
-const existingSet = await prisma.set.findUnique({
-  where: { slug: setSlug },
-});
-
-if (existingSet) {
-  console.log(`⚠️  Set already exists: ${setName}`);
-  return existingSet; // Reuse existing
-}
-
-// Card duplicate check
-const existingCard = await prisma.card.findUnique({
-  where: { slug: cardSlug },
-});
-
-if (existingCard) {
-  console.log(`⚠️  Skipping duplicate card: ${playerName}`);
-  continue; // Skip creation
-}
-```
-
-**Result**: Safe to run the same import multiple times without errors.
-
-#### Smart Parallel Detection
-
-AI identifies parallels by analyzing patterns:
-
-- **Name patterns**: "Prizm", "Optic", "Gold", etc.
-- **Print run indicators**: "8", "25", "99", "1/1"
-- **Numbering format**: "/8", "/25", "1 of 1"
-- **Context clues**: Position in checklist, naming conventions
-
-#### Type Classification
-
-Sets are automatically categorized:
-
-```typescript
-enum SetType {
-  BASE = 'Base',
-  INSERT = 'Insert',
-  AUTOGRAPH = 'Autograph',
-  MEMORABILIA = 'Memorabilia',
-  OTHER = 'Other',
-}
-```
-
-**AI Detection Logic:**
-- Contains "Auto", "Signature", "Autograph" → `AUTOGRAPH`
-- Contains "Jersey", "Patch", "Relic", "Memorabilia" → `MEMORABILIA`
-- Contains "Insert" or is non-base parallel → `INSERT`
-- Is base set → `BASE`
-- Default → `OTHER`
-
-#### Print Run Extraction
-
-AI extracts print runs from parallel names:
-
-```typescript
-// Examples:
-"Electric Etch Marble Flood 8" → printRun: 8
-"Gold Power 25" → printRun: 25
-"Black 1/1" → printRun: 1
-"Aqua Wave 99" → printRun: 99
-```
-
-**Slug Deduplication:**
-Print runs aren't duplicated in slugs if already in the name:
-- `electric-etch-marble-flood-8` (NOT `electric-etch-marble-flood-8-8`)
-- `gold-power-25` (NOT `gold-power-25-25`)
-- `black-1-of-1` (NOT `black-1-of-1-1`)
-
-### Usage Example
-
-1. Navigate to admin page with Excel import component
-2. Select "2024-25 Panini Obsidian Soccer" from release dropdown
-3. Upload `2024-25-Panini-Obsidian-Soccer-Checklist.xlsx`
-4. Click "Import Checklist"
-5. Watch progress counters increment
-6. Receive summary: "Created 47 sets and 1,234 cards"
-
-### Error Handling
-
-**Duplicate Constraint Violations:**
-- Automatically detected and skipped
-- Logged with `⚠️` warnings
-- Does not stop import process
-
-**Missing Release:**
-- User must select release before upload
-- File upload disabled until release selected
-
-**Invalid Excel Format:**
-- Returns clear error message
-- Expected columns: `Card #`, `Player`, `Team`, `Variant`/`Parallel`/`Type`
-
-**AI Analysis Failures:**
-- Falls back to basic structure
-- Logs error for debugging
-- Continues with partial data
-
-### Testing the Workflow
-
-#### Dry Run Mode
-
-Test the AI analysis without creating data:
-
-```typescript
-const response = await fetch('/api/sets/import-excel', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    releaseId: 'xxx',
-    fileData: base64File,
-    dryRun: true, // Preview only
-  }),
-});
-```
-
-Returns analysis results without database changes.
-
-#### Genkit Dev UI
-
-Test the AI flow in isolation:
-
-```bash
-npm run genkit
-```
-
-Navigate to http://localhost:4000 and test `analyzeChecklistFlow` with sample card data.
-
-### Common Issues and Solutions
-
-**Issue:** "Sets created in wrong release"
-- **Solution:** Added release selector to prevent AI auto-detection errors
-- **Prevention:** User explicitly chooses target release first
-
-**Issue:** "Duplicate constraint errors"
-- **Solution:** Added `findUnique()` checks before all `create()` operations
-- **Prevention:** Import is now idempotent (safe to retry)
-
-**Issue:** "Print run showing twice (e.g., `/145`)"
-- **Solution:** Check if variant already ends with print run before appending
-- **Prevention:** Slug generation logic checks for duplicates
-
-**Issue:** "No progress feedback during long imports"
-- **Solution:** Added animated progress counters
-- **Prevention:** User sees real-time feedback during import
-
-### Related Files
-
-- **`/lib/genkit.ts`** - Defines `analyzeChecklistFlow` for AI analysis
-- **`/lib/slugGenerator.ts`** - Generates unique slugs for sets and cards
-- **`/lib/checklistParser.ts`** - Parses Excel files using `xlsx` library
-- **`/components/ExcelImport.tsx`** - UI component for file upload
-- **`/app/api/sets/import-excel/route.ts`** - API endpoint handling imports
-
-### Future Enhancements
-
-- **Image Upload**: Allow uploading card images alongside checklist
-- **Validation Report**: Show warnings for missing data before import
-- **Partial Import**: Allow importing specific sets instead of full checklist
-- **Rollback**: Add ability to undo an import if something goes wrong
-- **Batch Import**: Support importing multiple releases at once
 
 ---
 
@@ -963,6 +627,10 @@ Location: `/components/Breadcrumb.tsx`
 
 ## Database Schema
 
+> **📊 For complete database reference documentation, see [docs/DATABASE.md](/docs/DATABASE.md)**
+>
+> This section contains development-specific schema patterns and quick reference. For detailed field descriptions, query patterns, and migration guides, refer to the comprehensive database documentation.
+
 ### Hierarchy
 ```
 Manufacturer
@@ -971,7 +639,7 @@ Manufacturer
             └── Card (playerName, team, cardNumber, variant, parallelType, printRun, slug)
 ```
 
-### Key Models
+### Key Models (Quick Reference)
 
 #### Card
 ```prisma
@@ -1088,32 +756,42 @@ model Release {
 #### Image
 ```prisma
 model Image {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   url       String
   caption   String?
-  order     Int      @default(0)
-  createdAt DateTime @default(now())
+  order     Int       @default(0)
+  type      ImageType // What this image belongs to
+  createdAt DateTime  @default(now())
 
-  // Optional foreign keys - one of these will be set
+  // Foreign keys - only one will be set based on type
   releaseId String?
-  release   Release? @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  release   Release?  @relation(fields: [releaseId], references: [id], onDelete: Cascade)
 
   setId     String?
-  set       Set?     @relation(fields: [setId], references: [id], onDelete: Cascade)
+  set       Set?      @relation(fields: [setId], references: [id], onDelete: Cascade)
 
   cardId    String?
-  card      Card?    @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  card      Card?     @relation(fields: [cardId], references: [id], onDelete: Cascade)
 
   postId    String?
-  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  post      Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+enum ImageType {
+  RELEASE    // Release product image
+  SET        // Set/insert image
+  CARD       // Individual card image
+  POST       // Post/article image
 }
 ```
 
 ### Important Schema Notes
 
+> **For comprehensive documentation on all schema fields, relationships, and query patterns, see [docs/DATABASE.md](/docs/DATABASE.md)**
+
 #### Set Parent-Child Relationships
 
-Sets use a self-referential relationship for parallel sets:
+Sets use a self-referential relationship for parallel sets. See [Parent-Child Parallel Sets](/docs/DATABASE.md#parent-child-parallel-sets) in the database reference for complete documentation.
 
 ```typescript
 // Parent set (e.g., "Obsidian Base")
@@ -1137,7 +815,7 @@ const parallelSet = {
 
 #### Print Run Fields
 
-Print runs appear in multiple places:
+Print runs appear in multiple places. See [Card model](/docs/DATABASE.md#card) and [Set model](/docs/DATABASE.md#set) in the database reference for complete field documentation.
 
 1. **Card.printRun** - Individual card print run (e.g., 8 for "/8")
 2. **Set.printRun** - Standard print run for all cards in set (e.g., 99 for all cards "/99")
@@ -1146,6 +824,8 @@ Print runs appear in multiple places:
 **Best Practice:** For parallel sets where all cards have the same print run, store in `Set.printRun`. For individual numbered cards, store in `Card.printRun`.
 
 #### Deprecated Fields
+
+See [Deprecated Fields](/docs/DATABASE.md#deprecated-fields) in the database reference for migration plans and handling guidance.
 
 - **Set.isBaseSet** - Deprecated, use `Set.type` instead
 - **Set.parallels** (Json) - Deprecated, use `Set.parallelSets` relation instead
@@ -1224,6 +904,14 @@ Before committing changes to page layouts:
 
 ## Recent Changes Log
 
+### November 14, 2025 - Documentation Cleanup
+
+**Changes:**
+- Removed legacy "AI-Powered Excel Import Workflow" section (components and API routes no longer exist)
+- Corrected Image model documentation to reflect actual schema (uses direct foreign keys with `type` discriminator, not junction tables)
+- Removed duplicate "Recent Changes Log" section
+- Updated table of contents to reflect current documentation structure
+
 ### November 12, 2025 - Database Schema Cleanup & Checklists Feature
 
 **Changes:**
@@ -1243,11 +931,11 @@ Before committing changes to page layouts:
 - Users can browse checklists without navigating manufacturer→release hierarchy
 - Direct links to set detail pages with full card checklists
 
-**Database Schema Updates:**
-- Architecture uses direct foreign keys with type discriminators (not junction tables)
-- Image model: `releaseId`, `setId`, `cardId`, `postId` with `type` field
+**Database Schema Architecture:**
+- Uses direct foreign keys with `ImageType` enum discriminator
+- Image model: `releaseId`, `setId`, `cardId`, `postId` with `type` field for relationship identification
 - SourceDocument model: `releaseId`, `postId` with `entityType` field
-- Confirmed no junction table models exist (e.g., ReleaseImage, PostImage)
+- No junction tables needed - simpler direct foreign key approach
 
 **Files Modified:**
 1. `prisma/schema.prisma` - Removed User model
@@ -1261,11 +949,11 @@ Before committing changes to page layouts:
 
 **Key Learnings:**
 - Always verify authentication is using correct schema before removing tables
-- Current schema uses simpler direct FK approach vs junction tables
+- Direct foreign keys with type discriminators are simpler than junction tables for this use case
 - TypeScript interfaces in frontend code may reference non-existent DB models
 - Database reset confirmed clean slate after removing legacy User table
 
-### November 11, 2025 - Documentation Consolidation
+### November 11, 2025 - Documentation Consolidation & Parallel Architecture
 **Changes:**
 - Consolidated parallel set architecture documentation from spec files into `.claude/CLAUDE.md`
 - Added comprehensive "Set & Parallel Architecture" section documenting parent-child relationships
@@ -1281,37 +969,7 @@ Before committing changes to page layouts:
 **Files Consolidated:**
 - `/PARALLEL_AS_SET_SPEC.md` → Extracted slug conventions, type prefixes, and special cases
 - `/PARENT_CHILD_PARALLEL_TODO.md` → Extracted testing checklist and edge cases
-- Both spec files can now be deleted as content is preserved in permanent documentation
-
-### November 2025 - AI Excel Import Workflow
-**Changes:**
-- Implemented AI-powered Excel checklist import workflow
-- Added release selector to prevent wrong release targeting
-- Added progress counters for real-time import feedback
-- Implemented duplicate detection for idempotent imports
-- Combined set tables into unified view on release pages
-- Fixed print run artifacts displaying incorrectly
-- Improved error handling for missing cards
-
-**Key Features Added:**
-- **Release Selector**: User must explicitly choose target release before import
-- **Progress Counters**: Animated counters show sets and cards being created
-- **Idempotent Operations**: Safe to run imports multiple times without errors
-- **Unified Tables**: All set types displayed in single table with section labels
-
-**Files Modified:**
-1. `/components/ExcelImport.tsx` - Added release selector and progress counters
-2. `/app/api/sets/import-excel/route.ts` - Added duplicate checking for all operations
-3. `/app/releases/[slug]/page.tsx` - Combined multiple tables into unified view
-4. `/app/sets/[slug]/page.tsx` - Removed duplicate print run badge
-5. `/app/cards/[slug]/page.tsx` - Improved 404 error handling
-6. `/README.md` - Documented AI Excel import workflow
-7. `/.claude/CLAUDE.md` - Documented AI Excel import workflow (this file)
-
-**Problem Solved:**
-- **Issue**: AI was adding sets/cards to wrong releases
-- **Solution**: Added human-in-the-loop release selection step
-- **Result**: User explicitly chooses target release, preventing AI mistakes
+- Both spec files deleted as content preserved in permanent documentation
 
 ### October 2025 - Layout Standardization
 **Changes:**
@@ -1348,19 +1006,6 @@ Before committing changes to page layouts:
 - Implement image optimization strategies
 - Consider static generation for popular pages
 - Add loading priorities for critical resources
-
----
-
-## Resources
-
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-- [Prisma Documentation](https://www.prisma.io/docs)
-- [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/)
-
----
-
-## Recent Changes Log
 
 ### November 9, 2025 - Donruss Soccer Import and Slug Generator Fix
 
@@ -1402,173 +1047,16 @@ Before committing changes to page layouts:
 - **Solution**: Updated all calls to use correct parameter order: `(year, releaseName, setName, setType, parallelName?)`
 - **Result**: All 149 sets now have unique slugs and correct card assignments
 
-### November 12, 2025 - Image Junction Tables & Database Reset
+---
 
-**Changes:**
-- Migrated all image relationships from direct foreign keys to junction tables
-- Completed database reset and fresh start
-- Cleaned up one-off scripts (23 scripts archived, then deleted)
-- Updated schema for consistency across all entity-image relationships
+## Resources
 
-**Database Schema Changes:**
-
-**Before (Direct Foreign Keys):**
-```prisma
-model Image {
-  id        String   @id
-  url       String
-  caption   String?
-  order     Int
-
-  // Direct foreign keys (REMOVED)
-  releaseId String?
-  release   Release?
-  setId     String?
-  set       Set?
-  cardId    String?
-  card      Card?
-  postId    String?
-  post      Post?
-}
-```
-
-**After (Junction Tables):**
-```prisma
-// Image model - no direct foreign keys
-model Image {
-  id        String   @id
-  url       String
-  caption   String?
-  order     Int
-  createdAt DateTime
-
-  // All relationships via junction tables
-  releases  ReleaseImage[]
-  sets      SetImage[]
-  cards     CardImage[]
-  posts     PostImage[]
-}
-
-// Junction tables (one for each entity type)
-model ReleaseImage {
-  id         String   @id
-  releaseId  String
-  imageId    String
-  order      Int
-  caption    String?
-  linkedAt   DateTime
-  linkedById String
-  @@unique([releaseId, imageId])
-}
-
-model SetImage {
-  id         String   @id
-  setId      String
-  imageId    String
-  order      Int
-  caption    String?
-  linkedAt   DateTime
-  linkedById String
-  @@unique([setId, imageId])
-}
-
-model CardImage {
-  id         String   @id
-  cardId     String
-  imageId    String
-  order      Int
-  caption    String?
-  isFront    Boolean?  // Special field for front/back
-  linkedAt   DateTime
-  linkedById String
-  @@unique([cardId, imageId])
-}
-
-model PostImage {
-  id         String   @id
-  postId     String
-  imageId    String
-  order      Int
-  caption    String?
-  linkedAt   DateTime
-  linkedById String
-  @@unique([postId, imageId])
-}
-```
-
-**Benefits of Junction Tables:**
-1. **Consistency**: All entity-image relationships work the same way
-2. **Metadata**: Each relationship can have its own order, caption, linkedAt, linkedById
-3. **Flexibility**: Easy to add new relationship types in future
-4. **Audit Trail**: Track who linked images and when
-5. **Context-specific captions**: Same image can have different captions in different contexts
-
-**Migration Steps Taken:**
-1. Created PostImage junction table (first migration)
-2. Created ReleaseImage, SetImage, CardImage junction tables
-3. Removed all direct foreign keys from Image model
-4. Ran `npx prisma db push --accept-data-loss` (lost 2 orphaned post images)
-5. Executed full database reset with `delete-all-data.ts`
-
-**Database Reset:**
-- Deleted 45 blobs from Vercel Blob storage
-- Deleted 2 orphaned images
-- Deleted 1 post (Mallory Swanson post)
-- All tables emptied for fresh start
-
-**Script Cleanup:**
-Removed all one-off and completed migration scripts:
-
-**Deleted from root:**
-- `genkit-flows.ts` - Legacy Genkit flows
-- `test-genkit-workflow.ts` - Test workflow
-- `update_base_sets.ts` - One-off migration
-- `backfill_set_slugs.ts` - One-off migration
-- `check_sets.ts` - One-off check
-- `check_release_slug.ts` - One-off check
-- `check_obsidian_sets.ts` - One-off check
-- `migrate_parallel_slugs.ts` - One-off migration
-- `create_parallel_cards.ts` - One-off creation
-- `cleanup_equinox_parallels.ts` - One-off cleanup
-
-**Deleted from scripts/:**
-- `generate-release-description.ts` - No future use
-- `import-donruss-soccer.ts` - One-off import
-- `import-from-pdf-checklist.ts` - One-off import
-- `review-neon-auth.ts` - No future use
-- `migrate-source-documents.ts` - Completed
-- `migrate-post-images.ts` - Completed
-- `migrate-mallory-swanson-images.ts` - Completed
-- `migrate-orphaned-post-images.ts` - Completed
-- `fix-donruss-structure.ts` - Completed
-- `delete-donruss-release.ts` - Completed
-- `check-database-state.ts` - One-off
-- `check-donruss-source-files.ts` - One-off
-- `check-image-table-state.ts` - One-off
-- `check-post-table-state.ts` - One-off
-- `cleanup-orphaned-documents.ts` - Completed
-- `delete-release-blobs.ts` - Completed
-- `restore-donruss-documents.ts` - Completed
-- `autograph_counts.js` - One-off analysis
-
-**Remaining Scripts:**
-- `delete-all-data.ts` - Database reset utility (useful for dev)
-- `init-admin.ts` - Admin initialization (setup)
-- `setup-neon-auth.ts` - Auth setup (initial setup)
-- `SCRIPT_INVENTORY.md` - Documentation
-
-**Files Modified:**
-1. `prisma/schema.prisma` - Complete Image model restructure
-2. `scripts/delete-all-data.ts` - Created comprehensive cleanup script
-3. `scripts/SCRIPT_INVENTORY.md` - Documented script organization
-4. `.claude/CLAUDE.md` - This file (updated documentation)
-
-**Key Learnings:**
-- Junction tables provide better consistency than mixed direct FKs + junctions
-- Always use `--accept-data-loss` flag when migrating in development
-- Keep only essential scripts; delete one-offs immediately after use
-- Document major schema changes in detail
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+- [Prisma Documentation](https://www.prisma.io/docs)
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/)
+- [Anthropic SDK Documentation](https://github.com/anthropics/anthropic-sdk-typescript)
 
 ---
 
-*Last Updated: November 12, 2025*
+*Last Updated: November 14, 2025*

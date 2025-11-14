@@ -6,7 +6,7 @@ A football (soccer) card AI and Data Platform
 
 ## Overview
 
-- **Database**: 8,977+ cards from 149+ sets across multiple releases (2024-25 Donruss Soccer, Obsidian, etc.)
+- **Database**: Comprehensive card database with support for manufacturers, releases, sets, and individual cards
 - **AI-Powered**: Claude Sonnet 4 for card identification, set analysis, and content generation
 - **Admin Tools**: Bulk card scanning, smart matching, source document library
 - **Public Features**: Searchable checklists, release database, eBay marketplace integration
@@ -29,8 +29,8 @@ A football (soccer) card AI and Data Platform
 ### Core Database
 - **Hierarchical Data Model**: Manufacturers → Releases → Sets → Cards
 - **Parent-Child Parallel Architecture**: Efficient storage with parallels referencing parent set cards
-- **149+ Sets**: Complete checklists from major releases (Donruss, Obsidian, etc.)
-- **8,977+ Cards**: Comprehensive card database with images and metadata
+- **Complete Checklists**: Major releases from Panini, Topps, and other manufacturers
+- **Card Database**: Comprehensive card database with images and metadata
 - **Release Management**: Approval workflow, reviews, source document tracking
 
 ### AI Integration
@@ -259,238 +259,44 @@ All public-facing pages follow a **standardized three-column layout** to ensure 
 
 ## Database Schema
 
-### Complete Entity-Relationship Diagram
+The footy.bot database uses PostgreSQL with Prisma ORM, designed around a hierarchical data model:
 
 ```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                         CORE HIERARCHY                                        │
-└──────────────────────────────────────────────────────────────────────────────┘
-
-┌─────────────────┐
-│  Manufacturer   │
-│─────────────────│
-│ id              │◄────┐
-│ name            │     │
-│ createdAt       │     │
-│ updatedAt       │     │
-└─────────────────┘     │
-                        │ 1:N
-                   ┌────┴──────────────────┐
-                   │     Release           │
-                   │───────────────────────│
-                   │ id                    │◄────┐
-                   │ name                  │     │
-                   │ year                  │     │
-                   │ slug                  │     │
-                   │ description (legacy)  │     │
-                   │ review                │     │ Footy's review
-                   │ reviewDate            │     │
-                   │ releaseDate (string)  │     │ Free-form date
-                   │ postDate              │     │ Chronological ordering
-                   │ isApproved            │     │ Approval workflow
-                   │ approvedAt            │     │ for public visibility
-                   │ approvedBy            │     │
-                   │ sellSheetText         │     │
-                   │ sourceFiles (JSON)    │     │
-                   │ manufacturerId        │     │
-                   │ createdAt             │     │
-                   │ updatedAt             │     │
-                   └───────────────────────┘     │ 1:N
-                                            ┌────┴──────────────────────┐
-                                            │       Set                 │
-                                            │───────────────────────────│
-                                            │ id                        │◄────┐
-                                            │ name                      │  │  │
-                                            │ slug                      │  │  │
-                                            │ type (SetType ENUM)       │──┼──┼── Base, Insert,
-                                            │ isBaseSet (deprecated)    │  │  │   Autograph, Memorabilia
-                                            │ releaseId                 │  │  │
-                                            │ totalCards                │  │  │
-                                            │ printRun                  │  │  │
-                                            │ description               │  │  │
-                                            │ sourceText                │  │  │
-                                            │ parallels (JSON, dep.)    │  │  │
-                                            │ parentSetId               │──┘  │ Parent-child
-                                            │ hasVariableChecklist      │     │ parallel relationship
-                                            │ mirrorsParentChecklist    │     │
-                                            │ createdAt                 │     │
-                                            │ updatedAt                 │     │
-                                            └───────────────────────────┘     │ 1:N
-                                                             ┌────┴──────────────────┐
-                                                             │       Card            │
-                                                             │───────────────────────│
-                                                             │ id                    │
-                                                             │ slug                  │
-                                                             │ playerName            │
-                                                             │ team                  │
-                                                             │ cardNumber            │
-                                                             │ variant               │
-                                                             │ parallelType          │
-                                                             │ serialNumber          │
-                                                             │ isNumbered            │
-                                                             │ printRun              │
-                                                             │ numbered              │
-                                                             │ rarity                │
-                                                             │ finish                │
-                                                             │ hasAutograph          │
-                                                             │ hasMemorabilia        │
-                                                             │ specialFeatures       │
-                                                             │ colorVariant          │
-                                                             │ detectionConfidence   │
-                                                             │ detectionMethods      │
-                                                             │ detectedText          │
-                                                             │ imageFront            │
-                                                             │ imageBack             │
-                                                             │ footyNotes            │
-                                                             │ setId                 │
-                                                             │ createdAt             │
-                                                             │ updatedAt             │
-                                                             └───────────────────────┘
-
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                         CONTENT & MEDIA                                       │
-└──────────────────────────────────────────────────────────────────────────────┘
-
-                          ┌───────────────────────┐
-                          │        Post           │
-                          │───────────────────────│
-                          │ id                    │
-                          │ title                 │
-                          │ slug                  │
-                          │ content               │
-                          │ excerpt               │
-                          │ type                  │──────┐ PostType ENUM:
-                          │ published             │      │ - NEWS
-                          │ postDate              │      │ - REVIEW
-                          │ releaseId  (optional) │──┐   │ - GUIDE
-                          │ setId      (optional) │──┼───│ - ANALYSIS
-                          │ cardId     (optional) │──┼───│ - GENERAL
-                          │ authorId              │  │   │
-                          │ createdAt             │  │   └────────────
-                          │ updatedAt             │  │
-                          └───────────────────────┘  │
-                                   │                 │ Optional References:
-                                   │ 1:N             │ Post can reference
-                                   ▼                 │ Release, Set, or Card
-                          ┌───────────────────────┐  │
-                          │       Image           │◄─┼──┐
-                          │───────────────────────│  │  │
-                          │ id                    │  │  │
-                          │ url                   │  │  │
-                          │ caption               │  │  │ Images can belong to:
-                          │ order                 │  │  │ - Release
-                          │ releaseId  (optional) │──┘  │ - Set
-                          │ setId      (optional) │─────┘ - Card
-                          │ cardId     (optional) │─────┐ - Post
-                          │ postId     (optional) │──┐  │
-                          │ createdAt             │  │  │
-                          └───────────────────────┘  │  │
-                                                     ▼  ▼
-
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                      SOURCE DOCUMENT MANAGEMENT                               │
-└──────────────────────────────────────────────────────────────────────────────┘
-
-                     ┌──────────────────────────────┐
-                     │      SourceDocument          │
-                     │──────────────────────────────│
-                     │ id                           │
-                     │ filename                     │
-                     │ displayName                  │
-                     │ blobUrl                      │ Vercel Blob storage
-                     │ mimeType                     │
-                     │ fileSize                     │
-                     │ documentType                 │──────┐ DocumentType ENUM:
-                     │ entityType                   │──────┼─ - SELL_SHEET
-                     │ tags          (String[])     │      │ - CHECKLIST
-                     │ extractedText                │      │ - PRESS_RELEASE
-                     │ uploadedById                 │      │ - PRICE_GUIDE
-                     │ uploadedAt                   │      │ - IMAGE
-                     │ lastUsedAt                   │      │ - OTHER
-                     │ usageCount                   │      └────────────
-                     │ usageContext                 │
-                     │ description                  │      EntityType ENUM:
-                     │ createdAt                    │      - RELEASE
-                     │ updatedAt                    │      - POST
-                     │                              │
-                     │ releaseId     (optional)     │──┐ Direct foreign keys
-                     │ postId        (optional)     │──┘ with type discriminator
-                     └──────────────────────────────┘
-
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                         AUTHENTICATION                                        │
-└──────────────────────────────────────────────────────────────────────────────┘
-
-Note: Authentication is handled by neon_auth.admin_users table (separate schema).
-No User model in public schema. Post.authorId and SourceDocument.uploadedById
-reference neon_auth.admin_users.id without enforced foreign key constraints.
+Manufacturer → Release → Set → Card
 ```
 
-### Key Relationships
+### Quick Reference
 
-**Hierarchical Data Flow:**
-- Manufacturer → Release → Set → Card
-- Each level provides context for AI analysis and URL structure
+| Entity | Description |
+|--------|-------------|
+| **Manufacturer** | Card manufacturers (Panini, Topps, etc.) |
+| **Release** | Product releases (e.g., "2024-25 Obsidian Soccer") |
+| **Set** | Card sets within releases (Base, Insert, Auto, Mem) |
+| **Card** | Individual cards with variants and serials |
+| **Post** | Blog posts, reviews, and articles |
+| **Image** | Images for all entity types |
+| **SourceDocument** | Reference documents (PDFs, checklists) |
 
-**Release Fields:**
-- `description`: Legacy field, use `review` instead
-- `review`: Footy's editorial review of the release
-- `reviewDate`: When the review was written/updated
-- `releaseDate`: Free-form string (e.g., "May 4, 2025" or "1978")
-- `postDate`: DateTime for chronological ordering (auto-populated from releaseDate)
+### Key Features
 
-**Release Approval Workflow:**
-- `isApproved`: Boolean flag controlling public visibility
-- `approvedAt`: Timestamp when release was approved
-- `approvedBy`: Email of admin who approved the release
-- Only approved releases are shown on public-facing pages
+- **Parent-Child Parallel Architecture**: Efficient storage with parallels referencing parent set cards
+- **Approval Workflow**: Releases require approval (`isApproved`) before public visibility
+- **Content Linking**: Posts, Images, and SourceDocuments use direct foreign keys with type discriminators
+- **Cascading Deletes**: Hierarchical relationships maintain referential integrity
+- **AI Metadata**: Cards store detection confidence, methods, and OCR text for Claude AI operations
 
-**Post Fields:**
-- `postDate`: DateTime for chronological ordering (defaults to createdAt, can be backdated)
+### Complete Documentation
 
-**Parent-Child Parallel Sets:**
-- Sets can have a parent-child relationship via `parentSetId`
-- Parent sets (null `parentSetId`) contain the card checklist
-- Child parallel sets reference the parent's cards
-- Flags: `hasVariableChecklist`, `mirrorsParentChecklist`
-- Cards are stored once on parent, not duplicated per parallel
+**[📖 View Complete Database Reference →](/docs/DATABASE.md)**
 
-**Set Types:**
-- `SetType` enum: Base, Insert, Autograph, Memorabilia
-- `isBaseSet` field is deprecated (use `type` instead)
-- Type affects slug generation and display categorization
-
-**Content Linking:**
-- Posts can reference Release, Set, or Card (optional foreign keys)
-- Images use direct foreign keys with `ImageType` enum discriminator (RELEASE, SET, CARD, POST)
-- Source Documents use direct foreign keys with `SourceDocumentEntityType` enum (RELEASE, POST)
-- No junction tables - simpler architecture with type discriminators
-
-**Serial Number Handling:**
-- `serialNumber`: Raw format (e.g., "/49", "1/1")
-- `printRun`: Numeric value (e.g., 49, 1)
-- `numbered`: Display format (e.g., "/49", "1 of 1")
-- `isNumbered`: Boolean flag for numbered cards
-
-**Parallel/Variation System:**
-- `parallelType`: Specific parallel name (e.g., "Gold Refractor", "Base")
-- `variant`: Basic variant designation
-- `specialFeatures`: Array of special attributes (rookie, insert, short_print)
-- `colorVariant`: Color designation (gold, red, blue, etc.)
-
-### Data Integrity
-
-**Cascading Deletes:**
-- Deleting a Manufacturer cascades to all Releases
-- Deleting a Release cascades to all Sets
-- Deleting a Set cascades to all Cards
-- Deleting a Post/Release/Set/Card cascades to associated Images
-
-**Unique Constraints:**
-- Card slugs must be unique (includes print run for serial numbered cards)
-- Manufacturer names must be unique
-- Release slugs must be unique
-- Post slugs must be unique
+Includes:
+- Detailed field descriptions for all models
+- Enum definitions (SetType, ImageType, PostType, etc.)
+- Parent-child parallel architecture explained
+- Common query patterns with TypeScript/Prisma examples
+- Data integrity rules and cascading deletes
+- Migration guide and deprecated fields
+- Relationship diagrams and entity descriptions
 
 ## API Reference
 

@@ -1245,36 +1245,17 @@ The API auto-generates URL-friendly slugs for all entities.
 
 ## Parent-Child Parallel Architecture
 
-Sets use a parent-child model for parallel variations:
+Sets use a parent-child model for parallel variations. See the **[Database Reference: Parent-Child Parallel Sets](./DATABASE.md#parent-child-parallel-sets)** for complete documentation including:
 
-- **Parent Sets:** Base/Insert/Auto/Memorabilia sets containing the actual card checklist
-- **Child Parallel Sets:** Variations (e.g., "Electric Etch Orange", "Gold Power") that reference parent's cards
-- **Cards stored once:** Cards exist only on parent sets, not duplicated for each parallel
-- **Query efficiency:** Simpler joins, fewer records, single source of truth
+- Architecture overview and benefits
+- Database structure and relationships
+- Query patterns with Prisma examples
+- Edge cases and cascading behavior
 
-**Example:**
-```typescript
-// Parent set
-{
-  "id": "cm3set123",
-  "name": "Obsidian Base",
-  "parentSetId": null,
-  "cards": [...200 cards],
-  "parallelSets": [
-    { "id": "cm3par1", "name": "Electric Etch Orange", "printRun": 8 },
-    { "id": "cm3par2", "name": "Gold Power 1/1", "printRun": 1 }
-  ]
-}
-
-// Child parallel set
-{
-  "id": "cm3par1",
-  "name": "Electric Etch Orange",
-  "parentSetId": "cm3set123",
-  "cards": [],  // Empty - references parent's cards
-  "printRun": 8
-}
-```
+**Quick Summary:**
+- **Parent Sets:** Contain the actual card checklist
+- **Child Parallel Sets:** Reference parent's cards (cards not duplicated)
+- **Storage Efficiency:** Single source of truth for card data
 
 ---
 
