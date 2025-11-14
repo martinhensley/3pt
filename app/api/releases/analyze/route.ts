@@ -179,7 +179,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       releaseInfo,
-      description: descriptionResult.description,
+      review: descriptionResult.description,
       createdRelease,
     });
   } catch (error) {

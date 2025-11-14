@@ -79,6 +79,7 @@ interface Release {
   slug: string;
   review: string | null;
   reviewDate: string | null;
+  postDate: string | null;
   createdAt: string;
   manufacturer: {
     name: string;
@@ -425,12 +426,12 @@ export default function ReleasePage() {
                   <p className="text-sm text-white/70 uppercase tracking-wide">
                     {(() => {
                       const reviewDate = release.reviewDate ? new Date(release.reviewDate) : null;
-                      const createdDate = new Date(release.createdAt);
+                      const postDate = release.postDate ? new Date(release.postDate) : new Date(release.createdAt);
                       const daysDiff = reviewDate
-                        ? Math.floor((reviewDate.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24))
+                        ? Math.floor((reviewDate.getTime() - postDate.getTime()) / (1000 * 60 * 60 * 24))
                         : 0;
                       const isUpdate = daysDiff > 7;
-                      const date = reviewDate || createdDate;
+                      const date = reviewDate || postDate;
                       const formattedDate = new Intl.DateTimeFormat('en-US', {
                         day: 'numeric',
                         month: 'short',
