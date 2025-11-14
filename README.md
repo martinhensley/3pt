@@ -1,19 +1,16 @@
 # footy.bot
 
-A football (soccer) trading card management assistant with human-curated card sets and sales data.
+A football (soccer) card AI and Data Platform
 
-## Roadmap / TODO
+**footy.bot** is a comprehensive database and content platform for soccer trading cards, powered by Claude AI (Sonnet 4). The platform combines structured data management with AI-assisted content creation to build the most complete soccer card reference available.
 
-### Future Features
-- **Sales Data Collection**: Aggregate and track historical sales data from major marketplaces (eBay, PWCC, Goldin, etc.) to provide market insights and pricing trends
-- **Comps (Comparable Valuations)**: Feature-as-a-service component providing third-party valuation services with comparable sales data, market analysis, and automated valuation models for grading companies and auction houses
-- **SEO Strategy & Optimization**: Once development slows and the app is ready for content production, focus on:
-  - Keyword research and targeting (primary: soccer card database, football trading cards; secondary: panini soccer cards, topps soccer cards)
-  - Content optimization for target keywords
-  - Link building and backlink strategy
-  - Performance optimization (Core Web Vitals)
-  - Advanced schema.org markup for rich snippets
-  - Content calendar for regular releases and guides
+## Overview
+
+- **Database**: 8,977+ cards from 149+ sets across multiple releases (2024-25 Donruss Soccer, Obsidian, etc.)
+- **AI-Powered**: Claude Sonnet 4 for card identification, set analysis, and content generation
+- **Admin Tools**: Bulk card scanning, smart matching, source document library
+- **Public Features**: Searchable checklists, release database, eBay marketplace integration
+- **Architecture**: Next.js 15, PostgreSQL (Neon), Vercel Blob storage, Anthropic SDK
 
 ## Security Notes
 
@@ -29,11 +26,45 @@ A football (soccer) trading card management assistant with human-curated card se
 
 ## Features
 
-- **Hand-Crafted Data Curation**: AI-assisted data organization for checklists, sales, and grading information at global scale
+### Core Database
 - **Hierarchical Data Model**: Manufacturers → Releases → Sets → Cards
-- **Content Publishing**: Create and manage blog posts about releases, sets, cards, and industry news
+- **Parent-Child Parallel Architecture**: Efficient storage with parallels referencing parent set cards
+- **149+ Sets**: Complete checklists from major releases (Donruss, Obsidian, etc.)
+- **8,977+ Cards**: Comprehensive card database with images and metadata
+- **Release Management**: Approval workflow, reviews, source document tracking
+
+### AI Integration
+- **Card Identification**: Analyze card images to identify player, set, variant, and print run
+- **Smart Matching**: Match scanned cards to existing database with confidence scores
+- **Bulk Scanning**: Process multiple cards at once with AI-assisted identification
+- **Content Generation**: Auto-generate release reviews and blog posts
+- **Set Analysis**: Extract card data from checklist documents
+
+### Admin Tools
+- **Source Document Library**: Manage PDFs, checklists, and reference images
+- **Activity Tracking**: Monitor all data changes and admin actions
+- **Bulk Operations**: Import/export, bulk card saves, batch processing
+- **Card Management**: Full CRUD with image uploads and metadata editing
+
+### Public Features
+- **Searchable Checklists**: Browse and filter all sets by manufacturer, release, and type
+- **Release Database**: Public catalog of approved releases with reviews
+- **eBay Integration**: Live marketplace listings via eBay Partner Network API
 - **SEO Optimized**: Dynamic metadata, sitemap, structured data, and Open Graph tags
 - **Responsive Design**: Mobile-friendly interface with footy.bot branding (Green #005031 & Orange #F47322)
+
+## Roadmap / TODO
+
+### Future Features
+- **Sales Data Collection**: Aggregate and track historical sales data from major marketplaces (eBay, PWCC, Goldin, etc.) to provide market insights and pricing trends
+- **Comps (Comparable Valuations)**: Feature-as-a-service component providing third-party valuation services with comparable sales data, market analysis, and automated valuation models for grading companies and auction houses
+- **SEO Strategy & Optimization**: Once development slows and the app is ready for content production, focus on:
+  - Keyword research and targeting (primary: soccer card database, football trading cards; secondary: panini soccer cards, topps soccer cards)
+  - Content optimization for target keywords
+  - Link building and backlink strategy
+  - Performance optimization (Core Web Vitals)
+  - Advanced schema.org markup for rich snippets
+  - Content calendar for regular releases and guides
 
 ## Tech Stack
 
@@ -42,10 +73,9 @@ A football (soccer) trading card management assistant with human-curated card se
 - **Styling**: Tailwind CSS v4
 - **Database**: PostgreSQL (Neon) with Prisma ORM
 - **Authentication**: NextAuth.js
-- **AI Orchestration**: Firebase Genkit (all AI operations use Genkit framework)
-- **AI Models**: Anthropic Claude 3.5 Sonnet (via Genkit)
+- **AI Integration**: Anthropic SDK (TypeScript)
+- **AI Models**: Claude Sonnet 4 (claude-sonnet-4-20250514)
 - **Image Processing**: Sharp
-- **Document Parsing**: pdfjs-dist, csv-parse
 
 ## Branding and Color Scheme
 
@@ -123,21 +153,24 @@ footy/
 │   │   ├── posts/          # Post management
 │   │   └── releases/       # Release management
 │   ├── api/                # API routes
+│   │   ├── admin/          # Admin-only endpoints
 │   │   ├── analyze/        # AI analysis endpoints
 │   │   ├── auth/           # NextAuth
 │   │   ├── cards/          # Card API
+│   │   ├── checklists/     # Checklist browser API
 │   │   ├── ebay/           # eBay API integration
+│   │   ├── generate/       # AI content generation
+│   │   ├── images/         # Image management
 │   │   ├── library/        # Library endpoints
 │   │   ├── posts/          # Post CRUD
 │   │   ├── releases/       # Release API
 │   │   ├── sets/           # Set API
 │   │   └── upload/         # File upload
 │   ├── cards/[slug]/       # Card detail pages
-│   ├── posts/[slug]/       # Post pages
-│   ├── releases/           # Release listing
-│   │   └── [slug]/         # Release detail pages
-│   ├── sets/[slug]/        # Set pages
-│   │   └── parallels/[parallel]/ # Parallel/variation pages
+│   ├── checklists/         # Public checklist browser
+│   ├── posts/              # Post index & detail pages
+│   ├── releases/           # Release index & detail pages
+│   ├── sets/[slug]/        # Set detail pages (parent & parallel)
 │   ├── globals.css         # Global styles
 │   ├── layout.tsx          # Root layout with metadata
 │   ├── page.tsx            # Homepage
@@ -147,21 +180,17 @@ footy/
 │   ├── Breadcrumb.tsx      # Navigation breadcrumbs
 │   ├── EbayAd.tsx          # eBay affiliate ads
 │   ├── EntitySelectors.tsx # Release/Set dropdowns
-│   ├── ExcelImport.tsx     # Excel checklist importer
 │   ├── Footer.tsx          # Site footer
 │   ├── Header.tsx          # Site header (standardized)
 │   └── MultiFileUpload.tsx # Multi-file upload component
 ├── lib/
-│   ├── ai.ts               # Claude AI integration (legacy)
 │   ├── auth.ts             # NextAuth config
 │   ├── checklistParser.ts  # Excel checklist parser
 │   ├── database.ts         # Database helpers
-│   ├── documentParser.ts   # PDF/CSV parsing
 │   ├── ebay.ts             # eBay API client
-│   ├── enhancedCardAnalysis.ts # AI card analysis
 │   ├── extractKeywords.ts  # Keyword extraction
 │   ├── formatters.ts       # Display formatting utilities
-│   ├── genkit.ts           # Firebase Genkit AI flows
+│   ├── genkit.ts           # Anthropic SDK AI functions
 │   ├── neon-auth.ts        # Neon database auth
 │   ├── prisma.ts           # Database client
 │   └── slugGenerator.ts    # URL slug generation
@@ -220,10 +249,10 @@ All public-facing pages follow a **standardized three-column layout** to ensure 
 - `/` - Homepage
 - `/releases` - Release index
 - `/releases/[slug]` - Release detail pages
+- `/checklists` - Searchable checklist browser
 - `/posts` - Post index
 - `/posts/[slug]` - Post detail pages
-- `/sets/[slug]` - Set detail pages
-- `/sets/[slug]/parallels/[parallel]` - Parallel pages
+- `/sets/[slug]` - Set detail pages (parent sets and parallel sets use same route)
 - `/cards/[slug]` - Card detail pages
 
 **See `.claude/CLAUDE.md` for detailed documentation.**
@@ -253,8 +282,11 @@ All public-facing pages follow a **standardized three-column layout** to ensure 
                    │ name                  │     │
                    │ year                  │     │
                    │ slug                  │     │
-                   │ description           │     │
-                   │ releaseDate           │     │
+                   │ description (legacy)  │     │
+                   │ review                │     │ Footy's review
+                   │ reviewDate            │     │
+                   │ releaseDate (string)  │     │ Free-form date
+                   │ postDate              │     │ Chronological ordering
                    │ isApproved            │     │ Approval workflow
                    │ approvedAt            │     │ for public visibility
                    │ approvedBy            │     │
@@ -329,10 +361,11 @@ All public-facing pages follow a **standardized three-column layout** to ensure 
                           │ excerpt               │
                           │ type                  │──────┐ PostType ENUM:
                           │ published             │      │ - NEWS
-                          │ releaseId  (optional) │──┐   │ - REVIEW
-                          │ setId      (optional) │──┼───│ - GUIDE
-                          │ cardId     (optional) │──┼───│ - ANALYSIS
-                          │ authorId              │  │   │ - GENERAL
+                          │ postDate              │      │ - REVIEW
+                          │ releaseId  (optional) │──┐   │ - GUIDE
+                          │ setId      (optional) │──┼───│ - ANALYSIS
+                          │ cardId     (optional) │──┼───│ - GENERAL
+                          │ authorId              │  │   │
                           │ createdAt             │  │   └────────────
                           │ updatedAt             │  │
                           └───────────────────────┘  │
@@ -364,47 +397,33 @@ All public-facing pages follow a **standardized three-column layout** to ensure 
                      │ id                           │
                      │ filename                     │
                      │ displayName                  │
-                     │ blobUrl                      │
+                     │ blobUrl                      │ Vercel Blob storage
                      │ mimeType                     │
                      │ fileSize                     │
                      │ documentType                 │──────┐ DocumentType ENUM:
-                     │ tags          (String[])     │      │ - SELL_SHEET
-                     │ extractedText                │      │ - CHECKLIST
-                     │ uploadedById                 │      │ - PRESS_RELEASE
-                     │ uploadedAt                   │      │ - PRICE_GUIDE
-                     │ lastUsedAt                   │      │ - IMAGE
-                     │ usageCount                   │      │ - OTHER
-                     │ description                  │      └────────────
-                     │ createdAt                    │
-                     │ updatedAt                    │
+                     │ entityType                   │──────┼─ - SELL_SHEET
+                     │ tags          (String[])     │      │ - CHECKLIST
+                     │ extractedText                │      │ - PRESS_RELEASE
+                     │ uploadedById                 │      │ - PRICE_GUIDE
+                     │ uploadedAt                   │      │ - IMAGE
+                     │ lastUsedAt                   │      │ - OTHER
+                     │ usageCount                   │      └────────────
+                     │ usageContext                 │
+                     │ description                  │      EntityType ENUM:
+                     │ createdAt                    │      - RELEASE
+                     │ updatedAt                    │      - POST
+                     │                              │
+                     │ releaseId     (optional)     │──┐ Direct foreign keys
+                     │ postId        (optional)     │──┘ with type discriminator
                      └──────────────────────────────┘
-                              │           │
-                              │ N:N       │ N:N
-                              ▼           ▼
-           ┌──────────────────────────┐  ┌──────────────────────────┐
-           │ ReleaseSourceDocument    │  │  PostSourceDocument      │
-           │──────────────────────────│  │──────────────────────────│
-           │ id                       │  │ id                       │
-           │ releaseId                │  │ postId                   │
-           │ documentId               │  │ documentId               │
-           │ usageContext             │  │ usageContext             │
-           │ linkedAt                 │  │ linkedAt                 │
-           │ linkedById               │  │ linkedById               │
-           └──────────────────────────┘  └──────────────────────────┘
 
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │                         AUTHENTICATION                                        │
 └──────────────────────────────────────────────────────────────────────────────┘
 
-                          ┌───────────────────────┐
-                          │        User           │
-                          │───────────────────────│
-                          │ id                    │
-                          │ username              │  Note: Authentication is
-                          │ password              │  handled by neon_auth
-                          │ createdAt             │  .admin_users table.
-                          │ updatedAt             │  This model kept for
-                          └───────────────────────┘  future use.
+Note: Authentication is handled by neon_auth.admin_users table (separate schema).
+No User model in public schema. Post.authorId and SourceDocument.uploadedById
+reference neon_auth.admin_users.id without enforced foreign key constraints.
 ```
 
 ### Key Relationships
@@ -413,11 +432,21 @@ All public-facing pages follow a **standardized three-column layout** to ensure 
 - Manufacturer → Release → Set → Card
 - Each level provides context for AI analysis and URL structure
 
+**Release Fields:**
+- `description`: Legacy field, use `review` instead
+- `review`: Footy's editorial review of the release
+- `reviewDate`: When the review was written/updated
+- `releaseDate`: Free-form string (e.g., "May 4, 2025" or "1978")
+- `postDate`: DateTime for chronological ordering (auto-populated from releaseDate)
+
 **Release Approval Workflow:**
 - `isApproved`: Boolean flag controlling public visibility
 - `approvedAt`: Timestamp when release was approved
 - `approvedBy`: Email of admin who approved the release
 - Only approved releases are shown on public-facing pages
+
+**Post Fields:**
+- `postDate`: DateTime for chronological ordering (defaults to createdAt, can be backdated)
 
 **Parent-Child Parallel Sets:**
 - Sets can have a parent-child relationship via `parentSetId`
@@ -432,9 +461,10 @@ All public-facing pages follow a **standardized three-column layout** to ensure 
 - Type affects slug generation and display categorization
 
 **Content Linking:**
-- Posts can reference Release, Set, or Card (optional)
-- Images can belong to Release, Set, Card, or Post
-- Source Documents can be linked to Releases or Posts
+- Posts can reference Release, Set, or Card (optional foreign keys)
+- Images use direct foreign keys with `ImageType` enum discriminator (RELEASE, SET, CARD, POST)
+- Source Documents use direct foreign keys with `SourceDocumentEntityType` enum (RELEASE, POST)
+- No junction tables - simpler architecture with type discriminators
 
 **Serial Number Handling:**
 - `serialNumber`: Raw format (e.g., "/49", "1/1")
@@ -462,201 +492,54 @@ All public-facing pages follow a **standardized three-column layout** to ensure 
 - Release slugs must be unique
 - Post slugs must be unique
 
-## API Endpoints
+## API Reference
 
-### Releases
-**GET** `/api/releases?slug={slug}`
-- Fetch release by slug with sets, manufacturer, and images
-- Returns: Release object with nested relationships
+footy.bot provides a comprehensive REST API for managing soccer card data, AI-powered analysis, and content generation.
 
-**POST** `/api/releases` (Auth required)
-- Create new release
-- Body: `{ name, year, manufacturerId, description?, releaseDate? }`
-- Auto-generates slug using `generateReleaseSlug()`
+### Quick Reference
 
-**PUT** `/api/releases` (Auth required)
-- Update existing release
-- Body: `{ id, name?, year?, description?, releaseDate? }`
+| Category | Endpoints | Description |
+|----------|-----------|-------------|
+| **Releases** | `/api/releases` | Manage card releases and approvals |
+| **Sets** | `/api/sets` | Manage card sets and parallels |
+| **Cards** | `/api/cards` | Individual card CRUD operations |
+| **Posts** | `/api/posts` | Blog posts and content management |
+| **AI Analysis** | `/api/analyze/*` | Claude AI card/set/release analysis |
+| **AI Generation** | `/api/generate/*` | Auto-generate reviews and content |
+| **Checklists** | `/api/checklists` | Public searchable checklist browser |
+| **Admin** | `/api/admin/*` | Admin-only operations (scanning, matching, bulk ops) |
+| **Uploads** | `/api/upload/*` | File and image uploads |
 
-**DELETE** `/api/releases?id={id}` (Auth required)
-- Delete release and cascade to all sets/cards/images
+### Authentication
 
----
+Most API endpoints require authentication via NextAuth.js session cookies. Public endpoints include:
+- `GET /api/releases?slug={slug}` - Fetch single release
+- `GET /api/sets?slug={slug}` - Fetch single set
+- `GET /api/cards?slug={slug}` - Fetch single card
+- `GET /api/posts` - List published posts
+- `GET /api/checklists` - Browse checklists
 
-### Sets
-**GET** `/api/sets?slug={slug}`
-- Fetch set by slug with cards, release, and parallel relationships
-- Returns: Set object with cards array
+### Complete Documentation
 
-**GET** `/api/sets?releaseId={releaseId}` (Auth required)
-- Fetch all sets for a release
-- Returns: Array of sets
+**[📖 View Complete API Documentation →](/docs/API.md)**
 
-**GET** `/api/sets?id={id}` (Auth required)
-- Fetch set by ID with cards count
-- Returns: Set object
+Includes:
+- Detailed endpoint specifications with HTTP methods and parameters
+- TypeScript request/response types for all endpoints
+- cURL examples for testing
+- Success and error response samples
+- Authentication details and session management
+- URL slug conventions and auto-generation rules
+- Parent-child parallel architecture explained
+- Error handling and status codes
 
-**POST** `/api/sets` (Auth required)
-- Create new set
-- Body: `{ name, type, isBaseSet, totalCards?, releaseId, parallels?, parentSetId?, printRun?, description? }`
-- Auto-generates slug using `generateSetSlug()` with type prefixes:
-  - Base: `year-release-base-setname` (or just `year-release-setname` if name includes "base")
-  - Insert: `year-release-insert-setname`
-  - Autograph: `year-release-auto-setname`
-  - Memorabilia: `year-release-mem-setname`
-  - Other: `year-release-setname`
-- Parallel sets include parent name and print run in slug
+### Key Features
 
-**PUT** `/api/sets` (Auth required)
-- Update existing set
-- Body: `{ id, name?, type?, totalCards?, parallels?, description? }`
-- Regenerates slug if name changes
-
-**DELETE** `/api/sets?setId={setId}` (Auth required)
-- Delete set and cascade to all cards
-
----
-
-### Cards
-**GET** `/api/cards?slug={slug}`
-- Fetch card by slug with set, release, and images
-- Returns: Card object with nested relationships
-
-**GET** `/api/cards?id={id}`
-- Fetch card by ID
-- Returns: Card object
-
-**POST** `/api/cards` (Auth required)
-- Add cards to a set
-- Body: `{ setId, cards: [...] }`
-- Auto-generates slugs using `generateCardSlug()`
-- Slug format: `year-release-set-cardnumber-playername-variant-printrun`
-- Special handling for 1/1 cards: converts to "1-of-1" in slug
-
-**DELETE** `/api/cards?setId={setId}` (Auth required)
-- Delete all cards in a set
-- Returns: Count of deleted cards
-
----
-
-### Posts
-**GET** `/api/posts?slug={slug}`
-- Fetch post by slug
-- Returns: Post object with optional release/set/card references
-
-**GET** `/api/posts` (Public)
-- Fetch all published posts
-- Returns: Array of posts ordered by creation date
-
-**POST** `/api/posts` (Auth required)
-- Create new post
-- Body: `{ title, content, excerpt?, type, published?, releaseId?, setId?, cardId? }`
-- Auto-generates slug from title
-
-**PUT** `/api/posts` (Auth required)
-- Update existing post
-- Body: `{ id, title?, content?, excerpt?, published? }`
-
-**DELETE** `/api/posts?id={id}` (Auth required)
-- Delete post and cascade to images
-
----
-
-### Analysis (Genkit AI Flows)
-**POST** `/api/analyze/release`
-- Analyze release documents using Genkit AI flow
-- Body: `{ documentText }`
-- Returns: Structured release information (name, year, description, sets)
-
-**POST** `/api/generate-description`
-- Generate AI-assisted descriptions for releases
-- Body: `{ name, sellSheetText }`
-- Returns: Generated description text
-
-**POST** `/api/sets/import-excel` (Auth required)
-- **AI-Powered Excel Import Workflow**
-- Automatically imports complete checklists from Excel files
-- Body: `{ releaseId, fileData (base64), dryRun? }`
-- Workflow:
-  1. Parses Excel file and extracts all cards
-  2. Uses Claude AI via Genkit to analyze set structure
-  3. Identifies base sets and their parallel variations
-  4. Determines set types (Base, Insert, Autograph, Memorabilia)
-  5. Creates hierarchical structure: parent sets → parallel sets → cards
-  6. Handles duplicate detection (idempotent - safe to run multiple times)
-- Features:
-  - **Dry run mode**: Preview analysis before creating data
-  - **Smart parallel detection**: Groups parallels under parent sets
-  - **Type classification**: Auto-categorizes sets by type
-  - **Print run extraction**: Automatically detects and assigns print runs
-  - **Release selector**: User explicitly chooses target release (prevents wrong imports)
-- Returns: Import summary with counts of sets and cards created
-
----
-
-### Uploads
-**POST** `/api/upload`
-- Upload images and documents
-- Supports: PNG, JPG, GIF, WebP, PDF, CSV
-- Returns: Public URL and metadata
-
-**POST** `/api/uploads/release-images`
-- Upload and associate images with release
-- Body: FormData with images and releaseId
-- Returns: Array of created image records
-
----
-
-### SEO
-**GET** `/sitemap.xml`
-- Dynamic sitemap with all releases, sets, cards, and posts
-- Updates automatically when content changes
-
-**GET** `/robots.txt`
-- Search engine directives
-
----
-
-### URL Slug Conventions
-
-**Release Slugs:**
-- Format: `{year}-{manufacturer}-{name}`
-- Example: `2024-25-panini-obsidian-soccer`
-
-**Set Slugs:**
-- Format: `{year}-{release}-{type-prefix}-{setname}[-{parallel}]`
-- Type prefixes: `base`, `insert`, `auto`, `mem` (or omit for Other)
-- Examples:
-  - Base: `2024-25-obsidian-soccer-obsidian-base`
-  - Insert: `2024-25-obsidian-soccer-insert-equinox`
-  - Autograph: `2024-25-obsidian-soccer-auto-dual-jersey-ink`
-  - Parallel: `2024-25-obsidian-soccer-obsidian-base-electric-etch-green-5`
-
-**Card Slugs:**
-- Format: `{year}-{release}-{set}-{cardnumber}-{player}-{parallel}-{printrun}`
-- Parallel cards exclude base set name from slug
-- 1/1 cards use "1-of-1" format
-- Examples:
-  - Base: `2024-25-obsidian-soccer-obsidian-base-1-jude-bellingham-145`
-  - Parallel: `2024-25-obsidian-soccer-1-jude-bellingham-electric-etch-orange-8`
-  - 1/1: `2024-25-obsidian-soccer-1-jude-bellingham-gold-power-1-of-1`
-
-**Special Handling:**
-- "Optic Base Set" → "optic" (base removed from slug)
-- "Base Set" → "base" (base kept in slug)
-- "1/1" or "1 of 1" → "1-of-1" in URLs
-- Print runs: " /5" → "-5" in URLs
-
-### Parent-Child Parallel Architecture
-
-The database uses a **parent-child model** for parallel sets:
-
-- **Parent Sets**: Base/Insert/Auto/Memorabilia sets containing the actual card checklist
-- **Child Parallel Sets**: Variations (e.g., "Electric Etch Orange", "Gold Power") that reference parent's cards
-- **Cards stored once**: Cards exist only on parent sets, not duplicated for each parallel
-- **Query efficiency**: Simpler joins, fewer records, single source of truth
-
-See `.claude/CLAUDE.md` for detailed documentation on parallel set architecture, query patterns, and testing checklists.
+- **Auto-generated Slugs**: All entities get SEO-friendly URLs automatically
+- **TypeScript-first**: Strongly typed request/response interfaces
+- **AI-Powered**: Claude Sonnet 4 for card identification and content generation
+- **Cascading Operations**: Deletes cascade through relationships (Release → Sets → Cards)
+- **Efficient Parallels**: Cards stored once on parent sets, referenced by parallel sets
 
 ## Environment Variables
 
@@ -684,29 +567,4 @@ EBAY_DELETION_ENDPOINT_URL=
 ## License
 
 Private project for footy.bot
-
----
-
-## Technical Notes
-
-### Multi-Document Analysis
-The system can analyze multiple document types simultaneously:
-- PDFs: Extracted text is analyzed for release/set/card information
-- CSVs: Parsed and used for card checklists
-- Images: Analyzed using Claude Vision
-- HTML: Web pages fetched and parsed for product information
-
-### AI Integration
-Uses Claude 3.5 Sonnet with structured output (Zod schemas) to curate and analyze data from diverse sources. The AI assists in:
-- Extracting and structuring card data with professional accuracy
-- Analyzing market trends and card variations
-- Creating expert-level content that provides genuine value to collectors
-- Ensuring data consistency and completeness across the platform
-
-### Database Design
-Hierarchical structure allows for:
-- Complete card library organization
-- Context-aware AI analysis
-- Efficient querying and relationships
-- Future expansion (price tracking, collection management)
 
