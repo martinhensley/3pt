@@ -146,6 +146,7 @@ export async function POST(request: NextRequest) {
               mimeType: mimeType || 'application/octet-stream',
               fileSize: 0, // We don't have size info at this point
               documentType: documentType as any,
+              entityType: 'RELEASE',
               tags: [releaseInfo.year, releaseInfo.manufacturer, releaseInfo.releaseName],
               extractedText: sourceText || null,
               uploadedById: session.user.email || 'unknown',

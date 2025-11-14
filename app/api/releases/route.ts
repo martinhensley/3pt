@@ -19,7 +19,22 @@ export async function GET(request: NextRequest) {
       // Fetch release by slug directly from Release model
       const release = await prisma.release.findUnique({
         where: { slug },
-        include: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          year: true,
+          releaseDate: true,
+          review: true,
+          reviewDate: true,
+          postDate: true,
+          sourceFiles: true,
+          isApproved: true,
+          approvedAt: true,
+          approvedBy: true,
+          manufacturerId: true,
+          createdAt: true,
+          updatedAt: true,
           manufacturer: true,
           images: {
             where: {
@@ -52,7 +67,6 @@ export async function GET(request: NextRequest) {
             }
           },
         },
-        // Also select sourceFiles JSON field
       });
 
       if (!release) {
@@ -185,13 +199,23 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    // Auto-populate postDate from releaseDate if not explicitly provided
+    let calculatedPostDate = null;
+    if (postDate) {
+      calculatedPostDate = new Date(postDate);
+    } else if (releaseDate) {
+      // Use parseReleaseDateToPostDate to convert releaseDate string to DateTime
+      const { parseReleaseDateToPostDate } = await import('@/lib/formatters');
+      calculatedPostDate = parseReleaseDateToPostDate(releaseDate);
+    }
+
     const release = await prisma.release.update({
       where: { id },
       data: {
         name,
         year,
         releaseDate: releaseDate || null,
-        postDate: postDate ? new Date(postDate) : null, // Allow admin to set custom postDate
+        postDate: calculatedPostDate,
         review: review || null,
         reviewDate: reviewDate ? new Date(reviewDate) : null,
         sourceFiles: sourceFiles || null,
