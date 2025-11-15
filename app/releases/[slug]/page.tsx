@@ -10,7 +10,7 @@ import EbayAd from "@/components/EbayAd";
 import EbayAdHorizontal from "@/components/EbayAdHorizontal";
 import { useEffect, useState, useMemo } from "react";
 import { extractKeywordsFromPost, getAdTitle } from "@/lib/extractKeywords";
-import { isParallelSet, getBaseSetSlug, sortSets, groupSetsByBase } from "@/lib/setUtils";
+import { isParallelSet, getBaseSetSlug, sortSets, sortSetsGrouped, groupSetsByBase } from "@/lib/setUtils";
 
 interface Image {
   id: string;
@@ -270,9 +270,9 @@ export default function ReleasePage() {
     });
 
     // Apply our custom sorting logic to each type group
-    // Non-parallels first, then parallels without print runs, then parallels with print runs (highest to lowest)
+    // Use the enhanced sortSetsGrouped function for all types to properly group sets with their parallels
     grouped.forEach((sets, type) => {
-      const sortedSets = sortSets(sets);
+      const sortedSets = sortSetsGrouped(sets);
       grouped.set(type, sortedSets);
     });
 

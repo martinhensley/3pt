@@ -119,7 +119,7 @@ export function getParallelPrintRun(parallelSlug: string): number | null {
  * 2. Parallel sets without print runs (alphabetical by variant)
  * 3. Parallel sets with print runs (highest to lowest)
  */
-export function sortSets<T extends { slug: string; printRun?: number | null }>(sets: T[]): T[] {
+export function sortSets<T extends { slug: string; printRun?: number | null; name?: string }>(sets: T[]): T[] {
   return sets.sort((a, b) => {
     const aIsParallel = isParallelSet(a.slug);
     const bIsParallel = isParallelSet(b.slug);
@@ -130,6 +130,10 @@ export function sortSets<T extends { slug: string; printRun?: number | null }>(s
 
     // Both non-parallel: sort alphabetically
     if (!aIsParallel && !bIsParallel) {
+      // If name is available, use it for better sorting
+      if (a.name && b.name) {
+        return a.name.localeCompare(b.name);
+      }
       return a.slug.localeCompare(b.slug);
     }
 
@@ -143,14 +147,114 @@ export function sortSets<T extends { slug: string; printRun?: number | null }>(s
 
     // Both have print runs: sort highest to lowest
     if (aPrintRun && bPrintRun) {
-      return bPrintRun - aPrintRun;
+      if (bPrintRun !== aPrintRun) {
+        return bPrintRun - aPrintRun;
+      }
+      // Same print run: sort alphabetically by name or variant
+      if (a.name && b.name) {
+        return a.name.localeCompare(b.name);
+      }
     }
 
-    // Both without print runs: sort alphabetically by variant
+    // Both without print runs: sort alphabetically by name or variant
+    if (a.name && b.name) {
+      return a.name.localeCompare(b.name);
+    }
     const aVariant = getParallelVariant(a.slug) ?? '';
     const bVariant = getParallelVariant(b.slug) ?? '';
     return aVariant.localeCompare(bVariant);
   });
+}
+
+/**
+ * Parse set name to extract base name and variant
+ * Used for proper grouping of all sets with their parallels
+ */
+function parseSetName(name: string): { baseName: string; variant: string } {
+  // Special cases for Base and Optic
+  if (name === 'Base') return { baseName: 'Base', variant: '' };
+  if (name === 'Optic') return { baseName: 'Optic', variant: '' };
+  if (name.startsWith('Base ')) return { baseName: 'Base', variant: name.substring(5) };
+  if (name.startsWith('Optic ')) return { baseName: 'Optic', variant: name.substring(6) };
+
+  // For other sets, extract the base name by removing color/variant suffixes
+  // Common patterns: "Set Name Red", "Set Name Gold", "Set Name Black", etc.
+  const colorPattern = /\s+(Red|Blue|Gold|Silver|Black|Pink|Green|Purple|Orange|Teal|Dragon Scale|Plum Blossom|Pink Ice|Pink Velocity|Argyle|Holo|Ice|Velocity|Cubic|Diamond|Mojo|Power|Pandora)(\s+\d+)?$/i;
+  const match = name.match(colorPattern);
+
+  if (match) {
+    const baseName = name.substring(0, match.index).trim();
+    const variant = match[0].trim();
+    return { baseName, variant };
+  }
+
+  // No variant found, this is a base set
+  return { baseName: name, variant: '' };
+}
+
+/**
+ * Enhanced sorting that properly groups sets with their parallels
+ * Groups sets by their base name, then applies parallel/print run rules within each group
+ */
+export function sortSetsGrouped<T extends { slug: string; printRun?: number | null; name: string; isParallel?: boolean }>(sets: T[]): T[] {
+  // First, group sets by their base name
+  const groups = new Map<string, T[]>();
+
+  sets.forEach(set => {
+    const { baseName } = parseSetName(set.name);
+    if (!groups.has(baseName)) {
+      groups.set(baseName, []);
+    }
+    groups.get(baseName)!.push(set);
+  });
+
+  // Sort sets within each group
+  groups.forEach((groupSets, baseName) => {
+    groupSets.sort((a, b) => {
+      const aParsed = parseSetName(a.name);
+      const bParsed = parseSetName(b.name);
+
+      // Base set (no variant) comes first
+      if (aParsed.variant === '' && bParsed.variant !== '') return -1;
+      if (aParsed.variant !== '' && bParsed.variant === '') return 1;
+
+      // Both are variants - apply print run rules
+      const aPrintRun = a.printRun || 0;
+      const bPrintRun = b.printRun || 0;
+
+      // Variants without print runs come before those with print runs
+      if (aPrintRun === 0 && bPrintRun !== 0) return -1;
+      if (aPrintRun !== 0 && bPrintRun === 0) return 1;
+
+      // Both have print runs: highest to lowest
+      if (aPrintRun !== 0 && bPrintRun !== 0) {
+        if (aPrintRun !== bPrintRun) {
+          return bPrintRun - aPrintRun;
+        }
+      }
+
+      // Same print run or both without: alphabetical by variant
+      return aParsed.variant.localeCompare(bParsed.variant);
+    });
+  });
+
+  // Sort the groups themselves
+  const sortedGroupNames = Array.from(groups.keys()).sort((a, b) => {
+    // Special ordering: Base first, then Optic, then alphabetical
+    if (a === 'Base' && b !== 'Base') return -1;
+    if (b === 'Base' && a !== 'Base') return 1;
+    if (a === 'Optic' && b !== 'Optic') return -1;
+    if (b === 'Optic' && a !== 'Optic') return 1;
+    return a.localeCompare(b);
+  });
+
+  // Flatten the sorted groups into a single array
+  const result: T[] = [];
+  sortedGroupNames.forEach(baseName => {
+    result.push(...groups.get(baseName)!);
+  });
+
+  return result;
 }
 
 /**
