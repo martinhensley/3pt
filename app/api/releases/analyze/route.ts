@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { documentText, fileUrl, mimeType, uploadedImages = [], createRelease = false } = body;
+    const { documentText, fileUrl, mimeType, uploadedImages = [], createRelease = false, releaseDate } = body;
 
     // Support both file upload and direct text input
     if (!documentText && !fileUrl) {
@@ -86,9 +86,12 @@ export async function POST(request: NextRequest) {
           ]
         : null;
 
+      // Use the manually edited release date if provided, otherwise use the one from analysis
+      const finalReleaseDate = releaseDate || releaseInfo.releaseDate || null;
+
       // Parse releaseDate string to postDate DateTime
-      const postDate = releaseInfo.releaseDate
-        ? parseReleaseDateToPostDate(releaseInfo.releaseDate)
+      const postDate = finalReleaseDate
+        ? parseReleaseDateToPostDate(finalReleaseDate)
         : null;
 
       // Create release
@@ -100,7 +103,7 @@ export async function POST(request: NextRequest) {
           slug: releaseInfo.slug,
           review: descriptionResult.description,
           reviewDate: new Date(),
-          releaseDate: releaseInfo.releaseDate || null,
+          releaseDate: finalReleaseDate,
           postDate: postDate,
           sellSheetText: sourceText,
           sourceFiles: sourceFiles || undefined,

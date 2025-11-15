@@ -170,6 +170,7 @@ export default function CreateReleasePage() {
           mimeType: documentMimeType,
           uploadedImages: uploadedImageUrls,
           createRelease: true,
+          releaseDate: editedReleaseDate || null, // Include the edited release date
         }),
       });
 

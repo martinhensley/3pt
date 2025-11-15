@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { cleanupImage } from '@/lib/blob-cleanup';
 
 export async function POST(
   request: NextRequest,
@@ -126,7 +127,22 @@ export async function DELETE(
       );
     }
 
-    // Delete the image
+    // Get the image first to retrieve the blob URL
+    const image = await prisma.image.findUnique({
+      where: { id: imageId },
+    });
+
+    if (!image) {
+      return NextResponse.json(
+        { error: 'Image not found' },
+        { status: 404 }
+      );
+    }
+
+    // Delete from blob storage
+    await cleanupImage(image);
+
+    // Delete the image from database
     await prisma.image.delete({
       where: { id: imageId },
     });

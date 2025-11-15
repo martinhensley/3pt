@@ -49,15 +49,13 @@ interface SourceDocument {
   mimeType: string;
   fileSize: number;
   documentType: 'SELL_SHEET' | 'CHECKLIST' | 'PRESS_RELEASE' | 'PRICE_GUIDE' | 'IMAGE' | 'OTHER';
+  entityType: 'RELEASE' | 'POST';
   description: string | null;
-  uploadedAt: string;
-}
-
-interface ReleaseSourceDocument {
-  id: string;
-  document: SourceDocument;
   usageContext: string | null;
-  linkedAt: string;
+  uploadedAt: string;
+  uploadedById: string;
+  lastUsedAt: string | null;
+  usageCount: number;
 }
 
 interface Release {
@@ -69,7 +67,7 @@ interface Release {
   review: string | null;
   reviewDate: string | null;
   sourceFiles: SourceFile[] | null;
-  sourceDocuments?: ReleaseSourceDocument[];
+  sourceDocuments?: SourceDocument[];
   isApproved: boolean;
   approvedAt: string | null;
   approvedBy: string | null;
@@ -1887,10 +1885,10 @@ export default function EditReleasePage() {
                   Documents from Document Library
                 </h4>
                 <div className="border border-gray-200 rounded-lg divide-y divide-gray-200 bg-gradient-to-br from-green-50 to-orange-50">
-                  {release.sourceDocuments.map((releaseDoc) => {
-                    const doc = releaseDoc.document;
-                    const fileSizeMB = (doc.fileSize / (1024 * 1024)).toFixed(2);
-                    const fileExtension = doc.filename.split('.').pop()?.toUpperCase() || 'FILE';
+                  {release.sourceDocuments.map((doc) => {
+                    // sourceDocuments is directly an array of SourceDocument entities
+                    const fileSizeMB = doc.fileSize ? (doc.fileSize / (1024 * 1024)).toFixed(2) : 'Unknown';
+                    const fileExtension = doc.filename?.split('.').pop()?.toUpperCase() || 'FILE';
 
                     // Document type badge colors
                     const typeColors: Record<string, { bg: string; text: string }> = {
@@ -1904,7 +1902,7 @@ export default function EditReleasePage() {
                     const colors = typeColors[doc.documentType] || typeColors.OTHER;
 
                     return (
-                      <div key={releaseDoc.id} className="flex items-center justify-between p-3 hover:bg-green-100 transition-colors">
+                      <div key={doc.id} className="flex items-center justify-between p-3 hover:bg-green-100 transition-colors">
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           {/* File Icon */}
                           <div className="flex-shrink-0">
@@ -1915,14 +1913,14 @@ export default function EditReleasePage() {
 
                           {/* Document Info */}
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">{doc.displayName}</p>
+                            <p className="text-sm font-medium text-gray-900 truncate">{doc.displayName || 'Unnamed Document'}</p>
                             <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                               <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${colors.bg} ${colors.text}`}>
-                                {doc.documentType.replace(/_/g, ' ')}
+                                {doc.documentType?.replace(/_/g, ' ') || 'UNKNOWN'}
                               </span>
                               <span className="text-xs text-gray-500">{fileSizeMB} MB</span>
-                              {releaseDoc.usageContext && (
-                                <span className="text-xs text-gray-500 italic truncate">• {releaseDoc.usageContext}</span>
+                              {doc.usageContext && (
+                                <span className="text-xs text-gray-500 italic truncate">• {doc.usageContext}</span>
                               )}
                             </div>
                           </div>
@@ -1930,14 +1928,16 @@ export default function EditReleasePage() {
 
                         {/* Actions */}
                         <div className="flex items-center gap-2 flex-shrink-0">
-                          <a
-                            href={doc.blobUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-3 py-1.5 text-xs bg-orange-100 hover:bg-orange-200 text-orange-700 rounded-lg transition-colors font-medium"
-                          >
-                            View
-                          </a>
+                          {doc.blobUrl && (
+                            <a
+                              href={doc.blobUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-3 py-1.5 text-xs bg-orange-100 hover:bg-orange-200 text-orange-700 rounded-lg transition-colors font-medium"
+                            >
+                              View
+                            </a>
+                          )}
                           <button
                             type="button"
                             onClick={async () => {

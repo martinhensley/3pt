@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
-    "init-admin": "tsx scripts/init-admin.ts"
+    "init-admin": "tsx scripts/init-admin.ts",
+    "blob:cleanup": "tsx scripts/cleanup-orphaned-blobs.ts",
+    "blob:cleanup:live": "tsx scripts/cleanup-orphaned-blobs.ts --live",
+    "blob:purge": "tsx scripts/purge-blob-store.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.44",
