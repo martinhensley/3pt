@@ -48,6 +48,7 @@ export async function POST(
           data: {
             url,
             releaseId,
+            type: 'RELEASE',
             order: startOrder + index,
           },
         })
