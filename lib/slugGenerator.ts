@@ -99,11 +99,15 @@ export function generateSetSlug(
  * Format for base cards: year-release-set-cardnumber-playername
  * Example: "2024-25-donruss-soccer-optic-2-malik-tillman"
  *
- * Format for parallel cards: year-release-cardnumber-playername-parallelname
- * Example: "2024-25-obsidian-soccer-1-jude-bellingham-electric-etch-marble-flood-8"
+ * Format for base parallel cards: year-release-cardnumber-playername-parallelname
+ * Example: "2024-25-donruss-soccer-1-jude-bellingham-pink-velocity-99"
+ *
+ * Format for insert/auto/mem cards: year-release-set-cardnumber-playername-variant
+ * Example: "2024-25-donruss-soccer-beautiful-game-autographs-9-abby-dahlkemper-black-1"
  *
  * Special handling:
- * - For parallel cards, the set name is excluded (parallel name is more specific)
+ * - Base set parallels exclude the set name (parallel name is more specific)
+ * - Insert/Autograph/Memorabilia cards ALWAYS include set name
  * - 1/1 cards: "1/1" or "1 of 1" -> "1-of-1" in slugs
  * - Print runs: Not added if already present at the end of variant
  */
@@ -115,7 +119,8 @@ export function generateCardSlug(
   cardNumber: string,
   playerName: string,
   variant: string | null,
-  printRun?: number | null
+  printRun?: number | null,
+  setType?: 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other'
 ): string {
   // Special handling for 1/1 cards - convert to "1-of-1" before slug generation
   const processedVariant = variant
@@ -132,19 +137,27 @@ export function generateCardSlug(
     (printRun === 1 && processedVariant.trim().endsWith('1-of-1'))
   );
 
-  // Detect if this is a parallel card by checking if variant is different from setName
-  // For parallel cards, we exclude the setName to avoid redundancy
-  // e.g., "2024-25-obsidian-soccer-1-jude-bellingham-electric-etch-marble-flood-8"
-  // instead of "2024-25-obsidian-soccer-base-1-jude-bellingham-electric-etch-marble-flood-8"
-  const isParallelCard = processedVariant &&
-    processedVariant.toLowerCase() !== setName.toLowerCase() &&
-    !processedVariant.toLowerCase().includes('base');
+  // Determine if we should exclude the set name from the slug
+  // ONLY exclude set name for Base set parallels (e.g., Optic Pink Velocity)
+  // For Insert, Autograph, and Memorabilia sets, ALWAYS include the set name
+  let excludeSetName = false;
+
+  if (setType === 'Base' || !setType) {
+    // Only for Base sets (or when setType is not provided for backward compatibility),
+    // check if this is a parallel card that should exclude the set name
+    const isBaseSetParallel = processedVariant &&
+      processedVariant.toLowerCase() !== setName.toLowerCase() &&
+      !processedVariant.toLowerCase().includes('base');
+
+    excludeSetName = isBaseSetParallel;
+  }
+  // For Insert, Autograph, Memorabilia, Other - never exclude set name
 
   const parts = [
     year,
     releaseName,
-    // Only include setName for base cards, not for parallels
-    isParallelCard ? null : setName,
+    // Include setName for all cards EXCEPT base set parallels
+    excludeSetName ? null : setName,
     cardNumber,
     playerName,
     processedVariant,

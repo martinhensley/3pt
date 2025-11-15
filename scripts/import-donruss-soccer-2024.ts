@@ -31,9 +31,9 @@ const PRINT_RUNS: Record<string, number | null> = {
 
   // Other specific print runs
   'Pink Ice': 25,
-  'Pink Velocity': 25,
-  'Plum Blossom': 88,
-  'Dragon Scale': 88,
+  'Pink Velocity': 99,  // Fixed: Pink Velocity is /99 not /25
+  'Plum Blossom': null,  // Fixed: Plum Blossom is unnumbered
+  'Dragon Scale': 8,     // Fixed: Dragon Scale is /8 not /88
 
   // No print run (unlimited parallels)
   'Cubic': null,
@@ -277,7 +277,7 @@ async function importDonrussSoccer() {
       // Create cards for this set
       let createdCards = 0;
       for (const card of cards) {
-        // Generate card slug
+        // Generate card slug - now passing setType
         const cardSlug = generateCardSlug(
           release.manufacturer.name,
           release.name,
@@ -286,7 +286,8 @@ async function importDonrussSoccer() {
           card.cardNumber,
           card.playerName,
           variantName,
-          printRun || undefined
+          printRun || undefined,
+          setType  // Pass the set type for proper slug generation
         );
 
         try {

@@ -316,6 +316,9 @@ return (
 
 **Key Rules:**
 1. **Parallel cards exclude the base set name** from slugs to avoid redundancy
+   - **EXCEPTION: Optic cards KEEP "optic" in slugs** - Optic is a distinct product line, not just a Base parallel
+   - Example: `2024-25-donruss-soccer-optic-1-matt-turner` (base Optic card)
+   - Example: `2024-25-donruss-soccer-optic-1-matt-turner-argyle` (Optic Argyle parallel)
 2. **Print runs are not duplicated** - if the parallel name ends with the print run, it's not added again
 3. **1/1 cards** use special formatting (see below)
 
