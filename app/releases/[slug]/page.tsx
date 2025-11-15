@@ -103,6 +103,7 @@ export default function ReleasePage() {
   const [release, setRelease] = useState<Release | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isCarouselPaused, setIsCarouselPaused] = useState(false);
   const [expandedTypes, setExpandedTypes] = useState<globalThis.Set<string>>(new globalThis.Set(['Base', 'Insert'])); // Base and Insert expanded by default
 
   useEffect(() => {
@@ -227,14 +228,14 @@ export default function ReleasePage() {
 
   // Auto-rotate carousel
   useEffect(() => {
-    if (carouselImages.length <= 1) return;
+    if (carouselImages.length <= 1 || isCarouselPaused) return;
 
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % carouselImages.length);
     }, 5000); // Change image every 5 seconds
 
     return () => clearInterval(interval);
-  }, [carouselImages.length]);
+  }, [carouselImages.length, isCarouselPaused]);
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % carouselImages.length);
@@ -400,10 +401,27 @@ export default function ReleasePage() {
                     </>
                   )}
 
-                  {/* Image Counter */}
+                  {/* Image Counter with Pause/Play Button */}
                   {carouselImages.length > 1 && (
-                    <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-semibold">
-                      {currentImageIndex + 1} / {carouselImages.length}
+                    <div className="absolute top-4 right-4 flex items-center gap-2">
+                      <button
+                        onClick={() => setIsCarouselPaused(!isCarouselPaused)}
+                        className="bg-black/50 backdrop-blur-sm text-white p-2 rounded-full hover:bg-black/70 transition-all duration-200"
+                        aria-label={isCarouselPaused ? 'Play carousel' : 'Pause carousel'}
+                      >
+                        {isCarouselPaused ? (
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
+                        ) : (
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+                          </svg>
+                        )}
+                      </button>
+                      <div className="bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-semibold">
+                        {currentImageIndex + 1} / {carouselImages.length}
+                      </div>
                     </div>
                   )}
 
