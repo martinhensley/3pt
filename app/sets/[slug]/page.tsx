@@ -10,6 +10,7 @@ import EbayAdHorizontal from "@/components/EbayAdHorizontal";
 import { useEffect, useState, useMemo } from "react";
 import { extractKeywordsFromPost, getAdTitle } from "@/lib/extractKeywords";
 import { formatParallelName } from "@/lib/formatters";
+import { isParallelSet, getBaseSetSlug, getParallelVariant, getParallelPrintRun } from "@/lib/setUtils";
 
 interface Card {
   id: string;
@@ -31,21 +32,12 @@ interface Card {
 interface Set {
   id: string;
   name: string;
+  slug: string;
   description: string | null;
   totalCards: string | null;
   printRun: number | null;
-  parentSetId: string | null;
-  parallelSets?: Array<{
-    id: string;
-    name: string;
-    slug: string;
-    printRun: number | null;
-  }>;
-  parentSet?: {
-    id: string;
-    name: string;
-    slug: string;
-  };
+  isParallel: boolean;
+  baseSetSlug: string | null;
   cards: Card[];
   release: {
     id: string;
@@ -104,7 +96,8 @@ export default function SetPage() {
 
   // For parallel sets, check if print run is already in the name before appending
   // Also check for "1 of 1" pattern for 1/1 cards
-  const displayNameWithPrintRun = set && set.parentSetId && set.printRun
+  const isParallel = set ? isParallelSet(set.slug) : false;
+  const displayNameWithPrintRun = set && isParallel && set.printRun
     ? (displayName.match(/\/\d+$/) || displayName.match(/\b1\s+of\s+1\b/i) ? displayName : `${displayName} /${set.printRun}`)
     : displayName;
 
@@ -130,7 +123,7 @@ export default function SetPage() {
 
   // For base sets with mixed base + parallel cards, only show base cards
   // For parallel sets, show all cards (they all belong to that parallel)
-  const displayCards = set?.parentSetId
+  const displayCards = isParallel
     ? (set?.cards || []) // Parallel set: show all cards
     : (set?.cards?.filter(card => // Base set: show only base cards
         card.parallelType === 'Base' || card.parallelType === null
@@ -146,7 +139,7 @@ export default function SetPage() {
     : [];
 
   const setCardCount = displayCards.length || (set?.totalCards ? parseInt(set.totalCards) : 0);
-  const setParallelCount = set?.parallelSets?.length || uniqueParallels.length;
+  const setParallelCount = uniqueParallels.length;
 
   // Sort cards numerically by cardNumber
   const sortedCards = displayCards.length > 0 ? [...displayCards].sort((a, b) => {
@@ -155,33 +148,8 @@ export default function SetPage() {
     return numA - numB;
   }) : [];
 
-  // Create parallel sets list from unique parallel types (if no parallelSets exists)
-  const displayParallels = set?.parallelSets && set.parallelSets.length > 0
-    ? set.parallelSets
-    : uniqueParallels.map(parallelType => {
-        // Extract print run from parallel name if it exists (e.g., "/44" or "1/1")
-        const printRunMatch = (parallelType || '').match(/\/(\d+)$/);
-        const extractedPrintRun = printRunMatch ? parseInt(printRunMatch[1]) : null;
-
-        // Generate parallel slug (just the parallel name part)
-        // This will be used in the path: /sets/{baseSetSlug}/parallels/{parallelSlug}
-        const parallelSlug = parallelType
-          ? parallelType
-              .toLowerCase()
-              .replace(/\b1\s*\/\s*1\b/gi, '1-of-1')        // Convert "1/1" to "1-of-1"
-              .replace(/\b1\s*of\s*1\b/gi, '1-of-1')        // Convert "1 of 1" to "1-of-1"
-              .replace(/\s*\/\s*(\d+)/g, '-$1')              // Convert " /44" to "-44"
-              .replace(/[^a-z0-9]+/g, '-')
-              .replace(/^-+|-+$/g, '')
-          : '';
-
-        return {
-          id: `temp-${parallelType}`,
-          name: parallelType || '',
-          slug: parallelSlug,
-          printRun: extractedPrintRun,
-        };
-      });
+  // Since sets are now independent, we don't need to build a parallel list
+  // Each parallel is its own set accessible from the release page
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
@@ -221,18 +189,8 @@ export default function SetPage() {
                 label: `${set.release.year || ""} ${set.release.name}`.trim(),
                 href: `/releases/${set.release.slug}`,
               },
-              // If this is a parallel set, include the parent set in breadcrumb
-              ...(set.parentSet ? [{
-                label: set.parentSet.name
-                  .replace(/\boptic\s+base\s+set\b/gi, 'Optic')
-                  .replace(/\boptic\s+base\b/gi, 'Optic')
-                  .replace(/\bbase\s+optic\b/gi, 'Optic')
-                  .replace(/\bsets?\b/gi, '')
-                  // Remove duplicate release name from parent set
-                  .replace(new RegExp(`\\b${set.release.name.split(' ')[0]}\\b`, 'gi'), '')
-                  .trim(),
-                href: `/sets/${set.parentSet.slug}`,
-              }] : []),
+              // If this is a parallel set, we could include the base set in breadcrumb
+              // But since parallels are now independent, we just go straight from release to set
               {
                 label: displayNameWithPrintRun,
                 href: `/sets/${slug}`,
@@ -259,7 +217,7 @@ export default function SetPage() {
               <div className="text-3xl font-bold text-white">{setCardCount > 0 ? setCardCount.toLocaleString() : '—'}</div>
             </div>
             {/* Only show parallels count for base sets (not for parallel sets) */}
-            {!set.parentSetId && (
+            {!isParallel && (
               <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
                 <div className="text-sm text-white/80 uppercase tracking-wide mb-1">Parallels</div>
                 <div className="text-3xl font-bold text-white">{setParallelCount > 0 ? setParallelCount : '—'}</div>
@@ -277,57 +235,7 @@ export default function SetPage() {
           )}
         </div>
 
-        {/* Parallels Section - Only show for base sets, not for parallel sets */}
-        {!set?.parentSetId && displayParallels && displayParallels.length > 0 && (
-          <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
-            <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-              </svg>
-              Parallels
-            </h3>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {displayParallels.map((parallelSet) => {
-                // Extract parallel name without print run (remove "/44" etc.)
-                const parallelNameWithoutPrintRun = parallelSet.name.replace(/\s*\/\d+$/, '');
-                // Check if name already contains "1 of 1" pattern (already formatted)
-                const alreadyHas1of1 = /\b1\s+of\s+1\b/i.test(parallelNameWithoutPrintRun);
-
-                return (
-                  <div
-                    key={parallelSet.id}
-                    className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border-2 border-white/20"
-                  >
-                    <div className="font-bold text-white">
-                      {formatParallelName(parallelNameWithoutPrintRun)}
-                      {/* Show print run if it exists and not already showing "1 of 1" */}
-                      {parallelSet.printRun && !alreadyHas1of1 && (
-                        <span className="ml-2 text-sm font-normal text-white/80">
-                          /{parallelSet.printRun}
-                        </span>
-                      )}
-                    </div>
-                    {/* Show card count if available */}
-                    {parallelSet.slug && (
-                      <Link
-                        href={
-                          // If this parallel has a full slug (from database), use it directly
-                          // Otherwise, use the parallels route structure
-                          set?.parallelSets && set.parallelSets.length > 0
-                            ? `/sets/${parallelSet.slug}`
-                            : `/sets/${slug}/parallels/${parallelSet.slug}`
-                        }
-                        className="text-sm text-white/60 hover:text-footy-orange transition-colors mt-1 inline-block"
-                      >
-                        View cards →
-                      </Link>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
+        {/* Parallels are now independent sets accessible from the release page */}
 
         {/* Card Checklist */}
         <div className="bg-white rounded-lg shadow-lg p-8 mb-8 transition-colors duration-300">

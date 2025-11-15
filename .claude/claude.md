@@ -456,107 +456,114 @@ Example: `2024-25-panini-donruss-soccer`
 
 ---
 
-## Set & Parallel Architecture
+## Set & Parallel Architecture (Simplified)
 
-### Parent-Child Parallel Relationships
+### Independent Parallel Sets
 
-The database uses a **parent-child model** for parallel sets:
+The database uses a **simplified independent model** for parallel sets:
 
-- **Parent Sets**: Base sets, insert sets, autograph sets, etc. that contain the actual card checklist
-- **Child Parallel Sets**: Variations of the parent set (e.g., "Electric Etch Orange", "Gold Power") that reference the parent's cards
+- **All sets are independent entities** with their own cards
+- **Parallels identified by naming convention**: Sets with "-parallel" in slug
+- **No parent-child relationships**: Each set stands alone
 
 **Database Structure:**
 ```typescript
-// Parent set (e.g., "Obsidian Base")
-const parentSet = {
+// Base set (e.g., "Optic")
+const baseSet = {
   id: 'abc123',
-  name: 'Obsidian Base',
+  name: 'Optic',
+  slug: '2024-25-donruss-soccer-optic',
   type: 'Base',
-  parentSetId: null,          // null indicates this is a parent
-  parallelSets: [child1, child2, ...], // Array of children
-  cards: [card1, card2, ...]   // Cards stored here
+  isParallel: false,
+  baseSetSlug: null,
+  cards: [card1, card2, ...] // Own cards
 };
 
-// Child parallel set (e.g., "Electric Etch Orange")
+// Parallel set (e.g., "Cubic")
 const parallelSet = {
   id: 'xyz789',
-  name: 'Electric Etch Orange',
+  name: 'Cubic',
+  slug: '2024-25-donruss-soccer-optic-cubic-parallel-99',
   type: 'Base',
-  parentSetId: 'abc123',      // Points to parent
-  parallelSets: [],           // Parallels don't have children
-  cards: []                   // Empty - references parent's cards
+  isParallel: true,
+  baseSetSlug: '2024-25-donruss-soccer-optic',
+  printRun: 99,
+  cards: [card1, card2, ...] // Own cards
 };
 ```
 
+**Naming Convention:**
+- Base sets: `{year}-{release}-{setname}`
+- Parallel sets: `{year}-{release}-{setname}-{variant}-parallel[-{printrun}]`
+- Examples:
+  - Base: `2024-25-donruss-soccer-optic`
+  - Parallel (no print run): `2024-25-donruss-soccer-optic-cubic-parallel`
+  - Parallel (with print run): `2024-25-donruss-soccer-optic-blue-cubic-parallel-99`
+
 **Key Principles:**
 
-1. **Cards stored once**: Cards exist only on the parent set, not duplicated for each parallel
-2. **Release pages show parents only**: Only parent sets displayed on release pages (not child parallels)
-3. **Set pages show parallels**: Parent set pages display links to their child parallel sets
-4. **Parallel pages reference parent cards**: When viewing a parallel, the page fetches and displays the parent's cards
+1. **Each set has own cards**: Cards duplicated across base and parallels
+2. **Release pages show all sets**: Both base and parallel sets displayed
+3. **Smart ordering**: Non-parallels first, then parallels without print runs (alphabetical), then parallels with print runs (highest to lowest)
+4. **No complex relationships**: Simpler data model, easier to maintain
 
 **Query Pattern:**
 ```typescript
-// Fetch set with parallel relationships
+// Fetch set independently
 const set = await prisma.set.findUnique({
   where: { slug: params.slug },
   include: {
-    cards: true,              // Cards (if parent)
-    parallelSets: true,       // Child parallels (if parent)
-    parentSet: {              // Parent info (if parallel)
-      include: { cards: true } // Parent's cards (if this is parallel)
+    cards: true,
+    release: {
+      include: { manufacturer: true }
     }
   }
 });
 
-// Display cards: use parent's cards if this is a parallel
-const cardsToDisplay = set.parentSetId
-  ? set.parentSet.cards
-  : set.cards;
+// Use utility functions for parallel detection
+import { isParallelSet, getBaseSetSlug, sortSets } from '@/lib/setUtils';
+
+const isParallel = isParallelSet(set.slug);
+const baseSlug = getBaseSetSlug(set.slug);
+
+// Sort sets on release page
+const sortedSets = sortSets(release.sets);
 ```
 
 **Benefits:**
-- **Storage efficiency**: Cards not duplicated across parallels
-- **Consistency**: Single source of truth for card data
-- **Maintainability**: Update cards in one place, reflects across all parallels
-- **Query performance**: Simpler joins, fewer records to fetch
+- **Simplicity**: No complex parent-child relationships to manage
+- **Independence**: Each set is self-contained
+- **Flexibility**: Easy to add/modify individual sets
+- **Clear naming**: Parallels explicitly identified in URLs
 
-### Edge Cases to Handle
+### Testing Checklist for Simplified Parallel Architecture
 
-1. **Sets with no parallels**: Create only 1 parent set, no children
-2. **Variable parallels**: Some parallels have player-specific print runs (e.g., "Messi /10, Ronaldo /25")
-3. **Cascading deletes**: Deleting parent should cascade delete children (handled by Prisma `onDelete: Cascade`)
-4. **Orphaned parallels**: Ensure parallel sets always have valid `parentSetId` reference
-
-### Testing Checklist for Parallel Sets
-
-When implementing or modifying parallel set functionality:
+When implementing sets with the new architecture:
 
 **Database Level:**
-- [ ] Parent sets have `parentSetId = null`
-- [ ] Parallel sets have `parentSetId` pointing to valid parent
-- [ ] Cards only exist for parent sets
-- [ ] Slugs are unique and follow conventions
-- [ ] Cascading deletes work correctly
+- [ ] All sets have unique slugs following naming conventions
+- [ ] Parallel sets have `isParallel = true`
+- [ ] Parallel sets have `baseSetSlug` pointing to base set slug
+- [ ] Each set has its own cards
+- [ ] Print runs stored correctly on parallel sets
 
 **Release Page (`/releases/[slug]`):**
-- [ ] Only parent sets displayed
-- [ ] No parallel sets shown
-- [ ] Correct card counts
+- [ ] All sets displayed (base and parallels)
+- [ ] Sets sorted correctly: non-parallels, then parallels without print runs, then parallels with print runs (highest to lowest)
+- [ ] Correct card counts for each set
 - [ ] Set type badges display correctly (Base, Insert, Auto, Mem)
 
 **Set Detail Page (`/sets/[slug]`):**
-- [ ] Parent set shows list of parallels as links
-- [ ] Clicking parallel navigates to `/sets/{parallel-slug}`
-- [ ] Parallel page shows same checklist as parent
-- [ ] Parallel page shows link back to parent
-- [ ] Breadcrumbs work correctly for both parent and parallel
+- [ ] Both base and parallel sets work independently
+- [ ] Correct cards displayed for each set
+- [ ] Print run displayed in header for parallels
+- [ ] Breadcrumbs show Release → Set
 
 **Admin Interface:**
-- [ ] Creating set with parallels creates parent + children
-- [ ] Cards only created for parent
-- [ ] Progress indicator shows accurate counts
-- [ ] Duplicate detection prevents errors on re-import
+- [ ] Can create base sets and parallel sets independently
+- [ ] Cards created for each set
+- [ ] Slug generation follows new convention
+- [ ] Import scripts create separate sets for each parallel
 
 ---
 
@@ -692,7 +699,6 @@ model Set {
   name        String
   slug        String   @unique // URL-friendly slug - required for public access
   type        SetType  @default(Base) // Base, Autograph, Memorabilia, or Insert
-  isBaseSet   Boolean  @default(false) // Deprecated: use type field instead
   releaseId   String
   release     Release  @relation(fields: [releaseId], references: [id], onDelete: Cascade)
   totalCards  String?
@@ -700,18 +706,11 @@ model Set {
   description String?  // Optional description for this set
 
   // Source data for regeneration and reference
-  sourceText  String?  @db.Text // Original pasted checklist text (parent sets only)
+  sourceText  String?  @db.Text // Original pasted checklist text
 
-  parallels   Json?    // DEPRECATED: Array of {name: string, printRun: string}
-
-  // Parent-child relationship for parallel sets
-  parentSetId String?  // Reference to parent set (null for parent sets)
-  parentSet   Set?     @relation("ParallelSets", fields: [parentSetId], references: [id], onDelete: Cascade)
-  parallelSets Set[]   @relation("ParallelSets") // Child parallel sets of this parent
-
-  // Flags for parallel behavior
-  hasVariableChecklist Boolean @default(false) // True if parallels have different checklists
-  mirrorsParentChecklist Boolean @default(true) // True if parallel cards should mirror parent set
+  // Parallel identification
+  isParallel  Boolean  @default(false) // True if this is a parallel set (identified by naming convention)
+  baseSetSlug String?  // Reference to the base set's slug (for parallels only)
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

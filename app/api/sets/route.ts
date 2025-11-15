@@ -43,10 +43,6 @@ export async function GET(request: NextRequest) {
               manufacturer: true,
             },
           },
-          parentSet: true, // Include parent if this is a parallel set
-          parallelSets: {  // Include child parallels if this is a parent set
-            orderBy: { name: 'asc' },
-          },
         },
       });
 
@@ -124,7 +120,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, isBaseSet, type, totalCards, releaseId, parallels, parentSetId, printRun, description } = body;
+    const { name, type, totalCards, releaseId, printRun, description, isParallel, variant } = body;
 
     if (!name || !releaseId) {
       return NextResponse.json(
@@ -148,71 +144,51 @@ export async function POST(request: NextRequest) {
     // Import generateSetSlug dynamically
     const { generateSetSlug } = await import("@/lib/slugGenerator");
 
-    // Determine set type (use 'type' field if provided, otherwise infer from isBaseSet)
-    const setType = type || (isBaseSet ? 'Base' : 'Other');
+    // Determine set type
+    const setType = type || 'Base';
 
     // Strip year from release name if it exists (to prevent duplicate year in slug)
     // E.g., "2024-25 Panini Obsidian Soccer" -> "Panini Obsidian Soccer"
     const cleanReleaseName = release.name.replace(/^\d{4}(-\d{2,4})?\s+/i, '');
 
-    // For parallel sets, we need to include the parent set name and the parallel name with print run
-    let slug: string;
-
-    if (parentSetId) {
-      // Fetch parent set to get its name
-      const parentSet = await prisma.set.findUnique({
-        where: { id: parentSetId },
-      });
-
-      if (!parentSet) {
-        return NextResponse.json(
-          { error: "Parent set not found" },
-          { status: 404 }
+    // Generate slug based on whether this is a parallel set
+    const slug = isParallel && variant
+      ? generateSetSlug(
+          release.year || '',
+          cleanReleaseName,
+          name, // Base set name (e.g., "Optic")
+          setType as 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other',
+          variant, // Parallel variant (e.g., "Cubic")
+          printRun // Print run if exists
+        )
+      : generateSetSlug(
+          release.year || '',
+          cleanReleaseName,
+          name,
+          setType as 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other'
         );
-      }
 
-      // Build parallel name with print run: "Electric Etch Green /5" -> "electric-etch-green-5"
-      // First, strip any existing print run from the name (e.g., "Equinox Electric Etch Yellow /10" -> "Equinox Electric Etch Yellow")
-      const nameWithoutPrintRun = name.replace(/\s*\/\s*\d+\s*$/, '').trim();
-
-      // Strip parent set name from parallel name if it's at the beginning (e.g., "Equinox Electric Etch Yellow" -> "Electric Etch Yellow")
-      const parentSetName = parentSet.name;
-      const parallelNameOnly = nameWithoutPrintRun.startsWith(parentSetName)
-        ? nameWithoutPrintRun.substring(parentSetName.length).trim()
-        : nameWithoutPrintRun;
-
-      const parallelNameWithPrintRun = printRun ? `${parallelNameOnly} /${printRun}` : parallelNameOnly;
-
-      // Generate slug with parent set name as base and parallel name
-      slug = generateSetSlug(
-        release.year || '',
-        cleanReleaseName,
-        parentSet.name, // Parent set name (e.g., "Obsidian Base")
-        setType as 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other',
-        parallelNameWithPrintRun // Parallel name with print run
-      );
-    } else {
-      // Regular set (non-parallel)
-      slug = generateSetSlug(
-        release.year || '',
-        cleanReleaseName,
-        name,
-        setType as 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other'
-      );
-    }
+    // Determine base set slug if this is a parallel
+    const baseSetSlug = isParallel
+      ? generateSetSlug(
+          release.year || '',
+          cleanReleaseName,
+          name,
+          setType as 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other'
+        )
+      : null;
 
     const set = await prisma.set.create({
       data: {
-        name,
+        name: isParallel && variant ? `${name} ${variant}` : name, // Include variant in name for parallels
         slug,
         type: setType as 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other',
-        isBaseSet: isBaseSet || false,
         totalCards: totalCards || null,
         printRun: printRun || null,
         description: description || null,
         releaseId,
-        parallels: parallels && parallels.length > 0 ? parallels : null,
-        parentSetId: parentSetId || null, // Accept parentSetId for child parallel sets
+        isParallel: isParallel || false,
+        baseSetSlug: baseSetSlug,
       },
     });
 
@@ -242,7 +218,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, name, isBaseSet, type, totalCards, parallels } = body;
+    const { id, name, type, totalCards, printRun, description } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -251,12 +227,11 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Fetch the existing set with release info and parent set
+    // Fetch the existing set with release info
     const existingSet = await prisma.set.findUnique({
       where: { id },
       include: {
         release: true,
-        parentSet: true,
       },
     });
 
@@ -270,65 +245,59 @@ export async function PUT(request: NextRequest) {
     // Build update data object
     const updateFields: Record<string, unknown> = {
       totalCards: totalCards || null,
-      parallels: parallels && parallels.length > 0 ? parallels : null,
     };
 
     if (name) {
       updateFields.name = name;
     }
 
-    if (isBaseSet !== undefined) {
-      updateFields.isBaseSet = isBaseSet;
-    }
-
     if (type !== undefined) {
       updateFields.type = type;
+    }
+
+    if (printRun !== undefined) {
+      updateFields.printRun = printRun;
+    }
+
+    if (description !== undefined) {
+      updateFields.description = description;
     }
 
     // Regenerate slug if name or type changed
     if (name || type) {
       const { generateSetSlug } = await import("@/lib/slugGenerator");
+      const { isParallelSet, getParallelVariant } = await import("@/lib/setUtils");
+
       const setType = type || existingSet.type;
       const setName = name || existingSet.name;
 
       // Strip year from release name if it exists (to prevent duplicate year in slug)
       const cleanReleaseName = existingSet.release.name.replace(/^\d{4}(-\d{2,4})?\s+/i, '');
 
-      let slug: string;
+      // Check if this is a parallel based on existing slug
+      const isParallel = isParallelSet(existingSet.slug);
 
-      if (existingSet.parentSetId && existingSet.parentSet) {
-        // For parallel sets, include parent set name and parallel name with print run
-        // First, strip any existing print run from the name
-        const nameWithoutPrintRun = setName.replace(/\s*\/\s*\d+\s*$/, '').trim();
+      if (isParallel) {
+        // Extract variant from existing slug or name
+        const variant = getParallelVariant(existingSet.slug);
 
-        // Strip parent set name from parallel name if it's at the beginning
-        const parentSetName = existingSet.parentSet.name;
-        const parallelNameOnly = nameWithoutPrintRun.startsWith(parentSetName)
-          ? nameWithoutPrintRun.substring(parentSetName.length).trim()
-          : nameWithoutPrintRun;
-
-        const parallelNameWithPrintRun = existingSet.printRun
-          ? `${parallelNameOnly} /${existingSet.printRun}`
-          : parallelNameOnly;
-
-        slug = generateSetSlug(
+        updateFields.slug = generateSetSlug(
           existingSet.release.year || '',
           cleanReleaseName,
-          existingSet.parentSet.name,
+          setName,
           setType as 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other',
-          parallelNameWithPrintRun
+          variant || '',
+          existingSet.printRun
         );
       } else {
         // Regular set (non-parallel)
-        slug = generateSetSlug(
+        updateFields.slug = generateSetSlug(
           existingSet.release.year || '',
           cleanReleaseName,
           setName,
           setType as 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other'
         );
       }
-
-      updateFields.slug = slug;
     }
 
     const set = await prisma.set.update({

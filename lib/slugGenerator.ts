@@ -13,91 +13,84 @@ export function generateReleaseSlug(manufacturer: string, name: string, year?: s
 
 /**
  * Generate a URL-friendly slug from set information
- * Format: year-release-[type]-setname[-parallel]
  *
- * Examples:
- * - Base set: "2024-25-panini-obsidian-soccer-base"
- * - Base set parallel: "2024-25-panini-obsidian-soccer-base-electric-etch-red-pulsar"
- * - Autograph: "2024-25-panini-obsidian-soccer-auto-dual-jersey-ink"
- * - Autograph parallel: "2024-25-panini-obsidian-soccer-auto-dual-jersey-ink-electric-etch-orange"
- * - Memorabilia: "2024-25-panini-obsidian-soccer-mem-patches"
- * - Insert: "2024-25-panini-obsidian-soccer-insert-downtown"
+ * New simplified format:
+ * - Base set: "2024-25-donruss-soccer-base"
+ * - Base parallel: "2024-25-donruss-soccer-cubic-parallel" or "2024-25-donruss-soccer-blue-cubic-parallel-99"
+ * - Insert set: "2024-25-donruss-soccer-kaboom"
+ * - Insert parallel: "2024-25-donruss-soccer-kaboom-gold-parallel-10"
  *
- * Special handling for set names:
- * - "Optic Base Set" -> "base" (not "base-optic")
- * - "Base Set" -> "base"
+ * Parallel naming convention:
+ * - Parallels are identified by "-parallel" suffix
+ * - Format: {base-set-slug}-{variant-name}-parallel[-{printrun}]
+ * - Examples:
+ *   - "cubic-parallel" (no print run)
+ *   - "blue-cubic-parallel-99" (print run 99)
+ *   - "gold-power-parallel-1" (1/1 parallel)
  *
- * Special handling for parallels:
- * - "1/1" or "1 of 1" -> "1-of-1"
+ * Special handling:
+ * - "1/1" or "1 of 1" -> converted to "-1" in print run
  */
 export function generateSetSlug(
   year: string,
   releaseName: string,
   setName: string,
   setType: 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other',
-  parallelName?: string
+  parallelName?: string,
+  printRun?: number | null
 ): string {
-  // Clean set name: simplify base set names to avoid redundancy
-  const cleanSetName = setName
-    .replace(/\boptic\s+base\s+set\b/gi, 'base')      // Optic Base Set -> base
-    .replace(/\boptic\s+base\b/gi, 'base')            // Optic Base -> base
-    .replace(/\bbase\s+optic\b/gi, 'base')            // Base Optic -> base
-    .replace(/\bobsidian\s+base\b/gi, 'base')         // Obsidian Base -> base
-    .replace(/\bbase\s+set\b/gi, 'base')              // Base Set -> base
-    .replace(/\bsets?\b/gi, '')                        // Remove remaining "set/sets"
-    .replace(/\bchecklist\b/gi, '')                    // Remove "checklist"
-    .trim();
+  // For Donruss sets specifically: special handling of "Base" and "Optic" names
+  let processedSetName = setName;
 
-  // Add type prefix (except for "Other")
-  let typePrefix = '';
-  switch (setType) {
-    case 'Base':
-      // For base sets, if the name isn't already "base", prepend it
-      if (!cleanSetName.toLowerCase().includes('base')) {
-        typePrefix = 'base';
-      }
-      break;
-    case 'Autograph':
-      typePrefix = 'auto';
-      break;
-    case 'Memorabilia':
-      typePrefix = 'mem';
-      break;
-    case 'Insert':
-      typePrefix = 'insert';
-      break;
-    case 'Other':
-      // No prefix for Other
-      break;
+  // Handle Donruss Optic naming
+  if (setName.toLowerCase().includes('optic')) {
+    // "Optic Base Set", "Base Optic", etc. → "optic"
+    processedSetName = 'optic';
+  } else if (setName.toLowerCase() === 'base' ||
+             setName.toLowerCase() === 'base set' ||
+             setName.toLowerCase() === 'base checklist') {
+    // Regular base sets → "base"
+    processedSetName = 'base';
+  } else {
+    // For non-base sets, clean up the name
+    processedSetName = setName
+      .replace(/\bset\b/gi, '')
+      .replace(/\bchecklist\b/gi, '')
+      .trim();
   }
 
-  // Clean parallel name if provided (handle 1/1 cards and print runs)
-  const cleanParallelName = parallelName
-    ? parallelName
-        .replace(/\bbase\s+set\s+checklist\b/gi, '')  // Remove "Base Set Checklist"
-        .replace(/\bchecklist\b/gi, '')                // Remove "checklist"
-        .replace(/\bbase\s+set\b/gi, '')               // Remove "Base Set"
-        .replace(/\b1\s*\/\s*1\b/gi, '1-of-1')        // Convert "1/1" to "1-of-1"
-        .replace(/\b1\s*of\s*1\b/gi, '1-of-1')        // Convert "1 of 1" to "1-of-1"
-        .replace(/\s*\/\s*(\d+)/g, '-$1')              // Convert " /44" to "-44"
-        .trim()
-    : '';
+  // If this is a parallel, append the parallel naming convention
+  if (parallelName) {
+    // Clean the parallel name
+    const cleanParallel = parallelName
+      .replace(/\b1\s*\/\s*1\b/gi, '1 of 1')  // Normalize 1/1 variations
+      .replace(/\b1\s*of\s*1\b/gi, '1 of 1')  // Normalize to "1 of 1"
+      .replace(/\s*\/\s*\d+$/g, '')           // Remove trailing print runs like "/99"
+      .trim();
 
-  // For parallel sets, include set name and type prefix for non-Base sets
-  // Base parallels: no prefix or set name (e.g., "2024-25-obsidian-soccer-electric-etch-green-5")
-  // Insert parallels: include set name (e.g., "2024-25-obsidian-soccer-equinox-orange-99")
-  // Auto parallels: include set name (e.g., "2024-25-obsidian-soccer-dual-auto-orange-99")
-  const parts = cleanParallelName
-    ? (setType === 'Base' || setType === 'Other')
-      ? [year, releaseName, cleanParallelName]
-      : [year, releaseName, cleanSetName, cleanParallelName]
-    : [year, releaseName, typePrefix, cleanSetName].filter(Boolean);
+    // Build the parts for a parallel set slug
+    const parts = [year, releaseName, processedSetName, cleanParallel, 'parallel'];
 
-  return parts
-    .join(' ')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+    // Add print run if provided (including 1 for 1/1 cards)
+    if (printRun) {
+      parts.push(printRun.toString());
+    }
+
+    return parts
+      .join(' ')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  } else {
+    // Non-parallel set
+    const parts = [year, releaseName, processedSetName];
+
+    return parts
+      .join(' ')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
 }
 
 /**

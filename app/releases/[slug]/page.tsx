@@ -10,6 +10,7 @@ import EbayAd from "@/components/EbayAd";
 import EbayAdHorizontal from "@/components/EbayAdHorizontal";
 import { useEffect, useState, useMemo } from "react";
 import { extractKeywordsFromPost, getAdTitle } from "@/lib/extractKeywords";
+import { isParallelSet, getBaseSetSlug, sortSets, groupSetsByBase } from "@/lib/setUtils";
 
 interface Image {
   id: string;
@@ -39,11 +40,11 @@ interface CardSet {
   name: string;
   slug: string;
   type: 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other';
-  isBaseSet: boolean;
   description: string | null;
   totalCards: string | null;
-  parallels: string[] | null;
-  parallelSets?: CardSet[];
+  printRun: number | null;
+  isParallel: boolean;
+  baseSetSlug: string | null;
   cards: Card[];
 }
 
@@ -253,17 +254,26 @@ export default function ReleasePage() {
     setExpandedTypes(newExpanded);
   };
 
-  // Group sets by type
+  // Group sets by type and sort using our new logic
   const setsByType = useMemo(() => {
     if (!release?.sets) return new Map();
 
     const grouped = new Map<string, CardSet[]>();
+
+    // Group all sets by type
     release.sets.forEach(set => {
       const type = set.type || 'Other';
       if (!grouped.has(type)) {
         grouped.set(type, []);
       }
       grouped.get(type)!.push(set);
+    });
+
+    // Apply our custom sorting logic to each type group
+    // Non-parallels first, then parallels without print runs, then parallels with print runs (highest to lowest)
+    grouped.forEach((sets, type) => {
+      const sortedSets = sortSets(sets);
+      grouped.set(type, sortedSets);
     });
 
     return grouped;
@@ -459,12 +469,12 @@ export default function ReleasePage() {
                   {/* Header Row - Always Visible */}
                   <div className="grid grid-cols-3 gap-4 px-4 py-3 bg-white/10">
                     <div className="font-bold text-sm uppercase tracking-wide text-white/90">Set Name</div>
-                    <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Parallels</div>
+                    <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Print Run</div>
                     <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Cards</div>
                   </div>
 
                   {/* Render all set types in order */}
-                  {['Base', 'Insert', 'Autograph', 'Memorabilia', 'Other'].map(setType => {
+                  {['Base', 'Autograph', 'Memorabilia', 'Insert', 'Other'].map(setType => {
                     const setsOfType = setsByType.get(setType);
                     if (!setsOfType || setsOfType.length === 0) return null;
 
@@ -477,24 +487,54 @@ export default function ReleasePage() {
                     };
                     const colors = typeColors[setType] || typeColors.Other;
 
+                    const isExpanded = expandedTypes.has(setType);
+
                     return (
                       <div key={setType}>
-                        {/* Type Label Row */}
-                        <div className={`w-full px-4 py-3 ${colors.bg} border-t border-white/10`}>
+                        {/* Type Label Row - Clickable Accordion Header */}
+                        <button
+                          onClick={() => toggleSetType(setType)}
+                          className={`w-full px-4 py-3 ${colors.bg} border-t border-white/10 flex items-center justify-between hover:opacity-80 transition-opacity`}
+                        >
                           <span className={`font-bold text-lg ${colors.text}`}>{setType}</span>
-                        </div>
+                          <svg
+                            className={`w-5 h-5 ${colors.text} transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
 
-                        {/* Set Rows */}
-                        {setsOfType.map((set: CardSet, idx: number) => {
+                        {/* Set Rows - Collapsible */}
+                        {isExpanded && setsOfType.map((set: CardSet, idx: number) => {
+                          // For parallel sets, use totalCards field (which should be set to match parent)
+                          // Fall back to cards length only if totalCards is not set
                           const setCardCount = set.totalCards ? parseInt(set.totalCards) : (set.cards?.length || 0);
-                          const setParallelCount = set.parallelSets?.length || (Array.isArray(set.parallels) ? set.parallels.length : 0);
 
-                          const displayName = set.name
+                          // Display print run for this set (if it has one)
+                          const printRun = set.printRun;
+                          const printRunDisplay = printRun
+                            ? (printRun === 1 ? '1/1' : `/${printRun}`)
+                            : '—';
+
+                          // Display name formatting
+                          let displayName = set.name
                             .replace(/\boptic\s+base\s+set\b/gi, 'Optic')
                             .replace(/\boptic\s+base\b/gi, 'Optic')
                             .replace(/\bbase\s+optic\b/gi, 'Optic')
                             .replace(/\bsets?\b/gi, '')
                             .trim();
+
+                          // Check if this is a parallel based on slug convention
+                          if (isParallelSet(set.slug)) {
+                            // Extract variant name from slug for display
+                            // This will already include "Parallel" in the name from the slug
+                            if (!displayName.toLowerCase().includes('parallel')) {
+                              displayName += ' Parallel';
+                            }
+                          }
 
                           const gradients = [
                             'from-blue-500/20 to-cyan-500/20',
@@ -514,7 +554,7 @@ export default function ReleasePage() {
                               <div className="font-semibold text-white hover:underline">{displayName}</div>
                               <div className="text-center">
                                 <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-white font-bold text-sm">
-                                  {setParallelCount > 0 ? setParallelCount : '—'}
+                                  {printRunDisplay}
                                 </span>
                               </div>
                               <div className="text-center">

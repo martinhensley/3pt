@@ -43,16 +43,13 @@ export async function GET(request: NextRequest) {
             orderBy: { order: 'asc' }
           },
           sets: {
-            where: {
-              parentSetId: null, // ONLY show parent sets on release page (filter out parallel sets)
-            },
+            // Show ALL sets now (no parent-child filtering)
             include: {
               cards: {
                 orderBy: [
                   { cardNumber: 'asc' }
                 ]
               },
-              parallelSets: true, // Include count of child parallels
             },
             orderBy: {
               createdAt: 'asc'
@@ -112,15 +109,13 @@ export async function GET(request: NextRequest) {
             orderBy: { order: 'asc' }
           },
           sets: {
-            // No parentSetId filter - show ALL sets for admin edit page
+            // Show ALL sets for admin edit page
             include: {
               cards: {
                 orderBy: [
                   { cardNumber: 'asc' }
                 ]
               },
-              parallelSets: true, // Include child parallels
-              parentSet: true, // Include parent set reference
             },
             orderBy: {
               createdAt: 'asc'

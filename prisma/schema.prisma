@@ -53,7 +53,6 @@ model Set {
   name        String
   slug        String   @unique // URL-friendly slug - required for public access
   type        SetType  @default(Base) // Base, Autograph, Memorabilia, or Insert
-  isBaseSet   Boolean  @default(false) // Deprecated: use type field instead
   releaseId   String
   release     Release  @relation(fields: [releaseId], references: [id], onDelete: Cascade)
   totalCards  String?
@@ -61,18 +60,11 @@ model Set {
   description String?  // Optional description for this set
 
   // Source data for regeneration and reference
-  sourceText  String?  @db.Text // Original pasted checklist text (parent sets only)
+  sourceText  String?  @db.Text // Original pasted checklist text
 
-  parallels   Json?    // DEPRECATED: Array of {name: string, printRun: string} - use parallelSets relation instead
-
-  // Parent-child relationship for parallel sets
-  parentSetId String?  // Reference to parent set (null for parent sets)
-  parentSet   Set?     @relation("ParallelSets", fields: [parentSetId], references: [id], onDelete: Cascade)
-  parallelSets Set[]   @relation("ParallelSets") // Child parallel sets of this parent
-
-  // Flags for parallel behavior
-  hasVariableChecklist Boolean @default(false) // True if parallels have different checklists (e.g., "or fewer")
-  mirrorsParentChecklist Boolean @default(true) // True if parallel cards should mirror parent set's checklist
+  // Parallel identification
+  isParallel  Boolean  @default(false) // True if this is a parallel set (identified by naming convention)
+  baseSetSlug String?  // Reference to the base set's slug (for parallels only)
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
