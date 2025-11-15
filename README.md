@@ -28,8 +28,9 @@ A football (soccer) card AI and Data Platform
 
 ### Core Database
 - **Hierarchical Data Model**: Manufacturers → Releases → Sets → Cards
-- **Parent-Child Parallel Architecture**: Efficient storage with parallels referencing parent set cards
-- **Complete Checklists**: Major releases from Panini, Topps, and other manufacturers
+- **Independent Parallel Architecture**: Sets with parallels grouped by base name with intelligent sorting
+- **Smart Set Sorting**: Automatic grouping of sets with their parallels (Base/Optic first, then alphabetical by base name)
+- **Complete Checklists**: Major releases from Panini, Topps, and other manufacturers (including 2024-25 Donruss Soccer: 116 sets, 8,947 cards)
 - **Card Database**: Comprehensive card database with images and metadata
 - **Release Management**: Approval workflow, reviews, source document tracking
 
@@ -193,6 +194,7 @@ footy/
 │   ├── genkit.ts           # Anthropic SDK AI functions
 │   ├── neon-auth.ts        # Neon database auth
 │   ├── prisma.ts           # Database client
+│   ├── setUtils.ts         # Set sorting and grouping utilities
 │   └── slugGenerator.ts    # URL slug generation
 ├── prisma/
 │   └── schema.prisma       # Database schema
@@ -279,7 +281,8 @@ Manufacturer → Release → Set → Card
 
 ### Key Features
 
-- **Parent-Child Parallel Architecture**: Efficient storage with parallels referencing parent set cards
+- **Independent Parallel Architecture**: Each set (base and parallel) stores its own cards with simplified architecture
+- **Intelligent Set Sorting**: Automatic grouping by base name with smart sorting (unnumbered first, then numbered highest to lowest)
 - **Approval Workflow**: Releases require approval (`isApproved`) before public visibility
 - **Content Linking**: Posts, Images, and SourceDocuments use direct foreign keys with type discriminators
 - **Cascading Deletes**: Hierarchical relationships maintain referential integrity

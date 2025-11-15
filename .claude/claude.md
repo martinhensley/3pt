@@ -903,6 +903,68 @@ Before committing changes to page layouts:
 
 ## Recent Changes Log
 
+### November 14, 2025 - Enhanced Set Sorting & Donruss Soccer Import
+
+**Changes:**
+- Implemented comprehensive set sorting system that groups sets with their parallels
+- Enhanced `sortSetsGrouped` function to work with all set types (Base, Insert, Autograph, Memorabilia)
+- Imported 2024-25 Panini Donruss Soccer: 116 sets with 8,947 cards
+- Fixed Optic parallel print runs to match official specifications
+
+**Set Sorting Enhancement:**
+- Updated `parseSetName` in `/lib/setUtils.ts` to detect base names and variants for all sets
+- Added comprehensive color/variant pattern detection (Red, Blue, Gold, Silver, Black, Pink, Green, Purple, Dragon Scale, Plum Blossom, Pink Ice, Pink Velocity, etc.)
+- Sets now properly group by base name (e.g., all "Craftsmen" variants together, all "Beautiful Game Autographs" variants together)
+- Within each group: base set first, unnumbered parallels (alphabetical), numbered parallels (highest to lowest)
+- Base and Optic sets maintain special priority ordering (Base group first, then Optic group)
+
+**Sorting Logic:**
+```
+Group Structure:
+- Base/Optic sets appear first
+- Other sets sorted alphabetically by base name
+- Within each group:
+  1. Base set (no variant)
+  2. Parallels without print runs (alphabetical by variant)
+  3. Parallels with print runs (sorted highest to lowest)
+  4. Same print runs sorted alphabetically by variant
+```
+
+**Donruss Soccer Import:**
+- Successfully imported all 116 sets from Excel checklist
+- Base and Optic sets: 200 cards each (cards 1-175 base + 176-200 Rated Rookies)
+- Insert sets: 53 sets with various parallels (Animation, Craftsmen, Kaboom, Magicians, etc.)
+- Autograph sets: 24 sets (Beautiful Game Autographs, Signature Series, etc.)
+- Memorabilia sets: 6 sets (Kit Kings, Kit Series)
+- Fixed Optic parallel print runs: Blue /149, Dragon Scale /8, Gold Power 1/1, Pink Velocity /99, Plum Blossom (unnumbered), Red /299, Teal Mojo /49
+
+**Optic Parallel Print Runs (Official Specifications):**
+- Argyle, Holo, Ice, Plum Blossom, Velocity: Unnumbered
+- Red: /299
+- Blue: /149
+- Pink Velocity: /99
+- Teal Mojo: /49
+- Pink Ice, Purple Mojo: /25
+- Gold: /10
+- Dragon Scale: /8
+- Green: /5
+- Black, Black Pandora, Gold Power: 1/1
+
+**Files Modified:**
+1. `/lib/setUtils.ts` - Enhanced `sortSetsGrouped` and `parseSetName` functions
+2. `/app/releases/[slug]/page.tsx` - Applied enhanced sorting to all set types
+3. `/scripts/import-donruss-soccer-2024.ts` - Main import script
+4. `/scripts/fix-optic-print-runs.ts` - Script to correct Optic parallel print runs
+5. `/scripts/fix-complete-donruss-import.ts` - Script to fix 200-card sets
+6. `/scripts/test-sorting-all-types.ts` - Comprehensive sorting validation
+7. Various utility scripts for validation and testing
+
+**Key Learnings:**
+- Pattern-based name parsing is effective for grouping sets with their parallels
+- Updating both set AND card print runs ensures data consistency
+- Enhanced sorting significantly improves user experience on release pages
+- Grouping sets by base name makes it easy to find all variants of a set
+
 ### November 14, 2025 - Documentation Cleanup
 
 **Changes:**
