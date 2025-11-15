@@ -2082,8 +2082,6 @@ export default function EditReleasePage() {
                     {/* Delete button */}
                     <button
                       onClick={async () => {
-                        if (!confirm('Are you sure you want to delete this image?')) return;
-
                         try {
                           const response = await fetch(`/api/releases/${release.id}/images?imageId=${image.id}`, {
                             method: 'DELETE',
