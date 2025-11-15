@@ -29,6 +29,16 @@ interface Card {
   imageBack: string | null;
 }
 
+interface ParallelSet {
+  id: string;
+  name: string;
+  slug: string;
+  printRun: number | null;
+  _count: {
+    cards: number;
+  };
+}
+
 interface Set {
   id: string;
   name: string;
@@ -39,6 +49,7 @@ interface Set {
   isParallel: boolean;
   baseSetSlug: string | null;
   cards: Card[];
+  parallelSets?: ParallelSet[];
   release: {
     id: string;
     name: string;
@@ -129,17 +140,8 @@ export default function SetPage() {
         card.parallelType === 'Base' || card.parallelType === null
       ) || []);
 
-  // Get unique parallel types (excluding Base)
-  const uniqueParallels = set?.cards
-    ? Array.from(new Set(
-        set.cards
-          .map(card => card.parallelType)
-          .filter(type => type && type !== 'Base')
-      ))
-    : [];
-
   const setCardCount = displayCards.length || (set?.totalCards ? parseInt(set.totalCards) : 0);
-  const setParallelCount = uniqueParallels.length;
+  const setParallelCount = set?.parallelSets?.length || 0;
 
   // Sort cards numerically by cardNumber
   const sortedCards = displayCards.length > 0 ? [...displayCards].sort((a, b) => {
@@ -233,9 +235,37 @@ export default function SetPage() {
               </p>
             </div>
           )}
-        </div>
 
-        {/* Parallels are now independent sets accessible from the release page */}
+          {/* Parallel Sets List */}
+          {!isParallel && set.parallelSets && set.parallelSets.length > 0 && (
+            <div className="pt-6 border-t border-white/20">
+              <h3 className="text-lg font-bold text-white mb-4">Parallel Sets</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {set.parallelSets.map((parallel) => {
+                  const variantName = parallel.name.replace(set.name, '').trim();
+                  const printRunDisplay = parallel.printRun
+                    ? (parallel.printRun === 1 ? ' (1 of 1)' : ` (/${parallel.printRun})`)
+                    : '';
+
+                  return (
+                    <Link
+                      key={parallel.id}
+                      href={`/sets/${parallel.slug}`}
+                      className="flex items-center justify-between p-3 bg-white/10 hover:bg-white/20 rounded-lg border border-white/20 transition-all duration-200 group"
+                    >
+                      <span className="font-semibold text-white group-hover:text-white/90">
+                        {variantName}{printRunDisplay}
+                      </span>
+                      <span className="text-sm text-white/70">
+                        {parallel._count.cards} cards →
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Card Checklist */}
         <div className="bg-white rounded-lg shadow-lg p-8 mb-8 transition-colors duration-300">

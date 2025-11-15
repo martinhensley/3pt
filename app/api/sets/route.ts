@@ -73,10 +73,35 @@ export async function GET(request: NextRequest) {
         },
       });
 
-      // Return the set with cards
+      // If this is a base set, fetch all parallel sets that reference it
+      let parallelSets: any[] = [];
+      if (!matchedSet.isParallel) {
+        parallelSets = await prisma.set.findMany({
+          where: {
+            baseSetSlug: matchedSet.slug,
+            isParallel: true,
+          },
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            printRun: true,
+            _count: {
+              select: { cards: true }
+            }
+          },
+          orderBy: [
+            { printRun: 'desc' }, // Highest print run first
+            { name: 'asc' }
+          ]
+        });
+      }
+
+      // Return the set with cards and parallels
       return NextResponse.json({
         ...matchedSet,
         cards: cards,
+        parallelSets: parallelSets,
       });
     }
 
