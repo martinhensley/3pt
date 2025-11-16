@@ -165,13 +165,13 @@ export default function SetsIndexPage() {
   const getBadgeColor = (type: string) => {
     switch (type) {
       case "Base":
-        return "bg-blue-100 text-blue-800";
+        return "bg-cyan-100 text-cyan-800";
       case "Insert":
-        return "bg-purple-100 text-purple-800";
-      case "Autograph":
         return "bg-green-100 text-green-800";
-      case "Memorabilia":
+      case "Autograph":
         return "bg-orange-100 text-orange-800";
+      case "Memorabilia":
+        return "bg-yellow-100 text-yellow-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -216,6 +216,8 @@ export default function SetsIndexPage() {
                     placeholder="Search by set name, release, or manufacturer..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    autoComplete="off"
+                    data-form-type="other"
                     className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900 placeholder-gray-500"
                   />
                   {searchQuery && (
@@ -346,20 +348,20 @@ export default function SetsIndexPage() {
               </div>
 
               {/* Per Page Selector */}
-              <div className="bg-white rounded-xl shadow-lg p-4 border border-gray-200">
+              <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-xl shadow-lg p-4 border border-gray-200">
                 <div className="flex items-center justify-between">
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-white">
                     Showing {sets.length > 0 ? ((currentPage - 1) * setsPerPage) + 1 : 0} - {Math.min(currentPage * setsPerPage, filteredCount)} of {filteredCount.toLocaleString()}
                   </div>
                   <div className="flex items-center gap-2">
-                    <label htmlFor="perPage" className="text-sm font-medium text-gray-700">
+                    <label htmlFor="perPage" className="text-sm font-medium text-white">
                       Sets per page:
                     </label>
                     <select
                       id="perPage"
                       value={setsPerPage}
                       onChange={(e) => handlePerPageChange(parseInt(e.target.value))}
-                      className="px-3 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900"
+                      className="px-3 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-white bg-white text-gray-900"
                     >
                       <option value="12">12</option>
                       <option value="24">24</option>
@@ -410,7 +412,7 @@ export default function SetsIndexPage() {
                             {set.type}
                           </span>
                           {set.isParallel && (
-                            <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-semibold">
+                            <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">
                               Parallel
                             </span>
                           )}

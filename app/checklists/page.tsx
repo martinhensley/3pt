@@ -94,9 +94,9 @@ export default function ChecklistsPage() {
   const getTypeBadgeColor = (type: string) => {
     switch (type) {
       case "Base":
-        return "bg-blue-100 text-blue-800";
+        return "bg-cyan-100 text-cyan-800";
       case "Insert":
-        return "bg-purple-100 text-purple-800";
+        return "bg-yellow-100 text-yellow-800";
       case "Autograph":
         return "bg-red-100 text-red-800";
       case "Memorabilia":

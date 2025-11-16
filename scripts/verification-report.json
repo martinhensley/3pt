@@ -1,0 +1,264 @@
+{
+  "timestamp": "2025-11-15T18:06:34.528Z",
+  "totalSetsChecked": 24,
+  "totalIssues": 15,
+  "results": [
+    {
+      "setName": "Optic Dragon Scale",
+      "totalCards": 200,
+      "printRunDistribution": {
+        "8": 200
+      },
+      "issues": []
+    },
+    {
+      "setName": "Beautiful Game Dual Autographs Dragon Scale",
+      "totalCards": 10,
+      "printRunDistribution": {
+        "5": 3,
+        "8": 4,
+        "25": 2,
+        "49": 1
+      },
+      "issues": [
+        "Card #1 has printRun 5",
+        "Card #3 has printRun 25",
+        "Card #4 has printRun 49",
+        "Card #5 has printRun 25",
+        "Card #6 has printRun 5"
+      ]
+    },
+    {
+      "setName": "Signature Series Dragon Scale",
+      "totalCards": 41,
+      "printRunDistribution": {
+        "5": 3,
+        "10": 3,
+        "49": 1,
+        "50": 1,
+        "75": 2,
+        "99": 26,
+        "null": 5
+      },
+      "issues": [
+        "Card #1 has printRun 5",
+        "Card #11 has printRun 5",
+        "Card #21 has printRun 99",
+        "Card #5 has printRun 5",
+        "Card #6 has printRun 99"
+      ]
+    },
+    {
+      "setName": "Beautiful Game Autographs Dragon Scale",
+      "totalCards": 42,
+      "printRunDistribution": {
+        "5": 6,
+        "25": 3,
+        "49": 2,
+        "50": 1,
+        "75": 2,
+        "99": 23,
+        "null": 5
+      },
+      "issues": [
+        "Card #1 has printRun 99",
+        "Card #10 has printRun 75",
+        "Card #11 has printRun 99",
+        "Card #23 has printRun 99",
+        "Card #5 has printRun 5"
+      ]
+    },
+    {
+      "setName": "Beautiful Game Autographs",
+      "totalCards": 43,
+      "printRunDistribution": {
+        "null": 43
+      },
+      "issues": []
+    },
+    {
+      "setName": "Beautiful Game Autographs Black",
+      "totalCards": 42,
+      "printRunDistribution": {
+        "1": 42
+      },
+      "issues": []
+    },
+    {
+      "setName": "Beautiful Game Autographs Blue",
+      "totalCards": 42,
+      "printRunDistribution": {
+        "10": 3,
+        "25": 6,
+        "49": 6,
+        "99": 26,
+        "null": 1
+      },
+      "issues": []
+    },
+    {
+      "setName": "Beautiful Game Autographs Gold",
+      "totalCards": 42,
+      "printRunDistribution": {
+        "3": 8,
+        "5": 2,
+        "10": 31,
+        "null": 1
+      },
+      "issues": []
+    },
+    {
+      "setName": "Beautiful Game Autographs Pink Ice",
+      "totalCards": 40,
+      "printRunDistribution": {
+        "25": 40
+      },
+      "issues": []
+    },
+    {
+      "setName": "Beautiful Game Autographs Red",
+      "totalCards": 42,
+      "printRunDistribution": {
+        "5": 3,
+        "10": 7,
+        "25": 5,
+        "49": 26,
+        "null": 1
+      },
+      "issues": []
+    },
+    {
+      "setName": "Beautiful Game Autographs Pink Velocity",
+      "totalCards": 43,
+      "printRunDistribution": {
+        "null": 43
+      },
+      "issues": []
+    },
+    {
+      "setName": "Signature Series",
+      "totalCards": 44,
+      "printRunDistribution": {
+        "null": 44
+      },
+      "issues": []
+    },
+    {
+      "setName": "Signature Series Black",
+      "totalCards": 41,
+      "printRunDistribution": {
+        "1": 41
+      },
+      "issues": []
+    },
+    {
+      "setName": "Signature Series Blue",
+      "totalCards": 41,
+      "printRunDistribution": {
+        "7": 1,
+        "10": 2,
+        "25": 4,
+        "49": 1,
+        "99": 33
+      },
+      "issues": []
+    },
+    {
+      "setName": "Signature Series Gold",
+      "totalCards": 39,
+      "printRunDistribution": {
+        "3": 7,
+        "10": 32
+      },
+      "issues": []
+    },
+    {
+      "setName": "Signature Series Pink Ice",
+      "totalCards": 42,
+      "printRunDistribution": {
+        "25": 42
+      },
+      "issues": []
+    },
+    {
+      "setName": "Signature Series Red",
+      "totalCards": 40,
+      "printRunDistribution": {
+        "5": 3,
+        "10": 3,
+        "19": 1,
+        "25": 1,
+        "49": 32
+      },
+      "issues": []
+    },
+    {
+      "setName": "Signature Series Pink Velocity",
+      "totalCards": 42,
+      "printRunDistribution": {
+        "null": 42
+      },
+      "issues": []
+    },
+    {
+      "setName": "Signature Series Dragon Scale",
+      "totalCards": 41,
+      "printRunDistribution": {
+        "5": 3,
+        "10": 3,
+        "49": 1,
+        "50": 1,
+        "75": 2,
+        "99": 26,
+        "null": 5
+      },
+      "issues": []
+    },
+    {
+      "setName": "Beautiful Game Autographs Dragon Scale",
+      "totalCards": 42,
+      "printRunDistribution": {
+        "5": 6,
+        "25": 3,
+        "49": 2,
+        "50": 1,
+        "75": 2,
+        "99": 23,
+        "null": 5
+      },
+      "issues": []
+    },
+    {
+      "setName": "Optic Pink Velocity",
+      "totalCards": 200,
+      "printRunDistribution": {
+        "99": 200
+      },
+      "issues": []
+    },
+    {
+      "setName": "Beautiful Game Dual Autographs Pink Velocity",
+      "totalCards": 10,
+      "printRunDistribution": {
+        "null": 10
+      },
+      "issues": []
+    },
+    {
+      "setName": "Beautiful Game Autographs Pink Velocity",
+      "totalCards": 43,
+      "printRunDistribution": {
+        "null": 43
+      },
+      "issues": []
+    },
+    {
+      "setName": "Signature Series Pink Velocity",
+      "totalCards": 42,
+      "printRunDistribution": {
+        "null": 42
+      },
+      "issues": []
+    }
+  ]
+}

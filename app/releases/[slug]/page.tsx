@@ -79,6 +79,7 @@ interface Release {
   year: string | null;
   slug: string;
   review: string | null;
+  releaseDate: string | null;
   reviewDate: string | null;
   postDate: string | null;
   createdAt: string;
@@ -104,7 +105,7 @@ export default function ReleasePage() {
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isCarouselPaused, setIsCarouselPaused] = useState(false);
-  const [expandedTypes, setExpandedTypes] = useState<globalThis.Set<string>>(new globalThis.Set(['Base', 'Insert'])); // Base and Insert expanded by default
+  const [expandedTypes, setExpandedTypes] = useState<globalThis.Set<string>>(new globalThis.Set(['Base', 'Autograph', 'Memorabilia', 'Insert', 'Other'])); // All set types expanded by default
 
   useEffect(() => {
     // Fetch release data directly from Release model
@@ -353,14 +354,25 @@ export default function ReleasePage() {
           <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white">
             {/* Hero Header */}
             <div className="p-8 pb-6">
-              <div className="flex items-center gap-3 flex-wrap">
-                <span className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full font-bold text-sm">
-                  RELEASE
-                </span>
-                <span className="text-white/80">•</span>
-                <h1 className="text-3xl md:text-4xl font-black leading-tight">
-                  {release.year} {release.manufacturer.name} {release.name}
-                </h1>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <span className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full font-bold text-sm">
+                    RELEASE
+                  </span>
+                  <span className="text-white/80">•</span>
+                  <h1 className="text-2xl md:text-3xl font-black leading-tight">
+                    {release.year} {release.manufacturer.name} {release.name}
+                  </h1>
+                </div>
+                {release.releaseDate && (
+                  <p className="text-base text-white/80">
+                    Release Date: {new Intl.DateTimeFormat('en-US', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric'
+                    }).format(new Date(release.releaseDate))}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -449,26 +461,6 @@ export default function ReleasePage() {
             {/* Review */}
             {release.review && (
               <div className="p-8 pt-6">
-                {/* Review Header */}
-                <div className="mb-6">
-                  <p className="text-sm text-white/70 uppercase tracking-wide">
-                    {(() => {
-                      const reviewDate = release.reviewDate ? new Date(release.reviewDate) : null;
-                      const postDate = release.postDate ? new Date(release.postDate) : new Date(release.createdAt);
-                      const daysDiff = reviewDate
-                        ? Math.floor((reviewDate.getTime() - postDate.getTime()) / (1000 * 60 * 60 * 24))
-                        : 0;
-                      const isUpdate = daysDiff > 7;
-                      const date = reviewDate || postDate;
-                      const formattedDate = new Intl.DateTimeFormat('en-US', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric'
-                      }).format(date);
-                      return isUpdate ? `footy's update ${formattedDate}` : `footy's review ${formattedDate}`;
-                    })()}
-                  </p>
-                </div>
                 {/* Review Content */}
                 <div className="space-y-4">
                   {release.review.split('\n\n').map((paragraph, idx) => (

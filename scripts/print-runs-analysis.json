@@ -1,0 +1,1667 @@
+{
+  "totalCards": 8977,
+  "totalSets": 149,
+  "setsWithVariablePrintRuns": [
+    {
+      "setName": "Beautiful Game Autographs Blue",
+      "totalCards": 42,
+      "printRuns": {
+        "10": 3,
+        "25": 6,
+        "49": 6,
+        "99": 26,
+        "DATE_CODE": 1
+      }
+    },
+    {
+      "setName": "Beautiful Game Autographs Dragon Scale",
+      "totalCards": 42,
+      "printRuns": {
+        "5": 6,
+        "25": 3,
+        "49": 2,
+        "50": 1,
+        "75": 2,
+        "99": 23,
+        "DATE_CODE": 5
+      }
+    },
+    {
+      "setName": "Beautiful Game Autographs Gold",
+      "totalCards": 42,
+      "printRuns": {
+        "3": 8,
+        "5": 2,
+        "10": 31,
+        "DATE_CODE": 1
+      }
+    },
+    {
+      "setName": "Beautiful Game Autographs Red",
+      "totalCards": 42,
+      "printRuns": {
+        "5": 3,
+        "10": 7,
+        "25": 5,
+        "49": 26,
+        "DATE_CODE": 1
+      }
+    },
+    {
+      "setName": "Beautiful Game Dual Autographs Blue",
+      "totalCards": 10,
+      "printRuns": {
+        "7": 2,
+        "10": 1,
+        "25": 6,
+        "DATE_CODE": 1
+      }
+    },
+    {
+      "setName": "Beautiful Game Dual Autographs Dragon Scale",
+      "totalCards": 10,
+      "printRuns": {
+        "5": 3,
+        "25": 2,
+        "49": 1,
+        "DATE_CODE": 4
+      }
+    },
+    {
+      "setName": "Beautiful Game Dual Autographs Gold",
+      "totalCards": 10,
+      "printRuns": {
+        "3": 5,
+        "5": 4,
+        "DATE_CODE": 1
+      }
+    },
+    {
+      "setName": "Beautiful Game Dual Autographs Red",
+      "totalCards": 10,
+      "printRuns": {
+        "5": 4,
+        "10": 5,
+        "DATE_CODE": 1
+      }
+    },
+    {
+      "setName": "Kit Series Gold",
+      "totalCards": 50,
+      "printRuns": {
+        "7": 1,
+        "10": 49
+      }
+    },
+    {
+      "setName": "Signature Series Blue",
+      "totalCards": 41,
+      "printRuns": {
+        "7": 1,
+        "10": 2,
+        "25": 4,
+        "49": 1,
+        "99": 33
+      }
+    },
+    {
+      "setName": "Signature Series Dragon Scale",
+      "totalCards": 41,
+      "printRuns": {
+        "5": 3,
+        "10": 3,
+        "49": 1,
+        "50": 1,
+        "75": 2,
+        "99": 26,
+        "DATE_CODE": 5
+      }
+    },
+    {
+      "setName": "Signature Series Gold",
+      "totalCards": 42,
+      "printRuns": {
+        "3": 7,
+        "10": 35
+      }
+    },
+    {
+      "setName": "Signature Series Red",
+      "totalCards": 42,
+      "printRuns": {
+        "5": 3,
+        "10": 3,
+        "19": 1,
+        "25": 1,
+        "49": 34
+      }
+    }
+  ],
+  "dragonScaleSets": [
+    {
+      "setName": "Base Optic Dragon Scale",
+      "totalCards": 175,
+      "printRuns": {
+        "8": 175
+      },
+      "cards": [
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Base Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        }
+      ]
+    },
+    {
+      "setName": "Beautiful Game Autographs Dragon Scale",
+      "totalCards": 42,
+      "printRuns": {
+        "5": 6,
+        "25": 3,
+        "49": 2,
+        "50": 1,
+        "75": 2,
+        "99": 23,
+        "DATE_CODE": 5
+      },
+      "cards": [
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "75"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "DATE_CODE"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "25"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "49"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "5"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "25"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "DATE_CODE"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "DATE_CODE"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "5"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "DATE_CODE"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "DATE_CODE"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "25"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "50"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "5"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "49"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "75"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "5"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "5"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "5"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Beautiful Game Autographs Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        }
+      ]
+    },
+    {
+      "setName": "Beautiful Game Dual Autographs Dragon Scale",
+      "totalCards": 10,
+      "printRuns": {
+        "5": 3,
+        "25": 2,
+        "49": 1,
+        "DATE_CODE": 4
+      },
+      "cards": [
+        {
+          "number": "Beautiful Game Dual Autographs Dragon Scale",
+          "player": "",
+          "printRun": "5"
+        },
+        {
+          "number": "Beautiful Game Dual Autographs Dragon Scale",
+          "player": "",
+          "printRun": "DATE_CODE"
+        },
+        {
+          "number": "Beautiful Game Dual Autographs Dragon Scale",
+          "player": "",
+          "printRun": "DATE_CODE"
+        },
+        {
+          "number": "Beautiful Game Dual Autographs Dragon Scale",
+          "player": "",
+          "printRun": "25"
+        },
+        {
+          "number": "Beautiful Game Dual Autographs Dragon Scale",
+          "player": "",
+          "printRun": "49"
+        },
+        {
+          "number": "Beautiful Game Dual Autographs Dragon Scale",
+          "player": "",
+          "printRun": "25"
+        },
+        {
+          "number": "Beautiful Game Dual Autographs Dragon Scale",
+          "player": "",
+          "printRun": "5"
+        },
+        {
+          "number": "Beautiful Game Dual Autographs Dragon Scale",
+          "player": "",
+          "printRun": "5"
+        },
+        {
+          "number": "Beautiful Game Dual Autographs Dragon Scale",
+          "player": "",
+          "printRun": "DATE_CODE"
+        },
+        {
+          "number": "Beautiful Game Dual Autographs Dragon Scale",
+          "player": "",
+          "printRun": "DATE_CODE"
+        }
+      ]
+    },
+    {
+      "setName": "Rated Rookies Optic Dragon Scale",
+      "totalCards": 25,
+      "printRuns": {
+        "8": 25
+      },
+      "cards": [
+        {
+          "number": "Rated Rookies Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Rated Rookies Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Rated Rookies Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Rated Rookies Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Rated Rookies Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Rated Rookies Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Rated Rookies Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Rated Rookies Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Rated Rookies Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Rated Rookies Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Rated Rookies Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Rated Rookies Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Rated Rookies Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Rated Rookies Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Rated Rookies Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Rated Rookies Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Rated Rookies Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Rated Rookies Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Rated Rookies Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Rated Rookies Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Rated Rookies Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Rated Rookies Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Rated Rookies Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Rated Rookies Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        },
+        {
+          "number": "Rated Rookies Optic Dragon Scale",
+          "player": "",
+          "printRun": "8"
+        }
+      ]
+    },
+    {
+      "setName": "Signature Series Dragon Scale",
+      "totalCards": 41,
+      "printRuns": {
+        "5": 3,
+        "10": 3,
+        "49": 1,
+        "50": 1,
+        "75": 2,
+        "99": 26,
+        "DATE_CODE": 5
+      },
+      "cards": [
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "5"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "5"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "10"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "50"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "10"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "DATE_CODE"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "49"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "DATE_CODE"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "DATE_CODE"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "DATE_CODE"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "75"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "75"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "DATE_CODE"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "10"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "5"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        },
+        {
+          "number": "Signature Series Dragon Scale",
+          "player": "",
+          "printRun": "99"
+        }
+      ]
+    }
+  ]
+}

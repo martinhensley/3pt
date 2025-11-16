@@ -7,6 +7,9 @@
 4. [Component Patterns](#component-patterns)
 5. [Database Schema](#database-schema)
 6. [Development Guidelines](#development-guidelines)
+   - [Data Import Requirements](#data-import-requirements)
+   - [Donruss Product Structure & Rated Rookies](#donruss-product-structure--rated-rookies)
+   - [TypeScript Best Practices](#typescript-best-practices)
 
 ---
 
@@ -835,6 +838,285 @@ See [Deprecated Fields](/docs/DATABASE.md#deprecated-fields) in the database ref
 ---
 
 ## Development Guidelines
+
+### Data Import Requirements
+
+**CRITICAL**: All import scripts MUST upload the source checklist file to ensure traceability and data integrity.
+
+#### Checklist Upload Process
+
+Every import script must include these steps:
+
+1. **Upload the checklist file** to Vercel Blob Storage
+2. **Create a SourceDocument record** linking the checklist to the release
+3. **Import sets and cards** from the checklist data
+
+**Example Implementation:**
+
+```typescript
+import { uploadChecklistToRelease, getExistingChecklist } from '@/lib/checklistUploader';
+import path from 'path';
+
+async function main() {
+  // 1. Create/find the release
+  const release = await prisma.release.create({
+    data: {
+      name: 'Obsidian Soccer',
+      year: '2024-25',
+      slug: '2024-25-panini-obsidian-soccer',
+      manufacturerId: manufacturerId
+    }
+  });
+
+  // 2. Upload the checklist (REQUIRED)
+  const checklistPath = '/Users/mh/Desktop/2024-25-Panini-Obsidian-Soccer-Cards-Checklist.xls';
+  const filename = path.basename(checklistPath);
+
+  const existing = await getExistingChecklist(release.id, filename);
+
+  if (!existing) {
+    console.log('\n📤 Uploading checklist...');
+    await uploadChecklistToRelease(
+      checklistPath,
+      release.id,
+      '2024-25 Panini Obsidian Soccer Checklist'
+    );
+    console.log('✅ Checklist uploaded successfully\n');
+  } else {
+    console.log('ℹ️  Checklist already uploaded\n');
+  }
+
+  // 3. Import sets and cards
+  // ... rest of import logic
+}
+```
+
+**Why This Matters:**
+- **Traceability**: Always able to reference the original source data
+- **Verification**: Users can download and verify card data
+- **Compliance**: Proper attribution to manufacturers
+- **Data Integrity**: Ability to re-import or correct data from original source
+
+**Detailed Documentation:**
+- See `/scripts/README-CHECKLIST-UPLOAD.md` for complete implementation guide
+- See `/lib/checklistUploader.ts` for utility functions
+
+#### Script Organization and Documentation
+
+**REQUIRED**: After completing an import or developing correction scripts for a release, all related scripts MUST be organized into a dedicated folder with comprehensive documentation.
+
+**Folder Structure:**
+```
+/scripts/{release-slug}/
+  ├── README.md                          # Comprehensive documentation
+  ├── import-{release}.ts                # Main import script
+  ├── fix-*.ts                           # Data correction scripts
+  ├── check-*.ts                         # Diagnostic/verification scripts
+  └── verify-*.ts                        # Post-import validation scripts
+```
+
+**Naming Convention:**
+- Use the release slug as the folder name (e.g., `road-to-qatar-2021-22`, `obsidian-2024-25`)
+- Prefix scripts with their purpose:
+  - `import-` - Initial data import
+  - `fix-` - Data corrections
+  - `check-` - Diagnostic queries
+  - `verify-` - Validation scripts
+
+**README.md Requirements:**
+
+Every script folder MUST include a comprehensive README.md with:
+
+1. **Release Information**
+   - Product name
+   - Manufacturer
+   - Release slug
+   - Total sets and cards
+
+2. **Scripts Overview**
+   - Description of each script
+   - What it fixes/checks
+   - Number of sets/cards affected
+   - Official specifications (for fix scripts)
+
+3. **Running Instructions**
+   - Example commands for each script
+   - Order of execution if dependencies exist
+
+4. **Summary of Corrections**
+   - Total updates made
+   - Issues fixed
+   - Database changes
+   - Data sources
+
+**Example README Structure:**
+
+```markdown
+# {Year} {Manufacturer} {Product Name} - Data Correction Scripts
+
+This directory contains scripts used to correct and fix data issues in the {Product Name} release.
+
+## Release Information
+
+- **Product:** {Product Name}
+- **Manufacturer:** {Manufacturer}
+- **Release Slug:** `{release-slug}`
+- **Total Sets:** X sets
+- **Total Cards:** Y cards
+
+## Scripts Overview
+
+### Category Name
+
+**`script-name.ts`**
+- Description of what it does
+- Updates X sets and Y cards
+- Official specs:
+  - Spec 1
+  - Spec 2
+
+## Running the Scripts
+
+All scripts can be run using `npx tsx`:
+
+\`\`\`bash
+npx tsx scripts/{release-slug}/script-name.ts
+\`\`\`
+
+## Summary of Corrections
+
+### Total Updates
+- **X sets corrected**
+- **Y cards updated**
+
+### Issues Fixed
+1. ✅ Issue description (X sets)
+2. ✅ Issue description (Y sets)
+
+### Database Changes
+- Field updates made
+- Cascade effects
+
+### Data Sources
+
+**Source Document:** Path to checklist file
+
+## Notes
+
+- Any special notes about the data
+- Edge cases handled
+- Known limitations
+```
+
+**When to Consolidate:**
+
+Consolidate scripts into a dedicated folder when:
+- Import is complete and verified
+- Multiple fix scripts have been created
+- Ready for final documentation
+- Moving on to next release
+
+**Example Implementations:**
+- `/scripts/road-to-qatar-2021-22/` - 11 scripts with comprehensive README
+- `/scripts/obsidian-2024-25/` - Import and verification scripts (if exists)
+- `/scripts/donruss-2024-25/` - Import and fix scripts (if exists)
+
+**Benefits:**
+- **Organization**: All related scripts in one place
+- **Documentation**: Clear purpose and usage for each script
+- **Traceability**: Official specs documented alongside corrections
+- **Maintainability**: Easy to find and update scripts
+- **Knowledge Transfer**: Future developers can understand the import process
+
+### Donruss Product Structure & Rated Rookies
+
+**CRITICAL KNOWLEDGE**: Donruss products have a specific structure for Rated Rookies that differs from how checklists represent them.
+
+#### How Rated Rookies Actually Work
+
+Donruss Rated Rookies are **NOT separate sets** - they are the last 25 cards within the Base and Optic sets:
+
+- **Base Set**: Cards 1-200 (175 regular cards + 25 Rated Rookies as cards 176-200)
+- **Optic Set**: Cards 1-200 (175 regular cards + 25 Rated Rookies as cards 176-200)
+- **All Parallels**: Also 200 cards each (same structure)
+
+#### The Checklist Problem
+
+Manufacturer checklists **incorrectly** list these as separate sets:
+- ❌ "Base" (175 cards)
+- ❌ "Rated Rookies" (25 cards)
+- ❌ "Base Optic" (175 cards)
+- ❌ "Rated Rookies Optic" (25 cards)
+
+This is **WRONG**. The correct structure is:
+- ✅ "Base" (200 cards total: 1-175 regular + 176-200 Rated Rookies)
+- ✅ "Optic" (200 cards total: 1-175 regular + 176-200 Rated Rookies)
+
+#### Import Strategy
+
+When importing Donruss products:
+
+1. **Initial Import**: Import as listed in checklist (will create split sets)
+2. **Merge Script**: Create a fix script to merge Rated Rookies into Base/Optic sets
+3. **Verify**: All Base and Optic sets should end up with 200 cards each
+
+**Example Merge Pattern:**
+```typescript
+// Find all "Rated Rookies" sets
+const ratedRookiesSets = sets.filter(s =>
+  s.name === 'Rated Rookies' ||
+  s.name.startsWith('Rated Rookies ')
+);
+
+// For each Rated Rookies set, find its matching Base set
+for (const rrSet of ratedRookiesSets) {
+  // Convert "Rated Rookies Holo Blue Laser" → "Base Holo Blue Laser"
+  const baseName = rrSet.name
+    .replace('Rated Rookies Optic', 'Optic')
+    .replace('Rated Rookies', 'Base');
+
+  const matchingBase = baseSets.find(b => b.name === baseName);
+
+  // Move all cards from RR set to Base set
+  await prisma.card.updateMany({
+    where: { setId: rrSet.id },
+    data: { setId: matchingBase.id }
+  });
+
+  // Update totalCards count
+  await prisma.set.update({
+    where: { id: matchingBase.id },
+    data: { totalCards: '200' }
+  });
+
+  // Delete the empty RR set
+  await prisma.set.delete({
+    where: { id: rrSet.id }
+  });
+}
+```
+
+**Reference Implementation:**
+- `/scripts/fix-road-to-qatar-rated-rookies.ts` - Merges Base Rated Rookies
+- `/scripts/fix-optic-parallels.ts` - Merges Optic Rated Rookies parallels
+- `/scripts/verify-road-to-qatar-import.ts` - Verifies 200-card sets
+
+#### Expected Results
+
+After merging:
+- **Base sets**: 11-25 sets (Base + all parallels), each with 200 cards
+- **Optic sets**: 14+ sets (Optic + all parallels), each with 200 cards
+- **Total set reduction**: ~24 sets removed (all "Rated Rookies" sets deleted)
+- **Card count**: Unchanged (just moved, not deleted)
+
+#### Products Affected
+
+This applies to **all Donruss soccer products**:
+- Donruss Soccer (2024-25, 2023-24, etc.)
+- Donruss Road to Qatar (2021-22)
+- Any future Donruss releases
+
+**Important**: Other manufacturers (Panini Select, Prizm, etc.) do NOT follow this pattern.
 
 ### TypeScript Best Practices
 

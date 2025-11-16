@@ -251,7 +251,7 @@ export default function ParallelPage() {
                     {(card.hasAutograph || card.hasMemorabilia || card.isNumbered) && (
                       <div className="flex gap-2 flex-wrap">
                         {card.hasAutograph && (
-                          <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-semibold">
+                          <span className="px-3 py-1 bg-cyan-100 text-cyan-800 text-xs rounded-full font-semibold">
                             AUTO
                           </span>
                         )}
