@@ -220,7 +220,7 @@ export default function CardsIndexPage() {
               {/* Header */}
               <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden text-white p-8">
                 <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
-                  All Cards
+                  All footy cards
                 </h1>
                 <div className="text-xl">
                   {filteredCount.toLocaleString()} of {totalCount.toLocaleString()} Card{totalCount !== 1 ? 's' : ''}

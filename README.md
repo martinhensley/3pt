@@ -49,6 +49,7 @@ A football (soccer) card AI and Data Platform
 
 ### Public Features
 - **Searchable Checklists**: Browse and filter all sets by manufacturer, release, and type
+- **Card Search**: Basic search with manual trigger (Enter key or Search button)
 - **Release Database**: Public catalog of approved releases with reviews
 - **eBay Integration**: Live marketplace listings via eBay Partner Network API
 - **SEO Optimized**: Dynamic metadata, sitemap, structured data, and Open Graph tags
@@ -57,6 +58,20 @@ A football (soccer) card AI and Data Platform
 ## Roadmap / TODO
 
 ### Future Features
+- **Advanced Search & Database Optimization**:
+  - **Search Improvements**: Current search is basic pattern matching; need to implement:
+    - Boolean search operators (AND, OR, NOT)
+    - Multi-term search with phrase matching
+    - Fuzzy matching for misspellings
+    - Search result relevance scoring
+    - Autocomplete/typeahead suggestions
+  - **Database Indexing**: Add indexes to Card table for search performance:
+    - `playerName` - most common search field
+    - `team` - frequently filtered
+    - `cardNumber` - exact match searches
+    - Composite indexes for common filter combinations
+    - Full-text search indexes for advanced search capabilities
+  - **Performance**: Current search scans entire table; with proper indexes and search optimization, query times should improve significantly
 - **Sales Data Collection**: Aggregate and track historical sales data from major marketplaces (eBay, PWCC, Goldin, etc.) to provide market insights and pricing trends
 - **Comps (Comparable Valuations)**: Feature-as-a-service component providing third-party valuation services with comparable sales data, market analysis, and automated valuation models for grading companies and auction houses
 - **SEO Strategy & Optimization**: Once development slows and the app is ready for content production, focus on:
