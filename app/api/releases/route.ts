@@ -29,9 +29,6 @@ export async function GET(request: NextRequest) {
           reviewDate: true,
           postDate: true,
           sourceFiles: true,
-          isApproved: true,
-          approvedAt: true,
-          approvedBy: true,
           manufacturerId: true,
           createdAt: true,
           updatedAt: true,
@@ -73,14 +70,7 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      // Check if release is approved (unless admin)
-      if (!isAdmin && !release.isApproved) {
-        return NextResponse.json(
-          { error: "Release not found" },
-          { status: 404 }
-        );
-      }
-
+      // Approval check removed - all releases are now public
       return NextResponse.json(release);
     } else if (id) {
       // Fetch release by ID (for admin edit page - include ALL sets including parallels)
@@ -95,9 +85,6 @@ export async function GET(request: NextRequest) {
           review: true,
           reviewDate: true,
           sourceFiles: true, // Include sourceFiles for Edit Release page
-          isApproved: true,
-          approvedAt: true,
-          approvedBy: true,
           manufacturerId: true,
           createdAt: true,
           updatedAt: true,
@@ -141,9 +128,8 @@ export async function GET(request: NextRequest) {
 
       return NextResponse.json(release);
     } else {
-      // Fetch all releases
+      // Fetch all releases - approval check removed, all releases are public
       const releases = await prisma.release.findMany({
-        where: isAdmin ? {} : { isApproved: true }, // Only show approved releases to public
         include: {
           manufacturer: true,
           images: {

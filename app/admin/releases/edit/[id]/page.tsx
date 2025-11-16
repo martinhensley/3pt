@@ -35,11 +35,6 @@ interface SetInfo {
   parallelSets?: SetInfo[]; // Child parallel sets (for parent sets)
 }
 
-interface SourceFile {
-  url: string;
-  filename: string;
-  type: string;
-}
 
 interface SourceDocument {
   id: string;
@@ -68,9 +63,6 @@ interface Release {
   reviewDate: string | null;
   sourceFiles: SourceFile[] | null;
   sourceDocuments?: SourceDocument[];
-  isApproved: boolean;
-  approvedAt: string | null;
-  approvedBy: string | null;
   manufacturerId: string;
   manufacturer: {
     id: string;
@@ -118,8 +110,6 @@ export default function EditReleasePage() {
   const [fetchingRelease, setFetchingRelease] = useState(true);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [generatingReview, setGeneratingReview] = useState(false);
-  const [reviewFile, setReviewFile] = useState<File | null>(null);
-  const [sourceFiles, setSourceFiles] = useState<SourceFile[]>([]);
   const [uploadingFile, setUploadingFile] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
 
@@ -166,7 +156,6 @@ export default function EditReleasePage() {
       setEditedPostDate(data.postDate ? new Date(data.postDate).toISOString().split('T')[0] : "");
       setEditedReview(data.review || "");
       setEditedReviewDate(data.reviewDate ? new Date(data.reviewDate).toISOString().split('T')[0] : "");
-      setSourceFiles(data.sourceFiles as SourceFile[] || []);
 
       // Transform sets data - only show parent sets at top level
       // Child parallel sets are nested under their parent's parallelSets array
@@ -1665,12 +1654,12 @@ export default function EditReleasePage() {
                 <svg className="w-5 h-5 text-footy-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
-                GenAI: Generate Review from Source Files
+                GenAI: Generate Review from Source Documents
               </h4>
-              {sourceFiles.length > 0 ? (
+              {release?.sourceDocuments && release.sourceDocuments.length > 0 ? (
                 <>
                   <p className="text-xs text-gray-600 mb-3">
-                    Uses uploaded source files ({sourceFiles.length} file{sourceFiles.length !== 1 ? 's' : ''}) to generate review
+                    Uses uploaded source documents ({release.sourceDocuments.length} document{release.sourceDocuments.length !== 1 ? 's' : ''}) to generate review
                   </p>
                   <button
                     type="button"
@@ -1697,51 +1686,9 @@ export default function EditReleasePage() {
                   </button>
                 </>
               ) : (
-                <>
-                  <p className="text-xs text-gray-600 mb-3">
-                    Upload source files below first, or optionally add a new file here
-                  </p>
-                  <div className="flex items-center gap-3">
-                    <label className="flex-1">
-                      <input
-                        type="file"
-                        accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.csv"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            handleFileUpload(file);
-                            e.target.value = "";
-                          }
-                        }}
-                        className="text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-green-700 hover:file:bg-green-200"
-                        disabled={uploadingFile}
-                      />
-                    </label>
-                    <button
-                      type="button"
-                      onClick={handleGenerateReview}
-                      disabled={generatingReview || sourceFiles.length === 0}
-                      className="px-4 py-2 bg-gradient-to-r from-footy-green to-green-600 hover:from-green-700 hover:to-green-700 text-white rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {generatingReview ? (
-                        <>
-                          <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          Generating...
-                        </>
-                      ) : (
-                        <>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                          </svg>
-                          Generate Review
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </>
+                <p className="text-xs text-gray-600">
+                  Upload source documents below first to enable AI review generation
+                </p>
               )}
             </div>
 
@@ -1774,13 +1721,13 @@ export default function EditReleasePage() {
           </div>
         </div>
 
-        {/* Source Files Section */}
+        {/* Source Documents Section */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Source Files
+            Source Documents
           </h3>
           <p className="text-sm text-gray-600 mb-4">
-            Upload sell sheets, checklists, PDFs, or other documents used for reference when creating content
+            Upload sell sheets, checklists, PDFs, or other documents for AI-powered content generation
           </p>
 
           <div className="space-y-4">
@@ -1789,12 +1736,30 @@ export default function EditReleasePage() {
               <label className="flex-1">
                 <input
                   type="file"
-                  accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.csv"
-                  onChange={(e) => {
+                  accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.csv,.xlsx,.xls,.doc,.docx"
+                  onChange={async (e) => {
                     const file = e.target.files?.[0];
-                    if (file) {
-                      handleFileUpload(file);
-                      e.target.value = ""; // Reset input
+                    if (file && release) {
+                      try {
+                        setUploadingFile(true);
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        const response = await fetch(`/api/admin/releases/${release.id}/source-documents`, {
+                          method: 'POST',
+                          body: formData,
+                        });
+                        if (!response.ok) throw new Error('Upload failed');
+                        setMessage({ type: 'success', text: `File "${file.name}" uploaded successfully` });
+                        setTimeout(() => setMessage(null), 3000);
+                        fetchRelease();
+                      } catch (error) {
+                        console.error('Failed to upload file:', error);
+                        setMessage({ type: 'error', text: 'Failed to upload file. Please try again.' });
+                        setTimeout(() => setMessage(null), 5000);
+                      } finally {
+                        setUploadingFile(false);
+                      }
+                      e.target.value = "";
                     }
                   }}
                   className="text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-green-700 hover:file:bg-green-200"
@@ -1805,84 +1770,21 @@ export default function EditReleasePage() {
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                   Uploading...
                 </div>
               )}
             </div>
 
-            {/* File List */}
-            {sourceFiles.length > 0 && (
-              <div className="border border-gray-200 rounded-lg divide-y divide-gray-200">
-                {sourceFiles.map((file, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-3 hover:bg-gray-50">
-                    <div className="flex items-center gap-3">
-                      {/* File Icon */}
-                      <div className="flex-shrink-0">
-                        {file.type === "pdf" ? (
-                          <svg className="w-8 h-8 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
-                          </svg>
-                        ) : file.type.match(/^(png|jpg|jpeg|webp)$/) ? (
-                          <svg className="w-8 h-8 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
-                          </svg>
-                        ) : (
-                          <svg className="w-8 h-8 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
-                          </svg>
-                        )}
-                      </div>
-
-                      {/* File Info */}
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{file.filename}</p>
-                        <p className="text-xs text-gray-500 uppercase">{file.type}</p>
-                      </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex items-center gap-2">
-                      <a
-                        href={file.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3 py-1.5 text-xs bg-green-100 hover:bg-green-200 text-green-700 rounded-lg transition-colors font-medium"
-                      >
-                        View
-                      </a>
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteFile(file.url)}
-                        className="px-3 py-1.5 text-xs bg-orange-100 hover:bg-orange-200 text-orange-700 rounded-lg transition-colors font-medium"
-                        disabled={loading}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {sourceFiles.length === 0 && (
-              <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
-                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                </svg>
-                <p className="mt-2 text-sm text-gray-500">No files uploaded yet</p>
-              </div>
-            )}
-
-            {/* Source Documents (from SourceDocument table) */}
+            {/* Document List */}
             {release?.sourceDocuments && release.sourceDocuments.length > 0 && (
-              <div className="mt-6">
+              <div className="mt-4">
                 <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
-                  Documents from Document Library
+                  Uploaded Documents ({release.sourceDocuments.length})
                 </h4>
                 <div className="border border-gray-200 rounded-lg divide-y divide-gray-200 bg-gradient-to-br from-green-50 to-orange-50">
                   {release.sourceDocuments.map((doc) => {
@@ -2136,433 +2038,6 @@ export default function EditReleasePage() {
             )}
           </div>
         </div>
-
-        {/* Sets Management */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">
-                Sets
-              </h3>
-              <p className="text-sm text-gray-600 mt-1">
-                Base sets, parallels, inserts, autographs, and memorabilia cards
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => handleAddSet(true)}
-              className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg transition-colors flex items-center gap-1.5"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Add Set
-            </button>
-          </div>
-
-          {editedSets.filter(set => !set.isDeleted).length > 0 ? (
-            <div className="space-y-4">
-              {editedSets
-                .map((set, idx) => ({ set, originalIdx: idx }))
-                .filter(({ set }) => !set.isDeleted)
-                .map(({ set, originalIdx: idx }) => {
-                  const isCollapsed = collapsedSets.has(idx);
-                  return (
-                      <div key={idx} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                        <div className="flex items-start justify-between gap-2 mb-3">
-                          <button
-                            type="button"
-                            onClick={() => toggleSetCollapse(idx)}
-                            className="px-2 py-2 hover:bg-gray-200 rounded transition-colors flex-shrink-0"
-                            title={isCollapsed ? "Expand" : "Collapse"}
-                          >
-                            <svg className={`w-5 h-5 text-gray-600 transition-transform ${isCollapsed ? '' : 'rotate-90'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
-                          </button>
-                          <div className="flex-1 space-y-2">
-                            <input
-                              type="text"
-                              value={set.name}
-                              onChange={(e) => handleUpdateSet(idx, "name", e.target.value)}
-                              placeholder="Set Name (e.g., Base, Optic, Dual Jersey Ink, Color Blast)"
-                              className="w-full px-3 py-2 font-semibold border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500"
-                            />
-                            <select
-                              value={set.type || 'Base'}
-                              onChange={(e) => handleUpdateSet(idx, "type", e.target.value as 'Base' | 'Autograph' | 'Memorabilia' | 'Insert')}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 text-sm focus:ring-2 focus:ring-blue-500"
-                            >
-                              <option value="Base">Base</option>
-                              <option value="Insert">Insert</option>
-                              <option value="Autograph">Autograph</option>
-                              <option value="Memorabilia">Memorabilia</option>
-                            </select>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveSet(idx)}
-                            className="px-3 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors flex-shrink-0"
-                            title="Remove set"
-                            disabled={loading}
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </div>
-
-                    {!isCollapsed && (
-                      <div>
-
-                    {/* Show indicator if this is a variable parallel set (manual serial mode) */}
-                    {set.manualSerialMode && (
-                      <div className="border-t border-gray-300 pt-3 mt-3 bg-green-50 rounded-lg p-3 -mx-1">
-                        <div className="flex items-start gap-2">
-                          <svg className="w-5 h-5 text-green-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          <div className="flex-1">
-                            <div className="text-sm font-medium text-green-900">
-                              Variable Serial Number Mode
-                            </div>
-                            <div className="text-xs text-green-700 mt-1">
-                              This parallel set has unique serial numbers per card. Paste checklist with format: &ldquo;Card# Player, Team /serial&rdquo;
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Unified Checklist/Set Data Upload/Paste Section */}
-                    <div className="border-t border-gray-300 pt-3 mt-3">
-                      <p className="text-sm font-semibold text-gray-700 mb-2">
-                        Set Data (Checklist & Parallels):
-                      </p>
-
-                      {/* Show parallels with expandable sections for card management */}
-                      {/* Only show legacy parallels array if parallelSets don't exist */}
-                      {set.parallels && set.parallels.length > 0 && (!set.parallelSets || set.parallelSets.length === 0) ? (
-                        <div className="space-y-2">
-                          <p className="text-xs text-gray-600 italic mb-3">
-                            Click a parallel to add/view cards for that specific parallel.
-                          </p>
-                          {sortParallelsByPrintRun(set.parallels).map((parallel, pIdx) => {
-                            // Check if this parallel has "or fewer" indicating variable serial numbers
-                            const hasVariableSerials = parallel.toLowerCase().includes('or fewer');
-
-                            // Get card count for this parallel from release data
-                            const parallelCards = release?.sets
-                              ?.find(s => s.id === set.id)
-                              ?.cards?.filter(c => c.parallelType === parallel) || [];
-                            const cardCount = parallelCards.length;
-
-                            return (
-                              <details key={pIdx} className="border border-gray-300 rounded-lg bg-gray-50">
-                                <summary className="cursor-pointer p-3 hover:bg-gray-100 transition-colors">
-                                  <div className="flex items-center gap-2 select-none">
-                                    <span className="text-xs font-bold text-footy-green bg-white px-2 py-1 rounded border border-footy-green">
-                                      {pIdx + 1}
-                                    </span>
-                                    <span className="text-sm font-semibold text-gray-900 flex-grow">
-                                      {parallel}
-                                    </span>
-                                    {hasVariableSerials && (
-                                      <span className="text-xs bg-orange-100 text-orange-800 px-2 py-0.5 rounded-full font-medium">
-                                        Variable Serials
-                                      </span>
-                                    )}
-                                    <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full font-medium">
-                                      {cardCount} card{cardCount !== 1 ? 's' : ''}
-                                    </span>
-                                  </div>
-                                </summary>
-
-                                <div className="p-3 border-t border-gray-300 bg-white space-y-3">
-                                  {/* Add Cards Section */}
-                                  <div className="border border-green-200 rounded-lg p-3 bg-green-50">
-                                    <label className="text-xs font-semibold text-gray-700 block mb-2">
-                                      Add Cards to {parallel}:
-                                    </label>
-                                    <textarea
-                                      id={`textarea-${set.id || idx}-${pIdx}`}
-                                      placeholder={hasVariableSerials
-                                        ? `Paste with serial numbers: 'Card# Player, Team /serial' (e.g., '2 Giovani Lo Celso, Argentina /149')`
-                                        : `Paste checklist for ${parallel}`}
-                                      rows={3}
-                                      className="w-full px-3 py-2 text-xs border border-gray-300 rounded bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 font-mono"
-                                    />
-                                    <div className="flex items-center justify-between mt-2">
-                                      <p className="text-xs text-gray-500 italic">
-                                        {hasVariableSerials
-                                          ? "Format: Card# Player, Team /serial"
-                                          : "Standard checklist"}
-                                      </p>
-                                      <button
-                                        type="button"
-                                        onClick={async () => {
-                                          const textarea = document.getElementById(`textarea-${set.id || idx}-${pIdx}`) as HTMLTextAreaElement;
-                                          const text = textarea?.value.trim();
-
-                                          if (!text) {
-                                            setMessage({ type: "error", text: "Please paste checklist data first" });
-                                            setTimeout(() => setMessage(null), 3000);
-                                            return;
-                                          }
-
-                                          if (!set.id) {
-                                            setMessage({ type: "error", text: "Please save the set first" });
-                                            setTimeout(() => setMessage(null), 3000);
-                                            return;
-                                          }
-
-                                          console.log('🎯 Parsing text for parallel:', parallel);
-                                          console.log('📝 Input text:', text);
-                                          const cards = parseCardsWithSerialNumbers(text, set.name);
-                                          console.log('✅ Parsed cards:', cards);
-
-                                          if (cards.length === 0) {
-                                            setMessage({ type: "error", text: "No cards found. Check format." });
-                                            setTimeout(() => setMessage(null), 3000);
-                                            return;
-                                          }
-
-                                          setMessage({ type: "success", text: `Creating ${cards.length} cards...` });
-
-                                          console.log('💾 Creating cards in database for parallel:', parallel);
-                                          await createCardsInDatabase(set.id, cards, [parallel], true);
-
-                                          setMessage({ type: "success", text: `✓ Added ${cards.length} cards` });
-                                          setTimeout(() => setMessage(null), 3000);
-
-                                          textarea.value = '';
-
-                                        }}
-                                        className="px-3 py-1 bg-footy-green hover:bg-green-800 text-white text-xs rounded transition-colors"
-                                      >
-                                        Add Cards
-                                      </button>
-                                    </div>
-                                  </div>
-
-                                  {/* Cards Grid - Only show if cards exist */}
-                                  {cardCount > 0 && (
-                                    <div>
-                                      <h4 className="text-xs font-semibold text-gray-700 mb-2">
-                                        Cards in {parallel}:
-                                      </h4>
-                                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 max-h-96 overflow-y-auto">
-                                        {parallelCards
-                                          .sort((a, b) => parseInt(a.cardNumber || '0') - parseInt(b.cardNumber || '0'))
-                                          .map((card) => (
-                                          <div
-                                            key={card.id}
-                                            className="border border-gray-200 rounded p-2 bg-gray-50 text-xs"
-                                          >
-                                            <div className="font-bold text-footy-green">
-                                              #{card.cardNumber}
-                                            </div>
-                                            <div className="text-gray-900 font-medium truncate">
-                                              {card.playerName}
-                                            </div>
-                                            {card.team && (
-                                              <div className="text-gray-600 text-xs truncate">
-                                                {card.team}
-                                              </div>
-                                            )}
-                                            {card.serialNumber && (
-                                              <div className="text-orange-600 font-semibold text-xs mt-1">
-                                                /{card.serialNumber}
-                                              </div>
-                                            )}
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-                                </div>
-                              </details>
-                            );
-                          })}
-                        </div>
-                      ) : (
-                        <div className="flex flex-col gap-2">
-                          <details className="text-sm" open>
-                            <summary className="cursor-pointer text-green-600 hover:underline font-medium">
-                              📋 Paste set data
-                            </summary>
-                            <div className="mt-2">
-                              <textarea
-                                placeholder={set.manualSerialMode
-                                  ? "Paste cards with serial numbers: 'Card# Player, Team /serial' (e.g., '2 Giovani Lo Celso, Argentina /149')"
-                                  : "Paste Set info format: Set Name, # Cards, Parallel info, Checklist"}
-                                rows={4}
-                                onChange={(e) => {
-                                  if (e.target.value.trim()) {
-                                    handleChecklistPaste(idx, e.target.value);
-                                    e.target.value = ''; // Clear after processing
-                                  }
-                                }}
-                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 font-mono"
-                              />
-                              <p className="text-xs text-gray-500 mt-1 italic">
-                                {set.manualSerialMode
-                                  ? "Format: Card# Player, Team /serial (one per line)"
-                                  : "Data will auto-load when pasted and show below ↓"}
-                              </p>
-                            </div>
-                          </details>
-                        </div>
-                      )}
-                    </div>
-
-                    {(set.cards && set.cards.length > 0) || (set.parallels && set.parallels.length > 0) ? (
-                      <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                        <div className="flex items-center justify-between gap-2 mb-2">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                            <span className="text-sm font-semibold text-green-700">
-                              Loaded:
-                            </span>
-                            {set.cards && set.cards.length > 0 && (
-                              <span className="text-xs bg-green-100 px-2 py-0.5 rounded">
-                                {set.cards.length} cards
-                              </span>
-                            )}
-                            {set.parallels && set.parallels.length > 0 && (
-                              <span className="text-xs bg-green-100 px-2 py-0.5 rounded">
-                                {set.parallels.length} parallels
-                              </span>
-                            )}
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              handleClearChecklist(idx);
-                              handleClearParallels(idx);
-                            }}
-                            className="px-2 py-1 text-xs bg-orange-100 hover:bg-orange-200 text-orange-700 rounded transition-colors"
-                            title="Clear all data"
-                          >
-                            Clear All
-                          </button>
-                        </div>
-                        <div className="space-y-2">
-                          {set.cards && set.cards.length > 0 && (
-                            <details className="text-sm">
-                              <summary className="cursor-pointer text-green-600 hover:underline">
-                                View cards ({set.cards.length})
-                              </summary>
-                              <div className="mt-2 max-h-40 overflow-y-auto space-y-1">
-                                {set.cards.map((card, cardIdx) => (
-                                  <div key={cardIdx} className="text-xs text-gray-700">
-                                    #{card.cardNumber} {card.playerName}
-                                    {card.team && ` (${card.team})`}
-                                  </div>
-                                ))}
-                              </div>
-                            </details>
-                          )}
-                          {set.parallels && set.parallels.length > 0 && (
-                            <details className="text-sm">
-                              <summary className="cursor-pointer text-green-600 hover:underline">
-                                View parallels ({set.parallels.length})
-                              </summary>
-                              <div className="mt-2 max-h-40 overflow-y-auto space-y-1">
-                                {sortParallelsByPrintRun(set.parallels).map((parallel, parallelIdx) => (
-                                  <div key={parallelIdx} className="text-xs text-gray-700">
-                                    • {parallel}
-                                  </div>
-                                ))}
-                              </div>
-                            </details>
-                          )}
-                        </div>
-                      </div>
-                    ) : null}
-
-                    {/* Nested Parallel Sets Display */}
-                    {set.parallelSets && set.parallelSets.length > 0 && (
-                      <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                        <h4 className="text-sm font-semibold text-green-900 mb-2 flex items-center gap-2">
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
-                          </svg>
-                          Parallel Sets ({set.parallelSets.length})
-                        </h4>
-                        <p className="text-xs text-green-700 mb-3">
-                          These parallel sets inherit the checklist from the parent &quot;{set.name}&quot; set
-                        </p>
-                        <div className="space-y-2">
-                          {set.parallelSets.map((parallel, pIdx) => {
-                            // The parallel name already includes the print run (e.g., "Electric Etch Green /5")
-                            // so we don't need to append it again
-                            const parallelDisplayName = parallel.name;
-
-                            return (
-                            <div key={parallel.id || pIdx} className="bg-white border border-green-200 rounded-lg p-3">
-                              <div className="flex items-center justify-between">
-                                <div className="flex-1">
-                                  <div className="font-medium text-sm text-gray-900">
-                                    {parallelDisplayName}
-                                  </div>
-                                  <div className="text-xs text-gray-600 mt-1">
-                                    {parallel.totalCards} cards • Inherits parent checklist
-                                  </div>
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={async () => {
-                                    if (confirm(`Delete parallel set "${parallel.name}"?`)) {
-                                      try {
-                                        const response = await fetch(`/api/sets?id=${parallel.id}`, {
-                                          method: 'DELETE',
-                                        });
-                                        if (response.ok) {
-                                          setMessage({ type: 'success', text: `Deleted "${parallel.name}"` });
-                                          setTimeout(() => setMessage(null), 3000);
-                                          // Refresh the page data
-                                          await fetchRelease();
-                                        } else {
-                                          throw new Error('Failed to delete parallel set');
-                                        }
-                                      } catch (error) {
-                                        console.error('Failed to delete parallel set:', error);
-                                        setMessage({ type: 'error', text: 'Failed to delete parallel set' });
-                                        setTimeout(() => setMessage(null), 5000);
-                                      }
-                                    }
-                                  }}
-                                  className="px-2 py-1 text-xs bg-orange-100 hover:bg-orange-200 text-orange-700 rounded transition-colors"
-                                  title="Delete parallel set"
-                                >
-                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                  </svg>
-                                </button>
-                              </div>
-                            </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-
-                  </div>
-                )}
-              </div>
-            );
-          })}
-            </div>
-          ) : (
-            <p className="text-sm text-gray-500 italic text-center py-4">
-              No sets yet. Click &ldquo;Add Set&rdquo; to create your first set.
-            </p>
-          )}
-        </div>
-
         {/* Action Buttons */}
         <div className="flex gap-4">
           <button
