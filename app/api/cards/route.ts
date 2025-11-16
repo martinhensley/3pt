@@ -11,23 +11,98 @@ export async function GET(request: NextRequest) {
     const slug = searchParams.get("slug");
     const id = searchParams.get("id");
 
-    // If no slug or id, return paginated cards for admin panel
+    // If no slug or id, return paginated cards with search/filter support
     if (!slug && !id) {
       const page = parseInt(searchParams.get("page") || "1");
       const limit = parseInt(searchParams.get("limit") || "50");
       const skip = (page - 1) * limit;
 
+      // Get filter parameters
+      const search = searchParams.get("search") || "";
+      const year = searchParams.get("year") || "";
+      const manufacturer = searchParams.get("manufacturer") || "";
+      const setType = searchParams.get("setType") || "";
+      const specialFeatures = searchParams.get("specialFeatures") || "";
+      const sortBy = searchParams.get("sortBy") || "year";
+      const sortOrder = searchParams.get("sortOrder") || "desc";
+
+      // Build where clause
+      const where: any = {};
+
+      // Text search across multiple fields
+      if (search) {
+        where.OR = [
+          { playerName: { contains: search, mode: 'insensitive' } },
+          { team: { contains: search, mode: 'insensitive' } },
+          { cardNumber: { contains: search, mode: 'insensitive' } },
+          { set: { name: { contains: search, mode: 'insensitive' } } },
+          { set: { release: { name: { contains: search, mode: 'insensitive' } } } },
+        ];
+      }
+
+      // Year filter
+      if (year) {
+        where.set = {
+          ...where.set,
+          release: {
+            ...where.set?.release,
+            year,
+          },
+        };
+      }
+
+      // Manufacturer filter
+      if (manufacturer) {
+        where.set = {
+          ...where.set,
+          release: {
+            ...where.set?.release,
+            manufacturer: {
+              name: manufacturer,
+            },
+          },
+        };
+      }
+
+      // Set type filter
+      if (setType) {
+        where.set = {
+          ...where.set,
+          type: setType,
+        };
+      }
+
+      // Special features filter
+      if (specialFeatures === "autograph") {
+        where.hasAutograph = true;
+      } else if (specialFeatures === "memorabilia") {
+        where.hasMemorabilia = true;
+      } else if (specialFeatures === "numbered") {
+        where.isNumbered = true;
+      }
+
+      // Build orderBy clause
+      let orderBy: any = [{ createdAt: 'desc' }];
+
+      if (sortBy === "player") {
+        orderBy = [{ playerName: sortOrder }];
+      } else if (sortBy === "team") {
+        orderBy = [{ team: sortOrder }];
+      } else if (sortBy === "cardNumber") {
+        orderBy = [{ cardNumber: sortOrder }];
+      } else if (sortBy === "year") {
+        orderBy = [
+          { set: { release: { year: sortOrder } } },
+          { createdAt: 'desc' },
+        ];
+      }
+
       const [cards, totalCount] = await Promise.all([
         prisma.card.findMany({
+          where,
           include: {
             set: {
               include: {
-                parentSet: {
-                  select: {
-                    id: true,
-                    type: true,
-                  },
-                },
                 release: {
                   include: {
                     manufacturer: true,
@@ -39,13 +114,11 @@ export async function GET(request: NextRequest) {
               orderBy: { order: 'asc' },
             },
           },
-          orderBy: [
-            { createdAt: 'desc' },
-          ],
+          orderBy,
           skip,
           take: limit,
         }),
-        prisma.card.count(),
+        prisma.card.count({ where }),
       ]);
 
       return NextResponse.json({
