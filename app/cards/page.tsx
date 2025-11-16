@@ -46,7 +46,7 @@ export default function CardsIndexPage() {
 
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [activeSearch, setActiveSearch] = useState(""); // The search term currently being used for filtering
   const [yearFilter, setYearFilter] = useState("");
   const [manufacturerFilter, setManufacturerFilter] = useState("");
   const [setTypeFilter, setSetTypeFilter] = useState("");
@@ -63,14 +63,18 @@ export default function CardsIndexPage() {
   const [uniqueManufacturers, setUniqueManufacturers] = useState<string[]>([]);
   const [uniqueSetTypes, setUniqueSetTypes] = useState<string[]>([]);
 
-  // Debounce search input
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchQuery);
-    }, 300);
+  // Handle search submission
+  const handleSearch = () => {
+    setActiveSearch(searchQuery);
+    setCurrentPage(1);
+  };
 
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
+  // Handle Enter key press
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   // Fetch cards with server-side filtering
   const fetchCards = useCallback(async () => {
@@ -83,7 +87,7 @@ export default function CardsIndexPage() {
         sortOrder,
       });
 
-      if (debouncedSearch) params.append("search", debouncedSearch);
+      if (activeSearch) params.append("search", activeSearch);
       if (yearFilter) params.append("year", yearFilter);
       if (manufacturerFilter) params.append("manufacturer", manufacturerFilter);
       if (setTypeFilter) params.append("setType", setTypeFilter);
@@ -103,7 +107,7 @@ export default function CardsIndexPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, cardsPerPage, debouncedSearch, yearFilter, manufacturerFilter, setTypeFilter, specialFilter, sortBy, sortOrder]);
+  }, [currentPage, cardsPerPage, activeSearch, yearFilter, manufacturerFilter, setTypeFilter, specialFilter, sortBy, sortOrder]);
 
   // Fetch filter options on mount
   useEffect(() => {
@@ -142,7 +146,7 @@ export default function CardsIndexPage() {
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [debouncedSearch, yearFilter, manufacturerFilter, setTypeFilter, specialFilter, sortBy, sortOrder]);
+  }, [activeSearch, yearFilter, manufacturerFilter, setTypeFilter, specialFilter, sortBy, sortOrder]);
 
   const totalPages = Math.ceil(filteredCount / cardsPerPage);
 
@@ -160,6 +164,7 @@ export default function CardsIndexPage() {
 
   const clearFilters = () => {
     setSearchQuery("");
+    setActiveSearch("");
     setYearFilter("");
     setManufacturerFilter("");
     setSetTypeFilter("");
@@ -190,7 +195,7 @@ export default function CardsIndexPage() {
     return `/cards/${slug}`;
   };
 
-  const hasActiveFilters = searchQuery || yearFilter || manufacturerFilter || setTypeFilter || specialFilter;
+  const hasActiveFilters = activeSearch || yearFilter || manufacturerFilter || setTypeFilter || specialFilter;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
@@ -225,22 +230,36 @@ export default function CardsIndexPage() {
 
               {/* Search Bar */}
               <div className="bg-white rounded-xl shadow-lg p-4 border border-gray-200">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search by player, team, set, release, or card number..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900 placeholder-gray-500"
-                  />
-                  {searchQuery && (
-                    <button
-                      onClick={() => setSearchQuery("")}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      ✕
-                    </button>
-                  )}
+                <div className="flex gap-2">
+                  <div className="relative flex-grow">
+                    <input
+                      type="text"
+                      placeholder="Search by player, team, set, release, or card number..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      autoComplete="off"
+                      data-form-type="other"
+                      className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900 placeholder-gray-500"
+                    />
+                    {searchQuery && (
+                      <button
+                        onClick={() => {
+                          setSearchQuery("");
+                          setActiveSearch("");
+                        }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                  <button
+                    onClick={handleSearch}
+                    className="px-6 py-3 bg-footy-green text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
+                  >
+                    Search
+                  </button>
                 </div>
               </div>
 
@@ -362,20 +381,20 @@ export default function CardsIndexPage() {
               </div>
 
               {/* Per Page Selector */}
-              <div className="bg-white rounded-xl shadow-lg p-4 border border-gray-200">
+              <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-xl shadow-lg p-4 border border-gray-200">
                 <div className="flex items-center justify-between">
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-white">
                     Showing {cards.length > 0 ? ((currentPage - 1) * cardsPerPage) + 1 : 0} - {Math.min(currentPage * cardsPerPage, filteredCount)} of {filteredCount.toLocaleString()}
                   </div>
                   <div className="flex items-center gap-2">
-                    <label htmlFor="perPage" className="text-sm font-medium text-gray-700">
+                    <label htmlFor="perPage" className="text-sm font-medium text-white">
                       Cards per page:
                     </label>
                     <select
                       id="perPage"
                       value={cardsPerPage}
                       onChange={(e) => handlePerPageChange(parseInt(e.target.value))}
-                      className="px-3 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900"
+                      className="px-3 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-white bg-white text-gray-900"
                     >
                       <option value="10">10</option>
                       <option value="25">25</option>
@@ -446,7 +465,7 @@ export default function CardsIndexPage() {
                         {(card.hasAutograph || card.hasMemorabilia || card.isNumbered) && (
                           <div className="flex gap-2 flex-wrap">
                             {card.hasAutograph && (
-                              <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-semibold">
+                              <span className="px-3 py-1 bg-cyan-100 text-cyan-800 text-xs rounded-full font-semibold">
                                 AUTO
                               </span>
                             )}
