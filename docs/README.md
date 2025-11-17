@@ -1,6 +1,6 @@
-# footy.bot Documentation
+# 3pt.bot Documentation
 
-Welcome to the footy.bot documentation hub.
+Welcome to the 3pt.bot documentation hub.
 
 ## Documentation Index
 

@@ -4,12 +4,12 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "About Us - footy.bot",
-  description: "Learn about footy.bot, your ultimate resource for soccer card information, collection management, and market insights.",
+  title: "About Us - 3pt.bot",
+  description: "Learn about 3pt.bot, your ultimate resource for soccer card information, collection management, and market insights.",
   openGraph: {
-    title: "About Us - footy.bot",
-    description: "Learn about footy.bot, your ultimate resource for soccer card information.",
-    url: "https://www.footy.bot/about",
+    title: "About Us - 3pt.bot",
+    description: "Learn about 3pt.bot, your ultimate resource for soccer card information.",
+    url: "https://www.3pt.bot/about",
   },
 };
 

@@ -1,6 +1,6 @@
-# footy.bot Database Reference
+# 3pt.bot Database Reference
 
-Complete database schema documentation for the footy.bot soccer card platform.
+Complete database schema documentation for the 3pt.bot soccer card platform.
 
 ## Table of Contents
 
@@ -43,7 +43,7 @@ Complete database schema documentation for the footy.bot soccer card platform.
 
 ## Introduction
 
-The footy.bot database uses PostgreSQL with Prisma ORM. The schema is designed around a **hierarchical data model** that mirrors the physical structure of trading card products:
+The 3pt.bot database uses PostgreSQL with Prisma ORM. The schema is designed around a **hierarchical data model** that mirrors the physical structure of trading card products:
 
 ```
 Manufacturer → Release → Set → Card
@@ -239,7 +239,7 @@ const release = await prisma.release.create({
     postDate: new Date("2025-05-04"),
     manufacturerId: manufacturer.id,
     isApproved: true,
-    approvedBy: "admin@footy.bot",
+    approvedBy: "admin@3pt.bot",
     approvedAt: new Date()
   }
 });

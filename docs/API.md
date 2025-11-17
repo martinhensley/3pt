@@ -1,6 +1,6 @@
-# footy.bot API Reference
+# 3pt.bot API Reference
 
-Complete REST API documentation for the footy.bot soccer card platform.
+Complete REST API documentation for the 3pt.bot soccer card platform.
 
 ## Table of Contents
 
@@ -21,9 +21,9 @@ Complete REST API documentation for the footy.bot soccer card platform.
 
 ## Introduction
 
-The footy.bot API provides programmatic access to soccer card data, AI-powered analysis, and content management features.
+The 3pt.bot API provides programmatic access to soccer card data, AI-powered analysis, and content management features.
 
-**Base URL:** `http://localhost:3000` (development) or `https://footy.bot` (production)
+**Base URL:** `http://localhost:3000` (development) or `https://3pt.bot` (production)
 
 **Content Type:** All requests and responses use `application/json` unless otherwise specified.
 
@@ -244,7 +244,7 @@ curl -X POST "http://localhost:3000/api/releases/approve" \
     "id": "cm3abc123",
     "isApproved": true,
     "approvedAt": "2025-01-15T10:30:00.000Z",
-    "approvedBy": "admin@footy.bot"
+    "approvedBy": "admin@3pt.bot"
   }
 }
 ```
@@ -1019,7 +1019,7 @@ Fetch recent admin activity log.
     "entityType": "Card",
     "entityId": "cm3card123",
     "details": "Created card: Jude Bellingham #1",
-    "userId": "admin@footy.bot",
+    "userId": "admin@3pt.bot",
     "createdAt": "2025-01-15T10:30:00.000Z"
   }
 ]

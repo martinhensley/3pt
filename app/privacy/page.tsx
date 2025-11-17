@@ -3,12 +3,12 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy - footy.bot",
-  description: "footy.bot Privacy Policy - Learn how we collect, use, and protect your information.",
+  title: "Privacy Policy - 3pt.bot",
+  description: "3pt.bot Privacy Policy - Learn how we collect, use, and protect your information.",
   openGraph: {
-    title: "Privacy Policy - footy.bot",
+    title: "Privacy Policy - 3pt.bot",
     description: "Learn how we collect, use, and protect your information.",
-    url: "https://www.footy.bot/privacy",
+    url: "https://www.3pt.bot/privacy",
   },
 };
 

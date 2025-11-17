@@ -3,12 +3,12 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Terms of Service - footy.bot",
-  description: "footy.bot Terms of Service - Review the terms and conditions for using our website.",
+  title: "Terms of Service - 3pt.bot",
+  description: "3pt.bot Terms of Service - Review the terms and conditions for using our website.",
   openGraph: {
-    title: "Terms of Service - footy.bot",
+    title: "Terms of Service - 3pt.bot",
     description: "Review the terms and conditions for using our website.",
-    url: "https://www.footy.bot/terms",
+    url: "https://www.3pt.bot/terms",
   },
 };
 

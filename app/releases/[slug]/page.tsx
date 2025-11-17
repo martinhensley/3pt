@@ -295,25 +295,25 @@ export default function ReleasePage() {
             "@type": "Article",
             headline: `${release.year} ${release.manufacturer.name} ${release.name}`,
             description: `${release.manufacturer.name} ${release.name} ${release.year || ''} trading card release`,
-            image: release.images.map(img => `https://www.footy.bot${img.url}`),
+            image: release.images.map(img => `https://www.3pt.bot${img.url}`),
             datePublished: release.createdAt,
             dateModified: release.createdAt,
             author: {
               "@type": "Organization",
               name: "Footy Bot",
-              url: "https://www.footy.bot"
+              url: "https://www.3pt.bot"
             },
             publisher: {
               "@type": "Organization",
               name: "Footy Bot",
               logo: {
                 "@type": "ImageObject",
-                url: "https://www.footy.bot/logo.png"
+                url: "https://www.3pt.bot/logo.png"
               }
             },
             mainEntityOfPage: {
               "@type": "WebPage",
-              "@id": `https://www.footy.bot/releases/${release.slug}`
+              "@id": `https://www.3pt.bot/releases/${release.slug}`
             },
             articleSection: "New Releases",
             keywords: "soccer cards, football cards, trading cards, collectibles"

@@ -67,25 +67,25 @@ export default function PostPage() {
     "@type": "Article",
     headline: post.title,
     description: post.excerpt,
-    image: post.images.map(img => `https://www.footy.bot${img.url}`),
+    image: post.images.map(img => `https://www.3pt.bot${img.url}`),
     datePublished: post.createdAt,
     dateModified: post.createdAt,
     author: {
       "@type": "Organization",
       name: "Footy Bot",
-      url: "https://www.footy.bot"
+      url: "https://www.3pt.bot"
     },
     publisher: {
       "@type": "Organization",
       name: "Footy Bot",
       logo: {
         "@type": "ImageObject",
-        url: "https://www.footy.bot/logo.png"
+        url: "https://www.3pt.bot/logo.png"
       }
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `https://www.footy.bot/posts/${post.slug}`
+      "@id": `https://www.3pt.bot/posts/${post.slug}`
     },
     articleSection: post.type === "CARD" ? "Trading Cards" : post.type === "SET" ? "Card Sets" : post.type === "RELEASE" ? "New Releases" : "General",
     keywords: "soccer cards, football cards, trading cards, collectibles"
