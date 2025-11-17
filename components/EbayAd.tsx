@@ -19,10 +19,36 @@ interface EbayAdProps {
 }
 
 export default function EbayAd({
-  query = "soccer cards",
+  query = "basketball cards",
   limit = 3,
-  title = "Soccer Cards on eBay"
+  title = "Basketball Cards on eBay"
 }: EbayAdProps) {
+  // Temporarily return placeholder instead of fetching eBay data
+  return (
+    <div className="bg-white border-2 border-gray-300 rounded-lg shadow-lg p-5">
+      <p className="text-sm text-footy-dark-green font-bold mb-4 text-center uppercase tracking-wide">
+        {title}
+      </p>
+      <div className="space-y-4">
+        {[1, 2, 3].slice(0, limit).map((i) => (
+          <div key={i} className="bg-gray-50 rounded-lg border-2 border-gray-200 p-4">
+            <div className="w-full h-32 bg-gray-200 rounded mb-3 flex items-center justify-center">
+              <span className="text-gray-400 text-sm">Ad Placeholder {i}</span>
+            </div>
+            <div className="h-4 bg-gray-200 rounded mb-2"></div>
+            <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-4 pt-4 border-t border-gray-300">
+        <p className="text-xs text-gray-500 text-center font-medium">
+          Sponsored Links (Placeholder)
+        </p>
+      </div>
+    </div>
+  );
+
+  /* Original eBay fetching code - commented out temporarily
   const [products, setProducts] = useState<EbayProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,6 +76,7 @@ export default function EbayAd({
 
     fetchProducts();
   }, [query, limit]);
+  */
 
   if (loading) {
     return (

@@ -19,10 +19,36 @@ interface EbayAdHorizontalProps {
 }
 
 export default function EbayAdHorizontal({
-  query = "soccer cards",
+  query = "basketball cards",
   limit = 4,
   title = "Featured on eBay"
 }: EbayAdHorizontalProps) {
+  // Temporarily return placeholder instead of fetching eBay data
+  return (
+    <div className="bg-white border-2 border-gray-300 rounded-lg shadow-lg p-6 my-8">
+      <p className="text-sm text-footy-dark-green font-bold mb-6 text-center uppercase tracking-wide">
+        {title}
+      </p>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[1, 2, 3, 4].slice(0, limit).map((i) => (
+          <div key={i} className="bg-gray-50 rounded-lg border-2 border-gray-200 p-3">
+            <div className="w-full h-32 bg-gray-200 rounded mb-3 flex items-center justify-center">
+              <span className="text-gray-400 text-xs">Ad {i}</span>
+            </div>
+            <div className="h-3 bg-gray-200 rounded mb-2"></div>
+            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-4 pt-4 border-t border-gray-300">
+        <p className="text-xs text-gray-500 text-center font-medium">
+          Sponsored Links (Placeholder)
+        </p>
+      </div>
+    </div>
+  );
+
+  /* Original eBay fetching code - commented out temporarily
   const [products, setProducts] = useState<EbayProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,6 +76,7 @@ export default function EbayAdHorizontal({
 
     fetchProducts();
   }, [query, limit]);
+  */
 
   if (loading) {
     return (

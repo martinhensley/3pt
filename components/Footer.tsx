@@ -21,18 +21,18 @@ export default function Footer({ rounded = true }: FooterProps) {
             </p>
           </div>
 
-          {/* Quick Links */}
+          {/* Card Library */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+            <h3 className="text-lg font-semibold mb-4">Card Library</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/" className="text-green-100 hover:text-white transition-colors">
-                  Home
+                <Link href="/cards" className="text-green-100 hover:text-white transition-colors">
+                  Cards
                 </Link>
               </li>
               <li>
-                <Link href="/posts" className="text-green-100 hover:text-white transition-colors">
-                  Posts
+                <Link href="/checklists" className="text-green-100 hover:text-white transition-colors">
+                  Checklists
                 </Link>
               </li>
               <li>
