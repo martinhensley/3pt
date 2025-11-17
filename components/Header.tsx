@@ -29,7 +29,7 @@ export default function Header({ showBackButton = false, rounded = true, showAd 
         <div className="text-center mb-6">
           <h1 className="text-4xl md:text-5xl font-bold font-orbitron">
             <Link href="/" className="hover:opacity-90 transition-opacity">
-              <span>footy<span className="text-footy-orange">.bot</span></span>
+              <span>3pt<span className="text-footy-orange">.bot</span></span>
             </Link>
           </h1>
         </div>
@@ -72,7 +72,7 @@ export default function Header({ showBackButton = false, rounded = true, showAd 
       {/* Optional ad space below header */}
       {showAd && (
         <div className="px-6 pb-6">
-          <EbayAdHorizontal query="soccer trading cards" limit={4} title="Featured Soccer Cards" />
+          <EbayAdHorizontal query="basketball trading cards" limit={4} title="Featured Basketball Cards" />
         </div>
       )}
     </header>

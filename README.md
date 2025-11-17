@@ -1,8 +1,8 @@
-# footy.bot
+# 3pt.bot
 
-A football (soccer) card AI and Data Platform
+A basketball card AI and Data Platform
 
-**footy.bot** is a comprehensive database and content platform for soccer trading cards, powered by Claude AI (Sonnet 4). The platform combines structured data management with AI-assisted content creation to build the most complete soccer card reference available.
+**3pt.bot** is a comprehensive database and content platform for basketball trading cards, powered by Claude AI (Sonnet 4). The platform combines structured data management with AI-assisted content creation to build the most complete basketball card reference available.
 
 ## Overview
 
@@ -30,7 +30,7 @@ A football (soccer) card AI and Data Platform
 - **Hierarchical Data Model**: Manufacturers → Releases → Sets → Cards
 - **Independent Parallel Architecture**: Sets with parallels grouped by base name with intelligent sorting
 - **Smart Set Sorting**: Automatic grouping of sets with their parallels (Base/Optic first, then alphabetical by base name)
-- **Complete Checklists**: Major releases from Panini, Topps, and other manufacturers (including 2024-25 Donruss Soccer: 116 sets, 8,947 cards)
+- **Complete Checklists**: Major releases from Panini, Topps, and other manufacturers
 - **Card Database**: Comprehensive card database with images and metadata
 - **Release Management**: Approval workflow, reviews, source document tracking
 
@@ -53,7 +53,7 @@ A football (soccer) card AI and Data Platform
 - **Release Database**: Public catalog of approved releases with reviews
 - **eBay Integration**: Live marketplace listings via eBay Partner Network API
 - **SEO Optimized**: Dynamic metadata, sitemap, structured data, and Open Graph tags
-- **Responsive Design**: Mobile-friendly interface with footy.bot branding (Green #005031 & Orange #F47322)
+- **Responsive Design**: Mobile-friendly interface with 3pt.bot branding (Green #005031 & Orange #F47322)
 
 ## Roadmap / TODO
 
@@ -75,7 +75,7 @@ A football (soccer) card AI and Data Platform
 - **Sales Data Collection**: Aggregate and track historical sales data from major marketplaces (eBay, PWCC, Goldin, etc.) to provide market insights and pricing trends
 - **Comps (Comparable Valuations)**: Feature-as-a-service component providing third-party valuation services with comparable sales data, market analysis, and automated valuation models for grading companies and auction houses
 - **SEO Strategy & Optimization**: Once development slows and the app is ready for content production, focus on:
-  - Keyword research and targeting (primary: soccer card database, football trading cards; secondary: panini soccer cards, topps soccer cards)
+  - Keyword research and targeting (primary: basketball card database, NBA trading cards; secondary: panini basketball cards, topps basketball cards)
   - Content optimization for target keywords
   - Link building and backlink strategy
   - Performance optimization (Core Web Vitals)
@@ -95,8 +95,8 @@ A football (soccer) card AI and Data Platform
 
 ## Branding and Color Scheme
 
-- Footy Green: #005031
-- Footy Orange: #F47322
+- 3pt Green: #005031
+- 3pt Orange: #F47322
 - White: #FFFFFF
 
 ## Quick Start
@@ -153,7 +153,7 @@ npx prisma generate
 ## Project Structure
 
 ```
-footy/
+3pt/
 ├── .claude/
 │   ├── CLAUDE.md           # Development documentation & patterns
 │   └── skills/             # Claude Code skills directory
@@ -276,7 +276,7 @@ All public-facing pages follow a **standardized three-column layout** to ensure 
 
 ## Database Schema
 
-The footy.bot database uses PostgreSQL with Prisma ORM, designed around a hierarchical data model:
+The 3pt.bot database uses PostgreSQL with Prisma ORM, designed around a hierarchical data model:
 
 ```
 Manufacturer → Release → Set → Card
@@ -318,7 +318,7 @@ Includes:
 
 ## API Reference
 
-footy.bot provides a comprehensive REST API for managing soccer card data, AI-powered analysis, and content generation.
+3pt.bot provides a comprehensive REST API for managing basketball card data, AI-powered analysis, and content generation.
 
 ### Quick Reference
 
@@ -390,5 +390,5 @@ EBAY_DELETION_ENDPOINT_URL=
 
 ## License
 
-Private project for footy.bot
+Private project for 3pt.bot
 

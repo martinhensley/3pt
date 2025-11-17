@@ -81,8 +81,8 @@ async function getAccessToken(): Promise<string> {
   return accessToken;
 }
 
-export async function searchSoccerCards(
-  query: string = "soccer cards",
+export async function searchBasketballCards(
+  query: string = "basketball cards",
   limit: number = 5
 ): Promise<EbayProduct[]> {
   const token = await getAccessToken();
@@ -99,7 +99,7 @@ export async function searchSoccerCards(
     ? "https://api.sandbox.ebay.com"
     : "https://api.ebay.com";
 
-  // Build search URL with filters for soccer cards
+  // Build search URL with filters for basketball cards
   const searchParams = new URLSearchParams({
     q: query,
     category_ids: "212", // Sports Trading Cards category

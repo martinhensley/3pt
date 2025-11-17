@@ -108,6 +108,12 @@ model Card {
   // Admin notes
   footyNotes            String?  @db.Text // Internal notes about this card
 
+  // Basketball-specific fields
+  position              String?  // Player position (PG, SG, SF, PF, C)
+  rookieYear            String?  // Rookie season (e.g., "2023-24")
+  college               String?  // College team
+  league                String?  // NBA, WNBA, College, International
+
   setId                 String
   set                   Set      @relation(fields: [setId], references: [id], onDelete: Cascade)
   createdAt             DateTime @default(now())

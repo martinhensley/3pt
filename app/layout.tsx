@@ -21,41 +21,43 @@ const orbitron = Orbitron({
 
 export const metadata: Metadata = {
   title: {
-    default: "Footy Bot - Soccer (Football) Card Information",
-    template: "%s | Footy Bot"
+    default: "3pt Bot - Basketball Card Information",
+    template: "%s | 3pt Bot"
   },
-  description: "Comprehensive compendium of football trading card information featuring player cards, sets, and releases from Panini, Topps, and more. Your ultimate soccer card reference and collector's guide.",
+  description: "Comprehensive compendium of basketball trading card information featuring player cards, sets, and releases from Panini, Topps, and more. Your ultimate basketball card reference and collector's guide.",
   keywords: [
-    "soccer cards",
-    "football cards",
+    "basketball cards",
+    "NBA cards",
     "trading cards",
-    "panini soccer cards",
-    "topps soccer",
-    "soccer card database",
-    "football trading cards",
-    "soccer collectibles",
+    "panini basketball cards",
+    "topps basketball",
+    "basketball card database",
+    "basketball trading cards",
+    "basketball collectibles",
     "player cards",
-    "soccer card information",
+    "basketball card information",
     "card collecting",
-    "sports cards"
+    "sports cards",
+    "NBA trading cards",
+    "college basketball cards"
   ],
-  authors: [{ name: "Footy Bot" }],
-  creator: "Footy Bot",
-  publisher: "Footy Bot",
+  authors: [{ name: "3pt Bot" }],
+  creator: "3pt Bot",
+  publisher: "3pt Bot",
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://www.footy.bot"),
+  metadataBase: new URL("https://www.3pt.bot"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Footy Bot - Soccer (Football) Card Information",
-    description: "Comprehensive compendium of football trading card information featuring player cards, sets, and releases. Your ultimate soccer card reference.",
-    url: "https://www.footy.bot",
-    siteName: "Footy Bot",
+    title: "3pt Bot - Basketball Card Information",
+    description: "Comprehensive compendium of basketball trading card information featuring player cards, sets, and releases. Your ultimate basketball card reference.",
+    url: "https://www.3pt.bot",
+    siteName: "3pt Bot",
     locale: "en_US",
     type: "website",
     images: [
@@ -63,14 +65,14 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Footy Bot - Soccer Card Compendium",
+        alt: "3pt Bot - Basketball Card Compendium",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Footy Bot - Soccer (Football) Card Information",
-    description: "Comprehensive compendium of football trading card information. Your ultimate soccer card reference and collector's guide.",
+    title: "3pt Bot - Basketball Card Information",
+    description: "Comprehensive compendium of basketball trading card information. Your ultimate basketball card reference and collector's guide.",
     images: ["/twitter-image.png"],
   },
   robots: {

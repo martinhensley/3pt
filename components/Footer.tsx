@@ -14,10 +14,10 @@ export default function Footer({ rounded = true }: FooterProps) {
           {/* About Section */}
           <div>
             <h3 className="text-lg font-bold font-orbitron mb-4">
-              <span className="text-white">footy</span><span className="text-footy-orange">.bot</span>
+              <span className="text-white">3pt</span><span className="text-footy-orange">.bot</span>
             </h3>
             <p className="text-sm text-green-100">
-              The ultimate resource for soccer cards, comps, and collection management.
+              The ultimate resource for basketball cards, comps, and collection management.
             </p>
           </div>
 
@@ -120,7 +120,7 @@ export default function Footer({ rounded = true }: FooterProps) {
         {/* Bottom Bar */}
         <div className="border-t border-green-600 pt-6 text-center">
           <p className="text-sm text-green-100">
-            <span className="text-white font-orbitron">footy</span><span className="text-footy-orange font-orbitron">.bot</span> © 2024-{new Date().getFullYear()} | All rights reserved
+            <span className="text-white font-orbitron">3pt</span><span className="text-footy-orange font-orbitron">.bot</span> © 2024-{new Date().getFullYear()} | All rights reserved
           </p>
         </div>
       </div>

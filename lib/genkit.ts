@@ -89,7 +89,7 @@ export async function analyzeRelease(input: {
     // Add the analysis prompt
     messageContent.push({
       type: 'text',
-      text: `You are analyzing a soccer card release document (sell sheet, catalog, etc.).
+      text: `You are analyzing a basketball card release document (sell sheet, catalog, etc.).
 
 Extract the following information from this document and return it as a JSON object:
 
@@ -97,9 +97,9 @@ CRITICAL REQUIREMENTS:
 
 1. Full Release Name Format: MUST be "Year Manufacturer ReleaseName"
    Examples:
-   - "2024-25 Panini Donruss Soccer"
-   - "2024-25 Topps Chrome UEFA Club Competitions"
-   - "2023-24 Panini Obsidian Soccer"
+   - "2024-25 Panini Prizm Basketball"
+   - "2024-25 Topps Chrome NBA"
+   - "2023-24 Panini Obsidian Basketball"
 
 2. Release date: Extract if explicitly mentioned (format: YYYY-MM-DD)
 
@@ -157,7 +157,7 @@ Return ONLY a JSON object with this structure:
     messages: [
       {
         role: 'user',
-        content: `You are analyzing a soccer card release document (sell sheet, catalog, etc.).
+        content: `You are analyzing a basketball card release document (sell sheet, catalog, etc.).
 
 Extract the following information from this document:
 
@@ -168,9 +168,9 @@ CRITICAL REQUIREMENTS:
 
 1. Full Release Name Format: MUST be "Year Manufacturer ReleaseName"
    Examples:
-   - "2024-25 Panini Donruss Soccer"
-   - "2024-25 Topps Chrome UEFA Club Competitions"
-   - "2023-24 Panini Obsidian Soccer"
+   - "2024-25 Panini Prizm Basketball"
+   - "2024-25 Topps Chrome NBA"
+   - "2023-24 Panini Obsidian Basketball"
 
 2. Release date: Extract if explicitly mentioned (format: YYYY-MM-DD)
 
@@ -222,7 +222,7 @@ export async function generateDescription(input: {
         role: 'user',
         content: `You MUST generate a description that is EXACTLY 7-21 sentences long. Count each sentence carefully before submitting.
 
-Generate a comprehensive, engaging description for this soccer card release based ONLY on the provided source document information.
+Generate a comprehensive, engaging description for this basketball card release based ONLY on the provided source document information.
 
 Release: ${input.release.fullReleaseName}
 
@@ -231,15 +231,15 @@ ${input.sourceText}
 
 CRITICAL REQUIREMENT: Your response MUST contain a MINIMUM of 7 sentences and a MAXIMUM of 21 sentences. This is non-negotiable. Count your sentences before responding.
 
-Write in the voice of footy, a passionate football (soccer) fanatic who lives in the British Commonwealth, attended the London School of Economics, and hails from the southern United States.
+Write in the voice of 3pt, a basketball analytics enthusiast with deep NBA knowledge, college hoops expertise, and a data-driven approach to card collecting.
 
 Requirements (all mandatory):
 1. LENGTH: 7-21 sentences (count them! Less than 7 is unacceptable)
 2. PARAGRAPHS: Use proper paragraph breaks (separate with double line breaks). Group into 2-4 paragraphs
 3. CONTENT: ONLY use information from the source documents - do NOT fabricate details
-4. PERSPECTIVE: Third-person about the cards - NEVER first-person or about footy himself
-5. STYLE: Commonwealth English (colour, favourite, whilst, analysed)
-6. TONE: LSE-level analytical precision mixed with Southern charm and enthusiasm
+4. PERSPECTIVE: Third-person about the cards - NEVER first-person or about 3pt himself
+5. STYLE: Analytical and data-focused, using basketball terminology and statistical concepts
+6. TONE: Professional yet enthusiastic, like a knowledgeable analyst breaking down a game
 7. FOCUS: What makes this release special and collectible
 
 To meet the minimum 7 sentences, you should discuss:

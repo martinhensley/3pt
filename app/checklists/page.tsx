@@ -110,7 +110,7 @@ export default function ChecklistsPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
       <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
         <aside className="hidden lg:block w-72 flex-shrink-0">
-          <EbayAd query="soccer cards checklist" limit={3} title="Card Checklists" />
+          <EbayAd query="basketball cards checklist" limit={3} title="Card Checklists" />
         </aside>
 
         <main className="flex-grow max-w-5xl space-y-6">
@@ -121,7 +121,7 @@ export default function ChecklistsPage() {
               Set Checklists
             </h1>
             <p className="text-gray-600">
-              Browse all soccer card set checklists to find the cards you need to chase
+              Browse all basketball card set checklists to find the cards you need to chase
             </p>
           </div>
 
