@@ -57,7 +57,7 @@ export default function PublicPageLayout({
         </aside>
 
         {/* Main Content */}
-        <main className="flex-grow max-w-5xl space-y-6">
+        <main className="flex-grow w-full max-w-5xl space-y-6">
           <Header showBackButton={showBackButton} rounded={true} />
 
           {loading ? (
