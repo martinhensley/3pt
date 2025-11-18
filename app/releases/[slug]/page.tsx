@@ -346,7 +346,7 @@ export default function ReleasePage() {
           {/* Combined Hero with Carousel */}
           <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white">
             {/* Hero Header */}
-            <div className="p-8 pb-6">
+            <div className="p-4 md:p-8 pb-6">
               <div className="space-y-3">
                 <div className="flex items-center gap-3 flex-wrap">
                   <span className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full font-bold text-sm">
@@ -453,7 +453,7 @@ export default function ReleasePage() {
 
             {/* Review */}
             {release.review && (
-              <div className="p-8 pt-6">
+              <div className="p-4 md:p-8 pt-6">
                 {/* Review Content */}
                 <div className="space-y-4">
                   {release.review.split('\n\n').map((paragraph, idx) => (
