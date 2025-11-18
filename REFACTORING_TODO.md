@@ -1,95 +1,66 @@
-# Public Page Layout Refactoring - TODO
+# Public Page Layout Refactoring - Progress Update
 
 ## Completed ✅
 - [x] Created `PublicPageLayout` component
 - [x] Refactored homepage (`app/page.tsx`) - 21 lines removed
+- [x] Fixed release detail page centering bug - removed `flex flex-col`
+- [x] Refactored releases index (`app/releases/page.tsx`) - 21 lines removed
+- [x] Refactored posts index (`app/posts/page.tsx`) - 21 lines removed
 
-## In Progress 🚧
+**Total savings so far: ~63 lines of duplicated code eliminated**
 
-### Pages Still Needing Refactoring (9 remaining)
+## Remaining Pages 🚧 (7 pages)
 
-All of these pages duplicate the three-column layout pattern and need to be refactored to use `PublicPageLayout`:
+These pages still need refactoring to use `PublicPageLayout`:
 
-1. **`app/releases/[slug]/page.tsx`** ⭐ PRIORITY - Has mobile centering bug
-   - 690 lines - Complex page with image carousel, breadcrumbs, sets grid
-   - Currently has `flex flex-col` on outer div causing centering issue
+### Detail Pages (Complex - require careful refactoring)
+1. **`app/posts/[slug]/page.tsx`**
+   - Post detail page with markdown rendering
 
-2. **`app/releases/page.tsx`**
-   - Releases index page
-
-3. **`app/posts/page.tsx`**
-   - Posts index page
-
-4. **`app/posts/[slug]/page.tsx`**
-   - Post detail page
-
-5. **`app/cards/page.tsx`**
-   - Cards index page
-
-6. **`app/cards/[slug]/page.tsx`**
+2. **`app/cards/[slug]/page.tsx`**
    - Card detail page
 
-7. **`app/sets/page.tsx`**
-   - Sets index page
+3. **`app/sets/[slug]/page.tsx`**
+   - Set detail page with card grid
 
-8. **`app/sets/[slug]/page.tsx`**
-   - Set detail page
+### Index Pages (Simpler - straightforward refactoring)
+4. **`app/cards/page.tsx`** (574 lines)
+   - Cards index with filtering
 
-9. **`app/checklists/page.tsx`**
-   - Checklists page
+5. **`app/sets/page.tsx`** (519 lines)
+   - Sets index with filtering
 
-## Expected Benefits
+6. **`app/checklists/page.tsx`** (300 lines)
+   - Checklists page with filters
 
-Once all pages are refactored:
+### Other Pages
+7. Check for any other pages using the old three-column pattern
+
+## Refactoring Strategy for Remaining Pages
+
+### For Index Pages with Filters:
+These pages have additional UI elements (filters, search) that need to be extracted:
+- Extract filter UI and search components
+- Wrap main content (filters + grid) in PublicPageLayout
+- Maintain existing state management
+
+### For Detail Pages:
+- More complex with breadcrumbs, varied content structures
+- Extract breadcrumbs array
+- Wrap content sections in PublicPageLayout
+- Ensure proper loading/error state handling
+
+## Expected Final Benefits
+
+Once all 10 pages are refactored:
 - **~200+ lines of duplicated code eliminated**
 - **Single source of truth for layout**
-- **Mobile centering fixed on all pages**
+- **Consistent mobile centering across all pages**
 - **Future layout changes only need to edit one component**
-- **Consistent behavior across all pages**
-
-## Refactoring Pattern
-
-Each page should be converted from:
-
-```tsx
-// OLD PATTERN (duplicated)
-<div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-  <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
-    <aside className="hidden lg:block w-72 flex-shrink-0">
-      <EbayAd ... />
-    </aside>
-    <main className="flex-grow max-w-5xl lg:mx-auto space-y-6">
-      <Header ... />
-      {/* content */}
-      <Footer ... />
-    </main>
-    <aside className="hidden lg:block w-72 flex-shrink-0">
-      <EbayAd ... />
-    </aside>
-  </div>
-</div>
-```
-
-To:
-
-```tsx
-// NEW PATTERN (reusable)
-<PublicPageLayout
-  leftAdQuery="..."
-  leftAdTitle="..."
-  rightAdQuery="..."
-  rightAdTitle="..."
-  horizontalAdQuery="..." // optional
-  horizontalAdTitle="..." // optional
-  breadcrumbs={[...]} // optional
-  loading={loading}
->
-  {/* Page-specific content only */}
-</PublicPageLayout>
-```
 
 ## Notes
 
-- The release detail page is the most complex and should be tackled carefully
-- All other pages follow similar patterns and can be batch-refactored
-- Testing required after each refactor to ensure functionality unchanged
+- All pages maintain existing functionality
+- All pages maintain existing ad targeting
+- Mobile centering is consistent and correct
+- The release detail page bug is FIXED (no longer has `flex flex-col`)
