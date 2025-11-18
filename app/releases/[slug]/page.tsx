@@ -330,7 +330,7 @@ export default function ReleasePage() {
           />
         </aside>
 
-        <main className="flex-grow max-w-5xl mx-auto space-y-6">
+        <main className="flex-grow max-w-5xl lg:mx-auto space-y-6">
           <Header showBackButton={false} rounded={true} />
 
           {loading ? (

@@ -25,7 +25,7 @@ export default function EbayAd({
 }: EbayAdProps) {
   // Temporarily return placeholder instead of fetching eBay data
   return (
-    <div className="bg-white border-2 border-gray-300 rounded-lg shadow-lg p-5">
+    <div className="bg-white border-2 border-gray-300 rounded-lg shadow-lg p-4 lg:p-5">
       <p className="text-sm text-footy-dark-green font-bold mb-4 text-center uppercase tracking-wide">
         {title}
       </p>
@@ -80,7 +80,7 @@ export default function EbayAd({
 
   if (loading) {
     return (
-      <div className="bg-white border-2 border-footy-gold rounded-lg shadow-lg p-5">
+      <div className="bg-white border-2 border-footy-gold rounded-lg shadow-lg p-4 lg:p-5">
         <p className="text-sm text-footy-dark-green font-bold mb-4 text-center uppercase tracking-wide">
           {title}
         </p>
@@ -93,7 +93,7 @@ export default function EbayAd({
 
   if (error || products.length === 0) {
     return (
-      <div className="bg-white border-2 border-footy-gold rounded-lg shadow-lg p-5">
+      <div className="bg-white border-2 border-footy-gold rounded-lg shadow-lg p-4 lg:p-5">
         <p className="text-sm text-footy-dark-green font-bold mb-4 text-center uppercase tracking-wide">
           {title}
         </p>
@@ -107,7 +107,7 @@ export default function EbayAd({
   }
 
   return (
-    <div className="bg-white border-2 border-footy-gold rounded-lg shadow-lg p-5">
+    <div className="bg-white border-2 border-footy-gold rounded-lg shadow-lg p-4 lg:p-5">
       <p className="text-sm text-footy-dark-green font-bold mb-4 text-center uppercase tracking-wide">
         {title}
       </p>

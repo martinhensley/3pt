@@ -113,7 +113,7 @@ export default function ChecklistsPage() {
           <EbayAd query="basketball cards checklist" limit={3} title="Card Checklists" />
         </aside>
 
-        <main className="flex-grow max-w-5xl mx-auto space-y-6">
+        <main className="flex-grow max-w-5xl lg:mx-auto space-y-6">
           <Header rounded={true} />
 
           <div className="mb-8">
