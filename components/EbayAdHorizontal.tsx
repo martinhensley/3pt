@@ -25,7 +25,7 @@ export default function EbayAdHorizontal({
 }: EbayAdHorizontalProps) {
   // Temporarily return placeholder instead of fetching eBay data
   return (
-    <div className="bg-white border-2 border-gray-300 rounded-lg shadow-lg p-6 my-8">
+    <div className="bg-white border-2 border-gray-300 rounded-lg shadow-lg p-4 lg:p-6 my-8">
       <p className="text-sm text-footy-dark-green font-bold mb-6 text-center uppercase tracking-wide">
         {title}
       </p>
@@ -80,7 +80,7 @@ export default function EbayAdHorizontal({
 
   if (loading) {
     return (
-      <div className="bg-white border-2 border-footy-gold rounded-lg shadow-lg p-6 my-8">
+      <div className="bg-white border-2 border-footy-gold rounded-lg shadow-lg p-4 lg:p-6 my-8">
         <p className="text-sm text-footy-dark-green font-bold mb-6 text-center uppercase tracking-wide">
           {title}
         </p>
@@ -96,7 +96,7 @@ export default function EbayAdHorizontal({
   }
 
   return (
-    <div className="bg-white border-2 border-footy-gold rounded-lg shadow-lg p-6 my-8">
+    <div className="bg-white border-2 border-footy-gold rounded-lg shadow-lg p-4 lg:p-6 my-8">
       <p className="text-sm text-footy-dark-green font-bold mb-6 text-center uppercase tracking-wide">
         {title}
       </p>
