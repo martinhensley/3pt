@@ -17,22 +17,26 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { documentText, fileUrl, mimeType, uploadedImages = [], createRelease = false, releaseDate } = body;
+    const { documentText, fileUrl, fileUrls, mimeType, uploadedImages = [], createRelease = false, releaseDate } = body;
+
+    // Support both single file (fileUrl) and multiple files (fileUrls)
+    const urlsToProcess = fileUrls || (fileUrl ? [fileUrl] : []);
 
     // Support both file upload and direct text input
-    if (!documentText && !fileUrl) {
+    if (!documentText && urlsToProcess.length === 0) {
       return NextResponse.json(
-        { error: 'Either documentText or fileUrl is required' },
+        { error: 'Either documentText or fileUrl/fileUrls is required' },
         { status: 400 }
       );
     }
 
     // Step 1: Analyze with Claude (Anthropic SDK)
-    // Claude can read PDFs directly, so we pass the URL instead of extracting text
+    // Claude can read PDFs and images directly, so we pass URLs instead of extracting text
     console.log('Analyzing release with Claude (Anthropic SDK)...');
     const releaseInfo = await analyzeReleaseFlow({
       documentText: documentText || undefined,
-      documentUrl: fileUrl || undefined,
+      documentUrl: urlsToProcess.length === 1 ? urlsToProcess[0] : undefined,
+      documentUrls: urlsToProcess.length > 1 ? urlsToProcess : undefined,
       mimeType: mimeType || undefined,
     });
     console.log('Release analysis complete:', releaseInfo);
@@ -75,15 +79,13 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // Prepare sourceFiles array from uploaded file
-      const sourceFiles = fileUrl
-        ? [
-            {
-              url: fileUrl,
-              type: mimeType || 'application/pdf',
-              filename: fileUrl.split('/').pop() || 'document',
-            },
-          ]
+      // Prepare sourceFiles array from uploaded files
+      const sourceFiles = urlsToProcess.length > 0
+        ? urlsToProcess.map(url => ({
+            url: url,
+            type: mimeType || 'application/pdf',
+            filename: url.split('/').pop() || 'document',
+          }))
         : null;
 
       // Use the manually edited release date if provided, otherwise use the one from analysis
@@ -126,39 +128,43 @@ export async function POST(request: NextRequest) {
         console.log(`Created ${uploadedImages.length} image records for release`);
       }
 
-      // Create source document record if fileUrl was provided
-      if (fileUrl) {
+      // Create source document records for all uploaded files
+      if (urlsToProcess.length > 0) {
         try {
-          const filename = fileUrl.split('/').pop() || 'document';
-          const displayName = `${releaseInfo.manufacturer} ${releaseInfo.releaseName} ${releaseInfo.year}`;
+          for (const [index, url] of urlsToProcess.entries()) {
+            const filename = url.split('/').pop() || 'document';
+            const displayName = urlsToProcess.length > 1
+              ? `${releaseInfo.manufacturer} ${releaseInfo.releaseName} ${releaseInfo.year} - Page ${index + 1}`
+              : `${releaseInfo.manufacturer} ${releaseInfo.releaseName} ${releaseInfo.year}`;
 
-          // Determine document type based on mime type and context
-          let documentType = 'OTHER';
-          if (mimeType?.includes('pdf')) {
-            // Most PDFs for releases are sell sheets or checklists
-            documentType = filename.toLowerCase().includes('checklist') ? 'CHECKLIST' : 'SELL_SHEET';
-          } else if (mimeType?.includes('excel') || mimeType?.includes('spreadsheet') || mimeType?.includes('csv')) {
-            documentType = 'CHECKLIST';
+            // Determine document type based on mime type and context
+            let documentType = 'OTHER';
+            if (mimeType?.includes('pdf')) {
+              // Most PDFs for releases are sell sheets or checklists
+              documentType = filename.toLowerCase().includes('checklist') ? 'CHECKLIST' : 'SELL_SHEET';
+            } else if (mimeType?.includes('excel') || mimeType?.includes('spreadsheet') || mimeType?.includes('csv')) {
+              documentType = 'CHECKLIST';
+            }
+
+            await prisma.sourceDocument.create({
+              data: {
+                filename: filename,
+                displayName: displayName,
+                blobUrl: url,
+                mimeType: mimeType || 'application/octet-stream',
+                fileSize: 0, // We don't have size info at this point
+                documentType: documentType as any,
+                entityType: 'RELEASE',
+                tags: [releaseInfo.year, releaseInfo.manufacturer, releaseInfo.releaseName],
+                extractedText: sourceText || null,
+                uploadedById: session.user.email || 'unknown',
+                releaseId: release.id,
+              },
+            });
           }
-
-          await prisma.sourceDocument.create({
-            data: {
-              filename: filename,
-              displayName: displayName,
-              blobUrl: fileUrl,
-              mimeType: mimeType || 'application/octet-stream',
-              fileSize: 0, // We don't have size info at this point
-              documentType: documentType as any,
-              entityType: 'RELEASE',
-              tags: [releaseInfo.year, releaseInfo.manufacturer, releaseInfo.releaseName],
-              extractedText: sourceText || null,
-              uploadedById: session.user.email || 'unknown',
-              releaseId: release.id,
-            },
-          });
-          console.log('Source document saved to library');
+          console.log(`Saved ${urlsToProcess.length} source document(s) to library`);
         } catch (docError) {
-          console.error('Failed to save source document:', docError);
+          console.error('Failed to save source documents:', docError);
           // Don't fail the whole request if source document save fails
         }
       }

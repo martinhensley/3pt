@@ -6,9 +6,8 @@ import AdminLayout from '@/components/AdminLayout';
 
 export default function CreateReleasePage() {
   const router = useRouter();
-  const [documentFile, setDocumentFile] = useState<File | null>(null);
-  const [documentFileUrl, setDocumentFileUrl] = useState<string>('');
-  const [documentMimeType, setDocumentMimeType] = useState<string>('');
+  const [documentFiles, setDocumentFiles] = useState<File[]>([]);
+  const [documentFileUrls, setDocumentFileUrls] = useState<string[]>([]);
   const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
@@ -37,54 +36,57 @@ export default function CreateReleasePage() {
   } | null>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setDocumentFile(file);
+    if (e.target.files && e.target.files.length > 0) {
+      const files = Array.from(e.target.files);
+      setDocumentFiles(files);
       setError(null);
       setAnalysisResult(null);
 
       // Auto-trigger analysis
-      await analyzeFile(file);
+      await analyzeFiles(files);
     }
   };
 
-  const analyzeFile = async (file: File) => {
+  const analyzeFiles = async (files: File[]) => {
     try {
       setUploading(true);
       setAnalyzing(true);
       setError(null);
 
-      // Step 1: Upload file to blob storage
-      console.log('Uploading file to blob storage...');
-      const formData = new FormData();
-      formData.append('file', file);
+      // Step 1: Upload all files to blob storage
+      console.log(`Uploading ${files.length} file(s) to blob storage...`);
+      const uploadedUrls: string[] = [];
 
-      const uploadResponse = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append('file', file);
 
-      if (!uploadResponse.ok) {
-        throw new Error('Failed to upload file');
+        const uploadResponse = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error(`Failed to upload file: ${file.name}`);
+        }
+
+        const { url: fileUrl } = await uploadResponse.json();
+        uploadedUrls.push(fileUrl);
+        console.log(`File uploaded (${uploadedUrls.length}/${files.length}):`, fileUrl);
       }
 
-      const { url: fileUrl } = await uploadResponse.json();
-      console.log('File uploaded:', fileUrl);
-
-      // Store the file URL and mime type for later use when creating the release
-      setDocumentFileUrl(fileUrl);
-      setDocumentMimeType(file.type);
-
+      // Store all uploaded file URLs
+      setDocumentFileUrls(uploadedUrls);
       setUploading(false);
 
-      // Step 2: Analyze with Genkit (Claude Sonnet 4 will read the PDF directly)
+      // Step 2: Analyze with Genkit (Claude Sonnet 4 will read all files)
       console.log('Analyzing release with Claude Sonnet 4...');
       const analyzeResponse = await fetch('/api/releases/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fileUrl,
-          mimeType: file.type,
+          fileUrls: uploadedUrls, // Changed from fileUrl to fileUrls (array)
+          mimeType: files[0].type, // Use first file's type for now
           uploadedImages: uploadedImageUrls,
           createRelease: false,
         }),
@@ -166,8 +168,8 @@ export default function CreateReleasePage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fileUrl: documentFileUrl,
-          mimeType: documentMimeType,
+          fileUrls: documentFileUrls, // Send array of all uploaded file URLs
+          mimeType: documentFiles[0]?.type || 'application/pdf', // Use first file's type
           uploadedImages: uploadedImageUrls,
           createRelease: true,
           releaseDate: editedReleaseDate || null, // Include the edited release date
@@ -206,7 +208,7 @@ export default function CreateReleasePage() {
               className={`flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
                 uploading || analyzing
                   ? 'border-gray-300 bg-gray-50 cursor-not-allowed'
-                  : documentFile
+                  : documentFiles.length > 0
                   ? 'border-green-400 bg-green-50 hover:bg-green-100'
                   : 'border-gray-300 bg-gray-50 hover:bg-gray-100 hover:border-orange-500'
               }`}
@@ -219,16 +221,21 @@ export default function CreateReleasePage() {
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                     <p className="mb-2 text-sm text-gray-700 font-semibold">
-                      {uploading ? 'Processing document...' : 'footy is analyzing...'}
+                      {uploading ? `Uploading ${documentFiles.length} file(s)...` : '3pt is analyzing...'}
                     </p>
                   </>
-                ) : documentFile ? (
+                ) : documentFiles.length > 0 ? (
                   <>
                     <svg className="w-12 h-12 mb-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <p className="mb-2 text-sm text-gray-700 font-semibold">{documentFile.name}</p>
-                    <p className="text-xs text-gray-500">Click to select a different file</p>
+                    <p className="mb-2 text-sm text-gray-700 font-semibold">
+                      {documentFiles.length} file{documentFiles.length !== 1 ? 's' : ''} uploaded
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {documentFiles.map(f => f.name).join(', ')}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-2">Click to select different files</p>
                   </>
                 ) : (
                   <>
@@ -238,7 +245,7 @@ export default function CreateReleasePage() {
                     <p className="mb-2 text-sm text-gray-700 font-semibold">
                       Click to upload or drag and drop
                     </p>
-                    <p className="text-xs text-gray-500">PDF or image files (Claude Sonnet 4 will analyze directly)</p>
+                    <p className="text-xs text-gray-500">PDF or image files - multiple files allowed (Claude Sonnet 4 will analyze all files)</p>
                   </>
                 )}
               </div>
@@ -249,6 +256,7 @@ export default function CreateReleasePage() {
                 onChange={handleFileChange}
                 className="hidden"
                 disabled={uploading || analyzing}
+                multiple
               />
             </label>
           </div>
@@ -333,32 +341,39 @@ export default function CreateReleasePage() {
             <div className="bg-white rounded-lg shadow-md p-6 mb-6">
               <h3 className="text-lg font-semibold mb-3">Source Documents and Images</h3>
               <p className="text-sm text-gray-600 mb-4">
-                The source document used to generate this release is shown below. Upload images (JPG, PNG, WebP, GIF) of the release for the image carousel - these can be sell sheet pages, product photos, or any visuals you want to display. Images will be automatically uploaded when you create the release.
+                The source document{documentFiles.length > 1 ? 's' : ''} used to generate this release {documentFiles.length > 1 ? 'are' : 'is'} shown below. Upload images (JPG, PNG, WebP, GIF) of the release for the image carousel - these can be sell sheet pages, product photos, or any visuals you want to display. Images will be automatically uploaded when you create the release.
               </p>
 
               <div className="space-y-6">
-                {/* Source Document Display */}
-                {documentFile && documentFileUrl && (
-                  <div className="border-2 border-footy-green/30 rounded-lg p-4 bg-footy-green/5">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <svg className="w-8 h-8 text-footy-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <div>
-                          <p className="font-semibold text-gray-900">{documentFile.name}</p>
-                          <p className="text-xs text-gray-600">Source document used for AI analysis</p>
+                {/* Source Documents Display */}
+                {documentFiles.length > 0 && documentFileUrls.length > 0 && (
+                  <div className="space-y-3">
+                    <h4 className="text-md font-semibold">Source Documents Used for Analysis</h4>
+                    {documentFiles.map((file, idx) => (
+                      <div key={idx} className="border-2 border-footy-green/30 rounded-lg p-4 bg-footy-green/5">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <svg className="w-8 h-8 text-footy-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <div>
+                              <p className="font-semibold text-gray-900">{file.name}</p>
+                              <p className="text-xs text-gray-600">Document {idx + 1} of {documentFiles.length}</p>
+                            </div>
+                          </div>
+                          {documentFileUrls[idx] && (
+                            <a
+                              href={documentFileUrls[idx]}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-4 py-2 bg-footy-orange text-white text-sm rounded-md hover:bg-footy-orange/90"
+                            >
+                              View {file.type.includes('pdf') ? 'PDF' : 'Image'}
+                            </a>
+                          )}
                         </div>
                       </div>
-                      <a
-                        href={documentFileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-4 py-2 bg-footy-orange text-white text-sm rounded-md hover:bg-footy-orange/90"
-                      >
-                        View {documentFile.type.includes('pdf') ? 'PDF' : 'Image'}
-                      </a>
-                    </div>
+                    ))}
                   </div>
                 )}
 

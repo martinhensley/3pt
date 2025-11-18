@@ -13,7 +13,7 @@ export default function AdminHeader() {
         <div className="text-center mb-6">
           <h1 className="text-4xl md:text-5xl font-bold font-orbitron">
             <Link href="/" className="hover:opacity-90 transition-opacity">
-              <span>footy<span className="text-footy-orange">.bot</span></span>
+              <span>3pt<span className="text-footy-orange">.bot</span></span>
             </Link>
           </h1>
         </div>

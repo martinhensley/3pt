@@ -36,60 +36,68 @@ export const DescriptionSchema = z.object({
 export async function analyzeRelease(input: {
   documentText?: string;
   documentUrl?: string;
+  documentUrls?: string[];
   mimeType?: string;
 }): Promise<ReleaseInfo> {
-  // If we have a document URL, download and analyze it
-  if (input.documentUrl && input.mimeType) {
-    console.log('📄 Processing document:', {
-      url: input.documentUrl,
-      mimeType: input.mimeType
-    });
+  // Support both single URL and multiple URLs
+  const urlsToProcess = input.documentUrls || (input.documentUrl ? [input.documentUrl] : []);
 
-    // Download the document
-    const response = await fetch(input.documentUrl);
-    if (!response.ok) {
-      throw new Error(`Failed to download document: ${response.statusText}`);
-    }
-
-    const arrayBuffer = await response.arrayBuffer();
-    const base64Data = Buffer.from(arrayBuffer).toString('base64');
+  // If we have document URLs, download and analyze them
+  if (urlsToProcess.length > 0 && input.mimeType) {
+    console.log(`📄 Processing ${urlsToProcess.length} document(s)`);
 
     // Build message content
     const messageContent: Anthropic.MessageCreateParams['messages'][0]['content'] = [];
 
-    // For PDFs, use document type
-    if (input.mimeType === 'application/pdf') {
-      console.log('📝 Analyzing PDF document...');
-      messageContent.push({
-        type: 'document',
-        source: {
-          type: 'base64',
-          media_type: 'application/pdf',
-          data: base64Data,
-        },
-      });
-    } else {
-      // For images, normalize MIME type
-      let normalizedMimeType = input.mimeType;
-      if (normalizedMimeType === 'image/jpg') {
-        normalizedMimeType = 'image/jpeg';
+    // Download and add each document to the message content
+    for (const [index, url] of urlsToProcess.entries()) {
+      console.log(`📥 Downloading document ${index + 1}/${urlsToProcess.length}:`, url);
+
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Failed to download document ${index + 1}: ${response.statusText}`);
       }
 
-      console.log('🖼️  Analyzing image document...');
-      messageContent.push({
-        type: 'image',
-        source: {
-          type: 'base64',
-          media_type: normalizedMimeType as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp',
-          data: base64Data,
-        },
-      });
+      const arrayBuffer = await response.arrayBuffer();
+      const base64Data = Buffer.from(arrayBuffer).toString('base64');
+
+      // Determine mime type from the URL or use the provided one
+      let docMimeType = input.mimeType;
+
+      // For PDFs, use document type
+      if (docMimeType === 'application/pdf') {
+        console.log(`📝 Adding PDF document ${index + 1} to analysis...`);
+        messageContent.push({
+          type: 'document',
+          source: {
+            type: 'base64',
+            media_type: 'application/pdf',
+            data: base64Data,
+          },
+        });
+      } else {
+        // For images, normalize MIME type
+        let normalizedMimeType = docMimeType;
+        if (normalizedMimeType === 'image/jpg') {
+          normalizedMimeType = 'image/jpeg';
+        }
+
+        console.log(`🖼️  Adding image document ${index + 1} to analysis...`);
+        messageContent.push({
+          type: 'image',
+          source: {
+            type: 'base64',
+            media_type: normalizedMimeType as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp',
+            data: base64Data,
+          },
+        });
+      }
     }
 
     // Add the analysis prompt
     messageContent.push({
       type: 'text',
-      text: `You are analyzing a basketball card release document (sell sheet, catalog, etc.).
+      text: `You are analyzing ${urlsToProcess.length > 1 ? `${urlsToProcess.length} basketball card release documents` : 'a basketball card release document'} (sell sheet, catalog, etc.).${urlsToProcess.length > 1 ? ' These documents are part of the same release and may be spread across multiple pages or images.' : ''}
 
 Extract the following information from this document and return it as a JSON object:
 
