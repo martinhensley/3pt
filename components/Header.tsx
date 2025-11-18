@@ -35,7 +35,7 @@ export default function Header({ showBackButton = false, rounded = true, showAd 
         </div>
 
         {/* Navigation menu */}
-        <nav className="flex justify-center items-center gap-6 border-t border-green-600 pt-6">
+        <nav className="flex flex-wrap justify-center items-center gap-3 md:gap-6 border-t border-green-600 pt-6">
           <Link
             href="/cards"
             className="text-green-100 hover:text-white transition-colors text-sm md:text-base font-medium"
