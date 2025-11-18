@@ -470,7 +470,7 @@ export default function ReleasePage() {
               {release.sets && release.sets.length > 0 && (
                 <div className="bg-white/5 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10">
                   {/* Header Row - Always Visible */}
-                  <div className="grid grid-cols-[1fr_120px_100px] gap-4 px-4 py-3 bg-white/10">
+                  <div className="grid grid-cols-[2fr_auto_auto] gap-4 px-4 py-3 bg-white/10 min-w-0">
                     <div className="font-bold text-sm uppercase tracking-wide text-white/90">Set Name</div>
                     <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Print Run</div>
                     <div className="font-bold text-sm uppercase tracking-wide text-white/90 text-center">Cards</div>
@@ -552,16 +552,16 @@ export default function ReleasePage() {
                             <Link
                               key={set.id}
                               href={`/sets/${set.slug}`}
-                              className={`grid grid-cols-[1fr_120px_100px] gap-4 px-4 py-3 bg-gradient-to-r ${gradient} hover:from-white/20 hover:to-white/10 transition-all duration-200 border-t border-white/10 cursor-pointer`}
+                              className={`grid grid-cols-[2fr_auto_auto] gap-4 px-4 py-3 bg-gradient-to-r ${gradient} hover:from-white/20 hover:to-white/10 transition-all duration-200 border-t border-white/10 cursor-pointer min-w-0`}
                             >
-                              <div className="font-semibold text-white hover:underline">{displayName}</div>
-                              <div className="text-center">
-                                <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-white font-bold text-sm">
+                              <div className="font-semibold text-white hover:underline truncate">{displayName}</div>
+                              <div className="text-center flex-shrink-0">
+                                <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-white font-bold text-sm whitespace-nowrap">
                                   {printRunDisplay}
                                 </span>
                               </div>
-                              <div className="text-center">
-                                <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-white font-bold text-sm">
+                              <div className="text-center flex-shrink-0">
+                                <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-white font-bold text-sm whitespace-nowrap">
                                   {setCardCount > 0 ? setCardCount.toLocaleString() : '—'}
                                 </span>
                               </div>
