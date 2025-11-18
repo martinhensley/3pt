@@ -47,7 +47,7 @@ export default function ReleasesIndex() {
     <div className="min-h-screen bg-gray-50">
       <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
         <aside className="hidden lg:block w-72 flex-shrink-0">
-          <EbayAd query="soccer cards" limit={3} title="Latest Soccer Cards" />
+          <EbayAd query="basketball cards" limit={3} title="Latest Basketball Cards" />
         </aside>
 
         <main className="flex-grow max-w-5xl space-y-6">
@@ -58,7 +58,7 @@ export default function ReleasesIndex() {
               All Releases
             </h1>
             <p className="text-gray-600">
-              Browse our complete collection of soccer card releases
+              Browse our complete collection of basketball card releases
             </p>
           </div>
 
@@ -75,7 +75,7 @@ export default function ReleasesIndex() {
                       No Releases Yet
                     </h2>
                     <p className="text-gray-600">
-                      Check back soon for the latest soccer card releases!
+                      Check back soon for the latest basketball card releases!
                     </p>
                   </div>
                 </div>
@@ -146,7 +146,7 @@ export default function ReleasesIndex() {
                 </div>
               )}
 
-              <EbayAdHorizontal query="soccer memorabilia" limit={4} title="More Soccer Collectibles" />
+              <EbayAdHorizontal query="basketball memorabilia" limit={4} title="More Basketball Collectibles" />
 
               <Footer rounded={true} />
             </>
@@ -154,7 +154,7 @@ export default function ReleasesIndex() {
         </main>
 
         <aside className="hidden lg:block w-72 flex-shrink-0">
-          <EbayAd query="soccer autographs" limit={3} title="Soccer Autographs" />
+          <EbayAd query="basketball autographs" limit={3} title="Basketball Autographs" />
         </aside>
       </div>
     </div>
