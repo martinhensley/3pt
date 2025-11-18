@@ -202,9 +202,9 @@ export default function CardsIndexPage() {
       <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
         <aside className="hidden lg:block w-72 flex-shrink-0">
           <EbayAd
-            query="soccer cards"
+            query="basketball cards"
             limit={3}
-            title="Soccer Cards"
+            title="Basketball Cards"
           />
         </aside>
 
@@ -220,7 +220,7 @@ export default function CardsIndexPage() {
               {/* Header */}
               <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden text-white p-8">
                 <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
-                  All footy cards
+                  All basketball cards
                 </h1>
                 <div className="text-xl">
                   {filteredCount.toLocaleString()} of {totalCount.toLocaleString()} Card{totalCount !== 1 ? 's' : ''}

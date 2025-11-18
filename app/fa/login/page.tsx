@@ -120,18 +120,6 @@ export default function LoginPage() {
             </a>
           </div>
         </div>
-
-        {/* Default Credentials Info (Remove in production) */}
-        <div className="mt-4 p-4 bg-gray-100 rounded-lg">
-          <p className="text-xs text-gray-600 text-center">
-            <strong>Admin Users:</strong>
-            <br />
-            Username: <code className="bg-white px-2 py-1 rounded">3pt</code> or{" "}
-            <code className="bg-white px-2 py-1 rounded">footy</code>
-            <br />
-            Password: <code className="bg-white px-2 py-1 rounded">test2222</code>
-          </p>
-        </div>
       </div>
     </div>
   );
