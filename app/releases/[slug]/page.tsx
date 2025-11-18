@@ -3,11 +3,7 @@
 import { notFound, useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import Breadcrumb from "@/components/Breadcrumb";
-import EbayAd from "@/components/EbayAd";
-import EbayAdHorizontal from "@/components/EbayAdHorizontal";
+import PublicPageLayout from "@/components/PublicPageLayout";
 import { useEffect, useState, useMemo } from "react";
 import { extractKeywordsFromPost, getAdTitle } from "@/lib/extractKeywords";
 import { isParallelSet, getBaseSetSlug, sortSets, sortSetsGrouped, groupSetsByBase } from "@/lib/setUtils";
@@ -285,70 +281,67 @@ export default function ReleasePage() {
     notFound();
   }
 
+  // Extract breadcrumbs for PublicPageLayout
+  const breadcrumbs = release ? [
+    { label: "Home", href: "/" },
+    {
+      label: `${release.year} ${release.manufacturer.name} ${release.name}`,
+      href: `/releases/${release.slug}`,
+    },
+  ] : undefined;
+
+  // Structured data for SEO
+  const structuredData = release ? {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: `${release.year} ${release.manufacturer.name} ${release.name}`,
+    description: `${release.manufacturer.name} ${release.name} ${release.year || ''} trading card release`,
+    image: release.images.map(img => `https://www.3pt.bot${img.url}`),
+    datePublished: release.createdAt,
+    dateModified: release.createdAt,
+    author: {
+      "@type": "Organization",
+      name: "Footy Bot",
+      url: "https://www.3pt.bot"
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Footy Bot",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://www.3pt.bot/logo.png"
+      }
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `https://www.3pt.bot/releases/${release.slug}`
+    },
+    articleSection: "New Releases",
+    keywords: "soccer cards, football cards, trading cards, collectibles"
+  } : null;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-      {release && (
+    <>
+      {structuredData && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Article",
-            headline: `${release.year} ${release.manufacturer.name} ${release.name}`,
-            description: `${release.manufacturer.name} ${release.name} ${release.year || ''} trading card release`,
-            image: release.images.map(img => `https://www.3pt.bot${img.url}`),
-            datePublished: release.createdAt,
-            dateModified: release.createdAt,
-            author: {
-              "@type": "Organization",
-              name: "Footy Bot",
-              url: "https://www.3pt.bot"
-            },
-            publisher: {
-              "@type": "Organization",
-              name: "Footy Bot",
-              logo: {
-                "@type": "ImageObject",
-                url: "https://www.3pt.bot/logo.png"
-              }
-            },
-            mainEntityOfPage: {
-              "@type": "WebPage",
-              "@id": `https://www.3pt.bot/releases/${release.slug}`
-            },
-            articleSection: "New Releases",
-            keywords: "soccer cards, football cards, trading cards, collectibles"
-          }) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
       )}
 
-      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
-        <aside className="hidden lg:block w-72 flex-shrink-0">
-          <EbayAd
-            query={adKeywords.primaryQuery}
-            limit={3}
-            title={getAdTitle(adKeywords.primaryQuery, "Soccer Cards")}
-          />
-        </aside>
-
-        <main className="flex-grow max-w-5xl lg:mx-auto space-y-6">
-          <Header showBackButton={false} rounded={true} />
-
-          {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
-            </div>
-          ) : release ? (
-            <>
-
-            <Breadcrumb
-            items={[
-              { label: "Home", href: "/" },
-              {
-                label: `${release.year} ${release.manufacturer.name} ${release.name}`,
-                href: `/releases/${release.slug}`,
-              },
-            ]}
-          />
+      <PublicPageLayout
+        leftAdQuery={adKeywords.primaryQuery}
+        leftAdTitle={getAdTitle(adKeywords.primaryQuery, "Soccer Cards")}
+        rightAdQuery={adKeywords.autographQuery}
+        rightAdTitle={getAdTitle(adKeywords.autographQuery, "Soccer Autographs")}
+        horizontalAdQuery={adKeywords.relatedQuery}
+        horizontalAdTitle={getAdTitle(adKeywords.relatedQuery, "Related Soccer Cards")}
+        breadcrumbs={breadcrumbs}
+        loading={loading}
+        error={!loading && !release ? "Release not found" : undefined}
+      >
+        {release && (
+          <>
 
           {/* Combined Hero with Carousel */}
           <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white">
@@ -665,26 +658,9 @@ export default function ReleasePage() {
               </div>
             </div>
           )}
-
-          <EbayAdHorizontal
-            query={adKeywords.relatedQuery}
-            limit={4}
-            title={getAdTitle(adKeywords.relatedQuery, "Related Soccer Cards")}
-          />
-
-          <Footer rounded={true} />
-          </>
-          ) : null}
-        </main>
-
-        <aside className="hidden lg:block w-72 flex-shrink-0">
-          <EbayAd
-            query={adKeywords.autographQuery}
-            limit={3}
-            title={getAdTitle(adKeywords.autographQuery, "Soccer Autographs")}
-          />
-        </aside>
-      </div>
-    </div>
+        </>
+        )}
+      </PublicPageLayout>
+    </>
   );
 }
