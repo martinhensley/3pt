@@ -50,7 +50,7 @@ export default function ReleasesIndex() {
           <EbayAd query="basketball cards" limit={3} title="Latest Basketball Cards" />
         </aside>
 
-        <main className="flex-grow max-w-5xl space-y-6">
+        <main className="flex-grow max-w-5xl mx-auto space-y-6">
           <Header rounded={true} />
 
           <div className="mb-8">
