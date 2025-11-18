@@ -344,7 +344,7 @@ export default function ReleasePage() {
           <>
 
           {/* Combined Hero with Carousel */}
-          <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white">
+          <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white w-full max-w-full">
             {/* Hero Header */}
             <div className="p-4 md:p-8 pb-6">
               <div className="space-y-3 min-w-0">
