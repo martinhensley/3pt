@@ -16,7 +16,7 @@ export default function Breadcrumb({ items }: BreadcrumbProps) {
 
   return (
     <nav className="bg-white rounded-lg shadow-md px-4 py-3 border border-gray-200">
-      <ol className="flex items-center space-x-2 text-sm">
+      <ol className="flex items-center flex-wrap space-x-2 text-sm">
         {items.map((item, index) => (
           <li key={index} className="flex items-center">
             {index > 0 && (
@@ -35,7 +35,7 @@ export default function Breadcrumb({ items }: BreadcrumbProps) {
               </svg>
             )}
             {index === items.length - 1 ? (
-              <span className="font-semibold text-gray-900">{item.label}</span>
+              <span className="font-semibold text-gray-900 break-words">{item.label}</span>
             ) : (
               <Link
                 href={item.href}
