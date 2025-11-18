@@ -19,6 +19,13 @@ const orbitron = Orbitron({
   weight: ["700"],
 });
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+};
+
 export const metadata: Metadata = {
   title: {
     default: "3pt Bot - Basketball Card Information",
