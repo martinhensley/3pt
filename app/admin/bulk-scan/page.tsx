@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import AdminLayout from '@/components/AdminLayout';
 
@@ -85,12 +85,12 @@ export default function BulkScanPage() {
   const [scanProgress, setScanProgress] = useState({ current: 0, total: 0 });
 
   // Load releases on mount
-  useState(() => {
+  useEffect(() => {
     fetch('/api/admin/releases')
       .then((res) => res.json())
       .then((data) => setReleases(data))
       .catch((err) => console.error('Failed to load releases:', err));
-  });
+  }, []);
 
   // Load sets when release changes
   const handleReleaseChange = useCallback((releaseId: string) => {

@@ -318,7 +318,6 @@ export default function CreateReleasePage() {
                       value={editedReleaseDate}
                       onChange={(e) => setEditedReleaseDate(e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="e.g., May 4, 2025 or Spring 2025 or 1978"
                     />
                     <p className="text-xs text-gray-500 mt-1">
                       Can be specific (May 4, 2025) or vague (Spring 2025, 1978)
