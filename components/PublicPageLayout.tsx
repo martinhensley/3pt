@@ -50,7 +50,7 @@ export default function PublicPageLayout({
 }: PublicPageLayoutProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
+      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-2 md:px-4 pt-6 pb-12">
         {/* Left Sidebar */}
         <aside className="hidden lg:block w-72 flex-shrink-0">
           <EbayAd query={leftAdQuery} limit={3} title={leftAdTitle} />
