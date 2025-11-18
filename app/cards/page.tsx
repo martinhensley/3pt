@@ -3,9 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import EbayAd from "@/components/EbayAd";
+import PublicPageLayout from "@/components/PublicPageLayout";
 
 interface Card {
   id: string;
@@ -198,25 +196,13 @@ export default function CardsIndexPage() {
   const hasActiveFilters = activeSearch || yearFilter || manufacturerFilter || setTypeFilter || specialFilter;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
-        <aside className="hidden lg:block w-72 flex-shrink-0">
-          <EbayAd
-            query="basketball cards"
-            limit={3}
-            title="Basketball Cards"
-          />
-        </aside>
-
-        <main className="flex-grow max-w-5xl lg:mx-auto space-y-6">
-          <Header rounded={true} />
-
-          {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
-            </div>
-          ) : (
-            <>
+    <PublicPageLayout
+      leftAdQuery="basketball player cards"
+      leftAdTitle="Player Cards"
+      rightAdQuery="basketball rookie cards"
+      rightAdTitle="Rookie Cards"
+      loading={loading}
+    >
               {/* Header */}
               <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden text-white p-8">
                 <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
@@ -555,20 +541,6 @@ export default function CardsIndexPage() {
                   </div>
                 </div>
               )}
-
-              <Footer rounded={true} />
-            </>
-          )}
-        </main>
-
-        <aside className="hidden lg:block w-72 flex-shrink-0">
-          <EbayAd
-            query="soccer autographs"
-            limit={3}
-            title="Soccer Autographs"
-          />
-        </aside>
-      </div>
-    </div>
+    </PublicPageLayout>
   );
 }

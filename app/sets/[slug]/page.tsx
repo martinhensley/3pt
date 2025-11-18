@@ -2,11 +2,7 @@
 
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import Breadcrumb from "@/components/Breadcrumb";
-import EbayAd from "@/components/EbayAd";
-import EbayAdHorizontal from "@/components/EbayAdHorizontal";
+import PublicPageLayout from "@/components/PublicPageLayout";
 import { useEffect, useState, useMemo } from "react";
 import { extractKeywordsFromPost, getAdTitle } from "@/lib/extractKeywords";
 import { formatParallelName } from "@/lib/formatters";
@@ -153,52 +149,33 @@ export default function SetPage() {
   // Since sets are now independent, we don't need to build a parallel list
   // Each parallel is its own set accessible from the release page
 
+  // Extract breadcrumbs for PublicPageLayout
+  const breadcrumbs = set ? [
+    { label: "Home", href: "/" },
+    {
+      label: `${set.release.year || ""} ${set.release.name}`.trim(),
+      href: `/releases/${set.release.slug}`,
+    },
+    {
+      label: displayNameWithPrintRun,
+      href: `/sets/${slug}`,
+    },
+  ] : undefined;
+
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
-        <aside className="hidden lg:block w-72 flex-shrink-0">
-          <EbayAd
-            query={adKeywords.primaryQuery}
-            limit={3}
-            title={getAdTitle(adKeywords.primaryQuery, "Soccer Cards")}
-          />
-        </aside>
-
-        <main className="flex-grow max-w-5xl lg:mx-auto space-y-6">
-          <Header rounded={true} />
-
-          {loading ? (
-            <div className="flex-grow flex items-center justify-center py-20">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
-            </div>
-          ) : !set ? (
-            <div className="flex-grow flex items-center justify-center py-20">
-              <div className="text-center">
-                <h1 className="text-2xl font-bold text-footy-green mb-4">Set Not Found</h1>
-                <p className="text-gray-600 mb-8">The set you&apos;re looking for doesn&apos;t exist.</p>
-                <Link href="/" className="text-footy-orange hover:underline font-semibold">
-                  ← Back to Home
-                </Link>
-              </div>
-            </div>
-          ) : (
-            <>
-
-          <Breadcrumb
-            items={[
-              { label: "Home", href: "/" },
-              {
-                label: `${set.release.year || ""} ${set.release.name}`.trim(),
-                href: `/releases/${set.release.slug}`,
-              },
-              // If this is a parallel set, we could include the base set in breadcrumb
-              // But since parallels are now independent, we just go straight from release to set
-              {
-                label: displayNameWithPrintRun,
-                href: `/sets/${slug}`,
-              },
-            ]}
-          />
+    <PublicPageLayout
+      leftAdQuery={adKeywords.primaryQuery}
+      leftAdTitle={getAdTitle(adKeywords.primaryQuery, "Soccer Cards")}
+      rightAdQuery={adKeywords.autographQuery}
+      rightAdTitle={getAdTitle(adKeywords.autographQuery, "Soccer Autographs")}
+      horizontalAdQuery={adKeywords.relatedQuery}
+      horizontalAdTitle={getAdTitle(adKeywords.relatedQuery, "Related Soccer Cards")}
+      breadcrumbs={breadcrumbs}
+      loading={loading}
+      error={!loading && !set ? "Set not found" : undefined}
+    >
+      {set && (
+        <>
 
         {/* Set Header */}
         <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
@@ -344,26 +321,8 @@ export default function SetPage() {
             </div>
           )}
         </div>
-
-        <EbayAdHorizontal
-          query={adKeywords.relatedQuery}
-          limit={4}
-          title={getAdTitle(adKeywords.relatedQuery, "Related Soccer Cards")}
-        />
-
-          <Footer rounded={true} />
-            </>
-          )}
-        </main>
-
-        <aside className="hidden lg:block w-72 flex-shrink-0">
-          <EbayAd
-            query={adKeywords.autographQuery}
-            limit={3}
-            title={getAdTitle(adKeywords.autographQuery, "Soccer Autographs")}
-          />
-        </aside>
-      </div>
-    </div>
+        </>
+      )}
+    </PublicPageLayout>
   );
 }

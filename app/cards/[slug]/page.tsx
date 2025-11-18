@@ -3,11 +3,7 @@
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import Breadcrumb from "@/components/Breadcrumb";
-import EbayAd from "@/components/EbayAd";
-import EbayAdHorizontal from "@/components/EbayAdHorizontal";
+import PublicPageLayout from "@/components/PublicPageLayout";
 import { useEffect, useState, useMemo } from "react";
 import { extractKeywordsFromPost, getAdTitle } from "@/lib/extractKeywords";
 import { formatParallelName } from "@/lib/formatters";
@@ -108,104 +104,86 @@ export default function CardDetailPage() {
       });
   }, [slug]);
 
+  // Extract breadcrumbs for PublicPageLayout
+  const breadcrumbs = card ? [
+    { label: "Home", href: "/" },
+    {
+      label: `${card.set.release.year || ""} ${card.set.release.name}`.trim(),
+      href: `/releases/${card.set.release.slug}`,
+    },
+    {
+      label: card.set.name
+        .replace(/\boptic\s+base\s+set\b/gi, "Optic")
+        .replace(/\boptic\s+base\b/gi, "Optic")
+        .replace(/\bbase\s+optic\b/gi, "Optic")
+        .replace(/\bbase\s+set\b/gi, "Base")
+        .replace(/\bsets?\b/gi, "")
+        .trim(),
+      href: `/sets/${[
+        card.set.release.year || "",
+        card.set.release.name,
+        card.set.name
+          .replace(/\boptic\s+base\s+set\b/gi, "Optic")
+          .replace(/\boptic\s+base\b/gi, "Optic")
+          .replace(/\bbase\s+optic\b/gi, "Optic")
+          .replace(/\bbase\s+set\b/gi, "Base")
+          .replace(/\bsets?\b/gi, "")
+          .trim()
+      ]
+        .filter(Boolean)
+        .join("-")
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "")}`,
+    },
+    ...(card.parallelType && card.parallelType.toLowerCase() !== 'base' ? [{
+      label: card.parallelType.replace(/\s*–\s*/g, ' '),
+      href: `/sets/${[
+        card.set.release.year || "",
+        card.set.release.name,
+        card.set.name
+          .replace(/\boptic\s+base\s+set\b/gi, "Optic")
+          .replace(/\boptic\s+base\b/gi, "Optic")
+          .replace(/\bbase\s+optic\b/gi, "Optic")
+          .replace(/\bbase\s+set\b/gi, "Base")
+          .replace(/\bsets?\b/gi, "")
+          .trim()
+      ]
+        .filter(Boolean)
+        .join("-")
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "")}/parallels/${card.parallelType
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "")}`,
+    }] : []),
+    {
+      label: `${card.parallelType && card.parallelType.toLowerCase() !== 'base' ? `${card.parallelType.replace(/\s*–\s*/g, ' ')} ` : ""}${card.playerName || "Unknown Player"} ${card.cardNumber ? `#${card.cardNumber}` : ""}`.trim(),
+      href: `/cards/${slug}`,
+    },
+  ] : undefined;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
-        <aside className="hidden lg:block w-72 flex-shrink-0">
-          <EbayAd
-            query={adKeywords.primaryQuery}
-            limit={3}
-            title={getAdTitle(adKeywords.primaryQuery, "Soccer Cards")}
-          />
-        </aside>
-
-        <main className="flex-grow max-w-5xl lg:mx-auto space-y-6">
-          <Header rounded={true} />
-
-          {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
-            </div>
-          ) : !card ? (
-            <div className="flex items-center justify-center py-20">
-              <div className="text-center">
-                <h1 className="text-2xl font-bold text-gray-900 mb-4">Card Not Found</h1>
-                <p className="text-gray-600 mb-8">The card you&apos;re looking for doesn&apos;t exist.</p>
-                <Link href="/" className="text-footy-green hover:underline">
-                  ← Back to Home
-                </Link>
-              </div>
-            </div>
-          ) : (
-            <>
-
-          <Breadcrumb
-            items={[
-              { label: "Home", href: "/" },
-              {
-                label: `${card.set.release.year || ""} ${card.set.release.name}`.trim(),
-                href: `/releases/${card.set.release.slug}`,
-              },
-              {
-                label: card.set.name
-                  .replace(/\boptic\s+base\s+set\b/gi, "Optic")
-                  .replace(/\boptic\s+base\b/gi, "Optic")
-                  .replace(/\bbase\s+optic\b/gi, "Optic")
-                  .replace(/\bbase\s+set\b/gi, "Base")
-                  .replace(/\bsets?\b/gi, "")
-                  .trim(),
-                href: `/sets/${[
-                  card.set.release.year || "",
-                  card.set.release.name,
-                  card.set.name
-                    .replace(/\boptic\s+base\s+set\b/gi, "Optic")
-                    .replace(/\boptic\s+base\b/gi, "Optic")
-                    .replace(/\bbase\s+optic\b/gi, "Optic")
-                    .replace(/\bbase\s+set\b/gi, "Base")
-                    .replace(/\bsets?\b/gi, "")
-                    .trim()
-                ]
-                  .filter(Boolean)
-                  .join("-")
-                  .toLowerCase()
-                  .replace(/\s+/g, "-")
-                  .replace(/[^a-z0-9-]/g, "")
-                  .replace(/-+/g, "-")
-                  .replace(/^-|-$/g, "")}`,
-              },
-              ...(card.parallelType && card.parallelType.toLowerCase() !== 'base' ? [{
-                label: card.parallelType.replace(/\s*–\s*/g, ' '),
-                href: `/sets/${[
-                  card.set.release.year || "",
-                  card.set.release.name,
-                  card.set.name
-                    .replace(/\boptic\s+base\s+set\b/gi, "Optic")
-                    .replace(/\boptic\s+base\b/gi, "Optic")
-                    .replace(/\bbase\s+optic\b/gi, "Optic")
-                    .replace(/\bbase\s+set\b/gi, "Base")
-                    .replace(/\bsets?\b/gi, "")
-                    .trim()
-                ]
-                  .filter(Boolean)
-                  .join("-")
-                  .toLowerCase()
-                  .replace(/\s+/g, "-")
-                  .replace(/[^a-z0-9-]/g, "")
-                  .replace(/-+/g, "-")
-                  .replace(/^-|-$/g, "")}/parallels/${card.parallelType
-                  .toLowerCase()
-                  .replace(/\s+/g, "-")
-                  .replace(/[^a-z0-9-]/g, "")
-                  .replace(/-+/g, "-")
-                  .replace(/^-|-$/g, "")}`,
-              }] : []),
-              {
-                label: `${card.parallelType && card.parallelType.toLowerCase() !== 'base' ? `${card.parallelType.replace(/\s*–\s*/g, ' ')} ` : ""}${card.playerName || "Unknown Player"} ${card.cardNumber ? `#${card.cardNumber}` : ""}`.trim(),
-                href: `/cards/${slug}`,
-              },
-            ]}
-          />
-
+    <PublicPageLayout
+      leftAdQuery={adKeywords.primaryQuery}
+      leftAdTitle={getAdTitle(adKeywords.primaryQuery, "Soccer Cards")}
+      rightAdQuery={adKeywords.autographQuery}
+      rightAdTitle={getAdTitle(adKeywords.autographQuery, "Soccer Autographs")}
+      horizontalAdQuery={adKeywords.relatedQuery}
+      horizontalAdTitle={getAdTitle(adKeywords.relatedQuery, "Related Soccer Cards")}
+      breadcrumbs={breadcrumbs}
+      loading={loading}
+      error={!loading && !card ? "Card not found" : undefined}
+    >
+      {card && (
+        <>
           {/* Card Header with Details */}
           <div className="rounded-2xl shadow-2xl overflow-hidden mb-8">
             {/* Green Header Section */}
@@ -332,27 +310,8 @@ export default function CardDetailPage() {
               </div>
             </div>
           )}
-
-
-          <EbayAdHorizontal
-            query={adKeywords.relatedQuery}
-            limit={4}
-            title={getAdTitle(adKeywords.relatedQuery, "Related Soccer Cards")}
-          />
-
-          <Footer rounded={true} />
-          </>
-          )}
-        </main>
-
-        <aside className="hidden lg:block w-72 flex-shrink-0">
-          <EbayAd
-            query={adKeywords.autographQuery}
-            limit={3}
-            title={getAdTitle(adKeywords.autographQuery, "Soccer Autographs")}
-          />
-        </aside>
-      </div>
-    </div>
+        </>
+      )}
+    </PublicPageLayout>
   );
 }
