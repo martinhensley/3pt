@@ -1,308 +1,66 @@
 # Footy.bot Development Documentation
 
+Quick reference for development patterns and critical rules. For comprehensive guides, see [/docs/README.md](/docs/README.md).
+
 ## Table of Contents
-1. [AI Integration Requirements](#ai-integration-requirements)
+1. [AI Integration](#ai-integration)
 2. [Standardized Page Layout](#standardized-page-layout)
 3. [URL Slug Conventions](#url-slug-conventions)
-4. [Component Patterns](#component-patterns)
-5. [Database Schema](#database-schema)
-6. [Development Guidelines](#development-guidelines)
-   - [Data Import Requirements](#data-import-requirements)
-   - [Donruss Product Structure & Rated Rookies](#donruss-product-structure--rated-rookies)
-   - [TypeScript Best Practices](#typescript-best-practices)
+4. [Parallel Set Architecture](#parallel-set-architecture)
+5. [Component Patterns](#component-patterns)
+6. [Database Schema](#database-schema)
+7. [Development Guidelines](#development-guidelines)
+8. [Recent Changes](#recent-changes)
 
 ---
 
-## AI Integration Requirements
+## AI Integration
 
-### Anthropic SDK for Serverless Compatibility
+**Uses [Anthropic SDK](https://github.com/anthropics/anthropic-sdk-typescript) directly for serverless compatibility.**
 
-**This project uses the [Anthropic SDK](https://github.com/anthropics/anthropic-sdk-typescript) directly for all AI operations.**
+All AI functions centralized in `/lib/genkit.ts`:
+- Model: `claude-sonnet-4-20250514`
+- Supports PDFs and images via base64 encoding
+- Always validate outputs with Zod schemas
 
-The application is deployed serverless on Vercel with a database-as-a-service backend. All AI functionality uses the Anthropic SDK for maximum compatibility and minimal overhead.
-
-#### Configuration
-
-All AI functions are centralized in `/lib/genkit.ts` (legacy filename retained for backward compatibility):
-
-```typescript
-import Anthropic from '@anthropic-ai/sdk';
-import { z } from 'zod';
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
-```
-
-#### Creating AI Functions
-
-Define reusable AI functions with Zod schema validation:
-
-```typescript
-export const ReleaseInfoSchema = z.object({
-  manufacturer: z.string(),
-  releaseName: z.string(),
-  year: z.string(),
-  slug: z.string(),
-  // ... more fields
-});
-
-export type ReleaseInfo = z.infer<typeof ReleaseInfoSchema>;
-
-export async function analyzeRelease(input: {
-  documentText?: string;
-  documentUrl?: string;
-  mimeType?: string;
-}): Promise<ReleaseInfo> {
-  const message = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 4096,
-    messages: [
-      {
-        role: 'user',
-        content: `Your prompt here...`,
-      },
-    ],
-  });
-
-  // Extract and validate response
-  const output = JSON.parse(extractedJson);
-  return ReleaseInfoSchema.parse(output);
-}
-```
-
-#### Using AI Functions
-
-Call functions from API routes:
-
-```typescript
-import { analyzeRelease, generateDescription } from '@/lib/genkit';
-
-const result = await analyzeRelease({
-  documentText: extractedText,
-});
-```
-
-#### PDF and Image Handling
-
-Claude supports PDFs and images via base64 encoding:
-
-```typescript
-// Download file
-const response = await fetch(fileUrl);
-const arrayBuffer = await response.arrayBuffer();
-const base64Data = Buffer.from(arrayBuffer).toString('base64');
-
-// For PDFs
-const message = await anthropic.messages.create({
-  model: 'claude-sonnet-4-20250514',
-  max_tokens: 4096,
-  messages: [
-    {
-      role: 'user',
-      content: [
-        {
-          type: 'document',
-          source: {
-            type: 'base64',
-            media_type: 'application/pdf',
-            data: base64Data,
-          },
-        },
-        {
-          type: 'text',
-          text: 'Analyze this PDF...',
-        },
-      ],
-    },
-  ],
-});
-
-// For images
-const message = await anthropic.messages.create({
-  model: 'claude-sonnet-4-20250514',
-  max_tokens: 4096,
-  messages: [
-    {
-      role: 'user',
-      content: [
-        {
-          type: 'image',
-          source: {
-            type: 'base64',
-            media_type: 'image/jpeg',
-            data: base64Data,
-          },
-        },
-        {
-          type: 'text',
-          text: 'Analyze this image...',
-        },
-      ],
-    },
-  ],
-});
-```
-
-#### Best Practices
-
-1. **Schema Validation**: Always use Zod schemas to validate AI outputs
-2. **Error Handling**: Wrap AI calls in try-catch blocks
-3. **Timeouts**: Set appropriate `maxDuration` in API routes (e.g., 300 seconds)
-4. **Token Limits**: Use appropriate `max_tokens` based on expected response size
-5. **Model Selection**: Use `claude-sonnet-4-20250514` for production workloads
-
-#### Environment Variables
-
-Required environment variable:
-
-```bash
-ANTHROPIC_API_KEY=your-api-key-here
-```
+**📚 Complete guide:** [AI Integration Guide](/docs/AI_INTEGRATION.md)
 
 ---
 
 ## Standardized Page Layout
 
-### Overview
-All public-facing pages in the application follow a **standardized three-column layout pattern** to ensure consistent user experience and prevent layout shifts during loading states.
-
-### Critical Pattern: Header Placement
-**IMPORTANT**: This pattern was established during extensive development sessions to eliminate header resizing issues. DO NOT deviate from this pattern without careful consideration.
-
-### Layout Structure
-
-```tsx
-export default function PageComponent() {
-  const [data, setData] = useState<DataType | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-      <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
-        {/* Left Sidebar - Always renders */}
-        <aside className="hidden lg:block w-72 flex-shrink-0">
-          <EbayAd query="primary-keywords" limit={3} title="Ad Title" />
-        </aside>
-
-        {/* Main Content - Always renders */}
-        <main className="flex-grow max-w-5xl space-y-6">
-          {/* Header ALWAYS renders immediately */}
-          <Header rounded={true} />
-
-          {/* Conditional content based on loading state */}
-          {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
-            </div>
-          ) : !data ? (
-            <div className="flex items-center justify-center py-20">
-              <div className="text-center">
-                <h1 className="text-2xl font-bold text-gray-900 mb-4">Not Found</h1>
-                <p className="text-gray-600 mb-8">The content you're looking for doesn't exist.</p>
-                <Link href="/" className="text-footy-green hover:underline">
-                  ← Back to Home
-                </Link>
-              </div>
-            </div>
-          ) : (
-            <>
-              <Breadcrumb items={[...]} />
-
-              {/* Main content here */}
-
-              <Footer rounded={true} />
-            </>
-          )}
-        </main>
-
-        {/* Right Sidebar - Always renders */}
-        <aside className="hidden lg:block w-72 flex-shrink-0">
-          <EbayAd query="secondary-keywords" limit={3} title="Ad Title" />
-        </aside>
-      </div>
-    </div>
-  );
-}
-```
+**CRITICAL**: All public pages follow a standardized three-column layout pattern.
 
 ### Key Principles
 
-1. **Header Renders Immediately**
-   - Header component MUST render before any loading conditional
-   - This prevents visual layout shift when transitioning from loading to content
-   - Header is placed inside `<main>` tag, NOT in a separate wrapper
+1. **Header renders immediately** - before any loading conditional
+2. **Consistent background** - same gradient in all states
+3. **Sidebars always render** - left and right columns render immediately
+4. **Three-column layout** - Left sidebar (288px) + Main content (max-w-5xl) + Right sidebar (288px)
+5. **No early returns** - use conditional rendering instead
 
-2. **Consistent Background**
-   - All states (loading, error, content) use the same background gradient
-   - Background: `bg-gradient-to-br from-gray-50 via-white to-gray-50`
+### Pattern
 
-3. **Sidebars Always Render**
-   - Left and right sidebars render immediately
-   - Hidden on mobile/tablet with `hidden lg:block`
-   - Maintain consistent width: `w-72`
-
-4. **Three-Column Layout**
-   - Left Sidebar (288px / w-72)
-   - Main Content (max-w-5xl / ~1024px)
-   - Right Sidebar (288px / w-72)
-   - Total max width: 1600px
-
-5. **No Early Returns**
-   - NEVER use early returns for loading/error states
-   - Use conditional rendering (`{loading ? ... : ...}`) instead
-   - This ensures consistent outer layout structure
-
-### Pages Following This Pattern
-
-✅ **All pages standardized as of October 2025:**
-- `/` - Homepage
-- `/releases` - Release index
-- `/releases/[slug]` - Release detail pages
-- `/posts` - Post index
-- `/posts/[slug]` - Post detail pages
-- `/sets/[slug]` - Set detail pages
-- `/sets/[slug]/parallels/[parallel]` - Parallel pages
-- `/cards/[slug]` - Card detail pages
-
-### Common Mistakes to Avoid
-
-❌ **Don't do this:**
 ```tsx
-// BAD: Early return with different layout
-if (loading) {
-  return (
-    <div className="min-h-screen bg-white">
-      <Header />
-      <div>Loading...</div>
-    </div>
-  );
-}
-
-// BAD: Header in separate wrapper with custom positioning
-<div className="w-full px-4 pt-6">
-  <div className="max-w-5xl mx-auto lg:ml-[304px]">
-    <Header />
-  </div>
-</div>
-```
-
-✅ **Do this instead:**
-```tsx
-// GOOD: Single return with conditional content
 return (
   <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
     <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
-      <aside>...</aside>
-      <main>
+      <aside className="hidden lg:block w-72 flex-shrink-0">
+        <EbayAd ... />
+      </aside>
+      <main className="flex-grow max-w-5xl space-y-6">
         <Header rounded={true} />
         {loading ? <LoadingSpinner /> : <Content />}
       </main>
-      <aside>...</aside>
+      <aside className="hidden lg:block w-72 flex-shrink-0">
+        <EbayAd ... />
+      </aside>
     </div>
   </div>
 );
 ```
+
+**📚 Complete guide:** [Frontend Patterns Guide](/docs/FRONTEND_PATTERNS.md)
 
 ---
 
@@ -310,530 +68,115 @@ return (
 
 ### Card Slugs
 
-**Base Card Format:** `{year}-{release}-{set}-{cardNumber}-{player}-{printRun}`
-- Example: `2024-25-obsidian-soccer-obsidian-base-1-jude-bellingham-145`
+**Base cards:**
+```
+{year}-{release}-{set}-{cardNumber}-{player}-{printRun}
+```
 
-**Parallel Card Format:** `{year}-{release}-{cardNumber}-{player}-{parallelName}-{printRun}`
-- Example: `2024-25-obsidian-soccer-1-jude-bellingham-electric-etch-marble-flood-8`
-- **Note:** Set name is excluded for parallel cards since parallel name is more specific
+**Parallel cards (set name excluded):**
+```
+{year}-{release}-{cardNumber}-{player}-{parallelName}-{printRun}
+```
 
-**Key Rules:**
-1. **Parallel cards exclude the base set name** from slugs to avoid redundancy
-   - **EXCEPTION: Optic cards KEEP "optic" in slugs** - Optic is a distinct product line, not just a Base parallel
-   - Example: `2024-25-donruss-soccer-optic-1-matt-turner` (base Optic card)
-   - Example: `2024-25-donruss-soccer-optic-1-matt-turner-argyle` (Optic Argyle parallel)
-2. **Print runs are not duplicated** - if the parallel name ends with the print run, it's not added again
-3. **1/1 cards** use special formatting (see below)
+**Exception:** Optic cards KEEP "optic" in slugs.
 
 ### Set Slugs
 
-**Format:** `{year}-{release}-{type-prefix}-{setname}[-{parallel}]`
+```
+{year}-{release}-{type-prefix}-{setname}[-{parallel}]
+```
 
-**Type Prefixes:**
-- `Base` → `base` (or omit if setName already contains "base")
-- `Autograph` → `auto`
-- `Memorabilia` → `mem`
-- `Insert` → `insert`
-- `Other` → (no prefix)
-
-**Examples:**
-- Base: `2024-25-obsidian-soccer-obsidian-base`
-- Insert: `2024-25-obsidian-soccer-insert-equinox`
-- Autograph: `2024-25-obsidian-soccer-auto-dual-jersey-ink`
-- Parallel: `2024-25-obsidian-soccer-obsidian-base-electric-etch-green-5`
+Type prefixes: `base`, `auto`, `mem`, `insert`
 
 ### Special Cases
 
-#### 1/1 Cards (Chase/Grail Cards)
-- **Database stores:** `"1/1"` or `"Black 1/1"`
-- **URLs use:** `"1-of-1"` or `"black-1-of-1"`
-- **Display shows:** `"1 of 1"` or `"Black 1 of 1"`
+- **1/1 cards**: Database `"1/1"` → URL `"1-of-1"` → Display `"1 of 1"`
+- **Optic Base**: Database `"Optic Base Set"` → URL `"optic"` → Display `"Optic"`
 
-**Slug Generation Pattern:**
-```typescript
-const slug = parallelName
-  .replace(/\b1\s*\/\s*1\b/gi, '1-of-1')  // Convert "1/1" FIRST
-  .replace(/\b1\s*of\s*1\b/gi, '1-of-1')  // Convert "1 of 1"
-  .toLowerCase()
-  .replace(/\s+/g, '-')
-  .replace(/[^a-z0-9-]/g, '')
-  .replace(/-+/g, '-')
-  .replace(/^-|-$/g, '');
-```
-
-**Display Formatting:**
-```typescript
-// Use formatParallelName from /lib/formatters.ts
-import { formatParallelName } from '@/lib/formatters';
-
-// Converts URL slugs to display format
-// "1-of-1" → "1 of 1"
-// "gold-power-1-of-1" → "Gold Power 1 of 1"
-<span>{formatParallelName(parallelName)}</span>
-```
-
-#### Optic Base Set Naming
-- **Database:** `"Optic Base Set"` or `"Base Optic"`
-- **URLs:** `"optic"` (Base is removed)
-- **Display:** `"Optic"` (Base is removed)
-
-**Pattern:**
-```typescript
-const displayName = setName
-  .replace(/\boptic\s+base\s+set\b/gi, 'Optic')
-  .replace(/\boptic\s+base\b/gi, 'Optic')
-  .replace(/\bbase\s+optic\b/gi, 'Optic')
-  .trim();
-```
-
-#### Regular Base Sets
-- **Database:** `"Base Set"`
-- **URLs:** `"base"` (keep "Base")
-- **Display:** `"Base"` (keep "Base")
-
-#### Print Runs in Parallels
-When a parallel name includes a print run indicator (e.g., "Electric Etch Orange /149"):
-- **Stored name:** Extract and clean the parallel name (e.g., "Electric Etch Orange")
-- **Set.printRun or Set.totalCards:** Store the print run separately
-- **Slug:** Include the print run number (e.g., `electric-etch-orange-149`)
-- **Display:** Show the full name with formatting (e.g., "Electric Etch Orange /149")
-
-### Card Slug Generation Logic
-
-**Location:** `/lib/slugGenerator.ts` - `generateCardSlug()` function
-
-**Implementation Details:**
-
-1. **Parallel Card Detection:**
-   - A card is considered a parallel if the variant differs from the set name
-   - Parallel cards have the set name excluded from the slug
-   - Example: Variant "Electric Etch Marble Flood 8" != Set "Obsidian Base" → parallel card
-
-2. **Print Run Deduplication:**
-   - Checks if variant already ends with the print run number
-   - Prevents duplicate print runs (e.g., `-8-8` becomes `-8`)
-   - Example: Variant "Electric Etch Marble Flood 8" with printRun=8 → only includes `-8` once
-
-3. **1/1 Card Handling:**
-   - Converts "1/1" or "1 of 1" to "1-of-1" format
-   - Detects if variant ends with "1-of-1" and printRun is 1
-   - Prevents adding extra `-1` to the slug
-
-**Code Reference:**
-```typescript
-// lib/slugGenerator.ts:117-167
-const isParallelCard = processedVariant &&
-  processedVariant.toLowerCase() !== setName.toLowerCase() &&
-  !processedVariant.toLowerCase().includes('base');
-
-const variantEndsWithPrintRun = processedVariant && printRun && (
-  processedVariant.trim().endsWith(` ${printRun}`) ||
-  (printRun === 1 && processedVariant.trim().endsWith('1-of-1'))
-);
-
-const parts = [
-  year,
-  releaseName,
-  isParallelCard ? null : setName,  // Exclude setName for parallels
-  cardNumber,
-  playerName,
-  processedVariant,
-  (printRun && !variantEndsWithPrintRun) ? printRun.toString() : null
-].filter(Boolean);
-```
-
-**Examples:**
-- Parallel: `generateCardSlug('Panini', 'Obsidian Soccer', '2024-25', 'Obsidian Base', '1', 'Jude Bellingham', 'Electric Etch Marble Flood 8', 8)`
-  → `2024-25-obsidian-soccer-1-jude-bellingham-electric-etch-marble-flood-8`
-- Base: `generateCardSlug('Panini', 'Obsidian Soccer', '2024-25', 'Obsidian Base', '1', 'Jude Bellingham', null, 145)`
-  → `2024-25-obsidian-soccer-obsidian-base-1-jude-bellingham-145`
-- 1/1: `generateCardSlug('Panini', 'Obsidian Soccer', '2024-25', 'Obsidian Base', '1', 'Jude Bellingham', 'Gold Power 1/1', 1)`
-  → `2024-25-obsidian-soccer-1-jude-bellingham-gold-power-1-of-1`
-
-### Set Slugs
-Format: `{year}-{release}-{setName}`
-
-Example: `2024-25-donruss-soccer-optic`
-
-### Release Slugs
-Format: `{year}-{manufacturer}-{release}`
-
-Example: `2024-25-panini-donruss-soccer`
+**📚 Complete guide:** [URL Slug Conventions](/docs/SLUG_CONVENTIONS.md)
 
 ---
 
-## Set & Parallel Architecture (Simplified)
+## Parallel Set Architecture
 
-### Independent Parallel Sets
+**Simplified independent model** - all sets are standalone entities.
 
-The database uses a **simplified independent model** for parallel sets:
+### Key Principles
 
-- **All sets are independent entities** with their own cards
-- **Parallels identified by naming convention**: Sets with "-parallel" in slug
-- **No parent-child relationships**: Each set stands alone
+1. **Each set has own cards** - cards duplicated across base and parallels
+2. **Parallels identified by naming** - sets with `-parallel` in slug
+3. **No parent-child relationships** - simpler data model
+4. **Smart ordering** - non-parallels first, then unnumbered parallels, then numbered parallels (highest to lowest)
 
-**Database Structure:**
-```typescript
-// Base set (e.g., "Optic")
-const baseSet = {
-  id: 'abc123',
-  name: 'Optic',
-  slug: '2024-25-donruss-soccer-optic',
-  type: 'Base',
-  isParallel: false,
-  baseSetSlug: null,
-  cards: [card1, card2, ...] // Own cards
-};
+### Naming Convention
 
-// Parallel set (e.g., "Cubic")
-const parallelSet = {
-  id: 'xyz789',
-  name: 'Cubic',
-  slug: '2024-25-donruss-soccer-optic-cubic-parallel-99',
-  type: 'Base',
-  isParallel: true,
-  baseSetSlug: '2024-25-donruss-soccer-optic',
-  printRun: 99,
-  cards: [card1, card2, ...] // Own cards
-};
+```
+Base:           {year}-{release}-{setname}
+Parallel:       {year}-{release}-{setname}-{variant}-parallel[-{printrun}]
 ```
 
-**Naming Convention:**
-- Base sets: `{year}-{release}-{setname}`
-- Parallel sets: `{year}-{release}-{setname}-{variant}-parallel[-{printrun}]`
-- Examples:
-  - Base: `2024-25-donruss-soccer-optic`
-  - Parallel (no print run): `2024-25-donruss-soccer-optic-cubic-parallel`
-  - Parallel (with print run): `2024-25-donruss-soccer-optic-blue-cubic-parallel-99`
-
-**Key Principles:**
-
-1. **Each set has own cards**: Cards duplicated across base and parallels
-2. **Release pages show all sets**: Both base and parallel sets displayed
-3. **Smart ordering**: Non-parallels first, then parallels without print runs (alphabetical), then parallels with print runs (highest to lowest)
-4. **No complex relationships**: Simpler data model, easier to maintain
-
-**Query Pattern:**
-```typescript
-// Fetch set independently
-const set = await prisma.set.findUnique({
-  where: { slug: params.slug },
-  include: {
-    cards: true,
-    release: {
-      include: { manufacturer: true }
-    }
-  }
-});
-
-// Use utility functions for parallel detection
-import { isParallelSet, getBaseSetSlug, sortSets } from '@/lib/setUtils';
-
-const isParallel = isParallelSet(set.slug);
-const baseSlug = getBaseSetSlug(set.slug);
-
-// Sort sets on release page
-const sortedSets = sortSets(release.sets);
-```
-
-**Benefits:**
-- **Simplicity**: No complex parent-child relationships to manage
-- **Independence**: Each set is self-contained
-- **Flexibility**: Easy to add/modify individual sets
-- **Clear naming**: Parallels explicitly identified in URLs
-
-### Testing Checklist for Simplified Parallel Architecture
-
-When implementing sets with the new architecture:
-
-**Database Level:**
-- [ ] All sets have unique slugs following naming conventions
-- [ ] Parallel sets have `isParallel = true`
-- [ ] Parallel sets have `baseSetSlug` pointing to base set slug
-- [ ] Each set has its own cards
-- [ ] Print runs stored correctly on parallel sets
-
-**Release Page (`/releases/[slug]`):**
-- [ ] All sets displayed (base and parallels)
-- [ ] Sets sorted correctly: non-parallels, then parallels without print runs, then parallels with print runs (highest to lowest)
-- [ ] Correct card counts for each set
-- [ ] Set type badges display correctly (Base, Insert, Auto, Mem)
-
-**Set Detail Page (`/sets/[slug]`):**
-- [ ] Both base and parallel sets work independently
-- [ ] Correct cards displayed for each set
-- [ ] Print run displayed in header for parallels
-- [ ] Breadcrumbs show Release → Set
-
-**Admin Interface:**
-- [ ] Can create base sets and parallel sets independently
-- [ ] Cards created for each set
-- [ ] Slug generation follows new convention
-- [ ] Import scripts create separate sets for each parallel
+**📚 Complete guide:** [Parallel Architecture Guide](/docs/PARALLEL_ARCHITECTURE.md)
 
 ---
 
 ## Component Patterns
 
 ### Header Component
-Location: `/components/Header.tsx`
-
-**Props:**
-- `showBackButton?: boolean` - Show back navigation (default: false)
-- `rounded?: boolean` - Apply rounded corners (default: false, use true on public pages)
-
-**Usage:**
 ```tsx
-// Public pages
 <Header showBackButton={false} rounded={true} />
-
-// Admin pages
-<Header showBackButton={true} rounded={false} />
 ```
 
 ### Footer Component
-Location: `/components/Footer.tsx`
-
-**Props:**
-- `rounded?: boolean` - Apply rounded corners (default: false, use true on public pages)
-
-**Usage:**
 ```tsx
 <Footer rounded={true} />
 ```
 
 ### EbayAd Component
-Location: `/components/EbayAd.tsx`
-
-**Props:**
-- `query: string` - Search keywords for eBay API
-- `limit?: number` - Number of ads to display (default: 3)
-- `title?: string` - Ad section title
-
-**Usage:**
 ```tsx
-<EbayAd
-  query="soccer cards"
-  limit={3}
-  title="Latest Soccer Cards"
-/>
+<EbayAd query="soccer cards" limit={3} title="Latest Soccer Cards" />
 ```
 
 ### Breadcrumb Component
-Location: `/components/Breadcrumb.tsx`
-
-**Props:**
-- `items: Array<{ label: string; href: string }>`
-
-**Usage:**
 ```tsx
-<Breadcrumb
-  items={[
-    { label: "Home", href: "/" },
-    { label: "Releases", href: "/releases" },
-    { label: "2024-25 Panini Obsidian Soccer", href: "/releases/2024-25-panini-obsidian-soccer" },
-  ]}
-/>
+<Breadcrumb items={[
+  { label: "Home", href: "/" },
+  { label: "Releases", href: "/releases" }
+]} />
 ```
 
 ---
 
 ## Database Schema
 
-> **📊 For complete database reference documentation, see [docs/DATABASE.md](/docs/DATABASE.md)**
->
-> This section contains development-specific schema patterns and quick reference. For detailed field descriptions, query patterns, and migration guides, refer to the comprehensive database documentation.
+> **📊 For complete database reference, see [DATABASE.md](/docs/DATABASE.md)**
 
 ### Hierarchy
+
 ```
 Manufacturer
   └── Release (year, name, slug, description, releaseDate, sourceFiles)
-       └── Set (name, slug, type, parentSet, parallelSets, printRun)
-            └── Card (playerName, team, cardNumber, variant, parallelType, printRun, slug)
+       └── Set (name, slug, type, isParallel, baseSetSlug, printRun)
+            └── Card (playerName, team, cardNumber, variant, printRun, slug)
 ```
 
-### Key Models (Quick Reference)
+### Set Model (Key Fields)
 
-#### Card
-```prisma
-model Card {
-  id                    String   @id @default(cuid())
-  slug                  String?  @unique
-  playerName            String?
-  team                  String?
-  cardNumber            String?
-  variant               String?  // Basic variant name (e.g., "Refractor", "Chrome")
-
-  // Enhanced parallel/variation detection fields
-  parallelType          String?  // Specific parallel type (e.g., "Gold Refractor", "Red Wave")
-  serialNumber          String?  // Serial number if numbered (e.g., "123/299")
-  isNumbered            Boolean  @default(false)
-  printRun              Int?     // Total print run (e.g., 299 for /299)
-  numbered              String?  // Display string for numbering (e.g., "1 of 1", "/99", "/199")
-  rarity                String?  // Rarity level (base, rare, super_rare, ultra_rare, one_of_one)
-  finish                String?  // Card finish (refractor, chrome, matte, glossy, holographic)
-  hasAutograph          Boolean  @default(false)
-  hasMemorabilia        Boolean  @default(false)
-  specialFeatures       String[] // Array of special features (rookie, insert, short_print, etc.)
-  colorVariant          String?  // Color designation (gold, red, blue, green, orange, etc.)
-
-  // OCR and detection metadata
-  detectionConfidence   Int?     // AI confidence score (0-100)
-  detectionMethods      String[] // Methods used (ocr, visual, ai_analysis)
-  detectedText          String?  // Raw OCR text for reference
-
-  // Images
-  imageFront            String?  // Front image URL
-  imageBack             String?  // Back image URL
-
-  // Admin notes
-  footyNotes            String?  @db.Text // Internal notes about this card
-
-  setId                 String
-  set                   Set      @relation(fields: [setId], references: [id], onDelete: Cascade)
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
-  posts                 Post[]   // Posts that reference this card
-  images                Image[]
-}
-```
-
-#### Set
 ```prisma
 model Set {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String   @unique // URL-friendly slug - required for public access
-  type        SetType  @default(Base) // Base, Autograph, Memorabilia, or Insert
-  releaseId   String
-  release     Release  @relation(fields: [releaseId], references: [id], onDelete: Cascade)
-  totalCards  String?
-  printRun    Int?     // Standard print run for this set (e.g., 99 for "/99" parallels)
-  description String?  // Optional description for this set
-
-  // Source data for regeneration and reference
-  sourceText  String?  @db.Text // Original pasted checklist text
-
-  // Parallel identification
-  isParallel  Boolean  @default(false) // True if this is a parallel set (identified by naming convention)
-  baseSetSlug String?  // Reference to the base set's slug (for parallels only)
-
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  slug        String   @unique  // URL-friendly slug
+  type        SetType            // Base, Autograph, Memorabilia, Insert
+  isParallel  Boolean            // true for parallel sets
+  baseSetSlug String?            // Reference to base set slug (for parallels)
+  printRun    Int?               // Standard print run for all cards in set
   cards       Card[]
-  posts       Post[]   // Posts that reference this set
-  images      Image[]
-}
-
-enum SetType {
-  Base
-  Autograph
-  Memorabilia
-  Insert
 }
 ```
 
-#### Release
-```prisma
-model Release {
-  id             String          @id @default(cuid())
-  name           String
-  year           String?
-  slug           String          @unique
-  description    String?         // Brief summary displayed in previews
-  releaseDate    DateTime?       // Official release date
+### Print Run Fields
 
-  // Source files used for AI analysis
-  sellSheetText  String?         @db.Text // Extracted text from sell sheets
-  sourceFiles    Json?           // Array of {url, type, filename} for PDFs/images
-
-  manufacturerId String
-  manufacturer   Manufacturer    @relation(fields: [manufacturerId], references: [id], onDelete: Cascade)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  sets           Set[]
-  posts          Post[]
-  images         Image[]
-  sourceDocuments ReleaseSourceDocument[]
-}
-```
-
-#### Image
-```prisma
-model Image {
-  id        String    @id @default(cuid())
-  url       String
-  caption   String?
-  order     Int       @default(0)
-  type      ImageType // What this image belongs to
-  createdAt DateTime  @default(now())
-
-  // Foreign keys - only one will be set based on type
-  releaseId String?
-  release   Release?  @relation(fields: [releaseId], references: [id], onDelete: Cascade)
-
-  setId     String?
-  set       Set?      @relation(fields: [setId], references: [id], onDelete: Cascade)
-
-  cardId    String?
-  card      Card?     @relation(fields: [cardId], references: [id], onDelete: Cascade)
-
-  postId    String?
-  post      Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
-}
-
-enum ImageType {
-  RELEASE    // Release product image
-  SET        // Set/insert image
-  CARD       // Individual card image
-  POST       // Post/article image
-}
-```
-
-### Important Schema Notes
-
-> **For comprehensive documentation on all schema fields, relationships, and query patterns, see [docs/DATABASE.md](/docs/DATABASE.md)**
-
-#### Set Parent-Child Relationships
-
-Sets use a self-referential relationship for parallel sets. See [Parent-Child Parallel Sets](/docs/DATABASE.md#parent-child-parallel-sets) in the database reference for complete documentation.
-
-```typescript
-// Parent set (e.g., "Obsidian Base")
-const parentSet = {
-  id: 'abc123',
-  name: 'Obsidian Base',
-  type: 'Base',
-  parentSetId: null,          // null indicates this is a parent
-  parallelSets: [child1, child2, ...] // Array of children
-};
-
-// Child parallel set (e.g., "Electric Etch Marble Flood 8")
-const parallelSet = {
-  id: 'xyz789',
-  name: 'Electric Etch Marble Flood 8',
-  type: 'Insert',
-  parentSetId: 'abc123',      // Points to parent
-  parallelSets: []            // Parallels don't have children
-};
-```
-
-#### Print Run Fields
-
-Print runs appear in multiple places. See [Card model](/docs/DATABASE.md#card) and [Set model](/docs/DATABASE.md#set) in the database reference for complete field documentation.
-
-1. **Card.printRun** - Individual card print run (e.g., 8 for "/8")
-2. **Set.printRun** - Standard print run for all cards in set (e.g., 99 for all cards "/99")
-3. **Card.numbered** - Display string (e.g., "1 of 1", "/99")
-
-**Best Practice:** For parallel sets where all cards have the same print run, store in `Set.printRun`. For individual numbered cards, store in `Card.printRun`.
-
-#### Deprecated Fields
-
-See [Deprecated Fields](/docs/DATABASE.md#deprecated-fields) in the database reference for migration plans and handling guidance.
-
-- **Set.isBaseSet** - Deprecated, use `Set.type` instead
-- **Set.parallels** (Json) - Deprecated, use `Set.parallelSets` relation instead
+- **Card.printRun** - Individual card print run (e.g., 8 for "/8")
+- **Set.printRun** - Standard print run for all cards in set (e.g., 99 for "/99")
+- **Card.numbered** - Display string (e.g., "1 of 1", "/99")
 
 ---
 
@@ -841,296 +184,38 @@ See [Deprecated Fields](/docs/DATABASE.md#deprecated-fields) in the database ref
 
 ### Data Import Requirements
 
-**CRITICAL**: All import scripts MUST upload the source checklist file to ensure traceability and data integrity.
-
-#### Checklist Upload Process
-
-Every import script must include these steps:
-
-1. **Upload the checklist file** to Vercel Blob Storage
-2. **Create a SourceDocument record** linking the checklist to the release
-3. **Import sets and cards** from the checklist data
-
-**Example Implementation:**
+**CRITICAL:** All import scripts MUST upload the source checklist file.
 
 ```typescript
-import { uploadChecklistToRelease, getExistingChecklist } from '@/lib/checklistUploader';
-import path from 'path';
+import { uploadChecklistToRelease } from '@/lib/checklistUploader';
 
-async function main() {
-  // 1. Create/find the release
-  const release = await prisma.release.create({
-    data: {
-      name: 'Obsidian Soccer',
-      year: '2024-25',
-      slug: '2024-25-panini-obsidian-soccer',
-      manufacturerId: manufacturerId
-    }
-  });
-
-  // 2. Upload the checklist (REQUIRED)
-  const checklistPath = '/Users/mh/Desktop/2024-25-Panini-Obsidian-Soccer-Cards-Checklist.xls';
-  const filename = path.basename(checklistPath);
-
-  const existing = await getExistingChecklist(release.id, filename);
-
-  if (!existing) {
-    console.log('\n📤 Uploading checklist...');
-    await uploadChecklistToRelease(
-      checklistPath,
-      release.id,
-      '2024-25 Panini Obsidian Soccer Checklist'
-    );
-    console.log('✅ Checklist uploaded successfully\n');
-  } else {
-    console.log('ℹ️  Checklist already uploaded\n');
-  }
-
-  // 3. Import sets and cards
-  // ... rest of import logic
-}
+// Upload checklist (REQUIRED)
+await uploadChecklistToRelease(checklistPath, release.id, 'Checklist Name');
 ```
 
-**Why This Matters:**
-- **Traceability**: Always able to reference the original source data
-- **Verification**: Users can download and verify card data
-- **Compliance**: Proper attribution to manufacturers
-- **Data Integrity**: Ability to re-import or correct data from original source
+**📚 Complete guide:** [Data Import Guide](/docs/IMPORT_GUIDE.md)
 
-**Detailed Documentation:**
-- See `/scripts/README-CHECKLIST-UPLOAD.md` for complete implementation guide
-- See `/lib/checklistUploader.ts` for utility functions
+### Donruss Products
 
-#### Script Organization and Documentation
+**CRITICAL:** Donruss Rated Rookies are NOT separate sets - they are cards 176-200 within Base and Optic sets.
 
-**REQUIRED**: After completing an import or developing correction scripts for a release, all related scripts MUST be organized into a dedicated folder with comprehensive documentation.
+**Strategy:**
+1. Import as listed in checklist (creates split sets)
+2. Run merge script to combine Rated Rookies into Base/Optic
+3. Verify all Base/Optic sets have 200 cards
 
-**Folder Structure:**
-```
-/scripts/{release-slug}/
-  ├── README.md                          # Comprehensive documentation
-  ├── import-{release}.ts                # Main import script
-  ├── fix-*.ts                           # Data correction scripts
-  ├── check-*.ts                         # Diagnostic/verification scripts
-  └── verify-*.ts                        # Post-import validation scripts
-```
-
-**Naming Convention:**
-- Use the release slug as the folder name (e.g., `road-to-qatar-2021-22`, `obsidian-2024-25`)
-- Prefix scripts with their purpose:
-  - `import-` - Initial data import
-  - `fix-` - Data corrections
-  - `check-` - Diagnostic queries
-  - `verify-` - Validation scripts
-
-**README.md Requirements:**
-
-Every script folder MUST include a comprehensive README.md with:
-
-1. **Release Information**
-   - Product name
-   - Manufacturer
-   - Release slug
-   - Total sets and cards
-
-2. **Scripts Overview**
-   - Description of each script
-   - What it fixes/checks
-   - Number of sets/cards affected
-   - Official specifications (for fix scripts)
-
-3. **Running Instructions**
-   - Example commands for each script
-   - Order of execution if dependencies exist
-
-4. **Summary of Corrections**
-   - Total updates made
-   - Issues fixed
-   - Database changes
-   - Data sources
-
-**Example README Structure:**
-
-```markdown
-# {Year} {Manufacturer} {Product Name} - Data Correction Scripts
-
-This directory contains scripts used to correct and fix data issues in the {Product Name} release.
-
-## Release Information
-
-- **Product:** {Product Name}
-- **Manufacturer:** {Manufacturer}
-- **Release Slug:** `{release-slug}`
-- **Total Sets:** X sets
-- **Total Cards:** Y cards
-
-## Scripts Overview
-
-### Category Name
-
-**`script-name.ts`**
-- Description of what it does
-- Updates X sets and Y cards
-- Official specs:
-  - Spec 1
-  - Spec 2
-
-## Running the Scripts
-
-All scripts can be run using `npx tsx`:
-
-\`\`\`bash
-npx tsx scripts/{release-slug}/script-name.ts
-\`\`\`
-
-## Summary of Corrections
-
-### Total Updates
-- **X sets corrected**
-- **Y cards updated**
-
-### Issues Fixed
-1. ✅ Issue description (X sets)
-2. ✅ Issue description (Y sets)
-
-### Database Changes
-- Field updates made
-- Cascade effects
-
-### Data Sources
-
-**Source Document:** Path to checklist file
-
-## Notes
-
-- Any special notes about the data
-- Edge cases handled
-- Known limitations
-```
-
-**When to Consolidate:**
-
-Consolidate scripts into a dedicated folder when:
-- Import is complete and verified
-- Multiple fix scripts have been created
-- Ready for final documentation
-- Moving on to next release
-
-**Example Implementations:**
-- `/scripts/road-to-qatar-2021-22/` - 11 scripts with comprehensive README
-- `/scripts/obsidian-2024-25/` - Import and verification scripts (if exists)
-- `/scripts/donruss-2024-25/` - Import and fix scripts (if exists)
-
-**Benefits:**
-- **Organization**: All related scripts in one place
-- **Documentation**: Clear purpose and usage for each script
-- **Traceability**: Official specs documented alongside corrections
-- **Maintainability**: Easy to find and update scripts
-- **Knowledge Transfer**: Future developers can understand the import process
-
-### Donruss Product Structure & Rated Rookies
-
-**CRITICAL KNOWLEDGE**: Donruss products have a specific structure for Rated Rookies that differs from how checklists represent them.
-
-#### How Rated Rookies Actually Work
-
-Donruss Rated Rookies are **NOT separate sets** - they are the last 25 cards within the Base and Optic sets:
-
-- **Base Set**: Cards 1-200 (175 regular cards + 25 Rated Rookies as cards 176-200)
-- **Optic Set**: Cards 1-200 (175 regular cards + 25 Rated Rookies as cards 176-200)
-- **All Parallels**: Also 200 cards each (same structure)
-
-#### The Checklist Problem
-
-Manufacturer checklists **incorrectly** list these as separate sets:
-- ❌ "Base" (175 cards)
-- ❌ "Rated Rookies" (25 cards)
-- ❌ "Base Optic" (175 cards)
-- ❌ "Rated Rookies Optic" (25 cards)
-
-This is **WRONG**. The correct structure is:
-- ✅ "Base" (200 cards total: 1-175 regular + 176-200 Rated Rookies)
-- ✅ "Optic" (200 cards total: 1-175 regular + 176-200 Rated Rookies)
-
-#### Import Strategy
-
-When importing Donruss products:
-
-1. **Initial Import**: Import as listed in checklist (will create split sets)
-2. **Merge Script**: Create a fix script to merge Rated Rookies into Base/Optic sets
-3. **Verify**: All Base and Optic sets should end up with 200 cards each
-
-**Example Merge Pattern:**
-```typescript
-// Find all "Rated Rookies" sets
-const ratedRookiesSets = sets.filter(s =>
-  s.name === 'Rated Rookies' ||
-  s.name.startsWith('Rated Rookies ')
-);
-
-// For each Rated Rookies set, find its matching Base set
-for (const rrSet of ratedRookiesSets) {
-  // Convert "Rated Rookies Holo Blue Laser" → "Base Holo Blue Laser"
-  const baseName = rrSet.name
-    .replace('Rated Rookies Optic', 'Optic')
-    .replace('Rated Rookies', 'Base');
-
-  const matchingBase = baseSets.find(b => b.name === baseName);
-
-  // Move all cards from RR set to Base set
-  await prisma.card.updateMany({
-    where: { setId: rrSet.id },
-    data: { setId: matchingBase.id }
-  });
-
-  // Update totalCards count
-  await prisma.set.update({
-    where: { id: matchingBase.id },
-    data: { totalCards: '200' }
-  });
-
-  // Delete the empty RR set
-  await prisma.set.delete({
-    where: { id: rrSet.id }
-  });
-}
-```
-
-**Reference Implementation:**
-- `/scripts/fix-road-to-qatar-rated-rookies.ts` - Merges Base Rated Rookies
-- `/scripts/fix-optic-parallels.ts` - Merges Optic Rated Rookies parallels
-- `/scripts/verify-road-to-qatar-import.ts` - Verifies 200-card sets
-
-#### Expected Results
-
-After merging:
-- **Base sets**: 11-25 sets (Base + all parallels), each with 200 cards
-- **Optic sets**: 14+ sets (Optic + all parallels), each with 200 cards
-- **Total set reduction**: ~24 sets removed (all "Rated Rookies" sets deleted)
-- **Card count**: Unchanged (just moved, not deleted)
-
-#### Products Affected
-
-This applies to **all Donruss soccer products**:
-- Donruss Soccer (2024-25, 2023-24, etc.)
-- Donruss Road to Qatar (2021-22)
-- Any future Donruss releases
-
-**Important**: Other manufacturers (Panini Select, Prizm, etc.) do NOT follow this pattern.
+**📚 Complete guide:** [Donruss Product Guide](/docs/DONRUSS_GUIDE.md)
 
 ### TypeScript Best Practices
 
 1. **Null Checks**
-   - Always check for null/undefined when accessing nested properties
    - Use optional chaining: `card?.set?.release?.name`
    - Add TypeScript guards in conditionals
 
 2. **Type Safety**
    ```typescript
-   // Good: Proper typing
    const [data, setData] = useState<DataType | null>(null);
 
-   // Good: Type guards in conditionals
    {data && data.property && (
      <Component data={data} />
    )}
@@ -1138,27 +223,16 @@ This applies to **all Donruss soccer products**:
 
 ### Component Development
 
-1. **Use Existing Patterns**
-   - Reference existing pages before creating new ones
-   - Maintain consistent styling with Tailwind
-   - Follow the standardized layout structure
-
-2. **Loading States**
-   - Always provide loading feedback
-   - Use consistent spinner design
-   - Show loading state in place of content, not entire page
-
-3. **Error Handling**
-   - Provide clear error messages
-   - Offer navigation back to safety (home, back button)
-   - Log errors to console for debugging
+1. **Use Existing Patterns** - Reference existing pages before creating new ones
+2. **Loading States** - Always provide loading feedback with consistent spinner
+3. **Error Handling** - Provide clear messages and navigation back to safety
 
 ### Styling Guidelines
 
-**Color Palette:**
+**Colors:**
 - Primary Green: `#005031` (footy-green)
 - Primary Orange: `#F47322` (footy-orange)
-- Backgrounds: Gradient from `gray-50` via `white` to `gray-50`
+- Backgrounds: `bg-gradient-to-br from-gray-50 via-white to-gray-50`
 
 **Spacing:**
 - Page padding: `px-4 pt-6 pb-12`
@@ -1166,8 +240,8 @@ This applies to **all Donruss soccer products**:
 - Gap between columns: `gap-4`
 
 **Rounded Corners:**
-- Public pages: Use `rounded-2xl` for major sections
-- Cards/items: Use `rounded-lg`
+- Public pages (major sections): `rounded-2xl`
+- Cards/items: `rounded-lg`
 
 ### Testing Checklist
 
@@ -1176,222 +250,53 @@ Before committing changes to page layouts:
 - ✅ Header renders immediately without flash/resize
 - ✅ Loading state shows spinner in content area only
 - ✅ Error state shows message in content area only
-- ✅ All three columns (sidebars + main) render immediately
+- ✅ All three columns render immediately
 - ✅ Same background gradient in all states
 - ✅ Mobile responsive (sidebars hidden on small screens)
 - ✅ TypeScript builds without errors
 - ✅ No console errors in browser
-- ✅ Breadcrumbs display correctly
-- ✅ Footer appears at bottom of content
 
 ---
 
-## Recent Changes Log
+## Recent Changes
+
+### November 17, 2025 - Documentation Reorganization
+
+**Changes:**
+- Reorganized documentation into dedicated guides in `/docs/`
+- Created 7 new comprehensive documentation files
+- Streamlined CLAUDE.md to ~450 lines (68% reduction from 1,409 lines)
+- Updated /docs/README.md as central navigation hub
+
+**New Documentation Files:**
+- `/docs/AI_INTEGRATION.md` - Complete AI integration guide
+- `/docs/FRONTEND_PATTERNS.md` - UI patterns and layout guide
+- `/docs/SLUG_CONVENTIONS.md` - URL slug formatting rules
+- `/docs/PARALLEL_ARCHITECTURE.md` - Parallel set architecture
+- `/docs/IMPORT_GUIDE.md` - Data import workflows
+- `/docs/DONRUSS_GUIDE.md` - Donruss-specific handling
+- `/docs/CHANGELOG.md` - Complete project history
+
+**Benefits:**
+- Much more scannable primary documentation
+- Detailed guides in logical locations
+- Historical changes archived separately
+- Easier to find specific information
 
 ### November 14, 2025 - Enhanced Set Sorting & Donruss Soccer Import
 
-**Changes:**
-- Implemented comprehensive set sorting system that groups sets with their parallels
-- Enhanced `sortSetsGrouped` function to work with all set types (Base, Insert, Autograph, Memorabilia)
+- Implemented comprehensive set sorting that groups sets with their parallels
 - Imported 2024-25 Panini Donruss Soccer: 116 sets with 8,947 cards
 - Fixed Optic parallel print runs to match official specifications
-
-**Set Sorting Enhancement:**
-- Updated `parseSetName` in `/lib/setUtils.ts` to detect base names and variants for all sets
-- Added comprehensive color/variant pattern detection (Red, Blue, Gold, Silver, Black, Pink, Green, Purple, Dragon Scale, Plum Blossom, Pink Ice, Pink Velocity, etc.)
-- Sets now properly group by base name (e.g., all "Craftsmen" variants together, all "Beautiful Game Autographs" variants together)
-- Within each group: base set first, unnumbered parallels (alphabetical), numbered parallels (highest to lowest)
-- Base and Optic sets maintain special priority ordering (Base group first, then Optic group)
-
-**Sorting Logic:**
-```
-Group Structure:
-- Base/Optic sets appear first
-- Other sets sorted alphabetically by base name
-- Within each group:
-  1. Base set (no variant)
-  2. Parallels without print runs (alphabetical by variant)
-  3. Parallels with print runs (sorted highest to lowest)
-  4. Same print runs sorted alphabetically by variant
-```
-
-**Donruss Soccer Import:**
-- Successfully imported all 116 sets from Excel checklist
-- Base and Optic sets: 200 cards each (cards 1-175 base + 176-200 Rated Rookies)
-- Insert sets: 53 sets with various parallels (Animation, Craftsmen, Kaboom, Magicians, etc.)
-- Autograph sets: 24 sets (Beautiful Game Autographs, Signature Series, etc.)
-- Memorabilia sets: 6 sets (Kit Kings, Kit Series)
-- Fixed Optic parallel print runs: Blue /149, Dragon Scale /8, Gold Power 1/1, Pink Velocity /99, Plum Blossom (unnumbered), Red /299, Teal Mojo /49
-
-**Optic Parallel Print Runs (Official Specifications):**
-- Argyle, Holo, Ice, Plum Blossom, Velocity: Unnumbered
-- Red: /299
-- Blue: /149
-- Pink Velocity: /99
-- Teal Mojo: /49
-- Pink Ice, Purple Mojo: /25
-- Gold: /10
-- Dragon Scale: /8
-- Green: /5
-- Black, Black Pandora, Gold Power: 1/1
+- Enhanced `sortSetsGrouped` to work with all set types
 
 **Files Modified:**
-1. `/lib/setUtils.ts` - Enhanced `sortSetsGrouped` and `parseSetName` functions
-2. `/app/releases/[slug]/page.tsx` - Applied enhanced sorting to all set types
+1. `/lib/setUtils.ts` - Enhanced sorting functions
+2. `/app/releases/[slug]/page.tsx` - Applied enhanced sorting
 3. `/scripts/import-donruss-soccer-2024.ts` - Main import script
-4. `/scripts/fix-optic-print-runs.ts` - Script to correct Optic parallel print runs
-5. `/scripts/fix-complete-donruss-import.ts` - Script to fix 200-card sets
-6. `/scripts/test-sorting-all-types.ts` - Comprehensive sorting validation
-7. Various utility scripts for validation and testing
+4. `/scripts/fix-optic-print-runs.ts` - Print run corrections
 
-**Key Learnings:**
-- Pattern-based name parsing is effective for grouping sets with their parallels
-- Updating both set AND card print runs ensures data consistency
-- Enhanced sorting significantly improves user experience on release pages
-- Grouping sets by base name makes it easy to find all variants of a set
-
-### November 14, 2025 - Documentation Cleanup
-
-**Changes:**
-- Removed legacy "AI-Powered Excel Import Workflow" section (components and API routes no longer exist)
-- Corrected Image model documentation to reflect actual schema (uses direct foreign keys with `type` discriminator, not junction tables)
-- Removed duplicate "Recent Changes Log" section
-- Updated table of contents to reflect current documentation structure
-
-### November 12, 2025 - Database Schema Cleanup & Checklists Feature
-
-**Changes:**
-- Removed legacy User table from public schema (authentication uses neon_auth.admin_users)
-- Added Checklists page with filtering by manufacturer, release, and set type
-- Fixed database cleanup script to remove references to non-existent junction tables
-- Updated delete-all-data script to reflect current schema architecture
-
-**Authentication Architecture:**
-- Verified authentication queries `neon_auth.admin_users` table (separate schema)
-- Removed unused `public.User` table from Prisma schema
-- Authentication remains fully functional via neon_auth integration
-
-**Checklists Feature:**
-- New `/checklists` route with filterable table of all card sets
-- Filters: search, manufacturer, release, and set type
-- Users can browse checklists without navigating manufacturer→release hierarchy
-- Direct links to set detail pages with full card checklists
-
-**Database Schema Architecture:**
-- Uses direct foreign keys with `ImageType` enum discriminator
-- Image model: `releaseId`, `setId`, `cardId`, `postId` with `type` field for relationship identification
-- SourceDocument model: `releaseId`, `postId` with `entityType` field
-- No junction tables needed - simpler direct foreign key approach
-
-**Files Modified:**
-1. `prisma/schema.prisma` - Removed User model
-2. `scripts/delete-all-data.ts` - Removed User deletion and fixed junction table references
-3. `scripts/verify-auth-schema.ts` - Created verification script
-4. `app/api/checklists/route.ts` - New API endpoint for fetching filtered sets
-5. `app/api/checklists/filters/route.ts` - New API endpoint for filter options
-6. `app/checklists/page.tsx` - New checklists browser page
-7. `components/Header.tsx` - Added "Checklists" navigation link
-8. `.claude/CLAUDE.md` - This documentation update
-
-**Key Learnings:**
-- Always verify authentication is using correct schema before removing tables
-- Direct foreign keys with type discriminators are simpler than junction tables for this use case
-- TypeScript interfaces in frontend code may reference non-existent DB models
-- Database reset confirmed clean slate after removing legacy User table
-
-### November 11, 2025 - Documentation Consolidation & Parallel Architecture
-**Changes:**
-- Consolidated parallel set architecture documentation from spec files into `.claude/CLAUDE.md`
-- Added comprehensive "Set & Parallel Architecture" section documenting parent-child relationships
-- Enhanced "URL Slug Conventions" with set slug formatting and type prefixes
-- Added testing checklists for parallel set functionality
-- Documented edge cases and query patterns
-
-**Sections Added:**
-- **Set & Parallel Architecture**: Parent-child model, database structure, query patterns, and benefits
-- **Edge Cases to Handle**: Sets without parallels, variable parallels, cascading deletes
-- **Testing Checklist for Parallel Sets**: Database, release page, set page, and admin interface tests
-
-**Files Consolidated:**
-- `/PARALLEL_AS_SET_SPEC.md` → Extracted slug conventions, type prefixes, and special cases
-- `/PARENT_CHILD_PARALLEL_TODO.md` → Extracted testing checklist and edge cases
-- Both spec files deleted as content preserved in permanent documentation
-
-### October 2025 - Layout Standardization
-**Changes:**
-- Standardized all public pages to use three-column layout
-- Fixed header resizing issues on 4 pages
-- Documented standardized pattern in this file
-
-**Commits:**
-- `3bdbf62` - Fix header resizing on all public pages
-- `4fdb904` - Fix TypeScript error in parallel page
-- `c422ec0` - Standardize release detail page layout
-
-**Pages Fixed:**
-1. `/cards/[slug]` - Card detail pages
-2. `/sets/[slug]/parallels/[parallel]` - Parallel pages
-3. `/posts/[slug]` - Post detail pages
-4. `/releases/[slug]` - Release detail pages
-
----
-
-## Future Considerations
-
-### Layout Enhancements
-- Consider lazy loading sidebar ads for performance
-- Evaluate sticky header for long pages
-- Implement skeleton loading for better perceived performance
-
-### Accessibility
-- Add ARIA labels to navigation
-- Ensure keyboard navigation works correctly
-- Test with screen readers
-
-### Performance
-- Implement image optimization strategies
-- Consider static generation for popular pages
-- Add loading priorities for critical resources
-
-### November 9, 2025 - Donruss Soccer Import and Slug Generator Fix
-
-**Changes:**
-- Fixed `generateSetSlug()` function parameter order issue in import scripts
-- Successfully imported all 149 sets and 8,977 cards from 2024-25 Donruss Soccer Master tab
-- Reclassified "Rated Rookies" sets from Insert to Base type (Rated Rookies are special rookie base cards, not inserts)
-- Created utility scripts for data cleanup and verification
-
-**Key Fixes:**
-- **Slug Generator Bug**: The `import-donruss-soccer.ts` script was calling `generateSetSlug()` with outdated parameter order
-  - Old call: `generateSetSlug('Panini', 'Donruss Soccer', '2024-25', setName)`
-  - Correct signature: `generateSetSlug(year, releaseName, setName, setType, parallelName?)`
-  - Fixed call: `generateSetSlug('2024-25', 'Panini Donruss Soccer', setName, setType)`
-  - This bug caused all sets to generate the same slug, resulting in only 2 sets being created
-
-- **Rated Rookies Classification**: Updated `determineSetType()` to classify "Rated Rookies" as Base type
-  - Rated Rookies are NOT parallels or inserts - they are a special subset of base cards featuring notable rookies
-  - Updated 33 Rated Rookies sets (parent + all parallels) to type "Base"
-
-**Import Results:**
-- **35 Base Sets**: Base (2 entries), Rated Rookies + all parallels
-- **84 Insert Sets**: Animation, Craftsmen, Crunch Time, Kaboom, Kit Kings, Kit Series, Magicians, Net Marvels, Night Moves, Pitch Kings, Rookie Kings, The Rookies, Zero Gravity (all with parallels)
-- **24 Autograph Sets**: Beautiful Game Autographs, Beautiful Game Dual Autographs, Signature Series (all with parallels)
-- **6 Memorabilia Sets**: Kit Kings, Kit Series (with parallels)
-- **Total**: 149 sets, 8,977 cards
-
-**Files Modified:**
-1. `/scripts/import-donruss-soccer.ts` - Fixed `generateSetSlug()` calls (3 locations)
-2. `/scripts/import-donruss-soccer.ts` - Updated `determineSetType()` to include Rated Rookies as Base
-3. `/scripts/clean-donruss-data.ts` - Created cleanup script to remove incorrect data
-4. `/scripts/fix-rated-rookies-type.ts` - Created script to update Rated Rookies classification
-5. `/scripts/check-donruss-sets.ts` - Created verification script
-6. `/scripts/debug-donruss-slugs.ts` - Created debugging script
-
-**Problem Solved:**
-- **Issue**: `generateSetSlug()` was being called with parameters in wrong order
-- **Impact**: All sets generated the same slug, causing only 2 sets to be created with 8,772 cards incorrectly assigned
-- **Solution**: Updated all calls to use correct parameter order: `(year, releaseName, setName, setType, parallelName?)`
-- **Result**: All 149 sets now have unique slugs and correct card assignments
+**📚 Full history:** [Changelog](/docs/CHANGELOG.md)
 
 ---
 
@@ -1405,4 +310,26 @@ Group Structure:
 
 ---
 
-*Last Updated: November 14, 2025*
+## Documentation Hub
+
+**📚 For comprehensive guides and detailed documentation, see [/docs/README.md](/docs/README.md)**
+
+### Core Reference
+- [Database Reference](/docs/DATABASE.md) - Complete schema documentation
+- [API Reference](/docs/API.md) - REST API documentation
+
+### Development Guides
+- [AI Integration](/docs/AI_INTEGRATION.md) - Anthropic SDK usage
+- [Frontend Patterns](/docs/FRONTEND_PATTERNS.md) - UI patterns and layouts
+- [URL Slug Conventions](/docs/SLUG_CONVENTIONS.md) - Slug formatting rules
+- [Parallel Architecture](/docs/PARALLEL_ARCHITECTURE.md) - Set relationships
+- [Data Import](/docs/IMPORT_GUIDE.md) - Import workflows
+- [Donruss Products](/docs/DONRUSS_GUIDE.md) - Special handling
+
+### Project Documentation
+- [Project README](../README.md) - Setup and overview
+- [Changelog](/docs/CHANGELOG.md) - Complete history
+
+---
+
+*Last Updated: November 17, 2025*
