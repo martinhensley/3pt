@@ -184,14 +184,20 @@ model Set {
 
 ### Data Import Requirements
 
-**CRITICAL:** All import scripts MUST upload the source checklist file.
+**Use the `checklist-release-etl` skill to import releases.**
 
-```typescript
-import { uploadChecklistToRelease } from '@/lib/checklistUploader';
+The skill handles:
+- Analyzing checklist files (PDF or Excel)
+- Creating release records
+- Generating sets and cards
+- Uploading source files to the database
 
-// Upload checklist (REQUIRED)
-await uploadChecklistToRelease(checklistPath, release.id, 'Checklist Name');
+**Usage:**
 ```
+/checklist-release-etl
+```
+
+The skill will guide you through the import process interactively.
 
 **📚 Complete guide:** [Data Import Guide](/docs/IMPORT_GUIDE.md)
 
