@@ -525,21 +525,13 @@ export default function ReleasePage() {
                             : '—';
 
                           // Display name formatting
+                          // Use the database name directly - it's already correctly formatted
                           let displayName = set.name
                             .replace(/\boptic\s+base\s+set\b/gi, 'Optic')
                             .replace(/\boptic\s+base\b/gi, 'Optic')
                             .replace(/\bbase\s+optic\b/gi, 'Optic')
                             .replace(/\bsets?\b/gi, '')
                             .trim();
-
-                          // Check if this is a parallel based on slug convention
-                          if (isParallelSet(set.slug)) {
-                            // Extract variant name from slug for display
-                            // This will already include "Parallel" in the name from the slug
-                            if (!displayName.toLowerCase().includes('parallel')) {
-                              displayName += ' Parallel';
-                            }
-                          }
 
                           const gradients = [
                             'from-blue-500/20 to-cyan-500/20',
