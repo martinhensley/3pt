@@ -179,7 +179,7 @@ function parseSetName(name: string): { baseName: string; variant: string } {
 
   // For other sets, extract the base name by removing color/variant suffixes
   // Common patterns: "Set Name Red", "Set Name Gold", "Set Name Black", etc.
-  const colorPattern = /\s+(Red|Blue|Gold|Silver|Black|Pink|Green|Purple|Orange|Teal|Dragon Scale|Plum Blossom|Pink Ice|Pink Velocity|Argyle|Holo|Ice|Velocity|Cubic|Diamond|Mojo|Power|Pandora)(\s+\d+)?$/i;
+  const colorPattern = /\s+(Red|Blue|Gold|Silver|Black|Pink|Green|Purple|Orange|Aqua|Teal|Dragon Scale|Plum Blossom|Pink Ice|Pink Velocity|Argyle|Holo|Ice|Velocity|Cubic|Diamond|Mojo|Power|Pandora)(\s+\d+)?$/i;
   const match = name.match(colorPattern);
 
   if (match) {
