@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { analyzeReleaseFlow, generateDescriptionFlow } from '@/lib/genkit';
+import { analyzeReleaseFlow, generateDescriptionFlow } from '@/lib/release-analyzer';
 import { prisma } from '@/lib/prisma';
 import { parseReleaseDateToPostDate } from '@/lib/formatters';
 
@@ -103,8 +103,7 @@ export async function POST(request: NextRequest) {
           name: releaseInfo.releaseName, // Use releaseName (without year/manufacturer) instead of fullReleaseName
           year: releaseInfo.year,
           slug: releaseInfo.slug,
-          review: descriptionResult.description,
-          reviewDate: new Date(),
+          summary: descriptionResult.description,
           releaseDate: finalReleaseDate,
           postDate: postDate,
           sellSheetText: sourceText,
@@ -189,7 +188,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       releaseInfo,
-      review: descriptionResult.description,
+      summary: descriptionResult.description,
       createdRelease,
     });
   } catch (error) {

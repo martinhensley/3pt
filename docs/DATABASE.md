@@ -165,9 +165,9 @@ Product releases (e.g., "2024-25 Panini Obsidian Soccer").
 | `name` | String | ✓ | | - | Release name (e.g., "Obsidian Soccer") |
 | `year` | String | | | - | Release year or season (e.g., "2024-25") |
 | `slug` | String | ✓ | ✓ | - | URL slug (auto-generated, e.g., "2024-25-panini-obsidian-soccer") |
-| `description` | String | | | - | **DEPRECATED:** Use `review` instead |
-| `review` | String (Text) | | | - | Footy's editorial review of the release |
-| `reviewDate` | DateTime | | | - | When review was written/updated |
+| `description` | String | | | - | **DEPRECATED:** Use `summary` instead |
+| `summary` | String (Text) | | | - | AI-generated summary of the release |
+| `summaryDate` | DateTime | | | - | When summary was generated/updated |
 | `releaseDate` | String | | | - | Free-form release date (e.g., "May 4, 2025" or "1978") |
 | `postDate` | DateTime | | | - | Date for chronological ordering (auto-populated or manual) |
 | `isApproved` | Boolean | ✓ | | `false` | Approval flag for public visibility |
@@ -194,8 +194,8 @@ model Release {
   year           String?
   slug           String          @unique
   description    String?         @db.Text // Legacy field
-  review         String?         @db.Text
-  reviewDate     DateTime?
+  summary        String?         @db.Text
+  summaryDate    DateTime?
   releaseDate    String?
   postDate       DateTime?
   isApproved     Boolean         @default(false)
@@ -219,7 +219,7 @@ model Release {
 **Release Date Fields:**
 - `releaseDate` (String): Free-form date for display (e.g., "May 4, 2025", "Spring 2025", "1978")
 - `postDate` (DateTime): Structured date for sorting and filtering (auto-populated from `releaseDate` or manually set)
-- `reviewDate` (DateTime): When Footy's review was written/updated
+- `summaryDate` (DateTime): When AI-generated summary was created/updated
 
 **Approval Workflow:**
 Only releases with `isApproved = true` are shown on public pages. This allows admins to:

@@ -23,9 +23,8 @@ model Release {
   name           String
   year           String?
   slug           String          @unique
-  description    String?         @db.Text // Legacy field - use review instead
-  review         String?         @db.Text // Footy's review of the release
-  reviewDate     DateTime?       // Date the review was written or last updated
+  description    String?         @db.Text // Legacy field - use summary instead
+  summary        String?         @db.Text // AI-generated summary of the release based on source materials
   releaseDate    String?         // Official release date as free-form string (e.g., "May 4, 2025" or "1978")
   postDate       DateTime?       // Date for chronological ordering (auto-populated from releaseDate or manually set)
 

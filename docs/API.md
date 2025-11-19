@@ -73,8 +73,8 @@ type ReleaseResponse = {
   year: string;
   slug: string;
   description: string | null; // Legacy field
-  review: string | null;
-  reviewDate: Date | null;
+  summary: string | null;
+  summaryDate: Date | null;
   releaseDate: string | null;
   postDate: Date | null;
   isApproved: boolean;
@@ -101,7 +101,7 @@ curl -X GET "http://localhost:3000/api/releases?slug=2024-25-panini-obsidian-soc
   "slug": "2024-25-panini-obsidian-soccer",
   "description": null,
   "review": "Panini's Obsidian Soccer delivers premium card stock...",
-  "reviewDate": "2025-01-15T00:00:00.000Z",
+  "summaryDate": "2025-01-15T00:00:00.000Z",
   "releaseDate": "December 2024",
   "postDate": "2024-12-01T00:00:00.000Z",
   "isApproved": true,
@@ -186,7 +186,7 @@ curl -X PUT "http://localhost:3000/api/releases" \
   -d '{
     "id": "cm3abc123",
     "review": "Updated review text...",
-    "reviewDate": "2025-01-20T00:00:00.000Z"
+    "summaryDate": "2025-01-20T00:00:00.000Z"
   }'
 ```
 
@@ -795,7 +795,7 @@ curl -X POST "http://localhost:3000/api/generate-review" \
 ```json
 {
   "review": "Panini's Obsidian Soccer delivers premium card stock and stunning designs...",
-  "reviewDate": "2025-01-15T00:00:00.000Z"
+  "summaryDate": "2025-01-15T00:00:00.000Z"
 }
 ```
 

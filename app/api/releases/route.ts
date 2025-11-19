@@ -25,8 +25,7 @@ export async function GET(request: NextRequest) {
           slug: true,
           year: true,
           releaseDate: true,
-          review: true,
-          reviewDate: true,
+          summary: true,
           postDate: true,
           sourceFiles: true,
           manufacturerId: true,
@@ -82,8 +81,7 @@ export async function GET(request: NextRequest) {
           slug: true,
           year: true,
           releaseDate: true,
-          review: true,
-          reviewDate: true,
+          summary: true,
           sourceFiles: true, // Include sourceFiles for Edit Release page
           manufacturerId: true,
           createdAt: true,
@@ -171,7 +169,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, name, year, releaseDate, review, reviewDate, sourceFiles, postDate } = body;
+    const { id, name, year, releaseDate, summary, sourceFiles, postDate } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -197,8 +195,7 @@ export async function PUT(request: NextRequest) {
         year,
         releaseDate: releaseDate || null,
         postDate: calculatedPostDate,
-        review: review || null,
-        reviewDate: reviewDate ? new Date(reviewDate) : null,
+        summary: summary || null,
         sourceFiles: sourceFiles || null,
       },
       include: {

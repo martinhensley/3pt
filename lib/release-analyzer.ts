@@ -216,7 +216,7 @@ Return ONLY a JSON object with this structure:
 }
 
 /**
- * Generate a description for a release
+ * Generate a summary for a release
  */
 export async function generateDescription(input: {
   release: ReleaseInfo;
@@ -228,39 +228,39 @@ export async function generateDescription(input: {
     messages: [
       {
         role: 'user',
-        content: `You MUST generate a description that is EXACTLY 7-21 sentences long. Count each sentence carefully before submitting.
+        content: `You MUST generate a release summary that is EXACTLY 3-11 sentences long. Count each sentence carefully before submitting.
 
-Generate a comprehensive, engaging description for this basketball card release based ONLY on the provided source document information.
+Generate a concise, engaging summary for this basketball card release. Use the source document information as your foundation, but leverage your expert knowledge of basketball cards to provide holistic context.
 
 Release: ${input.release.fullReleaseName}
 
 Source Document Information:
 ${input.sourceText}
 
-CRITICAL REQUIREMENT: Your response MUST contain a MINIMUM of 7 sentences and a MAXIMUM of 21 sentences. This is non-negotiable. Count your sentences before responding.
+CRITICAL REQUIREMENT: Your response MUST contain a MINIMUM of 3 sentences and a MAXIMUM of 11 sentences. This is non-negotiable. Count your sentences before responding.
 
-Write in the voice of 3pt, a basketball analytics enthusiast with deep NBA knowledge, college hoops expertise, and a data-driven approach to card collecting.
+Write as a relaxed, professional basketball analyst who knows the game inside and out. Think of the tone as a knowledgeable analyst breaking down a game on a podcast - informative but conversational, insightful but approachable.
 
 Requirements (all mandatory):
-1. LENGTH: 7-21 sentences (count them! Less than 7 is unacceptable)
-2. PARAGRAPHS: Use proper paragraph breaks (separate with double line breaks). Group into 2-4 paragraphs
-3. CONTENT: ONLY use information from the source documents - do NOT fabricate details
-4. PERSPECTIVE: Third-person about the cards - NEVER first-person or about 3pt himself
-5. STYLE: Analytical and data-focused, using basketball terminology and statistical concepts
-6. TONE: Professional yet enthusiastic, like a knowledgeable analyst breaking down a game
-7. FOCUS: What makes this release special and collectible
+1. LENGTH: 3-11 sentences (count them! Less than 3 is unacceptable)
+2. PARAGRAPHS: Use proper paragraph breaks (separate with double line breaks). Group into 1-3 paragraphs
+3. CONTENT: This is a SUMMARY of the release. Use source materials as the foundation, but add expert context about:
+   - How this release compares to previous years
+   - Notable changes or innovations in the product line
+   - Industry trends this release reflects or responds to
+   - What makes this release significant for collectors
+4. PERSPECTIVE: Third-person summary with expert insights
+5. STYLE: Relaxed professional - basketball terminology, accessible language, conversational but knowledgeable
+6. TONE: Informative and engaging, like a veteran analyst explaining a product to fellow collectors
+7. FOCUS: What's in this release and why it matters in the broader context
 
-To meet the minimum 7 sentences, you should discuss:
-- The overall release design philosophy and aesthetic
-- Notable features or innovations in this release
-- Parallel variations and their print runs (if mentioned)
-- Special insert sets or chase cards (if mentioned)
-- The player selection and key subjects (if mentioned)
-- The appeal to collectors
-- Any unique features or selling points
-- The overall value proposition
+Provide a concise summary covering:
+- The core offering and what makes it notable
+- Key sets, parallels, or chase elements worth mentioning
+- How this fits into the product line's evolution or the year's releases
+- Why collectors should care (brief context)
 
-Return ONLY the description text with paragraph breaks (double line breaks between paragraphs). No labels, no formatting, just the text.`,
+Return ONLY the summary text with paragraph breaks (double line breaks between paragraphs). No labels, no formatting, just the text.`,
       },
     ],
   });
@@ -272,7 +272,7 @@ Return ONLY the description text with paragraph breaks (double line breaks betwe
   }
 
   const description = textContent.text.trim();
-  console.log('✅ Successfully generated description');
+  console.log('✅ Successfully generated summary');
 
   return DescriptionSchema.parse({ description });
 }

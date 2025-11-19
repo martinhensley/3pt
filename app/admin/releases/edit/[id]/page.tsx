@@ -59,8 +59,7 @@ interface Release {
   year: string;
   releaseDate: string | null;
   postDate: string | null;
-  review: string | null;
-  reviewDate: string | null;
+  summary: string | null;
   sourceFiles: SourceFile[] | null;
   sourceDocuments?: SourceDocument[];
   manufacturerId: string;
@@ -112,6 +111,8 @@ export default function EditReleasePage() {
   const [generatingReview, setGeneratingReview] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
+  const [reviewFile, setReviewFile] = useState<File | null>(null);
+  const [sourceFiles, setSourceFiles] = useState<SourceFile[]>([]);
 
   // Release data
   const [release, setRelease] = useState<Release | null>(null);
@@ -123,7 +124,6 @@ export default function EditReleasePage() {
   const [editedReleaseDate, setEditedReleaseDate] = useState("");
   const [editedPostDate, setEditedPostDate] = useState("");
   const [editedReview, setEditedReview] = useState("");
-  const [editedReviewDate, setEditedReviewDate] = useState("");
   const [editedSets, setEditedSets] = useState<SetInfo[]>([]);
   const [collapsedSets, setCollapsedSets] = useState<Set<number>>(new Set()); // Track which sets are collapsed
 
@@ -154,8 +154,8 @@ export default function EditReleasePage() {
       setEditedYear(data.year);
       setEditedReleaseDate(data.releaseDate || "");
       setEditedPostDate(data.postDate ? new Date(data.postDate).toISOString().split('T')[0] : "");
-      setEditedReview(data.review || "");
-      setEditedReviewDate(data.reviewDate ? new Date(data.reviewDate).toISOString().split('T')[0] : "");
+      setEditedReview(data.summary || "");
+      setSourceFiles((data.sourceFiles as SourceFile[]) || []);
 
       // Transform sets data - only show parent sets at top level
       // Child parallel sets are nested under their parent's parallelSets array
@@ -1113,7 +1113,7 @@ export default function EditReleasePage() {
 
   const handleGenerateReview = async () => {
     // Check if we have source files first
-    if (sourceFiles.length === 0 && !reviewFile) {
+    if ((!release?.sourceDocuments || release.sourceDocuments.length === 0) && !reviewFile) {
       setMessage({ type: "error", text: "Please upload source files first or select a file to upload" });
       setTimeout(() => setMessage(null), 3000);
       return;
@@ -1121,7 +1121,7 @@ export default function EditReleasePage() {
 
     try {
       setGeneratingReview(true);
-      setMessage({ type: "success", text: "Generating review from source documents..." });
+      setMessage({ type: "success", text: "Generating summary from source documents..." });
 
       // If a new file is selected, upload it first
       if (reviewFile) {
@@ -1141,7 +1141,16 @@ export default function EditReleasePage() {
         }
       }
 
-      // Generate review using AI with release info
+      // Generate summary using AI with release info
+      console.log('[frontend] About to call /api/generate-review');
+      console.log('[frontend] Request body:', {
+        releaseId: release!.id,
+        manufacturer: editedManufacturer,
+        releaseName: editedReleaseName,
+        year: editedYear,
+        setCount: release?.sets?.length || 0
+      });
+
       const response = await fetch('/api/generate-review', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1154,21 +1163,26 @@ export default function EditReleasePage() {
         }),
       });
 
+      console.log('[frontend] Response received:', response.status, response.statusText);
+
       if (!response.ok) {
-        throw new Error('Failed to generate review');
+        const errorText = await response.text();
+        console.error('[frontend] Error response:', errorText);
+        throw new Error('Failed to generate summary');
       }
 
       const data = await response.json();
+      console.log('[frontend] Success! Generated excerpt length:', data.excerpt?.length);
       setEditedReview(data.excerpt || '');
-      // Set review date to today when generating a new review
-      setEditedReviewDate(new Date().toISOString().split('T')[0]);
-      setMessage({ type: "success", text: "Review generated successfully!" });
+      // Summary generated successfully
+      setMessage({ type: "success", text: "Summary generated successfully!" });
       setTimeout(() => setMessage(null), 3000);
     } catch (error) {
-      console.error('Failed to generate review:', error);
-      setMessage({ type: "error", text: "Failed to generate review. Please try again." });
+      console.error('[frontend] Failed to generate summary:', error);
+      setMessage({ type: "error", text: "Failed to generate summary. Please try again." });
       setTimeout(() => setMessage(null), 5000);
     } finally {
+      console.log('[frontend] Setting generatingReview to false');
       setGeneratingReview(false);
     }
   };
@@ -1315,7 +1329,7 @@ export default function EditReleasePage() {
 
       const errors: string[] = [];
 
-      // Update release metadata (name, year, review)
+      // Update release metadata (name, year, summary)
       try {
         const updateReleaseResponse = await fetch("/api/releases", {
           method: "PUT",
@@ -1326,9 +1340,8 @@ export default function EditReleasePage() {
             year: editedYear,
             releaseDate: editedReleaseDate || null,
             postDate: editedPostDate || null,
-            review: editedReview || null,
-            reviewDate: editedReviewDate || null,
-            sourceFiles: sourceFiles.length > 0 ? sourceFiles : null,
+            summary: editedReview || null,
+            sourceFiles: release.sourceFiles || null,
           }),
         });
 
@@ -1648,18 +1661,18 @@ export default function EditReleasePage() {
               />
             </div>
 
-            {/* GenAI Review Generator */}
+            {/* GenAI Summary Generator */}
             <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
               <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
                 <svg className="w-5 h-5 text-footy-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
-                GenAI: Generate Review from Source Documents
+                GenAI: Generate Summary from Source Documents
               </h4>
               {release?.sourceDocuments && release.sourceDocuments.length > 0 ? (
                 <>
                   <p className="text-xs text-gray-600 mb-3">
-                    Uses uploaded source documents ({release.sourceDocuments.length} document{release.sourceDocuments.length !== 1 ? 's' : ''}) to generate review
+                    Uses uploaded source documents ({release.sourceDocuments.length} document{release.sourceDocuments.length !== 1 ? 's' : ''}) to generate summary
                   </p>
                   <button
                     type="button"
@@ -1680,41 +1693,28 @@ export default function EditReleasePage() {
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
-                        Generate Review
+                        Generate Summary
                       </>
                     )}
                   </button>
                 </>
               ) : (
                 <p className="text-xs text-gray-600">
-                  Upload source documents below first to enable AI review generation
+                  Upload source documents below first to enable AI summary generation
                 </p>
               )}
             </div>
 
-            {/* Manual Review Input */}
+            {/* Manual Summary Input */}
             <div>
               <label className="block font-semibold text-gray-900 mb-2">
-                Review:
+                Summary:
               </label>
               <textarea
                 value={editedReview.replace(/<[^>]*>/g, '')} // Strip HTML tags
                 onChange={(e) => setEditedReview(e.target.value)}
-                placeholder="A comprehensive review of this release for collectors..."
+                placeholder="A comprehensive summary of this release for collectors..."
                 rows={6}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Review Date Input */}
-            <div>
-              <label className="block font-semibold text-gray-900 mb-2">
-                Review Date:
-              </label>
-              <input
-                type="date"
-                value={editedReviewDate}
-                onChange={(e) => setEditedReviewDate(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>

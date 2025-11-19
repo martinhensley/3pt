@@ -31,7 +31,7 @@ The application is deployed serverless on Vercel with a database-as-a-service ba
 
 ## Configuration
 
-All AI functions are centralized in `/lib/genkit.ts` (legacy filename retained for backward compatibility).
+All AI functions are centralized in `/lib/release-analyzer.ts`.
 
 ### Basic Setup
 
@@ -165,7 +165,7 @@ Call AI functions from API routes to process data:
 
 ```typescript
 // app/api/releases/analyze/route.ts
-import { analyzeRelease, generateDescription } from '@/lib/genkit';
+import { analyzeRelease, generateDescription } from '@/lib/release-analyzer';
 
 export async function POST(request: Request) {
   try {

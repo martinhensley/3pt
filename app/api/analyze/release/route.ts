@@ -112,8 +112,7 @@ export async function POST(request: NextRequest) {
             name: analysis.releaseName,
             year: analysis.year,
             slug: analysis.slug,
-            review: analysis.excerpt,
-            reviewDate: new Date(), // Set review date to now when creating from analysis
+            summary: analysis.excerpt,
             releaseDate: analysis.releaseDate ? new Date(analysis.releaseDate) : null,
             sellSheetText,
             sourceFiles,

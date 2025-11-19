@@ -74,9 +74,8 @@ interface Release {
   name: string;
   year: string | null;
   slug: string;
-  review: string | null;
+  summary: string | null;
   releaseDate: string | null;
-  reviewDate: string | null;
   postDate: string | null;
   createdAt: string;
   manufacturer: {
@@ -353,7 +352,6 @@ export default function ReleasePage() {
                     <span className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full font-bold text-sm">
                       RELEASE
                     </span>
-                    <span className="text-white/80">•</span>
                   </div>
                   <h1 className="text-2xl md:text-3xl font-black leading-tight break-words w-full sm:w-auto">
                     {release.year} {release.manufacturer.name} {release.name}
@@ -453,12 +451,12 @@ export default function ReleasePage() {
               </div>
             )}
 
-            {/* Review */}
-            {release.review && (
+            {/* Summary */}
+            {release.summary && (
               <div className="p-4 md:p-8 pt-6">
-                {/* Review Content */}
+                {/* Summary Content */}
                 <div className="space-y-4">
-                  {release.review.split('\n\n').map((paragraph, idx) => (
+                  {release.summary.split('\n\n').map((paragraph, idx) => (
                     <p key={idx} className="text-lg text-white/90 leading-relaxed">
                       {paragraph}
                     </p>
