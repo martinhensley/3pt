@@ -43,7 +43,7 @@ export async function createReleaseWithSets(
   },
   sets?: Array<{
     name: string;
-    totalCards?: string;
+    expectedCardCount?: number;
     parallels?: string[];
   }>
 ): Promise<Release & { sets: Set[]; manufacturer: Manufacturer }> {
@@ -61,7 +61,7 @@ export async function createReleaseWithSets(
         ? {
             create: sets.map(set => ({
               name: set.name,
-              totalCards: set.totalCards,
+              expectedCardCount: set.expectedCardCount,
               parallels: set.parallels || [],
             })),
           }
@@ -81,7 +81,7 @@ export async function addSetToRelease(
   releaseId: string,
   setData: {
     name: string;
-    totalCards?: string;
+    expectedCardCount?: number;
   }
 ): Promise<Set> {
   return await prisma.set.create({

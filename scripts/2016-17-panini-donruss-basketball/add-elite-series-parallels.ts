@@ -89,7 +89,7 @@ async function addEliteSeriesParallels() {
           baseSetSlug,
           printRun,
           releaseId: release.id,
-          totalCards: baseEliteSeriesSet.cards.length.toString()
+          expectedCardCount: baseEliteSeriesSet.cards.length.toString()
         }
       });
 

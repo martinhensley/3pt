@@ -29,7 +29,7 @@ export default function CreateSetPage() {
   const [releaseId, setReleaseId] = useState("");
   const [name, setName] = useState("");
   const [type, setType] = useState<"Base" | "Autograph" | "Memorabilia" | "Insert">("Base");
-  const [totalCards, setTotalCards] = useState("");
+  const [totalCards, setExpectedCardCount] = useState("");
   const [printRun, setPrintRun] = useState("");
   const [description, setDescription] = useState("");
   const [isParallel, setIsParallel] = useState(false);
@@ -136,7 +136,7 @@ export default function CreateSetPage() {
           releaseId,
           name,
           type,
-          totalCards: totalCards || null,
+          expectedCardCount: null,
           printRun: printRun ? parseInt(printRun) : null,
           description: description || null,
           isParallel,
@@ -316,7 +316,7 @@ export default function CreateSetPage() {
                 <input
                   type="text"
                   value={totalCards}
-                  onChange={(e) => setTotalCards(e.target.value)}
+                  onChange={(e) => setExpectedCardCount(e.target.value)}
                   placeholder="e.g., 200"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
                 />

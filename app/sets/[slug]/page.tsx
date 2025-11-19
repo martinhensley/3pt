@@ -40,7 +40,7 @@ interface Set {
   name: string;
   slug: string;
   description: string | null;
-  totalCards: string | null;
+  expectedCardCount: number | null;
   printRun: number | null;
   isParallel: boolean;
   baseSetSlug: string | null;
@@ -136,7 +136,7 @@ export default function SetPage() {
         card.parallelType === 'Base' || card.parallelType === null
       ) || []);
 
-  const setCardCount = displayCards.length || (set?.totalCards ? parseInt(set.totalCards) : 0);
+  const setCardCount = displayCards.length || (set?.expectedCardCount ? set.expectedCardCount : 0);
   const setParallelCount = set?.parallelSets?.length || 0;
 
   // Sort cards numerically by cardNumber
@@ -313,9 +313,9 @@ export default function SetPage() {
               <p className="text-gray-500 text-lg italic">
                 Detailed checklist not yet available for this set
               </p>
-              {set.totalCards && (
+              {set.expectedCardCount && (
                 <p className="text-gray-600 mt-2">
-                  This set contains {set.totalCards} cards
+                  This set contains {set.expectedCardCount} cards
                 </p>
               )}
             </div>

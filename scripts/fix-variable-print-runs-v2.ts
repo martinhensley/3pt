@@ -25,7 +25,7 @@ async function fixVariablePrintRuns() {
 
   const excelData = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
 
-  console.log(`📊 Loaded data for ${excelData.totalCards} cards across ${excelData.totalSets} sets\n`);
+  console.log(`📊 Loaded data for ${excelData.expectedCardCount} cards across ${excelData.totalSets} sets\n`);
 
   let totalFixed = 0;
   let totalErrors = 0;

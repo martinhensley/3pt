@@ -117,7 +117,7 @@ async function addRookieKings() {
           baseSetSlug,
           printRun,
           releaseId: release.id,
-          totalCards: ROOKIE_KINGS_CARDS.length.toString()
+          expectedCardCount: ROOKIE_KINGS_CARDS.length.toString()
         }
       });
 

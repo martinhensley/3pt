@@ -8,7 +8,7 @@ import AdminLayout from "@/components/AdminLayout";
 interface Stats {
   totalReleases: number;
   totalSets: number;
-  totalCards: number;
+  expectedCardCount: number;
   cardsWithImages: number;
   totalPosts: number;
   publishedPosts: number;
@@ -237,7 +237,7 @@ export default function AdminDashboard() {
                   />
                   <StatCard
                     title="Cards with Image/Total Cards"
-                    value={`${stats.cardsWithImages}/${stats.totalCards}`}
+                    value={`${stats.cardsWithImages}/${stats.expectedCardCount}`}
                     icon="🃏"
                   />
                   <StatCard

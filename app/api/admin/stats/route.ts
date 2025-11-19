@@ -53,10 +53,10 @@ export async function GET() {
         ) subquery
       `.then(result => result[0]?.count ? Number(result[0].count) : 0),
 
-      // Sets that have totalCards defined
+      // Sets that have expectedCardCount defined
       prisma.set.findMany({
         where: {
-          totalCards: {
+          expectedCardCount: {
             not: null,
           },
         },

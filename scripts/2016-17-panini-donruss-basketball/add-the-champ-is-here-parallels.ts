@@ -89,7 +89,7 @@ async function addTheChampIsHereParallels() {
           baseSetSlug,
           printRun,
           releaseId: release.id,
-          totalCards: baseChampSet.cards.length.toString()
+          expectedCardCount: baseChampSet.cards.length.toString()
         }
       });
 

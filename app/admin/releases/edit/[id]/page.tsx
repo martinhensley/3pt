@@ -23,7 +23,7 @@ interface SetInfo {
   name: string;
   isBaseSet: boolean;
   type?: 'Base' | 'Autograph' | 'Memorabilia' | 'Insert'; // Set type
-  totalCards?: string;
+  expectedCardCount?: string;
   printRun?: number | null; // Print run for parallel sets (e.g., 44 for "/44")
   parallels?: string[];
   cards?: CardInfo[];
@@ -71,7 +71,7 @@ interface Release {
     id: string;
     name: string;
     isBaseSet: boolean;
-    totalCards: string | null;
+    expectedCardCount: number | null;
     parallels: string[] | null;
     parentSetId: string | null;
     cards: Array<{
@@ -87,7 +87,7 @@ interface Release {
       id: string;
       name: string;
       isBaseSet: boolean;
-      totalCards: string | null;
+      expectedCardCount: number | null;
       printRun: number | null;
       parentSetId: string | null;
     }>;
@@ -166,7 +166,7 @@ export default function EditReleasePage() {
           name: set.name,
           isBaseSet: set.isBaseSet,
           type: set.type || 'Base',
-          totalCards: set.totalCards || "",
+          expectedCardCount: set.expectedCardCount || "",
           parallels: set.parallels || [],
           parentSetId: null,
           cards: set.cards.map((card: any) => ({
@@ -181,7 +181,7 @@ export default function EditReleasePage() {
             name: parallel.name,
             isBaseSet: parallel.isBaseSet,
             type: parallel.type || 'Base',
-            totalCards: parallel.totalCards || "",
+            expectedCardCount: parallel.expectedCardCount || "",
             printRun: parallel.printRun,
             parallels: [],
             parentSetId: parallel.parentSetId,
@@ -218,7 +218,7 @@ export default function EditReleasePage() {
     const newSet: SetInfo = {
       name: "",
       isBaseSet,
-      totalCards: "",
+      expectedCardCount: "",
       parallels: [],
       cards: [],
       isNew: true,
@@ -240,7 +240,7 @@ export default function EditReleasePage() {
 
   const handleUpdateSet = (index: number, field: keyof SetInfo, value: string) => {
     const updatedSets = [...editedSets];
-    if (field === "name" || field === "totalCards" || field === "type") {
+    if (field === "name" || field === "expectedCardCount" || field === "type") {
       updatedSets[index] = { ...updatedSets[index], [field]: value };
       setEditedSets(updatedSets);
     }
@@ -426,7 +426,7 @@ export default function EditReleasePage() {
   // Unified parser for complete set format: sub-set name, card count, parallels, and card list
   const parseCompleteSetData = (text: string): {
     name: string;
-    totalCards: string;
+    expectedCardCount: number;
     standardParallels: string[];
     variableParallels: Array<{ name: string; maxPrintRun: string }>;
     cards: CardInfo[]
@@ -489,12 +489,12 @@ export default function EditReleasePage() {
       ? parseCardsWithSerialNumbers(cardsText, name)
       : parseChecklistText(cardsText, name);
 
-    // totalCards is the actual count of cards parsed from the checklist
-    const totalCards = String(cards.length);
+    // expectedCardCount is the actual count of cards parsed from the checklist
+    const expectedCardCount = cards.length;
 
     return {
       name,
-      totalCards,
+      expectedCardCount,
       standardParallels,
       variableParallels,
       cards
@@ -527,7 +527,7 @@ export default function EditReleasePage() {
       updatedSets[index] = {
         ...updatedSets[index],
         cards: cards,
-        totalCards: String(cards.length),
+        expectedCardCount: cards.length,
       };
       setEditedSets(updatedSets);
 
@@ -554,7 +554,7 @@ export default function EditReleasePage() {
       setEditedSets(prevSets =>
         prevSets.map(set =>
           set.id === setId
-            ? { ...set, totalCards: String(setData._count?.cards || 0) }
+            ? { ...set, expectedCardCount: setData._count?.cards || 0 }
             : set
         )
       );
@@ -656,7 +656,7 @@ export default function EditReleasePage() {
         updatedSets[index] = {
           ...updatedSets[index],
           cards: cards,
-          totalCards: String(cards.length),
+          expectedCardCount: cards.length,
         };
         setEditedSets(updatedSets);
 
@@ -815,7 +815,7 @@ export default function EditReleasePage() {
         updatedSets[index] = {
           ...updatedSets[index],
           name: completeData.name,
-          totalCards: String(completeData.cards.length), // Always use actual count
+          expectedCardCount: completeData.cards.length, // Always use actual count
           parallels: allParallels.length > 0 ? allParallels : updatedSets[index].parallels,
           cards: completeData.cards,
         };
@@ -848,7 +848,7 @@ export default function EditReleasePage() {
                 name: completeData.name,
                 isBaseSet: updatedSets[index].isBaseSet,
                 type: updatedSets[index].type || (updatedSets[index].isBaseSet ? 'Base' : 'Insert'),
-                totalCards: completeData.totalCards,
+                expectedCardCount: completeData.expectedCardCount,
                 parallels: allParallels, // Use combined parallels (standard + variable)
                 releaseId: release!.id,
               }),
@@ -904,7 +904,7 @@ export default function EditReleasePage() {
                   body: JSON.stringify({
                     name: `${completeData.name} ${parallelName}`,
                     type: updatedSets[index].type || (updatedSets[index].isBaseSet ? 'Base' : 'Insert'),
-                    totalCards: completeData.totalCards,
+                    expectedCardCount: completeData.expectedCardCount,
                     printRun: printRun, // Store the print run number
                     releaseId: release!.id,
                     parentSetId: updatedSets[index].id, // Link to parent set for checklist inheritance
@@ -954,7 +954,7 @@ export default function EditReleasePage() {
       updatedSets[index] = {
         ...updatedSets[index],
         cards: cards,
-        totalCards: String(cards.length),
+        expectedCardCount: cards.length,
       };
       setEditedSets(updatedSets);
 
@@ -1061,7 +1061,7 @@ export default function EditReleasePage() {
     const newSets: SetInfo[] = variableParallels.map(parallel => ({
       name: `${baseSetName} ${parallel.name}`,
       isBaseSet: baseSet.isBaseSet,
-      totalCards: baseSet.totalCards,
+      expectedCardCount: baseSet.expectedCardCount,
       parallels: [],
       cards: [],
       isNew: true,
@@ -1369,7 +1369,7 @@ export default function EditReleasePage() {
               body: JSON.stringify({
                 name: set.name,
                 type: set.type || 'Base',
-                totalCards: set.totalCards || null,
+                expectedCardCount: null,
                 releaseId: release.id,
                 parallels: set.parallels || [],
               }),
@@ -1395,7 +1395,7 @@ export default function EditReleasePage() {
                     year: editedYear,
                     sets: [{
                       name: set.name,
-                      totalCards: set.totalCards,
+                      expectedCardCount: set.expectedCardCount,
                       features: set.parallels || [],
                       cards: set.cards.map(card => ({
                         playerName: card.playerName,
@@ -1421,7 +1421,7 @@ export default function EditReleasePage() {
                 id: set.id,
                 name: set.name,
                 type: set.type || 'Base',
-                totalCards: set.totalCards || null,
+                expectedCardCount: null,
                 parallels: set.parallels || [],
               }),
             });

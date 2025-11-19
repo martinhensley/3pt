@@ -63,7 +63,7 @@ async function main() {
   if (!release) throw new Error('Release not found');
 
   const setSlugMap = new Map<string, string>();
-  let totalSets = 0, totalCards = 0;
+  let totalSets = 0, expectedCardCount = 0;
 
   for (const s of sets) {
     console.log(`Processing: ${s.n} (${s.c.length} cards)...`);

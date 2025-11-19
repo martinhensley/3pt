@@ -89,7 +89,7 @@ async function addCrashersParallels() {
           baseSetSlug,
           printRun,
           releaseId: release.id,
-          totalCards: baseCrashersSet.cards.length.toString()
+          expectedCardCount: baseCrashersSet.cards.length.toString()
         }
       });
 

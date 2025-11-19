@@ -25,7 +25,7 @@ export default function CreateReleasePage() {
       releaseDate: string | null;
       sets: Array<{
         name: string;
-        totalCards: string | null;
+        expectedCardCount: number | null;
         parallels: string[] | null;
         autographs: boolean;
         memorabilia: boolean;

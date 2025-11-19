@@ -208,7 +208,7 @@ export async function POST(request: NextRequest) {
         name: isParallel && variant ? `${name} ${variant}` : name, // Include variant in name for parallels
         slug,
         type: setType as 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other',
-        totalCards: totalCards || null,
+        expectedCardCount: null,
         printRun: printRun || null,
         description: description || null,
         releaseId,
@@ -269,7 +269,7 @@ export async function PUT(request: NextRequest) {
 
     // Build update data object
     const updateFields: Record<string, unknown> = {
-      totalCards: totalCards || null,
+      expectedCardCount: null,
     };
 
     if (name) {

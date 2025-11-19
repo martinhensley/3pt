@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 
 interface VerificationResult {
   setName: string;
-  totalCards: number;
+  expectedCardCount: number;
   correctPrintRuns: number;
   incorrectPrintRuns: number;
   nullPrintRuns: number;
@@ -39,7 +39,7 @@ async function verifyPrintRunFixes() {
   for (const set of dragonScaleSets) {
     const result: VerificationResult = {
       setName: set.name,
-      totalCards: set.cards.length,
+      expectedCardCount: set.cards.length,
       correctPrintRuns: 0,
       incorrectPrintRuns: 0,
       nullPrintRuns: 0,
@@ -104,7 +104,7 @@ async function verifyPrintRunFixes() {
   for (const set of signatureSets) {
     const result: VerificationResult = {
       setName: set.name,
-      totalCards: set.cards.length,
+      expectedCardCount: set.cards.length,
       correctPrintRuns: 0,
       incorrectPrintRuns: 0,
       nullPrintRuns: 0,
@@ -168,7 +168,7 @@ async function verifyPrintRunFixes() {
   for (const set of pinkVelocitySets) {
     const result: VerificationResult = {
       setName: set.name,
-      totalCards: set.cards.length,
+      expectedCardCount: set.cards.length,
       correctPrintRuns: 0,
       incorrectPrintRuns: 0,
       nullPrintRuns: 0,
@@ -207,7 +207,7 @@ async function verifyPrintRunFixes() {
 
   for (const result of results) {
     console.log(`📦 ${result.setName}`);
-    console.log(`   Total cards: ${result.totalCards}`);
+    console.log(`   Total cards: ${result.expectedCardCount}`);
 
     // Print distribution
     console.log('   Print run distribution:');
@@ -252,7 +252,7 @@ async function verifyPrintRunFixes() {
     totalIssues,
     results: results.map(r => ({
       setName: r.setName,
-      totalCards: r.totalCards,
+      expectedCardCount: r.expectedCardCount,
       printRunDistribution: Object.fromEntries(r.printRunDistribution),
       issues: r.issues
     }))

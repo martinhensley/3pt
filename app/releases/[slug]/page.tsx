@@ -37,7 +37,7 @@ interface CardSet {
   slug: string;
   type: 'Base' | 'Autograph' | 'Memorabilia' | 'Insert' | 'Other';
   description: string | null;
-  totalCards: string | null;
+  expectedCardCount: number | null;
   printRun: number | null;
   isParallel: boolean;
   baseSetSlug: string | null;
@@ -514,7 +514,7 @@ export default function ReleasePage() {
                         {isExpanded && setsOfType.map((set: CardSet, idx: number) => {
                           // For parallel sets, use totalCards field (which should be set to match parent)
                           // Fall back to cards length only if totalCards is not set
-                          const setCardCount = set.totalCards ? parseInt(set.totalCards) : (set.cards?.length || 0);
+                          const setCardCount = set.expectedCardCount ? set.expectedCardCount : (set.cards?.length || 0);
 
                           // Display print run for this set (if it has one)
                           const printRun = set.printRun;

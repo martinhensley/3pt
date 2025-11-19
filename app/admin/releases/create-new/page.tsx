@@ -25,7 +25,7 @@ export default function CreateReleasePage() {
       releaseDate: string | null;
       sets: Array<{
         name: string;
-        totalCards: string | null;
+        expectedCardCount: number | null;
         parallels: string[] | null;
         autographs: boolean;
         memorabilia: boolean;
@@ -323,9 +323,9 @@ export default function CreateReleasePage() {
                 {analysisResult.releaseInfo.sets.map((set, idx) => (
                   <div key={idx} className="border border-gray-200 rounded-md p-4">
                     <div className="font-semibold text-lg mb-2">{set.name}</div>
-                    {set.totalCards && (
+                    {set.expectedCardCount && (
                       <div className="text-sm text-gray-600 mb-1">
-                        Total Cards: {set.totalCards}
+                        Total Cards: {set.expectedCardCount}
                       </div>
                     )}
                     {set.parallels && set.parallels.length > 0 && (

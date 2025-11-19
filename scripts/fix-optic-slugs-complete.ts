@@ -252,7 +252,7 @@ async function fixOpticSlugs() {
     }
 
     // Final validation
-    const totalCards = await prisma.card.count({
+    const expectedCardCount = await prisma.card.count({
       where: { set: { releaseId: release.id } }
     });
 
@@ -265,7 +265,7 @@ async function fixOpticSlugs() {
     console.log(`Total cards: ${totalCards}`);
     console.log('Expected: 8,977 cards across 116 sets');
 
-    if (totalCards === 8977) {
+    if (expectedCardCount === 8977) {
       console.log('\n✅ SUCCESS! All 8,977 cards imported correctly!');
     } else {
       console.log(`\n⚠️ Still have ${totalCards} cards (missing ${8977 - totalCards})`);

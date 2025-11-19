@@ -66,7 +66,7 @@ async function verifyImport() {
     console.log(`  Parallel sets: ${parallelCount}`);
 
     // 3. Analyze cards
-    const totalCards = release.sets.reduce((sum, set) => sum + set.cards.length, 0);
+    const expectedCardCount = release.sets.reduce((sum, set) => sum + set.cards.length, 0);
     console.log('\n\n🃏 CARD STATISTICS');
     console.log('-'.repeat(80));
     console.log(`Total Cards: ${totalCards}`);
@@ -201,7 +201,7 @@ async function verifyImport() {
     console.log(`✅ Source Documents: ${release.sourceDocuments.length}`);
 
     const setsMatch = release.sets.length === 104;
-    const cardsMatch = totalCards === 6553;
+    const cardsMatch = expectedCardCount === 6553;
 
     if (setsMatch && cardsMatch) {
       console.log('\n🎉 IMPORT VERIFICATION SUCCESSFUL! All expected data found.');

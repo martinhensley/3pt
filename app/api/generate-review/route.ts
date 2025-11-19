@@ -116,9 +116,9 @@ export async function POST(request: NextRequest) {
     // Build context about the sets
     console.log('[generate-review] Building sets context...');
     const setsContext = sets && sets.length > 0
-      ? sets.map((set: { name: string; totalCards?: string; features?: string[] }) => {
+      ? sets.map((set: { name: string; expectedCardCount?: string; features?: string[] }) => {
           let setDesc = `- ${set.name}`;
-          if (set.totalCards) setDesc += ` (${set.totalCards} cards)`;
+          if (set.expectedCardCount) setDesc += ` (${set.expectedCardCount} cards)`;
           if (set.features && set.features.length > 0) {
             setDesc += `: ${set.features.slice(0, 3).join(", ")}`;
           }

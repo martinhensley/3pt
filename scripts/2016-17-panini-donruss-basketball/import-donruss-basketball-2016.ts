@@ -149,7 +149,7 @@ async function importDonrussBasketball() {
 
     // 4. Process records and merge Rookies into Base
     const setMap = new Map<string, CardData[]>();
-    let totalCards = 0;
+    let expectedCardCount = 0;
 
     for (const record of records) {
       let setName = record['Card Set'];
@@ -244,7 +244,7 @@ async function importDonrussBasketball() {
           slug,
           type: setType,
           releaseId: release.id,
-          totalCards: cards.length.toString(),
+          expectedCardCount: cards.length,
           printRun,
           isParallel,
           baseSetSlug,

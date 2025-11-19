@@ -207,7 +207,7 @@ async function extractCompletePrintRuns() {
   // Save complete mapping to file
   const mappingData = {
     timestamp: new Date().toISOString(),
-    totalCards: allCards.length,
+    expectedCardCount: allCards.length,
     totalSets: setMappings.size,
     sets: sortedSets
   };

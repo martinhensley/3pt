@@ -12,7 +12,7 @@ interface Set {
   name: string;
   slug: string;
   type: "Base" | "Autograph" | "Memorabilia" | "Insert";
-  totalCards: string | null;
+  expectedCardCount: number | null;
   printRun: number | null;
   description: string | null;
   isParallel: boolean;
@@ -44,7 +44,7 @@ export default function EditSetPage() {
   // Form state
   const [name, setName] = useState("");
   const [type, setType] = useState<"Base" | "Autograph" | "Memorabilia" | "Insert">("Base");
-  const [totalCards, setTotalCards] = useState("");
+  const [totalCards, setExpectedCardCount] = useState("");
   const [printRun, setPrintRun] = useState("");
   const [description, setDescription] = useState("");
 
@@ -68,7 +68,7 @@ export default function EditSetPage() {
         setSet(data);
         setName(data.name || "");
         setType(data.type || "Base");
-        setTotalCards(data.totalCards || "");
+        setExpectedCardCount(data.expectedCardCount || "");
         setPrintRun(data.printRun ? data.printRun.toString() : "");
         setDescription(data.description || "");
       } else {
@@ -92,7 +92,7 @@ export default function EditSetPage() {
         id: setId,
         name,
         type,
-        totalCards: totalCards || null,
+        expectedCardCount: null,
         printRun: printRun ? parseInt(printRun) : null,
         description: description || null,
       };
@@ -237,7 +237,7 @@ export default function EditSetPage() {
                 <input
                   type="text"
                   value={totalCards}
-                  onChange={(e) => setTotalCards(e.target.value)}
+                  onChange={(e) => setExpectedCardCount(e.target.value)}
                   placeholder="e.g., 200"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
                 />

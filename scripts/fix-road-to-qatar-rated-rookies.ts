@@ -85,7 +85,7 @@ async function fixRatedRookies() {
       const newCardCount = matchingBase.cards.length + rrSet.cards.length;
       await prisma.set.update({
         where: { id: matchingBase.id },
-        data: { totalCards: newCardCount.toString() }
+        data: { expectedCardCount: newCardCount.toString() }
       });
 
       console.log(`   ✅ Updated totalCards to ${newCardCount}`);
@@ -174,7 +174,7 @@ async function fixRatedRookies() {
       const newOpticCount = opticBase.cards.length + rrOpticCards;
       await prisma.set.update({
         where: { id: opticBase.id },
-        data: { totalCards: newOpticCount.toString() }
+        data: { expectedCardCount: newOpticCount.toString() }
       });
       console.log(`✅ Added ${rrOpticCards} Rated Rookies Optic cards`);
       console.log(`✅ Updated Optic totalCards to ${newOpticCount}`);
@@ -234,7 +234,7 @@ async function fixRatedRookies() {
       const newCardCount = matchingParallel.cards.length + rrParallel.cards.length;
       await prisma.set.update({
         where: { id: matchingParallel.id },
-        data: { totalCards: newCardCount.toString() }
+        data: { expectedCardCount: newCardCount.toString() }
       });
 
       console.log(`   ✅ Updated totalCards to ${newCardCount}`);
@@ -268,7 +268,7 @@ async function fixRatedRookies() {
       return;
     }
 
-    const totalCards = updatedRelease.sets.reduce((sum, set) => sum + set.cards.length, 0);
+    const expectedCardCount = updatedRelease.sets.reduce((sum, set) => sum + set.cards.length, 0);
 
     console.log(`\nTotal sets after fix: ${updatedRelease.sets.length}`);
     console.log(`Total cards: ${totalCards}`);

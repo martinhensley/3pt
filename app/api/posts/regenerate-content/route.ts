@@ -66,7 +66,7 @@ Release Information:
 Sets in this Release:
 ${releaseData.sets.map((set, index) => `
 ${index + 1}. ${set.name}
-   - Total Cards: ${set.totalCards || 'Unknown'}
+   - Total Cards: ${set.expectedCardCount || 'Unknown'}
    - Parallels/Features: ${set.parallels ? JSON.stringify(set.parallels) : 'None listed'}
 `).join('\n')}
     `.trim();

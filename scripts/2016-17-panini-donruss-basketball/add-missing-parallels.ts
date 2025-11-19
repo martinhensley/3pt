@@ -91,7 +91,7 @@ async function addMissingParallels() {
           baseSetSlug: baseSlug,
           printRun,
           releaseId: release.id,
-          totalCards: baseSet.cards.length.toString()
+          expectedCardCount: baseSet.cards.length.toString()
         }
       });
 
@@ -166,7 +166,7 @@ async function addMissingParallels() {
       console.log(`  - ${set.name}: ${set._count.cards} cards ${set.printRun ? '(/' + set.printRun + ')' : ''}`);
     }
 
-    const totalCards = await prisma.card.count({
+    const expectedCardCount = await prisma.card.count({
       where: { set: { releaseId: release.id } }
     });
     console.log(`\nTotal cards across all sets: ${totalCards}`);

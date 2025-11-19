@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
         // Create set
         const set = await addSetToRelease(releaseId, {
           name: analysis.setName,
-          totalCards: analysis.totalCards,
+          expectedCardCount: analysis.expectedCardCount,
         });
 
         // Create cards if available

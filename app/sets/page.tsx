@@ -9,7 +9,7 @@ interface Set {
   name: string;
   slug: string;
   type: string;
-  totalCards: string | null;
+  expectedCardCount: number | null;
   printRun: number | null;
   isParallel: boolean;
   baseSetSlug: string | null;

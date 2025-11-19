@@ -153,7 +153,7 @@ async function importDonrussOpticBasketball() {
 
     // 4. Process records and group by set
     const setMap = new Map<string, CardData[]>();
-    let totalCards = 0;
+    let expectedCardCount = 0;
 
     for (const record of records) {
       const setName = record['Card Set'];
@@ -261,7 +261,7 @@ async function importDonrussOpticBasketball() {
           slug,
           type: setType,
           releaseId: release.id,
-          totalCards: cards.length.toString(),
+          expectedCardCount: cards.length,
           printRun: setPrintRun,
           isParallel,
           baseSetSlug,

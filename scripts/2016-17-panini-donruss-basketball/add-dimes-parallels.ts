@@ -89,7 +89,7 @@ async function addDimesParallels() {
           baseSetSlug,
           printRun,
           releaseId: release.id,
-          totalCards: baseDimesSet.cards.length.toString()
+          expectedCardCount: baseDimesSet.cards.length.toString()
         }
       });
 

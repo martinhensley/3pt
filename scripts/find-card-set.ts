@@ -13,7 +13,7 @@ async function main() {
         OR: [
           { name: 'CARD' },
           { name: { contains: 'CARD' } },
-          { totalCards: '1' }
+          { expectedCardCount: '1' }
         ]
       },
       include: {
@@ -36,7 +36,7 @@ async function main() {
       console.log(`Name: ${set.name}`);
       console.log(`Slug: ${set.slug}`);
       console.log(`Type: ${set.type}`);
-      console.log(`Total Cards: ${set.totalCards}`);
+      console.log(`Total Cards: ${set.expectedCardCount}`);
       console.log(`Actual Cards: ${set.cards.length}`);
       console.log(`Release: ${set.release.year} ${set.release.manufacturer.name} ${set.release.name}`);
 

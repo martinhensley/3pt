@@ -117,9 +117,9 @@ export async function POST(request: NextRequest) {
             sellSheetText,
             sourceFiles,
           },
-          analysis.sets.map((set: { name: string; totalCards?: string; features?: string[] }) => ({
+          analysis.sets.map((set: { name: string; expectedCardCount?: string; features?: string[] }) => ({
             name: set.name,
-            totalCards: set.totalCards,
+            expectedCardCount: set.expectedCardCount,
             parallels: set.features || [],
           }))
         );
@@ -175,7 +175,7 @@ export async function POST(request: NextRequest) {
           manufacturer,
           release,
           cardsCreated,
-          totalCards: Object.values(cardsCreated).reduce((sum, count) => sum + count, 0),
+          expectedCardCount: Object.values(cardsCreated).reduce((sum, count) => sum + count, 0),
           imagesCreated,
         };
       } catch (dbError) {

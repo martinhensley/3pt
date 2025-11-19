@@ -71,7 +71,7 @@ async function fixOpticParallels() {
       const newCount = matchingOptic.cards.length + rrParallel.cards.length;
       await prisma.set.update({
         where: { id: matchingOptic.id },
-        data: { totalCards: newCount.toString() }
+        data: { expectedCardCount: newCount.toString() }
       });
 
       console.log(`   ✅ Updated totalCards to ${newCount}`);
@@ -115,7 +115,7 @@ async function fixOpticParallels() {
       console.log(`  ${status} ${s.name.padEnd(40)} ${s.cards.length.toString().padStart(3)} cards`);
     });
 
-    const totalCards = updatedRelease.sets.reduce((sum, set) => sum + set.cards.length, 0);
+    const expectedCardCount = updatedRelease.sets.reduce((sum, set) => sum + set.cards.length, 0);
 
     console.log('\n\n' + '='.repeat(80));
     console.log('📊 FIX SUMMARY');

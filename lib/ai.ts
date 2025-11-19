@@ -31,7 +31,7 @@ export interface SetAnalysis {
   setName: string;
   manufacturer: string;
   year: string;
-  totalCards?: string;
+  expectedCardCount?: number;
   subsets?: string[];
   features?: string[];
   notableCards?: string[];
@@ -48,7 +48,7 @@ export interface CardInfo {
 export interface SetInfo {
   name: string;
   description?: string;
-  totalCards?: string;
+  expectedCardCount?: number;
   features?: string[];
   cards?: CardInfo[]; // Optional: extracted card checklist
 }
@@ -88,7 +88,7 @@ const setAnalysisSchema = z.object({
   setName: z.string().describe("Name of the card set"),
   manufacturer: z.string().describe("Card manufacturer/brand"),
   year: z.string().describe("Year or season"),
-  totalCards: z.string().optional().describe("Total number of cards in the set"),
+  expectedCardCount: z.number().optional().describe("Total number of cards in the set"),
   subsets: z.array(z.string()).optional().describe("List of subsets or insert sets"),
   features: z.array(z.string()).optional().describe("Notable features like autographs, memorabilia cards, parallels, etc."),
   notableCards: z.array(z.string()).optional().describe("Notable players or chase cards in the set"),
@@ -183,7 +183,7 @@ const releaseAnalysisSchema = z.object({
     z.object({
       name: z.string().describe("Name of the set within this release"),
       description: z.string().optional().describe("Brief description of this set"),
-      totalCards: z.preprocess(
+      expectedCardCount: z.preprocess(
         (val) => (val === null || val === undefined ? undefined : String(val)),
         z.string().optional()
       ).describe("Total number of cards in this set"),
@@ -222,7 +222,7 @@ const setAnalysisWithCardsSchema = z.object({
   setName: z.string().describe("Name of the card set"),
   manufacturer: z.string().describe("Card manufacturer/brand"),
   year: z.string().describe("Year or season"),
-  totalCards: z.string().optional().describe("Total number of cards in set"),
+  expectedCardCount: z.number().optional().describe("Total number of cards in set"),
   subsets: z.array(z.string()).optional().describe("Subsets or insert sets"),
   features: z.array(z.string()).optional().describe("Notable features"),
   notableCards: z.array(z.string()).optional().describe("Notable players or chase cards"),
@@ -367,7 +367,7 @@ Extract the data in this structure:
 - sets: Array of sets, each with:
   - name: Set name
   - description: Optional description
-  - totalCards: Optional total (as string)
+  - expectedCardCount: Optional total (as string)
   - features: Optional array of features
   - cards: Optional array of cards (ONLY if checklist provided), each with:
     - playerName: Player name

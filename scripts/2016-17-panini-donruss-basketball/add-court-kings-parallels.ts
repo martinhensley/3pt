@@ -90,7 +90,7 @@ async function addCourtKingsParallels() {
           baseSetSlug,
           printRun,
           releaseId: release.id,
-          totalCards: baseCourtKingsSet.cards.length.toString()
+          expectedCardCount: baseCourtKingsSet.cards.length.toString()
         }
       });
 

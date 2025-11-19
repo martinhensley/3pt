@@ -14,7 +14,7 @@ export interface ScanContext {
   };
   set: {
     name: string;
-    totalCards?: string;
+    expectedCardCount?: number;
   };
   parallel?: {
     name: string;
@@ -150,8 +150,8 @@ CONTEXT:
 - Release: ${release.year} ${release.manufacturer} ${release.name}
 - Set: ${set.name}`;
 
-  if (set.totalCards) {
-    prompt += `\n- Total Cards in Set: ${set.totalCards}`;
+  if (set.expectedCardCount) {
+    prompt += `\n- Total Cards in Set: ${set.expectedCardCount}`;
   }
 
   if (parallel) {

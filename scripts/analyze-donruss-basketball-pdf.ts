@@ -46,7 +46,7 @@ Organize the output in this JSON structure:
     {
       "name": "Base Set",
       "cardRange": "1-200",
-      "totalCards": 200,
+      "expectedCardCount": 200,
       "parallels": [
         {"name": "Holo", "printRun": null},
         {"name": "Press Proof", "printRun": 299},

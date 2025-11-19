@@ -231,7 +231,7 @@ async function importRoadToQatar() {
 
     // 5. Parse cards and group by set
     const setMap = new Map<string, CardData[]>();
-    let totalCards = 0;
+    let expectedCardCount = 0;
 
     // Skip header row
     for (let i = 1; i < jsonData.length; i++) {
@@ -320,7 +320,7 @@ async function importRoadToQatar() {
           slug,
           type: setType,
           releaseId: release.id,
-          totalCards: cards.length.toString(),
+          expectedCardCount: cards.length,
           printRun,
           isParallel,
           baseSetSlug,

@@ -49,9 +49,9 @@ model Set {
   type        SetType  @default(Base) // Base, Autograph, Memorabilia, or Insert
   releaseId   String
   release     Release  @relation(fields: [releaseId], references: [id], onDelete: Cascade)
-  totalCards  String?
-  printRun    Int?     // Standard print run for this set (e.g., 99 for "/99" parallels, null for unlimited base sets)
-  description String?  // Optional description for this set
+  expectedCardCount Int?     // Official/expected number of cards in this set from manufacturer's checklist
+  printRun          Int?     // Standard print run for this set (e.g., 99 for "/99" parallels, null for unlimited base sets)
+  description       String?  // Optional description for this set
 
   // Source data for regeneration and reference
   sourceText  String?  @db.Text // Original pasted checklist text

@@ -15,7 +15,7 @@ interface CardPrintRun {
 
 interface SetPrintRunSummary {
   setName: string;
-  totalCards: number;
+  expectedCardCount: number;
   printRunDistribution: Map<string, number>;
   cards: CardPrintRun[];
 }
@@ -112,14 +112,14 @@ async function analyzeExcelPrintRuns() {
     if (!setMap.has(setName)) {
       setMap.set(setName, {
         setName,
-        totalCards: 0,
+        expectedCardCount: 0,
         printRunDistribution: new Map(),
         cards: []
       });
     }
 
     const setSummary = setMap.get(setName)!;
-    setSummary.totalCards++;
+    setSummary.expectedCardCount++;
     setSummary.cards.push(card);
 
     // Update print run distribution
@@ -153,7 +153,7 @@ async function analyzeExcelPrintRuns() {
   variablePrintRunSets.sort((a, b) => a.setName.localeCompare(b.setName));
 
   for (const summary of variablePrintRunSets) {
-    console.log(`📦 ${summary.setName} (${summary.totalCards} cards)`);
+    console.log(`📦 ${summary.setName} (${summary.expectedCardCount} cards)`);
     console.log('   Print run distribution:');
 
     const sortedDistribution = Array.from(summary.printRunDistribution.entries())
@@ -178,7 +178,7 @@ async function analyzeExcelPrintRuns() {
 
   for (const [setName, summary] of setMap) {
     if (setName.toLowerCase().includes('dragon scale')) {
-      console.log(`📦 ${setName} (${summary.totalCards} cards)`);
+      console.log(`📦 ${setName} (${summary.expectedCardCount} cards)`);
       console.log('   Print run distribution:');
 
       const sortedDistribution = Array.from(summary.printRunDistribution.entries())
@@ -207,18 +207,18 @@ async function analyzeExcelPrintRuns() {
 
   // Generate detailed JSON report
   const report = {
-    totalCards: allCards.length,
+    expectedCardCount: allCards.length,
     totalSets: setMap.size,
     setsWithVariablePrintRuns: variablePrintRunSets.map(s => ({
       setName: s.setName,
-      totalCards: s.totalCards,
+      expectedCardCount: s.expectedCardCount,
       printRuns: Object.fromEntries(s.printRunDistribution)
     })),
     dragonScaleSets: Array.from(setMap.values())
       .filter(s => s.setName.toLowerCase().includes('dragon scale'))
       .map(s => ({
         setName: s.setName,
-        totalCards: s.totalCards,
+        expectedCardCount: s.expectedCardCount,
         printRuns: Object.fromEntries(s.printRunDistribution),
         cards: s.cards.map(c => ({
           number: c.cardNumber,

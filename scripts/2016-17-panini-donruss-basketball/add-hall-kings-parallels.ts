@@ -90,7 +90,7 @@ async function addHallKingsParallels() {
           baseSetSlug,
           printRun,
           releaseId: release.id,
-          totalCards: baseHallKingsSet.cards.length.toString()
+          expectedCardCount: baseHallKingsSet.cards.length.toString()
         }
       });
 

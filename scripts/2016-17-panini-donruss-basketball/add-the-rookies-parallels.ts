@@ -89,7 +89,7 @@ async function addTheRookiesParallels() {
           baseSetSlug,
           printRun,
           releaseId: release.id,
-          totalCards: baseRookiesSet.cards.length.toString()
+          expectedCardCount: baseRookiesSet.cards.length.toString()
         }
       });
 

@@ -23,7 +23,7 @@ export interface ParsedParallel {
 
 export interface ParsedSet {
   setName: string;
-  totalCards: number | null;
+  expectedCardCount: number | null;
   baseSetPrintRun: number | null; // e.g., 145 for base cards
   parallels: ParsedParallel[];
   baseCards: ParsedCard[];
@@ -43,11 +43,11 @@ export function parseChecklistText(text: string): ParsedSet {
   const setName = lines[0];
 
   // Parse total cards (second line if it's a number followed by "cards")
-  let totalCards: number | null = null;
+  let expectedCardCount: number | null = null;
   let startIndex = 1;
 
   if (lines[1]?.match(/^(\d+)\s+cards?$/i)) {
-    totalCards = parseInt(lines[1], 10);
+    expectedCardCount = parseInt(lines[1], 10);
     startIndex = 2;
   }
 
@@ -293,7 +293,7 @@ export function validateParsedSet(parsed: ParsedSet): string[] {
  */
 export function generateParseSummary(parsed: ParsedSet): string {
   let summary = `Set: ${parsed.setName}\n`;
-  summary += `Total Cards: ${parsed.totalCards || 'Unknown'}\n`;
+  summary += `Total Cards: ${parsed.expectedCardCount || 'Unknown'}\n`;
   summary += `Base Cards: ${parsed.baseCards.length}\n`;
   summary += `Base Print Run: ${parsed.baseSetPrintRun ? `/${parsed.baseSetPrintRun}` : 'Unlimited'}\n`;
   summary += `\nParallels: ${parsed.parallels.length}\n`;
