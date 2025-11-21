@@ -145,8 +145,8 @@ export async function GET(request: NextRequest) {
           },
         },
         orderBy: [
-          { postDate: 'desc' }, // Sort by postDate first (chronological)
-          { createdAt: 'desc' } // Fall back to createdAt if postDate is null
+          { postDate: 'asc' }, // Sort by postDate first (chronological, oldest to newest)
+          { createdAt: 'asc' } // Fall back to createdAt if postDate is null
         ]
       });
 

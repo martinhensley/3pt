@@ -62,6 +62,12 @@ export default function AdminHeader() {
               Dashboard
             </Link>
             <Link
+              href="/admin/stats"
+              className="text-footy-orange hover:text-white transition-colors text-sm md:text-base font-bold"
+            >
+              Stats
+            </Link>
+            <Link
               href="/admin/posts"
               className="text-footy-orange hover:text-white transition-colors text-sm md:text-base font-bold"
             >

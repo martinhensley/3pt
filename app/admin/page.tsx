@@ -29,7 +29,6 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [statsExpanded, setStatsExpanded] = useState(true);
   const [libraryExpanded, setLibraryExpanded] = useState(true);
 
   // Removed redirect - allow unauthenticated users to see login page
@@ -200,56 +199,6 @@ export default function AdminDashboard() {
             </>
           )}
 
-        {/* Statistics Accordion */}
-        {stats && (
-          <div className="bg-white rounded-xl shadow-lg mb-6 overflow-hidden">
-            <button
-              onClick={() => setStatsExpanded(!statsExpanded)}
-              className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
-            >
-              <h2 className="text-xl font-bold text-gray-900">Stats</h2>
-              <svg
-                className={`w-6 h-6 text-gray-600 transition-transform ${statsExpanded ? 'rotate-180' : ''}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            {statsExpanded && (
-              <div className="px-6 pb-6">
-                <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
-                  <StatCard
-                    title="Total Releases"
-                    value={stats.totalReleases}
-                    icon="📦"
-                  />
-                  <StatCard
-                    title="Total Sets"
-                    value={stats.totalSets}
-                    icon="📚"
-                  />
-                  <StatCard
-                    title="Sets Without Checklists"
-                    value={stats.setsWithoutChecklists}
-                    icon="📋"
-                  />
-                  <StatCard
-                    title="Cards with Image/Total Cards"
-                    value={`${stats.cardsWithImages}/${stats.expectedCardCount}`}
-                    icon="🃏"
-                  />
-                  <StatCard
-                    title="Published Posts"
-                    value={`${stats.publishedPosts}/${stats.totalPosts}`}
-                    icon="📝"
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-        )}
 
         {/* Library Accordion */}
         <div className="bg-white rounded-xl shadow-lg mb-8 overflow-hidden">
@@ -313,29 +262,5 @@ export default function AdminDashboard() {
           )}
         </div>
     </AdminLayout>
-  );
-}
-
-function StatCard({
-  title,
-  value,
-  icon,
-}: {
-  title: string;
-  value: number | string;
-  icon: string;
-}) {
-  return (
-    <div className="bg-gradient-to-br from-footy-green to-green-700 rounded-xl p-6 shadow-lg text-white">
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-3xl opacity-90">{icon}</span>
-        <span className="text-3xl font-bold">
-          {value}
-        </span>
-      </div>
-      <p className="text-sm font-semibold text-white/90">
-        {title}
-      </p>
-    </div>
   );
 }
