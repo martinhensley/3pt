@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import PublicPageLayout from "@/components/PublicPageLayout";
 import { useEffect, useState, useMemo } from "react";
-import { extractKeywordsFromPost, getAdTitle } from "@/lib/extractKeywords";
+import { buildSetQueries } from "@/lib/ebayQueries";
 import { formatParallelName } from "@/lib/formatters";
 import { isParallelSet, getBaseSetSlug, getParallelVariant, getParallelPrintRun } from "@/lib/setUtils";
 
@@ -39,6 +39,7 @@ interface Set {
   id: string;
   name: string;
   slug: string;
+  type: string;
   description: string | null;
   expectedCardCount: number | null;
   printRun: number | null;
@@ -109,24 +110,19 @@ export default function SetPage() {
     : displayName;
 
   // Extract keywords from set for dynamic ad queries - MUST be before conditional returns
-  const adKeywords = useMemo(() => {
+  const ebayQueries = useMemo(() => {
     if (!set) {
       return {
-        primaryQuery: 'soccer cards',
-        autographQuery: 'soccer autographs',
-        relatedQuery: 'soccer cards',
+        primary: 'basketball cards',
+        autograph: 'basketball autograph cards',
+        related: 'NBA basketball cards',
+        primaryTitle: 'Basketball Cards',
+        autographTitle: 'Autographs',
+        relatedTitle: 'NBA Cards',
       };
     }
-
-    // Create a post-like object for keyword extraction
-    const postLike = {
-      title: `${set.release.year} ${set.release.name} ${displayName}`,
-      content: `${set.release.manufacturer.name} ${set.release.name} ${displayName} ${set.release.year || ''} trading cards checklist`,
-      excerpt: `${set.release.manufacturer.name} ${set.release.name} ${displayName} ${set.release.year || ''} soccer card set`,
-      type: 'NEWS',
-    };
-    return extractKeywordsFromPost(postLike as { title: string; content: string; excerpt: string; type: string });
-  }, [set, displayName]);
+    return buildSetQueries(set);
+  }, [set]);
 
   // For base sets with mixed base + parallel cards, only show base cards
   // For parallel sets, show all cards (they all belong to that parallel)
@@ -164,12 +160,12 @@ export default function SetPage() {
 
   return (
     <PublicPageLayout
-      leftAdQuery={adKeywords.primaryQuery}
-      leftAdTitle={getAdTitle(adKeywords.primaryQuery, "Soccer Cards")}
-      rightAdQuery={adKeywords.autographQuery}
-      rightAdTitle={getAdTitle(adKeywords.autographQuery, "Soccer Autographs")}
-      horizontalAdQuery={adKeywords.relatedQuery}
-      horizontalAdTitle={getAdTitle(adKeywords.relatedQuery, "Related Soccer Cards")}
+      leftAdQuery={ebayQueries.primary}
+      leftAdTitle={ebayQueries.primaryTitle}
+      rightAdQuery={ebayQueries.autograph}
+      rightAdTitle={ebayQueries.autographTitle}
+      horizontalAdQuery={ebayQueries.related}
+      horizontalAdTitle={ebayQueries.relatedTitle}
       breadcrumbs={breadcrumbs}
       loading={loading}
       error={!loading && !set ? "Set not found" : undefined}

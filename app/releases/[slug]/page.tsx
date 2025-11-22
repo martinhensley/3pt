@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import PublicPageLayout from "@/components/PublicPageLayout";
 import { useEffect, useState, useMemo } from "react";
-import { extractKeywordsFromPost, getAdTitle } from "@/lib/extractKeywords";
+import { buildReleaseQueries } from "@/lib/ebayQueries";
 import { isParallelSet, getBaseSetSlug, sortSets, sortSetsGrouped, groupSetsByBase } from "@/lib/setUtils";
 
 interface Image {
@@ -123,24 +123,18 @@ export default function ReleasePage() {
   }, [slug]);
 
   // Extract keywords from release for dynamic ad queries
-  const adKeywords = useMemo(() => {
+  const ebayQueries = useMemo(() => {
     if (!release) {
       return {
-        primaryQuery: 'soccer cards',
-        autographQuery: 'soccer autographs',
-        relatedQuery: 'soccer cards',
-        playerName: null,
-        teamName: null,
+        primary: 'basketball cards',
+        autograph: 'basketball autograph cards',
+        related: 'NBA basketball cards',
+        primaryTitle: 'Basketball Cards',
+        autographTitle: 'Autographs',
+        relatedTitle: 'NBA Cards',
       };
     }
-    // Create a post-like object for keyword extraction using release data
-    const postLike = {
-      title: `${release.year} ${release.manufacturer.name} ${release.name}`,
-      content: `${release.manufacturer.name} ${release.name} ${release.year || ''} trading cards`,
-      excerpt: `${release.manufacturer.name} ${release.name} ${release.year || ''} soccer card release`,
-      type: 'NEWS',
-    };
-    return extractKeywordsFromPost(postLike as { title: string; content: string; excerpt: string; type: string });
+    return buildReleaseQueries(release);
   }, [release]);
 
   // Generate carousel images with AI-style captions
@@ -329,12 +323,12 @@ export default function ReleasePage() {
       )}
 
       <PublicPageLayout
-        leftAdQuery={adKeywords.primaryQuery}
-        leftAdTitle={getAdTitle(adKeywords.primaryQuery, "Soccer Cards")}
-        rightAdQuery={adKeywords.autographQuery}
-        rightAdTitle={getAdTitle(adKeywords.autographQuery, "Soccer Autographs")}
-        horizontalAdQuery={adKeywords.relatedQuery}
-        horizontalAdTitle={getAdTitle(adKeywords.relatedQuery, "Related Soccer Cards")}
+        leftAdQuery={ebayQueries.primary}
+        leftAdTitle={ebayQueries.primaryTitle}
+        rightAdQuery={ebayQueries.autograph}
+        rightAdTitle={ebayQueries.autographTitle}
+        horizontalAdQuery={ebayQueries.related}
+        horizontalAdTitle={ebayQueries.relatedTitle}
         breadcrumbs={breadcrumbs}
         loading={loading}
         error={!loading && !release ? "Release not found" : undefined}

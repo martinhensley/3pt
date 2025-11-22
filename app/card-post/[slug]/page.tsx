@@ -7,7 +7,7 @@ import Header from "@/components/Header";
 import EbayAd from "@/components/EbayAd";
 import EbayAdHorizontal from "@/components/EbayAdHorizontal";
 import { useEffect, useState, useMemo } from "react";
-import { extractKeywordsFromPost, getAdTitle } from "@/lib/extractKeywords";
+import { buildPostQueries } from "@/lib/ebayQueries";
 
 interface Post {
   id: string;
@@ -40,18 +40,19 @@ export default function CardPage() {
       });
   }, [slug]);
 
-  // Extract keywords from post for dynamic ad queries (must be before early returns)
-  const adKeywords = useMemo(() => {
+  // Build basketball queries from post content (must be before early returns)
+  const ebayQueries = useMemo(() => {
     if (!post) {
       return {
-        primaryQuery: 'soccer cards',
-        autographQuery: 'soccer autographs',
-        relatedQuery: 'soccer cards',
-        playerName: null,
-        teamName: null,
+        primary: 'basketball cards',
+        autograph: 'basketball autograph cards',
+        related: 'NBA basketball cards',
+        primaryTitle: 'Basketball Cards',
+        autographTitle: 'Autographs',
+        relatedTitle: 'NBA Cards',
       };
     }
-    return extractKeywordsFromPost(post);
+    return buildPostQueries(post);
   }, [post]);
 
   if (loading) {
@@ -110,9 +111,9 @@ export default function CardPage() {
       <div className="flex-grow flex gap-4 max-w-[1400px] mx-auto w-full px-4 py-12">
         <aside className="hidden lg:block w-72 flex-shrink-0">
           <EbayAd
-            query={adKeywords.primaryQuery}
+            query={ebayQueries.primary}
             limit={3}
-            title={getAdTitle(adKeywords.primaryQuery, "Soccer Cards")}
+            title={ebayQueries.primaryTitle}
           />
         </aside>
 
@@ -183,17 +184,17 @@ export default function CardPage() {
         </article>
 
         <EbayAdHorizontal
-          query={adKeywords.relatedQuery}
+          query={ebayQueries.related}
           limit={4}
-          title={getAdTitle(adKeywords.relatedQuery, "Related Soccer Cards")}
+          title={ebayQueries.relatedTitle}
         />
         </main>
 
         <aside className="hidden lg:block w-72 flex-shrink-0">
           <EbayAd
-            query={adKeywords.autographQuery}
+            query={ebayQueries.autograph}
             limit={3}
-            title={getAdTitle(adKeywords.autographQuery, "Soccer Autographs")}
+            title={ebayQueries.autographTitle}
           />
         </aside>
       </div>

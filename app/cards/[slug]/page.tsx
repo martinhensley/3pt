@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import PublicPageLayout from "@/components/PublicPageLayout";
 import { useEffect, useState, useMemo } from "react";
-import { extractKeywordsFromPost, getAdTitle } from "@/lib/extractKeywords";
+import { buildCardQueries } from "@/lib/ebayQueries";
 import { formatParallelName } from "@/lib/formatters";
 
 interface CardImage {
@@ -38,6 +38,7 @@ interface Card {
   set: {
     id: string;
     name: string;
+    type: string;
     release: {
       id: string;
       name: string;
@@ -56,24 +57,20 @@ export default function CardDetailPage() {
   const [card, setCard] = useState<Card | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Extract keywords from card for dynamic ad queries - MUST be before conditional returns
-  const adKeywords = useMemo(() => {
+  // Build basketball card queries for eBay ads - MUST be before conditional returns
+  const ebayQueries = useMemo(() => {
     if (!card) {
       return {
-        primaryQuery: 'soccer cards',
-        autographQuery: 'soccer autographs',
-        relatedQuery: 'soccer cards',
+        primary: 'basketball cards',
+        autograph: 'basketball autograph cards',
+        related: 'NBA basketball cards',
+        primaryTitle: 'Basketball Cards',
+        autographTitle: 'Autographs',
+        relatedTitle: 'NBA Cards',
       };
     }
 
-    // Create a post-like object for keyword extraction
-    const postLike = {
-      title: `${card.playerName || 'Unknown'} ${card.set.release.year || ''} ${card.set.release.name} ${card.set.name} #${card.cardNumber || ''}`,
-      content: `${card.set.release.manufacturer.name} ${card.set.release.name} ${card.set.name} ${card.playerName || ''} ${card.team || ''} card number ${card.cardNumber || ''}`,
-      excerpt: `${card.playerName || ''} ${card.team || ''} ${card.set.release.year || ''} ${card.set.release.name}`,
-      type: 'NEWS',
-    };
-    return extractKeywordsFromPost(postLike as { title: string; content: string; excerpt: string; type: string });
+    return buildCardQueries(card);
   }, [card]);
 
   useEffect(() => {
@@ -172,12 +169,12 @@ export default function CardDetailPage() {
 
   return (
     <PublicPageLayout
-      leftAdQuery={adKeywords.primaryQuery}
-      leftAdTitle={getAdTitle(adKeywords.primaryQuery, "Soccer Cards")}
-      rightAdQuery={adKeywords.autographQuery}
-      rightAdTitle={getAdTitle(adKeywords.autographQuery, "Soccer Autographs")}
-      horizontalAdQuery={adKeywords.relatedQuery}
-      horizontalAdTitle={getAdTitle(adKeywords.relatedQuery, "Related Soccer Cards")}
+      leftAdQuery={ebayQueries.primary}
+      leftAdTitle={ebayQueries.primaryTitle}
+      rightAdQuery={ebayQueries.autograph}
+      rightAdTitle={ebayQueries.autographTitle}
+      horizontalAdQuery={ebayQueries.related}
+      horizontalAdTitle={ebayQueries.relatedTitle}
       breadcrumbs={breadcrumbs}
       loading={loading}
       error={!loading && !card ? "Card not found" : undefined}

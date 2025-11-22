@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import PublicPageLayout from "@/components/PublicPageLayout";
 import { useEffect, useState, useMemo } from "react";
-import { extractKeywordsFromPost, getAdTitle } from "@/lib/extractKeywords";
+import { buildPostQueries } from "@/lib/ebayQueries";
 
 interface Post {
   id: string;
@@ -39,17 +39,18 @@ export default function PostPage() {
   }, [slug]);
 
   // Extract keywords from post for dynamic ad queries (must be before early returns)
-  const adKeywords = useMemo(() => {
+  const ebayQueries = useMemo(() => {
     if (!post) {
       return {
-        primaryQuery: 'soccer cards',
-        autographQuery: 'soccer autographs',
-        relatedQuery: 'soccer cards',
-        playerName: null,
-        teamName: null,
+        primary: 'basketball cards',
+        autograph: 'basketball autograph cards',
+        related: 'NBA basketball cards',
+        primaryTitle: 'Basketball Cards',
+        autographTitle: 'Autographs',
+        relatedTitle: 'NBA Cards',
       };
     }
-    return extractKeywordsFromPost(post);
+    return buildPostQueries(post);
   }, [post]);
 
   // Call notFound if post not found and not loading
@@ -103,12 +104,12 @@ export default function PostPage() {
       )}
 
       <PublicPageLayout
-        leftAdQuery={adKeywords.primaryQuery}
-        leftAdTitle={getAdTitle(adKeywords.primaryQuery, "Soccer Cards")}
-        rightAdQuery={adKeywords.autographQuery}
-        rightAdTitle={getAdTitle(adKeywords.autographQuery, "Soccer Autographs")}
-        horizontalAdQuery={adKeywords.relatedQuery}
-        horizontalAdTitle={getAdTitle(adKeywords.relatedQuery, "Related Soccer Cards")}
+        leftAdQuery={ebayQueries.primary}
+        leftAdTitle={ebayQueries.primaryTitle}
+        rightAdQuery={ebayQueries.autograph}
+        rightAdTitle={ebayQueries.autographTitle}
+        horizontalAdQuery={ebayQueries.related}
+        horizontalAdTitle={ebayQueries.relatedTitle}
         breadcrumbs={breadcrumbs}
         loading={loading}
       >

@@ -23,32 +23,6 @@ export default function EbayAd({
   limit = 3,
   title = "Basketball Cards on eBay"
 }: EbayAdProps) {
-  // Temporarily return placeholder instead of fetching eBay data
-  return (
-    <div className="bg-white border-2 border-gray-300 rounded-lg shadow-lg p-4 lg:p-5">
-      <p className="text-sm text-footy-dark-green font-bold mb-4 text-center uppercase tracking-wide">
-        {title}
-      </p>
-      <div className="space-y-4">
-        {[1, 2, 3].slice(0, limit).map((i) => (
-          <div key={i} className="bg-gray-50 rounded-lg border-2 border-gray-200 p-4">
-            <div className="w-full h-32 bg-gray-200 rounded mb-3 flex items-center justify-center">
-              <span className="text-gray-400 text-sm">Ad Placeholder {i}</span>
-            </div>
-            <div className="h-4 bg-gray-200 rounded mb-2"></div>
-            <div className="h-4 bg-gray-200 rounded w-2/3"></div>
-          </div>
-        ))}
-      </div>
-      <div className="mt-4 pt-4 border-t border-gray-300">
-        <p className="text-xs text-gray-500 text-center font-medium">
-          Sponsored Links (Placeholder)
-        </p>
-      </div>
-    </div>
-  );
-
-  /* Original eBay fetching code - commented out temporarily
   const [products, setProducts] = useState<EbayProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -76,7 +50,6 @@ export default function EbayAd({
 
     fetchProducts();
   }, [query, limit]);
-  */
 
   if (loading) {
     return (
@@ -84,22 +57,30 @@ export default function EbayAd({
         <p className="text-sm text-footy-dark-green font-bold mb-4 text-center uppercase tracking-wide">
           {title}
         </p>
-        <div className="flex items-center justify-center py-12">
-          <p className="text-sm text-gray-600">Loading...</p>
+        <div className="space-y-4">
+          {Array.from({ length: limit }).map((_, i) => (
+            <div key={i} className="bg-gray-50 rounded-lg border-2 border-gray-200 p-3 animate-pulse">
+              <div className="w-full h-48 bg-gray-200 rounded mb-3"></div>
+              <div className="h-4 bg-gray-200 rounded mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded w-2/3 mb-2"></div>
+              <div className="h-6 bg-gray-200 rounded w-1/3"></div>
+            </div>
+          ))}
         </div>
       </div>
     );
   }
 
   if (error || products.length === 0) {
+    // Fallback to generic basketball cards if specific query fails
     return (
       <div className="bg-white border-2 border-footy-gold rounded-lg shadow-lg p-4 lg:p-5">
         <p className="text-sm text-footy-dark-green font-bold mb-4 text-center uppercase tracking-wide">
           {title}
         </p>
         <div className="flex items-center justify-center py-12">
-          <p className="text-sm text-gray-600">
-            {error || "No products available"}
+          <p className="text-sm text-gray-600 text-center">
+            {error ? "Unable to load ads at this time" : "No products available"}
           </p>
         </div>
       </div>

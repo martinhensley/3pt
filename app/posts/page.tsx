@@ -44,12 +44,12 @@ export default function PostsIndex() {
 
   return (
     <PublicPageLayout
-      leftAdQuery="soccer cards"
-      leftAdTitle="Latest Soccer Cards"
-      rightAdQuery="soccer autographs"
-      rightAdTitle="Soccer Autographs"
-      horizontalAdQuery="soccer memorabilia"
-      horizontalAdTitle="More Soccer Collectibles"
+      leftAdQuery="basketball cards"
+      leftAdTitle="Latest Basketball Cards"
+      rightAdQuery="basketball autographs"
+      rightAdTitle="Basketball Autographs"
+      horizontalAdQuery="basketball memorabilia"
+      horizontalAdTitle="More Basketball Collectibles"
       loading={loading}
     >
       {posts.length === 0 ? (

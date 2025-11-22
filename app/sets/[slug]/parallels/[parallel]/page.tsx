@@ -9,7 +9,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 import EbayAd from "@/components/EbayAd";
 import EbayAdHorizontal from "@/components/EbayAdHorizontal";
 import { useEffect, useState, useMemo } from "react";
-import { extractKeywordsFromPost, getAdTitle } from "@/lib/extractKeywords";
+import { buildSetQueries } from "@/lib/ebayQueries";
 import { formatParallelName } from "@/lib/formatters";
 
 interface Card {
@@ -34,6 +34,7 @@ interface Card {
   set: {
     id: string;
     name: string;
+    type: string;
     release: {
       id: string;
       name: string;
@@ -62,24 +63,21 @@ export default function ParallelPage() {
   } | null>(null);
 
   // Extract keywords for ads
-  const adKeywords = useMemo(() => {
+  const ebayQueries = useMemo(() => {
     if (cards.length === 0) {
       return {
-        primaryQuery: 'soccer cards',
-        autographQuery: 'soccer autographs',
-        relatedQuery: 'soccer cards',
+        primary: 'basketball cards',
+        autograph: 'basketball autograph cards',
+        related: 'NBA basketball cards',
+        primaryTitle: 'Basketball Cards',
+        autographTitle: 'Autographs',
+        relatedTitle: 'NBA Cards',
       };
     }
 
     const firstCard = cards[0];
-    const postLike = {
-      title: `${parallelName} ${firstCard.set.release.year || ''} ${firstCard.set.release.name} ${firstCard.set.name}`,
-      content: `${firstCard.set.release.manufacturer.name} ${firstCard.set.release.name} ${firstCard.set.name} ${parallelName} parallel cards`,
-      excerpt: `${parallelName} ${firstCard.set.release.year || ''} ${firstCard.set.release.name}`,
-      type: 'NEWS',
-    };
-    return extractKeywordsFromPost(postLike as { title: string; content: string; excerpt: string; type: string });
-  }, [cards, parallelName]);
+    return buildSetQueries(firstCard.set);
+  }, [cards]);
 
   useEffect(() => {
     // Fetch set data with parallel parameter
@@ -120,9 +118,9 @@ export default function ParallelPage() {
       <div className="flex-grow flex gap-4 max-w-[1600px] mx-auto w-full px-4 pt-6 pb-12">
         <aside className="hidden lg:block w-72 flex-shrink-0">
           <EbayAd
-            query={adKeywords.primaryQuery}
+            query={ebayQueries.primary}
             limit={3}
-            title={getAdTitle(adKeywords.primaryQuery, "Soccer Cards")}
+            title={ebayQueries.primaryTitle}
           />
         </aside>
 
@@ -274,9 +272,9 @@ export default function ParallelPage() {
           </div>
 
           <EbayAdHorizontal
-            query={adKeywords.relatedQuery}
+            query={ebayQueries.related}
             limit={4}
-            title={getAdTitle(adKeywords.relatedQuery, "Related Soccer Cards")}
+            title={ebayQueries.relatedTitle}
           />
 
           <Footer rounded={true} />
@@ -286,9 +284,9 @@ export default function ParallelPage() {
 
         <aside className="hidden lg:block w-72 flex-shrink-0">
           <EbayAd
-            query={adKeywords.autographQuery}
+            query={ebayQueries.autograph}
             limit={3}
-            title={getAdTitle(adKeywords.autographQuery, "Soccer Autographs")}
+            title={ebayQueries.autographTitle}
           />
         </aside>
       </div>
