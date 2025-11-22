@@ -72,7 +72,7 @@ export default function ChecklistsPage() {
     fetch(`/api/checklists?${params}`)
       .then((res) => res.json())
       .then((data) => {
-        setSets(Array.isArray(data) ? data : []);
+        setSets(Array.isArray(data.sets) ? data.sets : []);
         setLoading(false);
       })
       .catch((error) => {
