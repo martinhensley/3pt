@@ -16,13 +16,28 @@ export async function GET(request: NextRequest) {
   const challenge = searchParams.get("challenge_code");
 
   // During endpoint verification, eBay sends a challenge_code parameter
-  // We need to return it with a specific response format
+  // We need to return a SHA-256 hash of: challenge_code + verification_token + endpoint_url
   if (challenge) {
     console.log("eBay endpoint verification - challenge code received:", challenge);
 
-    // eBay expects JSON response with challengeResponse field
+    const verificationToken = process.env.EBAY_VERIFICATION_TOKEN || "";
+    const endpointUrl = process.env.EBAY_DELETION_ENDPOINT_URL || "";
+
+    // Create the hash string: challengeCode + verificationToken + endpointUrl
+    const hashString = challenge + verificationToken + endpointUrl;
+
+    // Generate SHA-256 hash
+    const encoder = new TextEncoder();
+    const data = encoder.encode(hashString);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+    console.log("eBay challenge response hash generated:", hashHex);
+
+    // eBay expects JSON response with challengeResponse field containing the hash
     return new NextResponse(
-      JSON.stringify({ challengeResponse: challenge }),
+      JSON.stringify({ challengeResponse: hashHex }),
       {
         status: 200,
         headers: {
