@@ -202,9 +202,52 @@ function parseSetName(name: string): { baseName: string; variant: string } {
     return { baseName, variant: 'Tip-off' };
   }
 
+  // Check for Press Proof variants (common in Donruss)
+  // Pattern: "Set Name Press Proof [Color]" or "Set Name Press Proof" (unnumbered)
+  const pressProofPattern = /^(.+?)\s+Press Proof(?:\s+(Silver|Gold|Black|Blue|Red|Purple|Green|Orange))?$/i;
+  const pressProofMatch = name.match(pressProofPattern);
+
+  if (pressProofMatch) {
+    const baseName = pressProofMatch[1].trim();
+    const variant = pressProofMatch[2]
+      ? `Press Proof ${pressProofMatch[2]}`
+      : 'Press Proof';
+    return { baseName, variant };
+  }
+
+  // Check for Holo Laser variants (common in Donruss)
+  // Pattern: "Set Name Holo [Color(s)] Laser"
+  const holoLaserPattern = /^(.+?)\s+Holo\s+(.+?)\s+Laser$/i;
+  const holoLaserMatch = name.match(holoLaserPattern);
+
+  if (holoLaserMatch) {
+    const baseName = holoLaserMatch[1].trim();
+    const variant = `Holo ${holoLaserMatch[2]} Laser`;
+    return { baseName, variant };
+  }
+
+  // Check for simple Holo variants
+  // Pattern: "Set Name Holo"
+  if (name.endsWith(' Holo')) {
+    const baseName = name.substring(0, name.length - 5).trim();
+    return { baseName, variant: 'Holo' };
+  }
+
+  // Check for Patch/Tag variants (common in Tools of the Trade)
+  // Pattern: "Set Name Patch" or "Set Name Tag"
+  if (name.endsWith(' Patch')) {
+    const baseName = name.substring(0, name.length - 6).trim();
+    return { baseName, variant: 'Patch' };
+  }
+
+  if (name.endsWith(' Tag')) {
+    const baseName = name.substring(0, name.length - 4).trim();
+    return { baseName, variant: 'Tag' };
+  }
+
   // For other sets, extract the base name by removing color/variant suffixes
   // Common patterns: "Set Name Red", "Set Name Gold", "Set Name Black", etc.
-  const colorPattern = /\s+(Red|Blue|Gold|Silver|Black|Pink|Green|Purple|Orange|Aqua|Teal|Dragon Scale|Plum Blossom|Pink Ice|Pink Velocity|Argyle|Holo|Ice|Velocity|Cubic|Diamond|Mojo|Power|Pandora)(\s+\d+)?$/i;
+  const colorPattern = /\s+(Red|Blue|Gold|Silver|Black|Pink|Green|Purple|Orange|Aqua|Teal|Dragon Scale|Plum Blossom|Pink Ice|Pink Velocity|Argyle|Ice|Velocity|Cubic|Diamond|Mojo|Power|Pandora|Green Vinyl|Gold Vinyl)(\s+\d+)?$/i;
   const match = name.match(colorPattern);
 
   if (match) {
