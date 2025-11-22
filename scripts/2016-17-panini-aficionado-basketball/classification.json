@@ -1,0 +1,427 @@
+{
+  "release": {
+    "name": "Aficionado Basketball",
+    "year": "2016-17",
+    "manufacturer": "Panini"
+  },
+  "sets": [
+    {
+      "name": "Base Set",
+      "type": "Base",
+      "isParallel": false,
+      "baseSetName": null,
+      "parallelVariant": null,
+      "printRun": null,
+      "cardCount": 100
+    },
+    {
+      "name": "Opening Night Preview Edition",
+      "type": "Base",
+      "isParallel": false,
+      "baseSetName": null,
+      "parallelVariant": null,
+      "printRun": null,
+      "cardCount": 80
+    },
+    {
+      "name": "Base Set Artist's Proof",
+      "type": "Base",
+      "isParallel": true,
+      "baseSetName": "Base Set",
+      "parallelVariant": "Artist's Proof",
+      "printRun": 75,
+      "cardCount": 100
+    },
+    {
+      "name": "Base Set Artist's Proof Gold",
+      "type": "Base",
+      "isParallel": true,
+      "baseSetName": "Base Set",
+      "parallelVariant": "Artist's Proof Gold",
+      "printRun": 10,
+      "cardCount": 100
+    },
+    {
+      "name": "Base Set Artist's Proof Red",
+      "type": "Base",
+      "isParallel": true,
+      "baseSetName": "Base Set",
+      "parallelVariant": "Artist's Proof Red",
+      "printRun": 1,
+      "cardCount": 100
+    },
+    {
+      "name": "Base Set Tip-off",
+      "type": "Base",
+      "isParallel": true,
+      "baseSetName": "Base Set",
+      "parallelVariant": "Tip-off",
+      "printRun": 299,
+      "cardCount": 100
+    },
+    {
+      "name": "",
+      "type": "Insert",
+      "isParallel": false,
+      "baseSetName": null,
+      "parallelVariant": null,
+      "printRun": null,
+      "cardCount": 67
+    },
+    {
+      "name": "Authentics",
+      "type": "Insert",
+      "isParallel": false,
+      "baseSetName": null,
+      "parallelVariant": null,
+      "printRun": null,
+      "cardCount": 64
+    },
+    {
+      "name": "Craftwork",
+      "type": "Insert",
+      "isParallel": false,
+      "baseSetName": null,
+      "parallelVariant": null,
+      "printRun": null,
+      "cardCount": 70
+    },
+    {
+      "name": "Dual Authentics",
+      "type": "Insert",
+      "isParallel": false,
+      "baseSetName": null,
+      "parallelVariant": null,
+      "printRun": null,
+      "cardCount": 32
+    },
+    {
+      "name": "Endorsements",
+      "type": "Insert",
+      "isParallel": false,
+      "baseSetName": null,
+      "parallelVariant": null,
+      "printRun": null,
+      "cardCount": 48
+    },
+    {
+      "name": "First Impressions",
+      "type": "Insert",
+      "isParallel": false,
+      "baseSetName": null,
+      "parallelVariant": null,
+      "printRun": null,
+      "cardCount": 24
+    },
+    {
+      "name": "Global Reach",
+      "type": "Insert",
+      "isParallel": false,
+      "baseSetName": null,
+      "parallelVariant": null,
+      "printRun": null,
+      "cardCount": 40
+    },
+    {
+      "name": "Inducted",
+      "type": "Insert",
+      "isParallel": false,
+      "baseSetName": null,
+      "parallelVariant": null,
+      "printRun": null,
+      "cardCount": 10
+    },
+    {
+      "name": "Innovators",
+      "type": "Insert",
+      "isParallel": false,
+      "baseSetName": null,
+      "parallelVariant": null,
+      "printRun": null,
+      "cardCount": 10
+    },
+    {
+      "name": "Magic Numbers",
+      "type": "Insert",
+      "isParallel": false,
+      "baseSetName": null,
+      "parallelVariant": null,
+      "printRun": null,
+      "cardCount": 12
+    },
+    {
+      "name": "Meteor",
+      "type": "Insert",
+      "isParallel": false,
+      "baseSetName": null,
+      "parallelVariant": null,
+      "printRun": null,
+      "cardCount": 20
+    },
+    {
+      "name": "Power Surge",
+      "type": "Insert",
+      "isParallel": false,
+      "baseSetName": null,
+      "parallelVariant": null,
+      "printRun": null,
+      "cardCount": 18
+    },
+    {
+      "name": "Slick Picks",
+      "type": "Insert",
+      "isParallel": false,
+      "baseSetName": null,
+      "parallelVariant": null,
+      "printRun": null,
+      "cardCount": 20
+    },
+    {
+      "name": "Authentics Prime",
+      "type": "Insert",
+      "isParallel": true,
+      "baseSetName": "Authentics",
+      "parallelVariant": "Prime",
+      "printRun": 149,
+      "cardCount": 61
+    },
+    {
+      "name": "Dual Authentics Prime",
+      "type": "Insert",
+      "isParallel": true,
+      "baseSetName": "Dual Authentics",
+      "parallelVariant": "Prime",
+      "printRun": 149,
+      "cardCount": 31
+    },
+    {
+      "name": "Endorsements Artist's Proof Bronze",
+      "type": "Insert",
+      "isParallel": true,
+      "baseSetName": "Endorsements",
+      "parallelVariant": "Artist's Proof Bronze",
+      "printRun": 25,
+      "cardCount": 44
+    },
+    {
+      "name": "Endorsements Artist's Proof Gold",
+      "type": "Insert",
+      "isParallel": true,
+      "baseSetName": "Endorsements",
+      "parallelVariant": "Artist's Proof Gold",
+      "printRun": 10,
+      "cardCount": 50
+    },
+    {
+      "name": "First Impressions Artist's Proof Bronze",
+      "type": "Insert",
+      "isParallel": true,
+      "baseSetName": "First Impressions",
+      "parallelVariant": "Artist's Proof Bronze",
+      "printRun": 25,
+      "cardCount": 25
+    },
+    {
+      "name": "First Impressions Artist's Proof Gold",
+      "type": "Insert",
+      "isParallel": true,
+      "baseSetName": "First Impressions",
+      "parallelVariant": "Artist's Proof Gold",
+      "printRun": 10,
+      "cardCount": 25
+    },
+    {
+      "name": "Global Reach Artist's Proof",
+      "type": "Insert",
+      "isParallel": true,
+      "baseSetName": "Global Reach",
+      "parallelVariant": "Artist's Proof",
+      "printRun": 75,
+      "cardCount": 40
+    },
+    {
+      "name": "Global Reach Artist's Proof Gold",
+      "type": "Insert",
+      "isParallel": true,
+      "baseSetName": "Global Reach",
+      "parallelVariant": "Artist's Proof Gold",
+      "printRun": 10,
+      "cardCount": 40
+    },
+    {
+      "name": "Global Reach Artist's Proof Red",
+      "type": "Insert",
+      "isParallel": true,
+      "baseSetName": "Global Reach",
+      "parallelVariant": "Artist's Proof Red",
+      "printRun": 1,
+      "cardCount": 40
+    },
+    {
+      "name": "Inducted Artist's Proof",
+      "type": "Insert",
+      "isParallel": true,
+      "baseSetName": "Inducted",
+      "parallelVariant": "Artist's Proof",
+      "printRun": 75,
+      "cardCount": 10
+    },
+    {
+      "name": "Inducted Artist's Proof Gold",
+      "type": "Insert",
+      "isParallel": true,
+      "baseSetName": "Inducted",
+      "parallelVariant": "Artist's Proof Gold",
+      "printRun": 10,
+      "cardCount": 10
+    },
+    {
+      "name": "Inducted Artist's Proof Red",
+      "type": "Insert",
+      "isParallel": true,
+      "baseSetName": "Inducted",
+      "parallelVariant": "Artist's Proof Red",
+      "printRun": 1,
+      "cardCount": 10
+    },
+    {
+      "name": "Magic Numbers Artist's Proof",
+      "type": "Insert",
+      "isParallel": true,
+      "baseSetName": "Magic Numbers",
+      "parallelVariant": "Artist's Proof",
+      "printRun": 75,
+      "cardCount": 12
+    },
+    {
+      "name": "Magic Numbers Artist's Proof Gold",
+      "type": "Insert",
+      "isParallel": true,
+      "baseSetName": "Magic Numbers",
+      "parallelVariant": "Artist's Proof Gold",
+      "printRun": 10,
+      "cardCount": 12
+    },
+    {
+      "name": "Magic Numbers Artist's Proof Red",
+      "type": "Insert",
+      "isParallel": true,
+      "baseSetName": "Magic Numbers",
+      "parallelVariant": "Artist's Proof Red",
+      "printRun": 1,
+      "cardCount": 12
+    },
+    {
+      "name": "Power Surge Artist's Proof",
+      "type": "Insert",
+      "isParallel": true,
+      "baseSetName": "Power Surge",
+      "parallelVariant": "Artist's Proof",
+      "printRun": 75,
+      "cardCount": 18
+    },
+    {
+      "name": "Power Surge Artist's Proof Gold",
+      "type": "Insert",
+      "isParallel": true,
+      "baseSetName": "Power Surge",
+      "parallelVariant": "Artist's Proof Gold",
+      "printRun": 10,
+      "cardCount": 18
+    },
+    {
+      "name": "Power Surge Artist's Proof Red",
+      "type": "Insert",
+      "isParallel": true,
+      "baseSetName": "Power Surge",
+      "parallelVariant": "Artist's Proof Red",
+      "printRun": 1,
+      "cardCount": 18
+    },
+    {
+      "name": "Slick Picks Artist's Proof",
+      "type": "Insert",
+      "isParallel": true,
+      "baseSetName": "Slick Picks",
+      "parallelVariant": "Artist's Proof",
+      "printRun": 75,
+      "cardCount": 20
+    },
+    {
+      "name": "Slick Picks Artist's Proof Gold",
+      "type": "Insert",
+      "isParallel": true,
+      "baseSetName": "Slick Picks",
+      "parallelVariant": "Artist's Proof Gold",
+      "printRun": 10,
+      "cardCount": 20
+    },
+    {
+      "name": "Slick Picks Artist's Proof Red",
+      "type": "Insert",
+      "isParallel": true,
+      "baseSetName": "Slick Picks",
+      "parallelVariant": "Artist's Proof Red",
+      "printRun": 1,
+      "cardCount": 20
+    },
+    {
+      "name": "International Ink",
+      "type": "Autograph",
+      "isParallel": false,
+      "baseSetName": null,
+      "parallelVariant": null,
+      "printRun": null,
+      "cardCount": 23
+    },
+    {
+      "name": "Signatures",
+      "type": "Autograph",
+      "isParallel": false,
+      "baseSetName": null,
+      "parallelVariant": null,
+      "printRun": null,
+      "cardCount": 13
+    },
+    {
+      "name": "International Ink Artist's Proof Bronze",
+      "type": "Autograph",
+      "isParallel": true,
+      "baseSetName": "International Ink",
+      "parallelVariant": "Artist's Proof Bronze",
+      "printRun": 25,
+      "cardCount": 24
+    },
+    {
+      "name": "International Ink Artist's Proof Gold",
+      "type": "Autograph",
+      "isParallel": true,
+      "baseSetName": "International Ink",
+      "parallelVariant": "Artist's Proof Gold",
+      "printRun": 10,
+      "cardCount": 25
+    }
+  ],
+  "summary": {
+    "totalSets": 44,
+    "totalCards": 1636,
+    "byType": {
+      "Base": {
+        "sets": 6,
+        "cards": 580
+      },
+      "Insert": {
+        "sets": 34,
+        "cards": 971
+      },
+      "Autograph": {
+        "sets": 4,
+        "cards": 85
+      },
+      "Memorabilia": {
+        "sets": 0,
+        "cards": 0
+      }
+    }
+  }
+}

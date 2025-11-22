@@ -1672,7 +1672,8 @@ export default function EditReleasePage() {
               {release?.sourceDocuments && release.sourceDocuments.length > 0 ? (
                 <>
                   <p className="text-xs text-gray-600 mb-3">
-                    Uses uploaded source documents ({release.sourceDocuments.length} document{release.sourceDocuments.length !== 1 ? 's' : ''}) to generate summary
+                    Uses uploaded source documents ({release.sourceDocuments.length} document{release.sourceDocuments.length !== 1 ? 's' : ''}) to generate summary.
+                    <span className="block mt-1 font-semibold text-orange-700">⚠️ This will REPLACE the current summary. Only click if you want to regenerate it.</span>
                   </p>
                   <button
                     type="button"
@@ -1693,7 +1694,7 @@ export default function EditReleasePage() {
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
-                        Generate Summary
+                        Generate New Summary
                       </>
                     )}
                   </button>

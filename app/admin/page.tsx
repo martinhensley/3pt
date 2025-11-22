@@ -30,7 +30,6 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [libraryExpanded, setLibraryExpanded] = useState(true);
-  const [statsExpanded, setStatsExpanded] = useState(true);
 
   // Removed redirect - allow unauthenticated users to see login page
 
@@ -96,7 +95,7 @@ export default function AdminDashboard() {
         <div className="mb-6">
           {/* Quick Actions */}
           <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-4 gap-4">
             <button
               onClick={() => router.push("/admin/releases/create")}
               className="bg-gradient-to-br from-green-500 via-footy-green to-green-700 text-white p-6 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all flex flex-col items-center gap-3"
@@ -134,6 +133,19 @@ export default function AdminDashboard() {
               <span className="font-bold text-lg">Scan Cards</span>
               <span className="text-xs text-white/80 text-center">
                 Upload and identify card images
+              </span>
+            </button>
+
+            <button
+              onClick={() => router.push("/admin/stats")}
+              className="bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700 text-white p-6 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all flex flex-col items-center gap-3"
+            >
+              <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              <span className="font-bold text-lg">Statistics</span>
+              <span className="text-xs text-white/80 text-center">
+                View detailed analytics
               </span>
             </button>
           </div>
@@ -262,211 +274,6 @@ export default function AdminDashboard() {
             </div>
           )}
         </div>
-
-        {/* Statistics Accordion */}
-        {stats && (
-          <div className="bg-white rounded-xl shadow-lg mb-8 overflow-hidden">
-            <button
-              onClick={() => setStatsExpanded(!statsExpanded)}
-              className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
-            >
-              <h2 className="text-xl font-bold text-gray-900">Statistics</h2>
-              <svg
-                className={`w-6 h-6 text-gray-600 transition-transform ${statsExpanded ? 'rotate-180' : ''}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            {statsExpanded && (
-              <div className="px-6 pb-6">
-                {/* Primary Stats Grid */}
-                <div className="mb-6">
-                  <h3 className="text-lg font-bold text-gray-900 mb-3">Overview</h3>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
-                    <StatCard
-                      title="Total Releases"
-                      value={stats.totalReleases}
-                      icon="📦"
-                      color="green"
-                    />
-                    <StatCard
-                      title="Total Sets"
-                      value={stats.totalSets}
-                      icon="📚"
-                      color="blue"
-                    />
-                    <StatCard
-                      title="Total Cards"
-                      value={stats.totalCards}
-                      icon="🃏"
-                      color="purple"
-                    />
-                    <StatCard
-                      title="Cards with Images"
-                      value={stats.cardsWithImages}
-                      icon="🖼️"
-                      color="indigo"
-                    />
-                    <StatCard
-                      title="Published Posts"
-                      value={`${stats.publishedPosts}/${stats.totalPosts}`}
-                      icon="📝"
-                      color="orange"
-                    />
-                  </div>
-                </div>
-
-                {/* Attention Needed */}
-                <div className="mb-6">
-                  <h3 className="text-lg font-bold text-gray-900 mb-3">Attention Needed</h3>
-                  <div className="grid md:grid-cols-3 gap-4">
-                    <AlertCard
-                      title="Sets Without Checklists"
-                      value={stats.setsWithoutChecklists}
-                      icon="📋"
-                      description="Sets missing checklist data"
-                    />
-                    <AlertCard
-                      title="Cards Missing Images"
-                      value={stats.totalCards - stats.cardsWithImages}
-                      icon="🖼️"
-                      description="Cards that need images uploaded"
-                    />
-                    <AlertCard
-                      title="Releases Without Posts"
-                      value={stats.releasesWithoutPosts}
-                      icon="📝"
-                      description="Releases that need blog posts"
-                    />
-                  </div>
-                </div>
-
-                {/* Detailed Metrics */}
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-3">Detailed Metrics</h3>
-                  <div className="space-y-3">
-                    <MetricRow
-                      label="Image Coverage"
-                      value={stats.cardsWithImages}
-                      total={stats.totalCards}
-                      percentage={Math.round((stats.cardsWithImages / stats.totalCards) * 100)}
-                    />
-                    <MetricRow
-                      label="Post Publication Rate"
-                      value={stats.publishedPosts}
-                      total={stats.totalPosts}
-                      percentage={Math.round((stats.publishedPosts / stats.totalPosts) * 100)}
-                    />
-                    <MetricRow
-                      label="Sets with Checklists"
-                      value={stats.totalSets - stats.setsWithoutChecklists}
-                      total={stats.totalSets}
-                      percentage={Math.round(((stats.totalSets - stats.setsWithoutChecklists) / stats.totalSets) * 100)}
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
     </AdminLayout>
-  );
-}
-
-interface StatCardProps {
-  title: string;
-  value: number | string;
-  icon: string;
-  color: 'green' | 'blue' | 'purple' | 'indigo' | 'orange';
-}
-
-function StatCard({ title, value, icon, color }: StatCardProps) {
-  const colorClasses = {
-    green: 'from-green-500 to-green-700',
-    blue: 'from-blue-500 to-blue-700',
-    purple: 'from-purple-500 to-purple-700',
-    indigo: 'from-indigo-500 to-indigo-700',
-    orange: 'from-orange-500 to-orange-700',
-  };
-
-  return (
-    <div className={`bg-gradient-to-br ${colorClasses[color]} rounded-xl p-4 shadow-lg text-white`}>
-      <div className="flex items-center justify-between mb-1">
-        <span className="text-2xl opacity-90">{icon}</span>
-        <span className="text-2xl font-bold">
-          {value}
-        </span>
-      </div>
-      <p className="text-xs font-semibold text-white/90">
-        {title}
-      </p>
-    </div>
-  );
-}
-
-interface AlertCardProps {
-  title: string;
-  value: number;
-  icon: string;
-  description: string;
-}
-
-function AlertCard({ title, value, icon, description }: AlertCardProps) {
-  const isWarning = value > 0;
-
-  return (
-    <div className={`rounded-xl p-4 shadow-lg border-2 ${
-      isWarning
-        ? 'bg-amber-50 border-amber-300'
-        : 'bg-green-50 border-green-300'
-    }`}>
-      <div className="flex items-center justify-between mb-1">
-        <span className="text-2xl">{icon}</span>
-        <span className={`text-2xl font-bold ${
-          isWarning ? 'text-amber-700' : 'text-green-700'
-        }`}>
-          {value}
-        </span>
-      </div>
-      <p className={`text-sm font-semibold mb-0.5 ${
-        isWarning ? 'text-amber-900' : 'text-green-900'
-      }`}>
-        {title}
-      </p>
-      <p className={`text-xs ${
-        isWarning ? 'text-amber-600' : 'text-green-600'
-      }`}>
-        {description}
-      </p>
-    </div>
-  );
-}
-
-interface MetricRowProps {
-  label: string;
-  value: number;
-  total: number;
-  percentage: number;
-}
-
-function MetricRow({ label, value, total, percentage }: MetricRowProps) {
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-1">
-        <span className="text-sm font-medium text-gray-700">{label}</span>
-        <span className="text-sm font-bold text-gray-900">
-          {value} / {total} ({percentage}%)
-        </span>
-      </div>
-      <div className="w-full bg-gray-200 rounded-full h-2">
-        <div
-          className="bg-gradient-to-r from-footy-green to-green-600 h-2 rounded-full transition-all duration-500"
-          style={{ width: `${percentage}%` }}
-        />
-      </div>
-    </div>
   );
 }

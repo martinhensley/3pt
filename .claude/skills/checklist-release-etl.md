@@ -1,33 +1,49 @@
 # Checklist Release ETL
 
-**Extract, Transform, and Load** sets and cards from release checklist files (Excel/CSV) into Neon PostgreSQL via Prisma ORM.
+**Local-First ETL**: Generate TypeScript import scripts for trading card releases. Each release gets a dedicated script in `/scripts/{year}-{release}/`.
+
+## Philosophy: One-Off Scripts > Generic Web App
+
+This skill helps you create **custom import scripts per release** rather than building a generic web app. Benefits:
+
+- ✅ **No hosting costs** - Scripts run locally via Claude Code
+- ✅ **Version controlled** - Each release's script lives in your repo
+- ✅ **Customizable** - Easy to handle per-release quirks
+- ✅ **Debuggable** - TypeScript with full IDE support
+- ✅ **No API costs** - Direct database writes via Prisma
 
 ## ETL Process Overview
 
-This skill implements a complete ETL pipeline for trading card release data:
+This skill guides you through creating local TypeScript import scripts:
 
 ### **Extract** 📥
-- Parse Excel (.xls, .xlsx) or CSV files containing card checklists
-- Handle various checklist formats and structures
-- Identify columns: Card Set, Card Number, Player, Team, Print Run
-- Handle edge cases: wrapped quotes, special characters, empty fields
+- Parse checklist files (Excel/CSV/PDF) using Claude Code's vision
+- Split large PDFs into logical sections (Base, Insert, Autograph, Memorabilia)
+- Extract structured data: Set names, card numbers, players, teams, print runs
+- **Process each section separately** to avoid missing data
+
+**PDF Extraction Strategy:**
+1. **Section-by-Section Processing** - Don't process entire PDF at once
+2. **Split by Set Type**:
+   - Pages 1-X: Base sets → Extract separately
+   - Pages X-Y: Insert sets → Extract separately
+   - Pages Y-Z: Autograph sets → Extract separately
+   - Pages Z-End: Memorabilia sets → Extract separately
+3. **Verification After Each Section** - Confirm counts before moving on
+4. **Combine Results** - Merge all sections into final dataset
 
 ### **Transform** 🔄
-- Map flat checklist data to relational database schema
+- Generate TypeScript import script with structured data
 - Determine set types (Base, Insert, Autograph, Memorabilia)
-- Identify and process parallel sets with variants and print runs
-- Generate URL-friendly slugs for all entities
-- Merge special cases (e.g., Rated Rookies into Base sets)
-- Apply business rules (print run mappings, parallel naming)
-- Validate data integrity and relationships
+- Identify parallels and variants
+- Generate slugs for sets and cards
+- Apply business rules (Rated Rookies merging, print run mappings)
 
 ### **Load** 💾
-- Insert data into Neon PostgreSQL via Prisma ORM
-- Create/update Manufacturer → Release → Set → Card hierarchy
-- Handle duplicate detection and conflict resolution
-- Upload source checklist to Vercel Blob Storage
-- Create SourceDocument records linking files to releases
-- Maintain referential integrity across all tables
+- User runs generated TypeScript script locally
+- Script inserts data via Prisma ORM to Neon PostgreSQL
+- Handles duplicate detection (idempotent scripts)
+- (Optional) Upload source files to Vercel Blob
 
 ## Database Schema Mapping
 
@@ -148,43 +164,61 @@ generateCardSlug(manufacturer, release, year, setName, cardNumber, player, varia
 
 ## User Workflow
 
+### New Workflow: Generate TypeScript Import Script
 ```
-🎯 Checklist Release ETL
+🎯 Checklist Release ETL - Local Script Generation
 
-Step 1: Extract - Select Release
-Available releases needing import:
-  1. 2016-17 Panini Donruss Basketball
-  2. 2024-25 Panini Revolution Basketball
+Step 1: Identify Release & Sections
+Release: 2016-17 Panini Absolute Basketball
+Checklist file: /path/to/checklist.pdf (148 pages)
 
-Which release? 1
+📋 Completeness Checklist:
+  □ Base sets (pages 1-20)
+  □ Insert sets (pages 21-25)
+  □ Autograph sets (pages 26-85)
+  □ Memorabilia sets (pages 86-148)
 
-Step 2: Extract - Provide Source File
-Path to checklist (Excel/CSV): /Users/mh/Desktop/checklist.csv
+Step 2: Extract Section-by-Section
+Processing Base Sets (pages 1-20):
+  ✅ Extracted 3 sets, 600 cards
 
-Step 3: Transform - Analyzing Structure
-📊 Parsing CSV with 1,033 rows
-🔍 Detected 22 unique sets
-🔄 Identifying parallels and variants
-   - Base (200 cards)
-   - Base Holo Blue Laser (150 cards) → Parallel of Base
-   - All-Stars Press Proof Black (30 cards) → Parallel of All-Stars
+Processing Insert Sets (pages 21-25):
+  ✅ Extracted 1 set, 25 cards
 
-⚙️  Applying transformation rules:
-   - Merging Rookies (151-200) into Base set
-   - Mapping print runs (Black=1, Blue=99)
-   - Generating slugs for 1,033 cards
+Processing Autograph Sets (pages 26-85):
+  ✅ Extracted 15 sets, 453 cards
 
-Step 4: Load - Writing to Neon PostgreSQL
-💾 Creating sets...
-   ✅ Created 22 sets
-💾 Inserting cards...
-   ✅ Inserted 1,033 cards
-📦 Uploading checklist to blob storage...
-   ✅ Saved to library
+Processing Memorabilia Sets (pages 86-148):
+  ✅ Extracted 24 sets, 687 cards
 
-✅ ETL Complete!
-   Source: 1,033 rows (CSV)
-   Target: 22 sets, 1,033 cards (PostgreSQL)
+📊 Verification Summary:
+  - Base: 3 sets ✓
+  - Insert: 1 set ✓
+  - Autograph: 15 sets ✓
+  - Memorabilia: 24 sets ✓
+  - Total: 43 sets, 1,765 cards
+
+❓ Does this look complete? (y/n): y
+
+Step 3: Generate Import Scripts
+Creating scripts in /scripts/2016-17-panini-absolute-basketball/:
+  ✅ import-autographs.ts (15 sets, 453 cards)
+  ✅ import-memorabilia.ts (24 sets, 687 cards)
+  ✅ import-inserts.ts (1 set, 25 cards)
+
+Step 4: User Runs Scripts Locally
+$ npx tsx scripts/2016-17-panini-absolute-basketball/import-autographs.ts
+  ✅ Imported 15 autograph sets, 453 cards
+
+$ npx tsx scripts/2016-17-panini-absolute-basketball/import-memorabilia.ts
+  ✅ Imported 24 memorabilia sets, 687 cards
+
+$ npx tsx scripts/2016-17-panini-absolute-basketball/import-inserts.ts
+  ✅ Imported 1 insert set, 25 cards
+
+✅ Import Complete!
+  Scripts saved to: /scripts/2016-17-panini-absolute-basketball/
+  Database: 43 sets, 1,765 cards imported
 ```
 
 ## Implementation Pattern
@@ -276,11 +310,43 @@ async function etlChecklistToDatabase(
     }
   }
 
-  // Upload source to blob storage
-  await uploadChecklistToRelease(checklistPath, release.id, displayName);
+  // Optional: Upload source to blob storage
+  // await uploadChecklistToRelease(checklistPath, release.id, displayName);
 
   console.log('✅ ETL Complete!');
+  console.log(`Imported ${setCount} sets and ${cardCount} cards`);
 }
+```
+
+## Verification Steps
+
+**CRITICAL: Verify completeness before running import**
+
+### Pre-Import Checklist
+Before running generated scripts, confirm:
+- ✅ All Base sets extracted (including parallels)?
+- ✅ All Insert sets extracted?
+- ✅ All Autograph sets extracted?
+- ✅ All Memorabilia sets extracted?
+
+### Post-Extraction Verification
+After each section, show summary:
+```
+📊 Extraction Summary - Base Sets:
+  Sets: 3 (Base, Base Spectrum Black /1, Base Spectrum Gold /10)
+  Cards: 600 total
+  Expected: ~3 sets, ~600 cards ✓
+
+Continue to next section? (y/n)
+```
+
+### Expected Set Counts
+Ask user at start:
+```
+How many total sets do you expect in this release?
+(Leave blank if unknown): 43
+
+We'll validate against this count at the end.
 ```
 
 ## Error Handling

@@ -177,6 +177,31 @@ function parseSetName(name: string): { baseName: string; variant: string } {
   if (name.startsWith('Base ')) return { baseName: 'Base', variant: name.substring(5) };
   if (name.startsWith('Optic ')) return { baseName: 'Optic', variant: name.substring(6) };
 
+  // Check for Artist's Proof variants first (they contain color words)
+  // Pattern: "Set Name Artist's Proof [Gold|Red|Bronze]"
+  const artistProofPattern = /^(.+?)\s+Artist's Proof\s*(Gold|Red|Bronze)?$/i;
+  const artistMatch = name.match(artistProofPattern);
+
+  if (artistMatch) {
+    const baseName = artistMatch[1].trim();
+    const variant = artistMatch[2]
+      ? `Artist's Proof ${artistMatch[2]}`  // e.g., "Artist's Proof Gold"
+      : "Artist's Proof";  // Just "Artist's Proof" with no color
+    return { baseName, variant };
+  }
+
+  // Check for Prime variants
+  if (name.endsWith(' Prime')) {
+    const baseName = name.substring(0, name.length - 6).trim();
+    return { baseName, variant: 'Prime' };
+  }
+
+  // Check for Tip-off variants
+  if (name.endsWith(' Tip-off')) {
+    const baseName = name.substring(0, name.length - 8).trim();
+    return { baseName, variant: 'Tip-off' };
+  }
+
   // For other sets, extract the base name by removing color/variant suffixes
   // Common patterns: "Set Name Red", "Set Name Gold", "Set Name Black", etc.
   const colorPattern = /\s+(Red|Blue|Gold|Silver|Black|Pink|Green|Purple|Orange|Aqua|Teal|Dragon Scale|Plum Blossom|Pink Ice|Pink Velocity|Argyle|Holo|Ice|Velocity|Cubic|Diamond|Mojo|Power|Pandora)(\s+\d+)?$/i;
