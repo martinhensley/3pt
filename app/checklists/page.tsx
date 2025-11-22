@@ -43,8 +43,9 @@ export default function ChecklistsPage() {
   const [totalCount, setTotalCount] = useState(0);
   const [filteredCount, setFilteredCount] = useState(0);
 
-  // Filter states
-  const [search, setSearch] = useState("");
+  // Search and filter states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeSearch, setActiveSearch] = useState(""); // The search term currently being used for filtering
   const [selectedManufacturer, setSelectedManufacturer] = useState("");
   const [selectedRelease, setSelectedRelease] = useState("");
   const [selectedType, setSelectedType] = useState("");
@@ -79,7 +80,7 @@ export default function ChecklistsPage() {
         sortOrder,
       });
 
-      if (search) params.append("search", search);
+      if (activeSearch) params.append("search", activeSearch);
       if (selectedManufacturer) params.append("manufacturer", selectedManufacturer);
       if (selectedRelease) params.append("release", selectedRelease);
       if (selectedType) params.append("type", selectedType);
@@ -101,7 +102,7 @@ export default function ChecklistsPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, setsPerPage, search, selectedManufacturer, selectedRelease, selectedType, sortBy, sortOrder, totalCount]);
+  }, [currentPage, setsPerPage, activeSearch, selectedManufacturer, selectedRelease, selectedType, sortBy, sortOrder, totalCount]);
 
   // Fetch sets when filters/pagination/sorting changes
   useEffect(() => {
@@ -111,7 +112,7 @@ export default function ChecklistsPage() {
   // Reset to page 1 when filters or sorting change
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, selectedManufacturer, selectedRelease, selectedType, sortBy, sortOrder]);
+  }, [activeSearch, selectedManufacturer, selectedRelease, selectedType, sortBy, sortOrder]);
 
   // Filter releases based on selected manufacturer
   const filteredReleases = selectedManufacturer
@@ -136,6 +137,19 @@ export default function ChecklistsPage() {
 
   const totalPages = Math.ceil(filteredCount / setsPerPage);
 
+  // Handle search submission
+  const handleSearch = () => {
+    setActiveSearch(searchQuery);
+    setCurrentPage(1);
+  };
+
+  // Handle Enter key press
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
@@ -149,7 +163,8 @@ export default function ChecklistsPage() {
   };
 
   const clearFilters = () => {
-    setSearch("");
+    setSearchQuery("");
+    setActiveSearch("");
     setSelectedManufacturer("");
     setSelectedRelease("");
     setSelectedType("");
@@ -157,7 +172,7 @@ export default function ChecklistsPage() {
     setSortOrder("desc");
   };
 
-  const hasActiveFilters = search || selectedManufacturer || selectedRelease || selectedType;
+  const hasActiveFilters = activeSearch || selectedManufacturer || selectedRelease || selectedType;
 
   return (
     <PublicPageLayout
@@ -180,25 +195,44 @@ export default function ChecklistsPage() {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Filters</h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Search */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Search
-            </label>
+      {/* Search Bar */}
+      <div className="bg-white rounded-xl shadow-lg p-4 border border-gray-200 mb-6">
+        <div className="flex gap-2">
+          <div className="relative flex-grow">
             <input
               type="text"
-              placeholder="Search set names..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900"
+              placeholder="Search by set name, release, or manufacturer..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={handleKeyPress}
+              autoComplete="off"
+              data-form-type="other"
+              className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900 placeholder-gray-500"
             />
+            {searchQuery && (
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setActiveSearch("");
+                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            )}
           </div>
+          <button
+            onClick={handleSearch}
+            className="px-6 py-3 bg-footy-green text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
+          >
+            Search
+          </button>
+        </div>
+      </div>
 
+      {/* Filters and Sort */}
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 mb-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
           {/* Manufacturer filter */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -257,26 +291,7 @@ export default function ChecklistsPage() {
               <option value="Memorabilia">Memorabilia</option>
             </select>
           </div>
-        </div>
 
-        {/* Clear filters button */}
-        {hasActiveFilters && (
-          <div className="flex justify-end mt-4">
-            <button
-              onClick={clearFilters}
-              className="px-4 py-2 text-sm text-footy-green hover:text-green-700 font-semibold"
-            >
-              Clear All Filters
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Sort Controls */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Sort</h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Sort By */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -309,6 +324,18 @@ export default function ChecklistsPage() {
             </select>
           </div>
         </div>
+
+        {/* Clear filters button */}
+        {hasActiveFilters && (
+          <div className="flex justify-end">
+            <button
+              onClick={clearFilters}
+              className="px-4 py-2 text-sm text-footy-green hover:text-green-700 font-semibold"
+            >
+              Clear All Filters
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Results Per Page & Count */}
