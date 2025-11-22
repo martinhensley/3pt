@@ -20,14 +20,16 @@ export async function GET(request: NextRequest) {
   if (challenge) {
     console.log("eBay endpoint verification - challenge code received:", challenge);
 
-    return NextResponse.json({
-      challengeResponse: challenge,
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      status: 200,
-    });
+    // eBay expects JSON response with challengeResponse field
+    return new NextResponse(
+      JSON.stringify({ challengeResponse: challenge }),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
   }
 
   // If no challenge code, return success
