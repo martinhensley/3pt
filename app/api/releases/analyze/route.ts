@@ -79,6 +79,57 @@ export async function POST(request: NextRequest) {
         });
       }
 
+      // Check for duplicate release by slug
+      const { findReleaseBySlug, findExistingRelease } = await import('@/lib/database');
+
+      const duplicateBySlug = await findReleaseBySlug(releaseInfo.slug);
+      if (duplicateBySlug) {
+        console.log('Duplicate release found by slug:', releaseInfo.slug);
+        return NextResponse.json(
+          {
+            error: 'Duplicate release',
+            message: `A release with this slug already exists: ${releaseInfo.slug}`,
+            existingRelease: {
+              id: duplicateBySlug.id,
+              name: duplicateBySlug.name,
+              year: duplicateBySlug.year,
+              slug: duplicateBySlug.slug,
+              manufacturer: duplicateBySlug.manufacturer.name,
+              setCount: duplicateBySlug._count.sets,
+            },
+          },
+          { status: 409 }
+        );
+      }
+
+      // Check for duplicate release by manufacturer + name + year (case-insensitive)
+      const duplicateByData = await findExistingRelease(
+        manufacturer.id,
+        releaseInfo.releaseName,
+        releaseInfo.year
+      );
+      if (duplicateByData) {
+        console.log('Duplicate release found by data:', {
+          manufacturer: manufacturer.name,
+          name: releaseInfo.releaseName,
+          year: releaseInfo.year,
+        });
+        return NextResponse.json(
+          {
+            error: 'Duplicate release',
+            message: `A release with this name already exists for ${manufacturer.name}`,
+            existingRelease: {
+              id: duplicateByData.id,
+              name: duplicateByData.name,
+              year: duplicateByData.year,
+              slug: duplicateByData.slug,
+              manufacturer: duplicateByData.manufacturer.name,
+            },
+          },
+          { status: 409 }
+        );
+      }
+
       // Prepare sourceFiles array from uploaded files
       const sourceFiles = urlsToProcess.length > 0
         ? urlsToProcess.map(url => ({
@@ -191,8 +242,23 @@ export async function POST(request: NextRequest) {
       summary: descriptionResult.description,
       createdRelease,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Release analysis error:', error);
+
+    // Handle Prisma unique constraint violation (P2002)
+    if (error.code === 'P2002') {
+      const target = error.meta?.target || ['unknown field'];
+      console.error('Unique constraint violation on:', target);
+
+      return NextResponse.json(
+        {
+          error: 'Duplicate release',
+          message: `A release with this ${target.join(', ')} already exists`,
+          details: 'This release appears to be a duplicate. Please check existing releases.',
+        },
+        { status: 409 }
+      );
+    }
 
     const errorDetails = {
       message: error instanceof Error ? error.message : String(error),

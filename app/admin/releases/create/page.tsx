@@ -35,12 +35,22 @@ export default function CreateReleasePage() {
     summary: string;
   } | null>(null);
 
+  const [duplicateRelease, setDuplicateRelease] = useState<{
+    id: string;
+    name: string;
+    year: string;
+    slug: string;
+    manufacturer: string;
+    setCount?: number;
+  } | null>(null);
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const files = Array.from(e.target.files);
       setDocumentFiles(files);
       setError(null);
       setAnalysisResult(null);
+      setDuplicateRelease(null); // Reset duplicate warning on new file upload
 
       // Auto-trigger analysis
       await analyzeFiles(files);
@@ -103,9 +113,22 @@ export default function CreateReleasePage() {
       setAnalysisResult(result);
       setEditedReleaseDate(result.releaseInfo.releaseDate || '');
       setAnalyzing(false);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error:', err);
-      setError(err instanceof Error ? err.message : 'An error occurred');
+
+      // Check if this is a duplicate release error from the backend
+      if (err.response?.status === 409 || err.message?.includes('Duplicate release')) {
+        const errorData = await err.response?.json?.() || {};
+        if (errorData.existingRelease) {
+          setDuplicateRelease(errorData.existingRelease);
+          setError(null); // Clear generic error since we're showing duplicate warning
+        } else {
+          setError(errorData.message || 'This release already exists');
+        }
+      } else {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      }
+
       setUploading(false);
       setAnalyzing(false);
     }
@@ -178,7 +201,16 @@ export default function CreateReleasePage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.details || 'Failed to create release');
+
+        // Handle duplicate release error
+        if (response.status === 409 && errorData.existingRelease) {
+          setDuplicateRelease(errorData.existingRelease);
+          setError(null); // Clear generic error
+          setAnalyzing(false);
+          return; // Don't throw, just show the duplicate warning
+        }
+
+        throw new Error(errorData.details || errorData.message || 'Failed to create release');
       }
 
       const result = await response.json();
@@ -482,22 +514,68 @@ export default function CreateReleasePage() {
               </div>
             </div>
 
-            {/* Create Button */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-semibold mb-4">3. Create Release</h2>
-              <p className="text-sm text-gray-600 mb-4">
-                Review the information above. If everything looks correct, click the button below to
-                create the release in the database.
-              </p>
+            {/* Duplicate Warning */}
+            {duplicateRelease && (
+              <div className="bg-orange-50 border-2 border-orange-500 rounded-lg shadow-md p-6">
+                <div className="flex items-start gap-4">
+                  <svg className="w-12 h-12 text-orange-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <div className="flex-grow">
+                    <h3 className="text-xl font-bold text-orange-700 mb-2">
+                      Duplicate Release Detected
+                    </h3>
+                    <p className="text-orange-800 mb-4">
+                      This release already exists in the database and cannot be created again.
+                    </p>
+                    <div className="bg-white rounded-lg p-4 mb-4">
+                      <h4 className="font-semibold text-gray-900 mb-2">Existing Release:</h4>
+                      <dl className="grid grid-cols-2 gap-2 text-sm">
+                        <dt className="text-gray-600">Name:</dt>
+                        <dd className="text-gray-900 font-medium">{duplicateRelease.name}</dd>
+                        <dt className="text-gray-600">Year:</dt>
+                        <dd className="text-gray-900 font-medium">{duplicateRelease.year}</dd>
+                        <dt className="text-gray-600">Manufacturer:</dt>
+                        <dd className="text-gray-900 font-medium">{duplicateRelease.manufacturer}</dd>
+                        <dt className="text-gray-600">Slug:</dt>
+                        <dd className="text-gray-900 font-mono text-xs">{duplicateRelease.slug}</dd>
+                        {duplicateRelease.setCount !== undefined && (
+                          <>
+                            <dt className="text-gray-600">Sets:</dt>
+                            <dd className="text-gray-900 font-medium">{duplicateRelease.setCount}</dd>
+                          </>
+                        )}
+                      </dl>
+                    </div>
+                    <a
+                      href={`/admin/releases/edit/${duplicateRelease.id}`}
+                      className="inline-block px-6 py-2 bg-orange-600 text-white font-semibold rounded-md hover:bg-orange-700 transition-colors"
+                    >
+                      View Existing Release
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
 
-              <button
-                onClick={handleCreateRelease}
-                disabled={analyzing}
-                className="px-8 py-3 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
-              >
-                {analyzing ? 'Creating Release...' : 'Create Release'}
-              </button>
-            </div>
+            {/* Create Button */}
+            {!duplicateRelease && (
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <h2 className="text-xl font-semibold mb-4">3. Create Release</h2>
+                <p className="text-sm text-gray-600 mb-4">
+                  Review the information above. If everything looks correct, click the button below to
+                  create the release in the database.
+                </p>
+
+                <button
+                  onClick={handleCreateRelease}
+                  disabled={analyzing}
+                  className="px-8 py-3 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                >
+                  {analyzing ? 'Creating Release...' : 'Create Release'}
+                </button>
+              </div>
+            )}
           </>
         )}
       </div>

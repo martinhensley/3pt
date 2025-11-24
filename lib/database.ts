@@ -396,6 +396,48 @@ export async function releaseExists(
 }
 
 /**
+ * Find an existing release by manufacturer, name, and year
+ * Returns the release object with manufacturer relation if found, null otherwise
+ */
+export async function findExistingRelease(
+  manufacturerId: string,
+  releaseName: string,
+  year?: string
+): Promise<(Release & { manufacturer: Manufacturer }) | null> {
+  return await prisma.release.findFirst({
+    where: {
+      manufacturerId,
+      name: {
+        equals: releaseName,
+        mode: "insensitive",
+      },
+      year: year || undefined,
+    },
+    include: {
+      manufacturer: true,
+    },
+  });
+}
+
+/**
+ * Find an existing release by slug
+ * Returns the release object with manufacturer relation if found, null otherwise
+ */
+export async function findReleaseBySlug(
+  slug: string
+): Promise<(Release & { manufacturer: Manufacturer; _count: { sets: number; } }) | null> {
+  return await prisma.release.findUnique({
+    where: { slug },
+    include: {
+      manufacturer: true,
+      _count: {
+        select: { sets: true },
+      },
+    },
+  });
+}
+
+/**
  * Check if a set already exists in a release
  */
 export async function setExists(
