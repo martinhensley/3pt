@@ -1,3 +1,8 @@
+---
+name: checklist-release-etl
+description: "Local-First ETL for trading card releases. Generate TypeScript import scripts for PDF/Excel checklists with parallel detection and print run mapping."
+---
+
 # Checklist Release ETL
 
 **Local-First ETL**: Generate TypeScript import scripts for trading card releases. Each release gets a dedicated script in `/scripts/{year}-{release}/`.
