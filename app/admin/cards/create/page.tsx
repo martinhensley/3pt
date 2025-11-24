@@ -48,7 +48,7 @@ export default function CreateCardPage() {
   const [hasAutograph, setHasAutograph] = useState(false);
   const [hasMemorabilia, setHasMemorabilia] = useState(false);
   const [colorVariant, setColorVariant] = useState("");
-  const [footyNotes, setFootyNotes] = useState("");
+  const [notes, setNotes] = useState("");
   const [frontImage, setFrontImage] = useState<File | null>(null);
   const [backImage, setBackImage] = useState<File | null>(null);
   const [frontImagePreview, setFrontImagePreview] = useState<string | null>(null);
@@ -170,7 +170,7 @@ export default function CreateCardPage() {
         hasAutograph,
         hasMemorabilia,
         colorVariant: colorVariant || null,
-        footyNotes,
+        notes,
       };
 
       // Handle front image
@@ -524,8 +524,8 @@ export default function CreateCardPage() {
                 Internal Notes
               </label>
               <textarea
-                value={footyNotes}
-                onChange={(e) => setFootyNotes(e.target.value)}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
                 rows={4}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
                 placeholder="Add any internal notes about this card..."

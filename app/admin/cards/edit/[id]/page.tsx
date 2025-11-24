@@ -25,7 +25,7 @@ interface Card {
   hasMemorabilia: boolean;
   specialFeatures: string[];
   colorVariant: string | null;
-  footyNotes: string | null;
+  notes: string | null;
   imageFront: string | null;
   imageBack: string | null;
   set: {
@@ -72,7 +72,7 @@ export default function EditCardPage() {
   const [hasAutograph, setHasAutograph] = useState(false);
   const [hasMemorabilia, setHasMemorabilia] = useState(false);
   const [colorVariant, setColorVariant] = useState("");
-  const [footyNotes, setFootyNotes] = useState("");
+  const [notes, setNotes] = useState("");
   const [newFrontImage, setNewFrontImage] = useState<File | null>(null);
   const [newBackImage, setNewBackImage] = useState<File | null>(null);
   const [removeFrontImage, setRemoveFrontImage] = useState(false);
@@ -112,7 +112,7 @@ export default function EditCardPage() {
         setHasAutograph(data.hasAutograph || false);
         setHasMemorabilia(data.hasMemorabilia || false);
         setColorVariant(data.colorVariant || "");
-        setFootyNotes(data.footyNotes || "");
+        setNotes(data.notes || "");
       } else {
         setMessage({ type: "error", text: "Card not found" });
       }
@@ -175,7 +175,7 @@ export default function EditCardPage() {
         hasAutograph,
         hasMemorabilia,
         colorVariant: colorVariant || null,
-        footyNotes,
+        notes,
       };
 
       // Handle front image
@@ -496,8 +496,8 @@ export default function EditCardPage() {
                 Internal Notes
               </label>
               <textarea
-                value={footyNotes}
-                onChange={(e) => setFootyNotes(e.target.value)}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
                 rows={4}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
                 placeholder="Add any internal notes about this card..."
