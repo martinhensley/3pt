@@ -171,7 +171,7 @@ export default function SourceDocumentDetailPage() {
       <AdminLayout maxWidth="1600px">
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-3pt-green"></div>
             <p className="mt-4 text-gray-600">Loading document...</p>
           </div>
         </div>
@@ -187,7 +187,7 @@ export default function SourceDocumentDetailPage() {
             <p className="text-xl text-gray-600">Document not found</p>
             <button
               onClick={() => router.push("/admin/library/source-documents")}
-              className="mt-4 text-footy-green hover:text-green-700"
+              className="mt-4 text-3pt-green hover:text-green-700"
             >
               ← Back to Library
             </button>
@@ -203,7 +203,7 @@ export default function SourceDocumentDetailPage() {
       <div className="mb-8">
         <button
           onClick={() => router.push("/admin/library/source-documents")}
-          className="text-footy-green hover:text-green-700 mb-4 inline-block"
+          className="text-3pt-green hover:text-green-700 mb-4 inline-block"
         >
           ← Back to Library
         </button>
@@ -227,7 +227,7 @@ export default function SourceDocumentDetailPage() {
                       type="text"
                       value={editDisplayName}
                       onChange={(e) => setEditDisplayName(e.target.value)}
-                      className="text-2xl font-bold text-gray-900 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green"
+                      className="text-2xl font-bold text-gray-900 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green"
                     />
                   ) : (
                     <h1 className="text-2xl font-bold text-gray-900">{document.displayName}</h1>
@@ -239,7 +239,7 @@ export default function SourceDocumentDetailPage() {
                     <select
                       value={editDocType}
                       onChange={(e) => setEditDocType(e.target.value as DocumentType)}
-                      className="px-3 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green"
+                      className="px-3 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green"
                     >
                       <option value="SELL_SHEET">Sell Sheet</option>
                       <option value="CHECKLIST">Checklist</option>
@@ -262,7 +262,7 @@ export default function SourceDocumentDetailPage() {
                   href={document.blobUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 text-center bg-footy-green text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
+                  className="flex-1 text-center bg-3pt-green text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
                 >
                   Download File
                 </a>
@@ -309,7 +309,7 @@ export default function SourceDocumentDetailPage() {
                     onChange={(e) => setEditDescription(e.target.value)}
                     rows={4}
                     placeholder="Add a description"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green"
                   />
                 ) : (
                   <p className="text-gray-700">
@@ -327,7 +327,7 @@ export default function SourceDocumentDetailPage() {
                     value={editTags}
                     onChange={(e) => setEditTags(e.target.value)}
                     placeholder="2024, Topps, Chrome (comma-separated)"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green"
                   />
                 ) : document.tags.length > 0 ? (
                   <div className="flex flex-wrap gap-2">

@@ -33,9 +33,9 @@ export default function VelocityMetrics({ data }: VelocityMetricsProps) {
       label: 'Releases This Month',
       value: data.releasesThisMonth,
       icon: '🚀',
-      color: 'bg-footy-green/10 border-footy-green/30',
-      textColor: 'text-footy-green',
-      valueColor: 'text-footy-green',
+      color: 'bg-3pt-green/10 border-3pt-green/30',
+      textColor: 'text-3pt-green',
+      valueColor: 'text-3pt-green',
       trend: releasesTrend,
     },
     {

@@ -53,8 +53,8 @@ export default function EbayAd({
 
   if (loading) {
     return (
-      <div className="bg-white border-2 border-footy-gold rounded-lg shadow-lg p-4 lg:p-5">
-        <p className="text-sm text-footy-dark-green font-bold mb-4 text-center uppercase tracking-wide">
+      <div className="bg-white border-2 border-3pt-gold rounded-lg shadow-lg p-4 lg:p-5">
+        <p className="text-sm text-3pt-dark-green font-bold mb-4 text-center uppercase tracking-wide">
           {title}
         </p>
         <div className="space-y-4">
@@ -74,8 +74,8 @@ export default function EbayAd({
   if (error || products.length === 0) {
     // Fallback to generic basketball cards if specific query fails
     return (
-      <div className="bg-white border-2 border-footy-gold rounded-lg shadow-lg p-4 lg:p-5">
-        <p className="text-sm text-footy-dark-green font-bold mb-4 text-center uppercase tracking-wide">
+      <div className="bg-white border-2 border-3pt-gold rounded-lg shadow-lg p-4 lg:p-5">
+        <p className="text-sm text-3pt-dark-green font-bold mb-4 text-center uppercase tracking-wide">
           {title}
         </p>
         <div className="flex items-center justify-center py-12">
@@ -88,8 +88,8 @@ export default function EbayAd({
   }
 
   return (
-    <div className="bg-white border-2 border-footy-gold rounded-lg shadow-lg p-4 lg:p-5">
-      <p className="text-sm text-footy-dark-green font-bold mb-4 text-center uppercase tracking-wide">
+    <div className="bg-white border-2 border-3pt-gold rounded-lg shadow-lg p-4 lg:p-5">
+      <p className="text-sm text-3pt-dark-green font-bold mb-4 text-center uppercase tracking-wide">
         {title}
       </p>
 
@@ -100,7 +100,7 @@ export default function EbayAd({
             href={product.itemAffiliateWebUrl}
             target="_blank"
             rel="noopener noreferrer sponsored"
-            className="block bg-gray-50 rounded-lg border-2 border-gray-200 hover:border-footy-gold hover:shadow-md transition-all duration-200 overflow-hidden group"
+            className="block bg-gray-50 rounded-lg border-2 border-gray-200 hover:border-3pt-gold hover:shadow-md transition-all duration-200 overflow-hidden group"
           >
             <div className="relative w-full h-48 bg-white">
               {product.image ? (
@@ -123,7 +123,7 @@ export default function EbayAd({
               <p className="text-sm text-gray-900 font-semibold line-clamp-2 mb-2 leading-tight">
                 {product.title}
               </p>
-              <p className="text-lg font-bold text-footy-dark-green">
+              <p className="text-lg font-bold text-3pt-dark-green">
                 {new Intl.NumberFormat("en-US", {
                   style: "currency",
                   currency: product.currency,

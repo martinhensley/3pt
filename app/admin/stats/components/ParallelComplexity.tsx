@@ -67,13 +67,13 @@ export default function ParallelComplexity({ data }: ParallelComplexityProps) {
         <>
           {/* Summary Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="p-4 bg-footy-green/10 rounded-lg border border-footy-green/20">
+            <div className="p-4 bg-3pt-green/10 rounded-lg border border-3pt-green/20">
               <div className="text-xs text-gray-600 mb-1">Total Parallel Sets</div>
-              <div className="text-2xl font-bold text-footy-green">{totalParallels}</div>
+              <div className="text-2xl font-bold text-3pt-green">{totalParallels}</div>
             </div>
-            <div className="p-4 bg-footy-orange/10 rounded-lg border border-footy-orange/20">
+            <div className="p-4 bg-3pt-orange/10 rounded-lg border border-3pt-orange/20">
               <div className="text-xs text-gray-600 mb-1">Total Base Sets</div>
-              <div className="text-2xl font-bold text-footy-orange">{totalBase}</div>
+              <div className="text-2xl font-bold text-3pt-orange">{totalBase}</div>
             </div>
             <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
               <div className="text-xs text-gray-600 mb-1">Avg Complexity</div>

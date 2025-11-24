@@ -276,7 +276,7 @@ export default function CreateSetPage() {
                   type="checkbox"
                   checked={isParallel}
                   onChange={(e) => setIsParallel(e.target.checked)}
-                  className="w-4 h-4 text-footy-green border-gray-300 rounded focus:ring-footy-green"
+                  className="w-4 h-4 text-3pt-green border-gray-300 rounded focus:ring-3pt-green"
                 />
                 <span className="text-sm font-semibold text-gray-900">
                   This is a parallel set
@@ -360,7 +360,7 @@ export default function CreateSetPage() {
             {slugPreview && (
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                 <h3 className="text-sm font-semibold text-gray-900 mb-2">Slug Preview</h3>
-                <p className="text-sm font-mono text-footy-green">
+                <p className="text-sm font-mono text-3pt-green">
                   {slugPreview}
                 </p>
                 {isParallel && baseSetSlug && (
@@ -376,7 +376,7 @@ export default function CreateSetPage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="px-6 py-2 bg-footy-green hover:bg-green-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2 bg-3pt-green hover:bg-green-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {saving ? "Creating..." : "Create Set"}
               </button>

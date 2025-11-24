@@ -184,7 +184,7 @@ export default function SetsIndexPage() {
       loading={loading}
     >
               {/* Header */}
-              <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden text-white p-8">
+              <div className="bg-gradient-to-r from-3pt-green to-green-700 rounded-2xl shadow-2xl overflow-hidden text-white p-8">
                 <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
                   All Sets
                 </h1>
@@ -204,7 +204,7 @@ export default function SetsIndexPage() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     autoComplete="off"
                     data-form-type="other"
-                    className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900 placeholder-gray-500"
+                    className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green bg-white text-gray-900 placeholder-gray-500"
                   />
                   {searchQuery && (
                     <button
@@ -228,7 +228,7 @@ export default function SetsIndexPage() {
                     <select
                       value={yearFilter}
                       onChange={(e) => setYearFilter(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green bg-white text-gray-900"
                     >
                       <option value="">All Years</option>
                       {uniqueYears.map(year => (
@@ -245,7 +245,7 @@ export default function SetsIndexPage() {
                     <select
                       value={manufacturerFilter}
                       onChange={(e) => setManufacturerFilter(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green bg-white text-gray-900"
                     >
                       <option value="">All Manufacturers</option>
                       {uniqueManufacturers.map(mfg => (
@@ -262,7 +262,7 @@ export default function SetsIndexPage() {
                     <select
                       value={setTypeFilter}
                       onChange={(e) => setSetTypeFilter(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green bg-white text-gray-900"
                     >
                       <option value="">All Types</option>
                       {uniqueSetTypes.map(type => (
@@ -279,7 +279,7 @@ export default function SetsIndexPage() {
                     <select
                       value={parallelFilter}
                       onChange={(e) => setParallelFilter(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green bg-white text-gray-900"
                     >
                       <option value="">All Sets</option>
                       <option value="non-parallel">Non-Parallel Only</option>
@@ -295,7 +295,7 @@ export default function SetsIndexPage() {
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value as any)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green bg-white text-gray-900"
                     >
                       <option value="year">Year</option>
                       <option value="name">Set Name</option>
@@ -312,7 +312,7 @@ export default function SetsIndexPage() {
                     <select
                       value={sortOrder}
                       onChange={(e) => setSortOrder(e.target.value as any)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green bg-white text-gray-900"
                     >
                       <option value="desc">Descending</option>
                       <option value="asc">Ascending</option>
@@ -325,7 +325,7 @@ export default function SetsIndexPage() {
                   <div className="flex justify-end">
                     <button
                       onClick={clearFilters}
-                      className="px-4 py-2 text-sm text-footy-green hover:text-green-700 font-semibold"
+                      className="px-4 py-2 text-sm text-3pt-green hover:text-green-700 font-semibold"
                     >
                       Clear All Filters
                     </button>
@@ -334,7 +334,7 @@ export default function SetsIndexPage() {
               </div>
 
               {/* Per Page Selector */}
-              <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-xl shadow-lg p-4 border border-gray-200">
+              <div className="bg-gradient-to-r from-3pt-green to-green-700 rounded-xl shadow-lg p-4 border border-gray-200">
                 <div className="flex items-center justify-between">
                   <div className="text-sm text-white">
                     Showing {sets.length > 0 ? ((currentPage - 1) * setsPerPage) + 1 : 0} - {Math.min(currentPage * setsPerPage, filteredCount)} of {filteredCount.toLocaleString()}
@@ -368,7 +368,7 @@ export default function SetsIndexPage() {
                     {hasActiveFilters && (
                       <button
                         onClick={clearFilters}
-                        className="mt-4 px-6 py-2 bg-footy-green text-white rounded-lg hover:bg-green-700 transition-colors"
+                        className="mt-4 px-6 py-2 bg-3pt-green text-white rounded-lg hover:bg-green-700 transition-colors"
                       >
                         Clear Filters
                       </button>
@@ -380,7 +380,7 @@ export default function SetsIndexPage() {
                       <Link
                         key={set.id}
                         href={`/sets/${set.slug}`}
-                        className="block bg-gradient-to-br from-gray-50 to-white border-2 border-gray-200 rounded-xl p-6 hover:border-footy-orange hover:shadow-xl transition-all cursor-pointer"
+                        className="block bg-gradient-to-br from-gray-50 to-white border-2 border-gray-200 rounded-xl p-6 hover:border-3pt-orange hover:shadow-xl transition-all cursor-pointer"
                       >
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex-grow">
@@ -456,7 +456,7 @@ export default function SetsIndexPage() {
                             onClick={() => handlePageChange(pageNum)}
                             className={`px-4 py-2 border rounded-lg transition-colors ${
                               currentPage === pageNum
-                                ? 'bg-footy-green text-white border-footy-green'
+                                ? 'bg-3pt-green text-white border-3pt-green'
                                 : 'border-gray-300 hover:bg-gray-50'
                             }`}
                           >

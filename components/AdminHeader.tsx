@@ -7,13 +7,13 @@ export default function AdminHeader() {
   const { data: session } = useSession();
 
   return (
-    <header className="bg-gradient-to-r from-footy-green to-green-700 text-white shadow-lg rounded-xl">
+    <header className="bg-gradient-to-r from-3pt-green to-green-700 text-white shadow-lg rounded-xl">
       <div className="px-6 py-8">
         {/* Logo */}
         <div className="text-center mb-6">
           <h1 className="text-4xl md:text-5xl font-bold font-orbitron">
             <Link href="/" className="hover:opacity-90 transition-opacity">
-              <span>3pt<span className="text-footy-orange">.bot</span></span>
+              <span>3pt<span className="text-3pt-orange">.bot</span></span>
             </Link>
           </h1>
         </div>
@@ -57,38 +57,38 @@ export default function AdminHeader() {
           <div className="flex justify-center items-center gap-6 mt-2 pt-2">
             <Link
               href="/admin"
-              className="text-footy-orange hover:text-white transition-colors text-sm md:text-base font-bold"
+              className="text-3pt-orange hover:text-white transition-colors text-sm md:text-base font-bold"
             >
               Dashboard
             </Link>
             <Link
               href="/admin/posts"
-              className="text-footy-orange hover:text-white transition-colors text-sm md:text-base font-bold"
+              className="text-3pt-orange hover:text-white transition-colors text-sm md:text-base font-bold"
             >
               Manage Posts
             </Link>
             <Link
               href="/admin/releases"
-              className="text-footy-orange hover:text-white transition-colors text-sm md:text-base font-bold"
+              className="text-3pt-orange hover:text-white transition-colors text-sm md:text-base font-bold"
             >
               Manage Releases
             </Link>
             <Link
               href="/admin/sets"
-              className="text-footy-orange hover:text-white transition-colors text-sm md:text-base font-bold"
+              className="text-3pt-orange hover:text-white transition-colors text-sm md:text-base font-bold"
             >
               Manage Sets
             </Link>
             <Link
               href="/admin/cards"
-              className="text-footy-orange hover:text-white transition-colors text-sm md:text-base font-bold"
+              className="text-3pt-orange hover:text-white transition-colors text-sm md:text-base font-bold"
             >
               Manage Cards
             </Link>
             <button
               type="button"
               onClick={() => signOut()}
-              className="text-footy-orange hover:text-white transition-colors text-sm md:text-base font-bold"
+              className="text-3pt-orange hover:text-white transition-colors text-sm md:text-base font-bold"
             >
               Log Out
             </button>

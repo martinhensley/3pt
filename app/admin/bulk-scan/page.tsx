@@ -405,7 +405,7 @@ export default function BulkScanPage() {
           <button
             onClick={handleScanCards}
             disabled={!selectedReleaseId || !selectedSetId || frontImages.length === 0 || isScanning}
-            className="mt-4 px-6 py-3 bg-footy-green text-white rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="mt-4 px-6 py-3 bg-3pt-green text-white rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isScanning ? `Scanning... (${scanProgress.current}/${scanProgress.total})` : 'Scan Cards'}
           </button>
@@ -461,7 +461,7 @@ export default function BulkScanPage() {
             <button
               onClick={handleSaveCards}
               disabled={isSaving}
-              className="mt-4 px-6 py-3 bg-footy-orange text-white rounded-lg font-semibold hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="mt-4 px-6 py-3 bg-3pt-orange text-white rounded-lg font-semibold hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSaving ? 'Saving...' : 'Save All Cards'}
             </button>

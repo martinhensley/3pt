@@ -125,7 +125,7 @@ export default function MultiFileUpload({
           accept={acceptedTypes}
           onChange={handleFileSelect}
           disabled={uploading}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-gold text-gray-900 disabled:opacity-50"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-3pt-gold text-gray-900 disabled:opacity-50"
         />
         <p className="mt-1 text-xs text-gray-600">
           You can select multiple files. Supported: images, PDFs, CSVs, HTML,
@@ -168,7 +168,7 @@ export default function MultiFileUpload({
             type="button"
             onClick={handleUploadAll}
             disabled={uploading}
-            className="mt-3 w-full bg-footy-dark-green text-white font-semibold py-2 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+            className="mt-3 w-full bg-3pt-dark-green text-white font-semibold py-2 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             {uploading ? "Uploading..." : `Upload ${selectedFiles.length} File${selectedFiles.length > 1 ? "s" : ""}`}
           </button>
@@ -206,7 +206,7 @@ export default function MultiFileUpload({
                 )}
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 text-xs font-semibold bg-footy-gold text-footy-dark-green rounded">
+                    <span className="px-2 py-0.5 text-xs font-semibold bg-3pt-gold text-3pt-dark-green rounded">
                       {getFileTypeLabel(file.type)}
                     </span>
                     <p className="text-sm font-medium text-gray-900">

@@ -35,7 +35,7 @@ export default function PrivacyPage() {
           {/* Introduction */}
           <section>
             <p className="text-gray-700 leading-relaxed mb-4">
-              Welcome to <span className="font-orbitron">footy<span className="text-footy-orange">.bot</span></span>. We are committed to protecting your privacy and ensuring you have a positive experience on our website. This Privacy Policy outlines how we collect, use, disclose, and safeguard your information when you visit our website.
+              Welcome to <span className="font-orbitron">3pt<span className="text-3pt-orange">.bot</span></span>. We are committed to protecting your privacy and ensuring you have a positive experience on our website. This Privacy Policy outlines how we collect, use, disclose, and safeguard your information when you visit our website.
             </p>
             <p className="text-gray-700 leading-relaxed">
               Please read this Privacy Policy carefully. If you do not agree with the terms of this Privacy Policy, please do not access the site.
@@ -295,7 +295,7 @@ export default function PrivacyPage() {
               TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW:
             </p>
             <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4 text-sm">
-              <li>IN NO EVENT SHALL <span className="font-orbitron">footy<span className="text-footy-orange">.bot</span></span>, ITS OFFICERS, DIRECTORS, EMPLOYEES, OR AGENTS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING WITHOUT LIMITATION, LOSS OF PROFITS, DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES.</li>
+              <li>IN NO EVENT SHALL <span className="font-orbitron">3pt<span className="text-3pt-orange">.bot</span></span>, ITS OFFICERS, DIRECTORS, EMPLOYEES, OR AGENTS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING WITHOUT LIMITATION, LOSS OF PROFITS, DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES.</li>
               <li>OUR TOTAL LIABILITY TO YOU FOR ALL CLAIMS ARISING OUT OF OR RELATED TO THIS PRIVACY POLICY OR OUR WEBSITE SHALL NOT EXCEED TEN DOLLARS ($10 USD) IN THE AGGREGATE.</li>
               <li>WE SHALL NOT BE LIABLE FOR ANY FAILURE OR DELAY IN PERFORMANCE DUE TO CIRCUMSTANCES BEYOND OUR REASONABLE CONTROL, INCLUDING BUT NOT LIMITED TO ACTS OF GOD, WAR, TERRORISM, RIOTS, EMBARGOES, ACTS OF CIVIL OR MILITARY AUTHORITIES, FIRE, FLOODS, ACCIDENTS, NETWORK INFRASTRUCTURE FAILURES, STRIKES, OR SHORTAGES OF TRANSPORTATION FACILITIES, FUEL, ENERGY, LABOR, OR MATERIALS.</li>
               <li>WE ARE NOT RESPONSIBLE FOR THE ACTIONS, CONTENT, INFORMATION, OR DATA OF THIRD PARTIES, AND YOU RELEASE US FROM ANY CLAIMS AND DAMAGES ARISING FROM OR IN ANY WAY CONNECTED WITH SUCH THIRD PARTIES.</li>
@@ -345,7 +345,7 @@ export default function PrivacyPage() {
             </p>
             <div className="bg-gray-50 border border-gray-400 rounded-lg p-4">
               <p className="text-gray-700 text-sm leading-relaxed mb-3">
-                <strong>Material Connection:</strong> <span className="font-orbitron">footy<span className="text-footy-orange">.bot</span></span> is a participant in affiliate advertising programs, including the eBay Partner Network. We may earn commissions from qualifying purchases made through links on our website. This means we receive a financial benefit when you click on certain links and make purchases.
+                <strong>Material Connection:</strong> <span className="font-orbitron">3pt<span className="text-3pt-orange">.bot</span></span> is a participant in affiliate advertising programs, including the eBay Partner Network. We may earn commissions from qualifying purchases made through links on our website. This means we receive a financial benefit when you click on certain links and make purchases.
               </p>
               <p className="text-gray-700 text-sm leading-relaxed mb-3">
                 <strong>No Endorsement:</strong> The presence of affiliate links does not constitute an endorsement, recommendation, or warranty of any products or services. We are not responsible for the accuracy of product descriptions, pricing, availability, or quality of products sold by third parties.
@@ -362,7 +362,7 @@ export default function PrivacyPage() {
               Indemnification
             </h2>
             <p className="text-gray-700 leading-relaxed">
-              You agree to defend, indemnify, and hold harmless <span className="font-orbitron">footy<span className="text-footy-orange">.bot</span></span>, its officers, directors, employees, agents, licensors, and service providers from and against any claims, liabilities, damages, judgments, awards, losses, costs, expenses, or fees (including reasonable attorneys&apos; fees) arising out of or relating to your violation of this Privacy Policy or your use of the website, including, but not limited to, your User Content, any use of the website&apos;s content, services, and products other than as expressly authorized in this Privacy Policy, or your use of any information obtained from the website.
+              You agree to defend, indemnify, and hold harmless <span className="font-orbitron">3pt<span className="text-3pt-orange">.bot</span></span>, its officers, directors, employees, agents, licensors, and service providers from and against any claims, liabilities, damages, judgments, awards, losses, costs, expenses, or fees (including reasonable attorneys&apos; fees) arising out of or relating to your violation of this Privacy Policy or your use of the website, including, but not limited to, your User Content, any use of the website&apos;s content, services, and products other than as expressly authorized in this Privacy Policy, or your use of any information obtained from the website.
             </p>
           </section>
 
@@ -376,7 +376,7 @@ export default function PrivacyPage() {
                 <strong>Binding Arbitration:</strong> Any dispute, controversy, or claim arising out of or relating to this Privacy Policy, or the breach, termination, enforcement, interpretation, or validity thereof, shall be resolved by binding arbitration administered by the American Arbitration Association (AAA) in accordance with its Commercial Arbitration Rules.
               </p>
               <p className="text-gray-700 leading-relaxed">
-                <strong>CLASS ACTION WAIVER:</strong> YOU AND <span className="font-orbitron text-xs">footy<span className="text-footy-orange">.bot</span></span> AGREE THAT EACH MAY BRING CLAIMS AGAINST THE OTHER ONLY IN YOUR OR ITS INDIVIDUAL CAPACITY AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED CLASS OR REPRESENTATIVE PROCEEDING. YOU WAIVE ANY RIGHT TO A JURY TRIAL.
+                <strong>CLASS ACTION WAIVER:</strong> YOU AND <span className="font-orbitron text-xs">3pt<span className="text-3pt-orange">.bot</span></span> AGREE THAT EACH MAY BRING CLAIMS AGAINST THE OTHER ONLY IN YOUR OR ITS INDIVIDUAL CAPACITY AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED CLASS OR REPRESENTATIVE PROCEEDING. YOU WAIVE ANY RIGHT TO A JURY TRIAL.
               </p>
               <p className="text-gray-700 leading-relaxed">
                 <strong>Exceptions:</strong> Either party may seek injunctive or other equitable relief in any court of competent jurisdiction to prevent the actual or threatened infringement, misappropriation, or violation of a party&apos;s intellectual property rights.
@@ -416,7 +416,7 @@ export default function PrivacyPage() {
               Entire Agreement
             </h2>
             <p className="text-gray-700 leading-relaxed">
-              This Privacy Policy, together with our Terms of Service (if applicable), constitutes the entire agreement between you and <span className="font-orbitron">footy<span className="text-footy-orange">.bot</span></span> regarding your use of the website and supersedes all prior and contemporaneous understandings, agreements, representations, and warranties, both written and oral, regarding the website.
+              This Privacy Policy, together with our Terms of Service (if applicable), constitutes the entire agreement between you and <span className="font-orbitron">3pt<span className="text-3pt-orange">.bot</span></span> regarding your use of the website and supersedes all prior and contemporaneous understandings, agreements, representations, and warranties, both written and oral, regarding the website.
             </p>
           </section>
         </div>

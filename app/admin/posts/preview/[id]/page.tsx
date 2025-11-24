@@ -166,7 +166,7 @@ export default function PreviewPostPage() {
             className="prose prose-lg max-w-none
               prose-headings:text-gray-900
               prose-p:text-gray-700
-              prose-a:text-footy-green
+              prose-a:text-3pt-green
               prose-strong:text-gray-900
               prose-ul:text-gray-700
               prose-ol:text-gray-700"

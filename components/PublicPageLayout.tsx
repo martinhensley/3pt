@@ -62,7 +62,7 @@ export default function PublicPageLayout({
 
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-3pt-green"></div>
             </div>
           ) : error ? (
             <div className="flex items-center justify-center py-20">

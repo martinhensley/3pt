@@ -41,13 +41,13 @@ export default function GrowthChart({ data }: GrowthChartProps) {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="p-4 bg-gradient-to-br from-footy-green/10 to-footy-green/5 rounded-lg border border-footy-green/20">
+        <div className="p-4 bg-gradient-to-br from-3pt-green/10 to-3pt-green/5 rounded-lg border border-3pt-green/20">
           <div className="text-xs text-gray-600 mb-1">Total Releases Added</div>
-          <div className="text-2xl font-bold text-footy-green">{totalReleases}</div>
+          <div className="text-2xl font-bold text-3pt-green">{totalReleases}</div>
         </div>
-        <div className="p-4 bg-gradient-to-br from-footy-orange/10 to-footy-orange/5 rounded-lg border border-footy-orange/20">
+        <div className="p-4 bg-gradient-to-br from-3pt-orange/10 to-3pt-orange/5 rounded-lg border border-3pt-orange/20">
           <div className="text-xs text-gray-600 mb-1">Total Sets Added</div>
-          <div className="text-2xl font-bold text-footy-orange">{totalSets}</div>
+          <div className="text-2xl font-bold text-3pt-orange">{totalSets}</div>
         </div>
         <div className="p-4 bg-gradient-to-br from-blue-500/10 to-blue-500/5 rounded-lg border border-blue-500/20">
           <div className="text-xs text-gray-600 mb-1">Total Cards Added</div>

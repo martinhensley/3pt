@@ -35,7 +35,7 @@ export default function TermsPage() {
           {/* Introduction */}
           <section>
             <p className="text-gray-700 leading-relaxed mb-4">
-              Welcome to <span className="font-orbitron">footy<span className="text-footy-orange">.bot</span></span>. These Terms of Service (&ldquo;Terms&rdquo;) govern your access to and use of our website, services, and content. By accessing or using our website, you agree to be bound by these Terms and our Privacy Policy.
+              Welcome to <span className="font-orbitron">3pt<span className="text-3pt-orange">.bot</span></span>. These Terms of Service (&ldquo;Terms&rdquo;) govern your access to and use of our website, services, and content. By accessing or using our website, you agree to be bound by these Terms and our Privacy Policy.
             </p>
             <div className="bg-gray-50 border border-gray-400 rounded-lg p-4">
               <p className="text-gray-700 text-sm leading-relaxed font-semibold">
@@ -50,7 +50,7 @@ export default function TermsPage() {
               Acceptance of Terms
             </h2>
             <p className="text-gray-700 leading-relaxed mb-3">
-              By accessing, browsing, or using <span className="font-orbitron">footy<span className="text-footy-orange">.bot</span></span>, you acknowledge that you have read, understood, and agree to be bound by these Terms and all applicable laws and regulations. If you do not agree with these Terms, you are prohibited from using or accessing this website.
+              By accessing, browsing, or using <span className="font-orbitron">3pt<span className="text-3pt-orange">.bot</span></span>, you acknowledge that you have read, understood, and agree to be bound by these Terms and all applicable laws and regulations. If you do not agree with these Terms, you are prohibited from using or accessing this website.
             </p>
             <p className="text-gray-700 leading-relaxed">
               We reserve the right to modify these Terms at any time without prior notice. Your continued use of the website following any changes constitutes acceptance of those changes. It is your responsibility to review these Terms periodically.
@@ -92,7 +92,7 @@ export default function TermsPage() {
                 THE WEBSITE AND ALL CONTENT, SERVICES, AND PRODUCTS ARE PROVIDED ON AN &ldquo;AS IS&rdquo; AND &ldquo;AS AVAILABLE&rdquo; BASIS WITHOUT ANY WARRANTIES OF ANY KIND.
               </p>
               <p className="text-gray-700 leading-relaxed">
-                TO THE FULLEST EXTENT PERMITTED BY LAW, <span className="font-orbitron text-xs">footy<span className="text-footy-orange">.bot</span></span> EXPRESSLY DISCLAIMS ALL WARRANTIES, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, INCLUDING BUT NOT LIMITED TO:
+                TO THE FULLEST EXTENT PERMITTED BY LAW, <span className="font-orbitron text-xs">3pt<span className="text-3pt-orange">.bot</span></span> EXPRESSLY DISCLAIMS ALL WARRANTIES, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, INCLUDING BUT NOT LIMITED TO:
               </p>
               <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
                 <li>IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT</li>
@@ -162,7 +162,7 @@ export default function TermsPage() {
               eBay Partner Network and Affiliate Links
             </h2>
             <p className="text-gray-700 leading-relaxed mb-3">
-              <span className="font-orbitron">footy<span className="text-footy-orange">.bot</span></span> is a participant in the eBay Partner Network and other affiliate programs. We display product listings and links from eBay and other third-party platforms.
+              <span className="font-orbitron">3pt<span className="text-3pt-orange">.bot</span></span> is a participant in the eBay Partner Network and other affiliate programs. We display product listings and links from eBay and other third-party platforms.
             </p>
             <div className="bg-gray-50 border border-gray-400 rounded-lg p-4">
               <p className="text-gray-700 text-sm leading-relaxed mb-3">
@@ -206,7 +206,7 @@ export default function TermsPage() {
               TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW:
             </p>
             <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4 text-sm">
-              <li>IN NO EVENT SHALL <span className="font-orbitron">footy<span className="text-footy-orange">.bot</span></span>, ITS OWNERS, OFFICERS, DIRECTORS, EMPLOYEES, AGENTS, LICENSORS, SUPPLIERS, OR SERVICE PROVIDERS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, PUNITIVE, OR EXEMPLARY DAMAGES, INCLUDING BUT NOT LIMITED TO DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA, USE, GOODWILL, BUSINESS INTERRUPTION, OR OTHER INTANGIBLE LOSSES.</li>
+              <li>IN NO EVENT SHALL <span className="font-orbitron">3pt<span className="text-3pt-orange">.bot</span></span>, ITS OWNERS, OFFICERS, DIRECTORS, EMPLOYEES, AGENTS, LICENSORS, SUPPLIERS, OR SERVICE PROVIDERS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, PUNITIVE, OR EXEMPLARY DAMAGES, INCLUDING BUT NOT LIMITED TO DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA, USE, GOODWILL, BUSINESS INTERRUPTION, OR OTHER INTANGIBLE LOSSES.</li>
               <li>OUR TOTAL LIABILITY TO YOU FOR ALL CLAIMS ARISING OUT OF OR RELATED TO THESE TERMS OR YOUR USE OF THE WEBSITE SHALL NOT EXCEED TEN DOLLARS ($10 USD) IN THE AGGREGATE.</li>
               <li>WE SHALL NOT BE LIABLE FOR ANY DAMAGES ARISING FROM: (A) YOUR USE OR INABILITY TO USE THE WEBSITE; (B) UNAUTHORIZED ACCESS TO OR ALTERATION OF YOUR DATA; (C) STATEMENTS OR CONDUCT OF ANY THIRD PARTY; (D) ERRORS, INACCURACIES, OR OMISSIONS IN CONTENT; (E) VIRUSES OR MALICIOUS CODE; (F) LOSS OF DATA; OR (G) ANY OTHER MATTER RELATING TO THE WEBSITE.</li>
               <li>WE SHALL NOT BE LIABLE FOR ANY FAILURE OR DELAY CAUSED BY CIRCUMSTANCES BEYOND OUR REASONABLE CONTROL, INCLUDING BUT NOT LIMITED TO ACTS OF GOD, WAR, TERRORISM, RIOTS, EMBARGOES, GOVERNMENT ACTIONS, FIRES, FLOODS, EARTHQUAKES, PANDEMICS, INTERNET FAILURES, CYBER ATTACKS, OR LABOR DISPUTES.</li>
@@ -220,7 +220,7 @@ export default function TermsPage() {
               Indemnification
             </h2>
             <p className="text-gray-700 leading-relaxed">
-              You agree to defend, indemnify, and hold harmless <span className="font-orbitron">footy<span className="text-footy-orange">.bot</span></span>, its owners, officers, directors, employees, agents, licensors, suppliers, and service providers from and against any and all claims, liabilities, damages, losses, costs, expenses, fees (including reasonable attorneys&apos; fees and court costs) arising from or relating to: (a) your use of the website; (b) your violation of these Terms; (c) your violation of any rights of another party; (d) your violation of any applicable laws or regulations; (e) any content you submit, post, or transmit through the website; or (f) any transactions or interactions you have with third parties through the website.
+              You agree to defend, indemnify, and hold harmless <span className="font-orbitron">3pt<span className="text-3pt-orange">.bot</span></span>, its owners, officers, directors, employees, agents, licensors, suppliers, and service providers from and against any and all claims, liabilities, damages, losses, costs, expenses, fees (including reasonable attorneys&apos; fees and court costs) arising from or relating to: (a) your use of the website; (b) your violation of these Terms; (c) your violation of any rights of another party; (d) your violation of any applicable laws or regulations; (e) any content you submit, post, or transmit through the website; or (f) any transactions or interactions you have with third parties through the website.
             </p>
           </section>
 
@@ -230,7 +230,7 @@ export default function TermsPage() {
               Intellectual Property
             </h2>
             <p className="text-gray-700 leading-relaxed mb-3">
-              The website and its entire contents, features, and functionality (including but not limited to all information, software, text, displays, images, video, audio, and the design, selection, and arrangement thereof) are owned by <span className="font-orbitron">footy<span className="text-footy-orange">.bot</span></span>, its licensors, or other providers of such material and are protected by copyright, trademark, patent, trade secret, and other intellectual property laws.
+              The website and its entire contents, features, and functionality (including but not limited to all information, software, text, displays, images, video, audio, and the design, selection, and arrangement thereof) are owned by <span className="font-orbitron">3pt<span className="text-3pt-orange">.bot</span></span>, its licensors, or other providers of such material and are protected by copyright, trademark, patent, trade secret, and other intellectual property laws.
             </p>
             <p className="text-gray-700 leading-relaxed mb-3">
               You may not reproduce, distribute, modify, create derivative works of, publicly display, publicly perform, republish, download, store, or transmit any of the material on our website, except as follows:
@@ -251,7 +251,7 @@ export default function TermsPage() {
               Third-Party Links and Services
             </h2>
             <p className="text-gray-700 leading-relaxed mb-3">
-              The website may contain links to third-party websites, services, or resources that are not owned or controlled by <span className="font-orbitron">footy<span className="text-footy-orange">.bot</span></span>. We have no control over, and assume no responsibility for, the content, privacy policies, or practices of any third-party websites or services.
+              The website may contain links to third-party websites, services, or resources that are not owned or controlled by <span className="font-orbitron">3pt<span className="text-3pt-orange">.bot</span></span>. We have no control over, and assume no responsibility for, the content, privacy policies, or practices of any third-party websites or services.
             </p>
             <div className="bg-gray-50 border border-gray-400 rounded-lg p-4">
               <p className="text-gray-700 text-sm leading-relaxed">
@@ -286,7 +286,7 @@ export default function TermsPage() {
                 <strong>Binding Arbitration:</strong> Except as otherwise provided herein, any dispute, controversy, or claim arising out of or relating to these Terms, or the breach, termination, enforcement, interpretation, or validity thereof, including disputes about the scope or applicability of this agreement to arbitrate, shall be resolved by binding arbitration administered by the American Arbitration Association (AAA) in accordance with its Commercial Arbitration Rules and the procedures set forth in these Terms.
               </p>
               <p className="text-gray-700 leading-relaxed">
-                <strong>CLASS ACTION WAIVER:</strong> YOU AND <span className="font-orbitron text-xs">footy<span className="text-footy-orange">.bot</span></span> AGREE THAT EACH PARTY MAY BRING CLAIMS AGAINST THE OTHER ONLY IN YOUR OR ITS INDIVIDUAL CAPACITY AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED CLASS, CONSOLIDATED, OR REPRESENTATIVE PROCEEDING. UNLESS BOTH YOU AND WE AGREE OTHERWISE, THE ARBITRATOR MAY NOT CONSOLIDATE MORE THAN ONE PERSON&apos;S CLAIMS AND MAY NOT OTHERWISE PRESIDE OVER ANY FORM OF A REPRESENTATIVE OR CLASS PROCEEDING. YOU HEREBY WAIVE ANY RIGHT TO A JURY TRIAL.
+                <strong>CLASS ACTION WAIVER:</strong> YOU AND <span className="font-orbitron text-xs">3pt<span className="text-3pt-orange">.bot</span></span> AGREE THAT EACH PARTY MAY BRING CLAIMS AGAINST THE OTHER ONLY IN YOUR OR ITS INDIVIDUAL CAPACITY AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED CLASS, CONSOLIDATED, OR REPRESENTATIVE PROCEEDING. UNLESS BOTH YOU AND WE AGREE OTHERWISE, THE ARBITRATOR MAY NOT CONSOLIDATE MORE THAN ONE PERSON&apos;S CLAIMS AND MAY NOT OTHERWISE PRESIDE OVER ANY FORM OF A REPRESENTATIVE OR CLASS PROCEEDING. YOU HEREBY WAIVE ANY RIGHT TO A JURY TRIAL.
               </p>
               <p className="text-gray-700 leading-relaxed">
                 <strong>Arbitration Procedure:</strong> The arbitration will be conducted in English. The arbitrator&apos;s decision will be final and binding. Judgment on the arbitration award may be entered in any court having jurisdiction. Each party shall bear its own costs and expenses and an equal share of the arbitrator&apos;s fees and administrative fees of arbitration.
@@ -342,7 +342,7 @@ export default function TermsPage() {
               Entire Agreement
             </h2>
             <p className="text-gray-700 leading-relaxed">
-              These Terms, together with our Privacy Policy and any other legal notices published by us on the website, constitute the entire agreement between you and <span className="font-orbitron">footy<span className="text-footy-orange">.bot</span></span> concerning your use of the website and supersede all prior or contemporaneous agreements, communications, and proposals, whether oral or written, between you and us regarding the website.
+              These Terms, together with our Privacy Policy and any other legal notices published by us on the website, constitute the entire agreement between you and <span className="font-orbitron">3pt<span className="text-3pt-orange">.bot</span></span> concerning your use of the website and supersede all prior or contemporaneous agreements, communications, and proposals, whether oral or written, between you and us regarding the website.
             </p>
           </section>
 
@@ -352,7 +352,7 @@ export default function TermsPage() {
               Waiver
             </h2>
             <p className="text-gray-700 leading-relaxed">
-              No waiver by <span className="font-orbitron">footy<span className="text-footy-orange">.bot</span></span> of any term or condition set forth in these Terms shall be deemed a further or continuing waiver of such term or condition or a waiver of any other term or condition. Any failure to assert a right or provision under these Terms shall not constitute a waiver of such right or provision.
+              No waiver by <span className="font-orbitron">3pt<span className="text-3pt-orange">.bot</span></span> of any term or condition set forth in these Terms shall be deemed a further or continuing waiver of such term or condition or a waiver of any other term or condition. Any failure to assert a right or provision under these Terms shall not constitute a waiver of such right or provision.
             </p>
           </section>
 
@@ -377,7 +377,7 @@ export default function TermsPage() {
               Acknowledgment
             </h3>
             <p className="text-gray-700 leading-relaxed">
-              BY USING THIS WEBSITE, YOU ACKNOWLEDGE THAT YOU HAVE READ THESE TERMS OF SERVICE AND AGREE TO BE BOUND BY THEM. YOU FURTHER ACKNOWLEDGE THAT THESE TERMS CONSTITUTE A BINDING AGREEMENT BETWEEN YOU AND <span className="font-orbitron text-sm">footy<span className="text-footy-orange">.bot</span></span>.
+              BY USING THIS WEBSITE, YOU ACKNOWLEDGE THAT YOU HAVE READ THESE TERMS OF SERVICE AND AGREE TO BE BOUND BY THEM. YOU FURTHER ACKNOWLEDGE THAT THESE TERMS CONSTITUTE A BINDING AGREEMENT BETWEEN YOU AND <span className="font-orbitron text-sm">3pt<span className="text-3pt-orange">.bot</span></span>.
             </p>
           </section>
         </div>

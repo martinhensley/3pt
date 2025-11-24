@@ -162,7 +162,7 @@ export default function SourceDocumentsPage() {
       <div className="mb-8">
         <button
           onClick={() => router.push("/admin")}
-          className="text-footy-green hover:text-green-700 mb-4 inline-block"
+          className="text-3pt-green hover:text-green-700 mb-4 inline-block"
         >
           ← Back to Admin
         </button>
@@ -194,13 +194,13 @@ export default function SourceDocumentsPage() {
               placeholder="Search documents..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green"
             />
 
             <select
               value={documentType}
               onChange={(e) => setDocumentType(e.target.value as DocumentType | "")}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green"
             >
               <option value="">All Types</option>
               <option value="SELL_SHEET">Sell Sheets</option>
@@ -213,7 +213,7 @@ export default function SourceDocumentsPage() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green"
             >
               <option value="uploadedAt">Upload Date</option>
               <option value="displayName">Name</option>
@@ -223,7 +223,7 @@ export default function SourceDocumentsPage() {
             <select
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green"
             >
               <option value="desc">Descending</option>
               <option value="asc">Ascending</option>
@@ -234,7 +234,7 @@ export default function SourceDocumentsPage() {
         {/* Documents Grid */}
         {loading ? (
           <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-3pt-green"></div>
             <p className="mt-4 text-gray-600">Loading documents...</p>
           </div>
         ) : documents.length === 0 ? (

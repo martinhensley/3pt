@@ -43,14 +43,14 @@ export default function PageComponent() {
           {/* Conditional content based on loading state */}
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-3pt-green"></div>
             </div>
           ) : !data ? (
             <div className="flex items-center justify-center py-20">
               <div className="text-center">
                 <h1 className="text-2xl font-bold text-gray-900 mb-4">Not Found</h1>
                 <p className="text-gray-600 mb-8">The content you're looking for doesn't exist.</p>
-                <Link href="/" className="text-footy-green hover:underline">
+                <Link href="/" className="text-3pt-green hover:underline">
                   ← Back to Home
                 </Link>
               </div>
@@ -312,7 +312,7 @@ Always provide loading feedback to users.
 
 ```tsx
 <div className="flex items-center justify-center py-20">
-  <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
+  <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-3pt-green"></div>
 </div>
 ```
 
@@ -359,7 +359,7 @@ Provide clear, actionable error messages.
       <p className="text-gray-600 mb-8">
         The content you're looking for doesn't exist.
       </p>
-      <Link href="/" className="text-footy-green hover:underline">
+      <Link href="/" className="text-3pt-green hover:underline">
         ← Back to Home
       </Link>
     </div>
@@ -416,16 +416,16 @@ const colors = {
 
 ```tsx
 // Text colors
-className="text-footy-green"
-className="text-footy-orange"
+className="text-3pt-green"
+className="text-3pt-orange"
 className="text-gray-900"
 
 // Background gradient
 className="bg-gradient-to-br from-gray-50 via-white to-gray-50"
 
 // Border colors
-className="border-footy-green"
-className="border-b-2 border-footy-green" // Spinner
+className="border-3pt-green"
+className="border-b-2 border-3pt-green" // Spinner
 ```
 
 ### Spacing
