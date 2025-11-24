@@ -1,4 +1,4 @@
-# Footy.bot Development Documentation
+# 3pt.bot Development Documentation
 
 Quick reference for development patterns and critical rules. For comprehensive guides, see [/docs/README.md](/docs/README.md).
 
@@ -18,7 +18,7 @@ Quick reference for development patterns and critical rules. For comprehensive g
 
 **Uses [Anthropic SDK](https://github.com/anthropics/anthropic-sdk-typescript) directly for serverless compatibility.**
 
-All AI functions centralized in `/lib/genkit.ts`:
+All AI functions centralized in `/lib/ai.ts`:
 - Model: `claude-sonnet-4-20250514`
 - Supports PDFs and images via base64 encoding
 - Always validate outputs with Zod schemas
@@ -133,7 +133,7 @@ Parallel:       {year}-{release}-{setname}-{variant}-parallel[-{printrun}]
 
 ### EbayAd Component
 ```tsx
-<EbayAd query="soccer cards" limit={3} title="Latest Soccer Cards" />
+<EbayAd query="basketball cards" limit={3} title="Latest Basketball Cards" />
 ```
 
 ### Breadcrumb Component
@@ -236,8 +236,8 @@ The skill will guide you through the import process interactively.
 ### Styling Guidelines
 
 **Colors:**
-- Primary Green: `#005031` (footy-green)
-- Primary Orange: `#F47322` (footy-orange)
+- Primary Green: `#005031` (3pt-green)
+- Primary Orange: `#F47322` (3pt-orange)
 - Backgrounds: `bg-gradient-to-br from-gray-50 via-white to-gray-50`
 
 **Spacing:**

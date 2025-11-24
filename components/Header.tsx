@@ -11,14 +11,14 @@ interface HeaderProps {
 
 export default function Header({ showBackButton = false, rounded = true, showAd = false }: HeaderProps) {
   return (
-    <header className={`bg-gradient-to-r from-footy-green to-green-700 text-white shadow-lg ${rounded ? 'rounded-xl' : ''}`}>
+    <header className={`bg-gradient-to-r from-3pt-green to-green-700 text-white shadow-lg ${rounded ? 'rounded-xl' : ''}`}>
       <div className="px-4 lg:px-6 py-8">
         {/* Top section with back button */}
         {showBackButton && (
           <div className="mb-4">
             <Link
               href="/"
-              className="inline-block text-footy-orange hover:text-white transition-colors text-sm"
+              className="inline-block text-3pt-orange hover:text-white transition-colors text-sm"
             >
               ← Back to Home
             </Link>
@@ -29,7 +29,7 @@ export default function Header({ showBackButton = false, rounded = true, showAd 
         <div className="text-center mb-6">
           <h1 className="text-4xl md:text-5xl font-bold font-orbitron">
             <Link href="/" className="hover:opacity-90 transition-opacity">
-              <span>3pt<span className="text-footy-orange">.bot</span></span>
+              <span>3pt<span className="text-3pt-orange">.bot</span></span>
             </Link>
           </h1>
         </div>

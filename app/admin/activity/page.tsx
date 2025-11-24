@@ -158,7 +158,7 @@ function ActivityContent() {
                   onClick={() => handleTypeFilterChange(type)}
                   className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
                     typeFilter === type
-                      ? "bg-footy-green text-white"
+                      ? "bg-3pt-green text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                 >
@@ -176,7 +176,7 @@ function ActivityContent() {
                 onClick={() => handleSortChange("date")}
                 className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all flex items-center gap-1 ${
                   sortBy === "date"
-                    ? "bg-footy-green text-white"
+                    ? "bg-3pt-green text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
@@ -191,7 +191,7 @@ function ActivityContent() {
                 onClick={() => handleSortChange("type")}
                 className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all flex items-center gap-1 ${
                   sortBy === "type"
-                    ? "bg-footy-green text-white"
+                    ? "bg-3pt-green text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
@@ -222,7 +222,7 @@ function ActivityContent() {
                     onClick={() => activity.link && router.push(activity.link)}
                   >
                     <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-12 h-12 bg-footy-green/10 rounded-full flex items-center justify-center text-2xl">
+                      <div className="flex-shrink-0 w-12 h-12 bg-3pt-green/10 rounded-full flex items-center justify-center text-2xl">
                         {getActivityIcon(activity.type)}
                       </div>
                       <div className="flex-grow">
@@ -288,7 +288,7 @@ function ActivityContent() {
                               onClick={() => handlePageChange(pageNum)}
                               className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
                                 page === pageNum
-                                  ? "bg-footy-green text-white"
+                                  ? "bg-3pt-green text-white"
                                   : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
                               }`}
                             >

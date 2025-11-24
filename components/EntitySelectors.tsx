@@ -75,7 +75,7 @@ export function ReleaseSelect({
         value={value || ""}
         onChange={handleChange}
         disabled={loading}
-        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-gold text-gray-900 disabled:opacity-50"
+        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-3pt-gold text-gray-900 disabled:opacity-50"
       >
         <option value="">
           {loading ? "Loading releases..." : "-- Select a Release --"}
@@ -163,7 +163,7 @@ export function SetSelect({
         value={value || ""}
         onChange={handleChange}
         disabled={loading}
-        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-gold text-gray-900 disabled:opacity-50"
+        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-3pt-gold text-gray-900 disabled:opacity-50"
       >
         <option value="">
           {loading ? "Loading sets..." : "-- Select a Set --"}

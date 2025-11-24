@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
       hasAutograph?: boolean;
       hasMemorabilia?: boolean;
       colorVariant?: string | null;
-      footyNotes?: string | null;
+      notes?: string | null;
       imageFront?: string;
       imageBack?: string;
       setId: string;
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
     if (body.hasAutograph !== undefined) cardData.hasAutograph = Boolean(body.hasAutograph);
     if (body.hasMemorabilia !== undefined) cardData.hasMemorabilia = Boolean(body.hasMemorabilia);
     if (body.colorVariant !== undefined) cardData.colorVariant = body.colorVariant || null;
-    if (body.footyNotes !== undefined) cardData.footyNotes = body.footyNotes || null;
+    if (body.notes !== undefined) cardData.notes = body.notes || null;
 
     // Create card first to get the ID
     const newCard = await prisma.card.create({

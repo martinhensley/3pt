@@ -57,7 +57,7 @@ export async function PUT(
       hasAutograph?: boolean;
       hasMemorabilia?: boolean;
       colorVariant?: string | null;
-      footyNotes?: string | null;
+      notes?: string | null;
       imageFront?: string;
       imageBack?: string;
     } = {};
@@ -77,7 +77,7 @@ export async function PUT(
     if (body.hasAutograph !== undefined) updateData.hasAutograph = Boolean(body.hasAutograph);
     if (body.hasMemorabilia !== undefined) updateData.hasMemorabilia = Boolean(body.hasMemorabilia);
     if (body.colorVariant !== undefined) updateData.colorVariant = body.colorVariant || null;
-    if (body.footyNotes !== undefined) updateData.footyNotes = body.footyNotes || null;
+    if (body.notes !== undefined) updateData.notes = body.notes || null;
 
     // Handle image uploads if provided
     if (body.imageFront || body.imageBack) {

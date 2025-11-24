@@ -72,7 +72,7 @@ export default function AdminDashboard() {
       <AdminLayout maxWidth="1600px">
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
           <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
-            <h1 className="text-3xl font-bold text-footy-green mb-4">
+            <h1 className="text-3xl font-bold text-3pt-green mb-4">
               Admin Login Required
             </h1>
             <p className="text-gray-600 mb-6">
@@ -80,7 +80,7 @@ export default function AdminDashboard() {
             </p>
             <button
               onClick={() => signIn()}
-              className="w-full bg-gradient-to-r from-footy-green to-green-700 text-white font-bold py-3 px-6 rounded-xl hover:shadow-lg hover:scale-105 transition-all"
+              className="w-full bg-gradient-to-r from-3pt-green to-green-700 text-white font-bold py-3 px-6 rounded-xl hover:shadow-lg hover:scale-105 transition-all"
             >
               Sign In
             </button>
@@ -98,7 +98,7 @@ export default function AdminDashboard() {
           <div className="grid md:grid-cols-4 gap-4">
             <button
               onClick={() => router.push("/admin/releases/create")}
-              className="bg-gradient-to-br from-green-500 via-footy-green to-green-700 text-white p-6 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all flex flex-col items-center gap-3"
+              className="bg-gradient-to-br from-green-500 via-3pt-green to-green-700 text-white p-6 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all flex flex-col items-center gap-3"
             >
               <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -111,7 +111,7 @@ export default function AdminDashboard() {
 
             <button
               onClick={() => router.push("/admin/posts/create")}
-              className="bg-gradient-to-br from-orange-500 via-footy-orange to-orange-700 text-white p-6 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all flex flex-col items-center gap-3"
+              className="bg-gradient-to-br from-orange-500 via-3pt-orange to-orange-700 text-white p-6 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all flex flex-col items-center gap-3"
             >
               <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -160,7 +160,7 @@ export default function AdminDashboard() {
               </h2>
               <button
                 onClick={() => router.push("/admin/activity")}
-                className="text-sm font-semibold text-footy-green hover:underline flex items-center gap-1"
+                className="text-sm font-semibold text-3pt-green hover:underline flex items-center gap-1"
               >
                 View All Activity
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -175,7 +175,7 @@ export default function AdminDashboard() {
                     key={index}
                     className="flex items-start gap-4 pb-4 border-b border-gray-200 last:border-0 last:pb-0"
                   >
-                    <div className="flex-shrink-0 w-10 h-10 bg-footy-green/10 rounded-full flex items-center justify-center">
+                    <div className="flex-shrink-0 w-10 h-10 bg-3pt-green/10 rounded-full flex items-center justify-center">
                       {activity.type === "RELEASE" && "📦"}
                       {activity.type === "POST" && "📝"}
                     </div>
@@ -234,7 +234,7 @@ export default function AdminDashboard() {
               <div className="grid md:grid-cols-3 gap-4">
                 <button
                   onClick={() => router.push("/admin/library/source-documents")}
-                  className="bg-gradient-to-br from-green-50 via-green-100 to-emerald-100 text-footy-green border-2 border-green-200 p-6 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all flex flex-col items-center gap-2"
+                  className="bg-gradient-to-br from-green-50 via-green-100 to-emerald-100 text-3pt-green border-2 border-green-200 p-6 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all flex flex-col items-center gap-2"
                 >
                   <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -247,7 +247,7 @@ export default function AdminDashboard() {
 
                 <button
                   onClick={() => router.push("/admin/library/checklists")}
-                  className="bg-gradient-to-br from-orange-50 via-orange-100 to-amber-100 text-footy-orange border-2 border-orange-200 p-6 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all flex flex-col items-center gap-2"
+                  className="bg-gradient-to-br from-orange-50 via-orange-100 to-amber-100 text-3pt-orange border-2 border-orange-200 p-6 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all flex flex-col items-center gap-2"
                 >
                   <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
@@ -260,7 +260,7 @@ export default function AdminDashboard() {
 
                 <button
                   onClick={() => router.push("/admin/library/card-images")}
-                  className="bg-gradient-to-br from-green-50 via-emerald-100 to-teal-100 text-footy-green border-2 border-green-200 p-6 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all flex flex-col items-center gap-2"
+                  className="bg-gradient-to-br from-green-50 via-emerald-100 to-teal-100 text-3pt-green border-2 border-green-200 p-6 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all flex flex-col items-center gap-2"
                 >
                   <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />

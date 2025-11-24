@@ -46,8 +46,8 @@ function LoginForm() {
           {/* Logo/Header */}
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold font-orbitron mb-2">
-              <span className="text-footy-green">3pt</span>
-              <span className="text-footy-orange">.bot</span>
+              <span className="text-3pt-green">3pt</span>
+              <span className="text-3pt-orange">.bot</span>
             </h1>
             <p className="text-gray-600 text-sm">Admin Login</p>
           </div>
@@ -73,7 +73,7 @@ function LoginForm() {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green focus:border-transparent"
                 placeholder="Enter your username"
                 required
                 autoComplete="username"
@@ -93,7 +93,7 @@ function LoginForm() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green focus:border-transparent"
                 placeholder="Enter your password"
                 required
                 autoComplete="current-password"
@@ -104,7 +104,7 @@ function LoginForm() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-footy-green hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-3pt-green hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Signing in..." : "Sign In"}
             </button>
@@ -114,7 +114,7 @@ function LoginForm() {
           <div className="mt-6 text-center">
             <a
               href="/"
-              className="text-sm text-footy-green hover:text-green-700 transition-colors"
+              className="text-sm text-3pt-green hover:text-green-700 transition-colors"
             >
               ← Back to Home
             </a>
@@ -129,7 +129,7 @@ export default function LoginPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 flex items-center justify-center">
-        <div className="text-footy-green">Loading...</div>
+        <div className="text-3pt-green">Loading...</div>
       </div>
     }>
       <LoginForm />

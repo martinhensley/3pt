@@ -257,7 +257,7 @@ export default function EditPostPage() {
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white text-gray-900"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-3pt-orange bg-white text-gray-900"
             />
           </div>
 
@@ -270,7 +270,7 @@ export default function EditPostPage() {
               value={excerpt}
               onChange={(e) => setExcerpt(e.target.value)}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white text-gray-900"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-3pt-orange bg-white text-gray-900"
             />
           </div>
 
@@ -288,7 +288,7 @@ export default function EditPostPage() {
               <button
                 onClick={handleRegenerateContent}
                 disabled={regenerating}
-                className="px-4 py-2 bg-gradient-to-r from-footy-orange to-orange-600 text-white font-semibold rounded-lg hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 whitespace-nowrap"
+                className="px-4 py-2 bg-gradient-to-r from-3pt-orange to-orange-600 text-white font-semibold rounded-lg hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 whitespace-nowrap"
               >
                 {regenerating ? "Regenerating..." : "🔄 Regenerate Content"}
               </button>
@@ -365,7 +365,7 @@ export default function EditPostPage() {
               multiple
               accept=".jpg,.jpeg,.png,.webp,.gif"
               onChange={handleImageFileChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white text-gray-900"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-3pt-orange bg-white text-gray-900"
             />
             {newImages.length > 0 && (
               <p className="text-sm text-gray-600 mt-2">
@@ -381,7 +381,7 @@ export default function EditPostPage() {
               id="published"
               checked={published}
               onChange={(e) => setPublished(e.target.checked)}
-              className="w-5 h-5 text-footy-green rounded focus:ring-2 focus:ring-footy-orange"
+              className="w-5 h-5 text-3pt-green rounded focus:ring-2 focus:ring-3pt-orange"
             />
             <label htmlFor="published" className="text-sm font-semibold text-gray-900">
               Published
@@ -393,7 +393,7 @@ export default function EditPostPage() {
             <button
               onClick={handleSave}
               disabled={saving}
-              className="flex-grow bg-gradient-to-r from-footy-green to-green-700 text-white font-bold py-4 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="flex-grow bg-gradient-to-r from-3pt-green to-green-700 text-white font-bold py-4 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {saving ? "Saving..." : "Save Changes"}
             </button>

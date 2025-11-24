@@ -204,7 +204,7 @@ export default function CardsIndexPage() {
       loading={loading}
     >
               {/* Header */}
-              <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden text-white p-8">
+              <div className="bg-gradient-to-r from-3pt-green to-green-700 rounded-2xl shadow-2xl overflow-hidden text-white p-8">
                 <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
                   All basketball cards
                 </h1>
@@ -226,7 +226,7 @@ export default function CardsIndexPage() {
                       onKeyPress={handleKeyPress}
                       autoComplete="off"
                       data-form-type="other"
-                      className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900 placeholder-gray-500"
+                      className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green bg-white text-gray-900 placeholder-gray-500"
                     />
                     {searchQuery && (
                       <button
@@ -242,7 +242,7 @@ export default function CardsIndexPage() {
                   </div>
                   <button
                     onClick={handleSearch}
-                    className="px-6 py-3 bg-footy-green text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
+                    className="px-6 py-3 bg-3pt-green text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
                   >
                     Search
                   </button>
@@ -260,7 +260,7 @@ export default function CardsIndexPage() {
                     <select
                       value={yearFilter}
                       onChange={(e) => setYearFilter(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green bg-white text-gray-900"
                     >
                       <option value="">All Years</option>
                       {uniqueYears.map(year => (
@@ -277,7 +277,7 @@ export default function CardsIndexPage() {
                     <select
                       value={manufacturerFilter}
                       onChange={(e) => setManufacturerFilter(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green bg-white text-gray-900"
                     >
                       <option value="">All Manufacturers</option>
                       {uniqueManufacturers.map(mfg => (
@@ -294,7 +294,7 @@ export default function CardsIndexPage() {
                     <select
                       value={setTypeFilter}
                       onChange={(e) => setSetTypeFilter(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green bg-white text-gray-900"
                     >
                       <option value="">All Types</option>
                       {uniqueSetTypes.map(type => (
@@ -311,7 +311,7 @@ export default function CardsIndexPage() {
                     <select
                       value={specialFilter}
                       onChange={(e) => setSpecialFilter(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green bg-white text-gray-900"
                     >
                       <option value="">All Cards</option>
                       <option value="autograph">Autographs Only</option>
@@ -328,7 +328,7 @@ export default function CardsIndexPage() {
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value as any)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green bg-white text-gray-900"
                     >
                       <option value="year">Year</option>
                       <option value="player">Player Name</option>
@@ -345,7 +345,7 @@ export default function CardsIndexPage() {
                     <select
                       value={sortOrder}
                       onChange={(e) => setSortOrder(e.target.value as any)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green bg-white text-gray-900"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green bg-white text-gray-900"
                     >
                       <option value="desc">Descending</option>
                       <option value="asc">Ascending</option>
@@ -358,7 +358,7 @@ export default function CardsIndexPage() {
                   <div className="flex justify-end">
                     <button
                       onClick={clearFilters}
-                      className="px-4 py-2 text-sm text-footy-green hover:text-green-700 font-semibold"
+                      className="px-4 py-2 text-sm text-3pt-green hover:text-green-700 font-semibold"
                     >
                       Clear All Filters
                     </button>
@@ -367,7 +367,7 @@ export default function CardsIndexPage() {
               </div>
 
               {/* Per Page Selector */}
-              <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-xl shadow-lg p-4 border border-gray-200">
+              <div className="bg-gradient-to-r from-3pt-green to-green-700 rounded-xl shadow-lg p-4 border border-gray-200">
                 <div className="flex items-center justify-between">
                   <div className="text-sm text-white">
                     Showing {cards.length > 0 ? ((currentPage - 1) * cardsPerPage) + 1 : 0} - {Math.min(currentPage * cardsPerPage, filteredCount)} of {filteredCount.toLocaleString()}
@@ -401,7 +401,7 @@ export default function CardsIndexPage() {
                     {hasActiveFilters && (
                       <button
                         onClick={clearFilters}
-                        className="mt-4 px-6 py-2 bg-footy-green text-white rounded-lg hover:bg-green-700 transition-colors"
+                        className="mt-4 px-6 py-2 bg-3pt-green text-white rounded-lg hover:bg-green-700 transition-colors"
                       >
                         Clear Filters
                       </button>
@@ -413,7 +413,7 @@ export default function CardsIndexPage() {
                       <Link
                         key={card.id}
                         href={getCardLink(card)}
-                        className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200 hover:border-footy-orange hover:shadow-lg transition-all cursor-pointer"
+                        className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200 hover:border-3pt-orange hover:shadow-lg transition-all cursor-pointer"
                       >
                         {/* Card Image Preview */}
                         {card.imageFront ? (
@@ -427,7 +427,7 @@ export default function CardsIndexPage() {
                             />
                           </div>
                         ) : (
-                          <div className="flex-shrink-0 w-16 h-16 bg-footy-green text-white rounded-lg flex items-center justify-center font-black text-lg">
+                          <div className="flex-shrink-0 w-16 h-16 bg-3pt-green text-white rounded-lg flex items-center justify-center font-black text-lg">
                             {card.cardNumber || '?'}
                           </div>
                         )}
@@ -444,7 +444,7 @@ export default function CardsIndexPage() {
                             {card.cardNumber && <span>#{card.cardNumber}</span>}
                             {card.team && <span className="ml-2">• {card.team}</span>}
                             {card.variant && <span className="ml-2 text-purple-600">• {card.variant}</span>}
-                            {card.parallelType && <span className="ml-2 text-footy-orange">• {card.parallelType}</span>}
+                            {card.parallelType && <span className="ml-2 text-3pt-orange">• {card.parallelType}</span>}
                           </div>
                         </div>
 
@@ -511,7 +511,7 @@ export default function CardsIndexPage() {
                             onClick={() => handlePageChange(pageNum)}
                             className={`px-4 py-2 border rounded-lg transition-colors ${
                               currentPage === pageNum
-                                ? 'bg-footy-green text-white border-footy-green'
+                                ? 'bg-3pt-green text-white border-3pt-green'
                                 : 'border-gray-300 hover:bg-gray-50'
                             }`}
                           >

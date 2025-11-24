@@ -81,12 +81,12 @@ export default function CardPage() {
     dateModified: post.createdAt,
     author: {
       "@type": "Organization",
-      name: "Footy Bot",
+      name: "3pt Bot",
       url: "https://www.3pt.bot"
     },
     publisher: {
       "@type": "Organization",
-      name: "Footy Bot",
+      name: "3pt Bot",
       logo: {
         "@type": "ImageObject",
         url: "https://www.3pt.bot/logo.png"
@@ -121,7 +121,7 @@ export default function CardPage() {
         <article>
           <div className="mb-8">
             <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
-              <span className="bg-footy-orange text-white px-3 py-1 rounded-full font-semibold">
+              <span className="bg-3pt-orange text-white px-3 py-1 rounded-full font-semibold">
                 Card
               </span>
               <span>•</span>
@@ -134,7 +134,7 @@ export default function CardPage() {
               </time>
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-bold text-footy-green mb-6">
+            <h1 className="text-4xl md:text-5xl font-bold text-3pt-green mb-6">
               {post.title}
             </h1>
 
@@ -148,7 +148,7 @@ export default function CardPage() {
               {post.images.map((image) => (
                 <div
                   key={image.id}
-                  className="relative bg-gray-100 rounded-lg overflow-hidden border-2 border-footy-green shadow-lg"
+                  className="relative bg-gray-100 rounded-lg overflow-hidden border-2 border-3pt-green shadow-lg"
                 >
                   <Image
                     src={image.url}
@@ -169,14 +169,14 @@ export default function CardPage() {
           )}
 
           <div
-            className="prose prose-lg max-w-none prose-headings:text-footy-green prose-a:text-footy-orange prose-strong:text-footy-green"
+            className="prose prose-lg max-w-none prose-headings:text-3pt-green prose-a:text-3pt-orange prose-strong:text-3pt-green"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
 
           <div className="mt-12 pt-8 border-t border-gray-200">
             <Link
               href="/"
-              className="inline-flex items-center text-footy-green hover:text-footy-orange font-semibold transition-colors"
+              className="inline-flex items-center text-3pt-green hover:text-3pt-orange font-semibold transition-colors"
             >
               ← View All Posts
             </Link>
@@ -199,10 +199,10 @@ export default function CardPage() {
         </aside>
       </div>
 
-      <footer className="bg-footy-green text-white transition-colors duration-300">
+      <footer className="bg-3pt-green text-white transition-colors duration-300">
         <div className="max-w-4xl mx-auto px-4 py-8 text-center">
           <p className="text-sm">
-            <span className="text-white">footy</span><span className="text-footy-orange">.bot</span> © 2024-{new Date().getFullYear()}
+            <span className="text-white">3pt</span><span className="text-3pt-orange">.bot</span> © 2024-{new Date().getFullYear()}
           </p>
         </div>
       </footer>

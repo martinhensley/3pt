@@ -211,7 +211,7 @@ export default function ManagePostsPage() {
                 placeholder="Search posts by title, excerpt, or slug..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-footy-green focus:border-transparent"
+                className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-3pt-green focus:border-transparent"
               />
               <svg
                 className="absolute left-3 top-3.5 w-5 h-5 text-gray-400"
@@ -282,7 +282,7 @@ export default function ManagePostsPage() {
 
               <button
                 onClick={() => router.push('/admin/posts/create')}
-                className="px-4 py-2 bg-footy-green hover:bg-green-700 text-white rounded-lg transition-colors"
+                className="px-4 py-2 bg-3pt-green hover:bg-green-700 text-white rounded-lg transition-colors"
               >
                 Create New Post
               </button>
@@ -385,7 +385,7 @@ export default function ManagePostsPage() {
                       {post.type === "RELEASE" && post.releaseId && (
                         <button
                           onClick={() => router.push(`/admin/releases/edit/${post.releaseId}`)}
-                          className="px-4 py-2 bg-footy-green text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                          className="px-4 py-2 bg-3pt-green text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
                         >
                           Edit Release
                         </button>
@@ -395,7 +395,7 @@ export default function ManagePostsPage() {
                         className={`px-4 py-2 rounded-lg transition-colors text-sm font-medium ${
                           post.published
                             ? "bg-yellow-500 text-white hover:bg-yellow-600"
-                            : "bg-footy-green text-white hover:bg-green-700"
+                            : "bg-3pt-green text-white hover:bg-green-700"
                         }`}
                       >
                         {post.published ? "Unpublish" : "Publish"}

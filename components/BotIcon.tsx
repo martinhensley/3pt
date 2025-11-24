@@ -1,4 +1,4 @@
-export default function FootyBotIcon({ className = "w-12 h-12" }: { className?: string }) {
+export default function BotIcon({ className = "w-12 h-12" }: { className?: string }) {
   return (
     <svg
       className={className}
@@ -21,7 +21,7 @@ export default function FootyBotIcon({ className = "w-12 h-12" }: { className?: 
         fill="white"
       />
 
-      {/* FOOTY Text */}
+      {/* 3PT Text */}
       <text
         x="256"
         y="240"
@@ -31,7 +31,7 @@ export default function FootyBotIcon({ className = "w-12 h-12" }: { className?: 
         fill="#005031"
         textAnchor="middle"
       >
-        FOOTY
+        3PT
       </text>
 
       {/* .BOT Text */}

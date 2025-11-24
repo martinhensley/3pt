@@ -1,6 +1,6 @@
 # AI Integration Guide
 
-Complete guide for implementing AI functionality using the Anthropic SDK in the Footy.bot application.
+Complete guide for implementing AI functionality using the Anthropic SDK in the 3pt.bot application.
 
 ## Table of Contents
 - [Overview](#overview)
@@ -202,7 +202,7 @@ export async function POST(request: Request) {
 
 ```typescript
 // scripts/import-release.ts
-import { analyzeRelease } from '@/lib/genkit';
+import { analyzeRelease } from '@/lib/ai';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();

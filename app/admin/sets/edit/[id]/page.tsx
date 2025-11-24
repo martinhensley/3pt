@@ -181,7 +181,7 @@ export default function EditSetPage() {
               </div>
               <div>
                 <span className="font-semibold">Slug:</span>{" "}
-                <span className="font-mono text-footy-green">{set.slug}</span>
+                <span className="font-mono text-3pt-green">{set.slug}</span>
               </div>
               {set.isParallel && (
                 <div>
@@ -282,7 +282,7 @@ export default function EditSetPage() {
                   This is a parallel set.{" "}
                   {set.baseSetSlug && (
                     <>
-                      Base set slug: <span className="font-mono text-footy-green">{set.baseSetSlug}</span>
+                      Base set slug: <span className="font-mono text-3pt-green">{set.baseSetSlug}</span>
                     </>
                   )}
                 </p>
@@ -297,7 +297,7 @@ export default function EditSetPage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="px-6 py-2 bg-footy-green hover:bg-green-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2 bg-3pt-green hover:bg-green-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {saving ? "Saving..." : "Save Changes"}
               </button>

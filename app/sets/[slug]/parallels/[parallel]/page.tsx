@@ -129,7 +129,7 @@ export default function ParallelPage() {
 
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-3pt-green"></div>
             </div>
           ) : cards.length === 0 ? (
             <div className="flex items-center justify-center py-20">
@@ -138,7 +138,7 @@ export default function ParallelPage() {
                 <p className="text-gray-600 mb-8">
                   No cards found for this parallel/variation.
                 </p>
-                <Link href="/" className="text-footy-green hover:underline">
+                <Link href="/" className="text-3pt-green hover:underline">
                   ← Back to Home
                 </Link>
               </div>
@@ -173,7 +173,7 @@ export default function ParallelPage() {
           )}
 
           {/* Header */}
-          <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
+          <div className="bg-gradient-to-r from-3pt-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white p-8">
             {setInfo && firstCard && (
               <>
                 <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
@@ -212,7 +212,7 @@ export default function ParallelPage() {
                   <Link
                     key={card.id}
                     href={`/cards/${cardSlug}`}
-                    className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200 hover:border-footy-orange hover:shadow-lg transition-all cursor-pointer"
+                    className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200 hover:border-3pt-orange hover:shadow-lg transition-all cursor-pointer"
                   >
                     {/* Card Image Preview */}
                     {card.imageFront && (
@@ -229,7 +229,7 @@ export default function ParallelPage() {
 
                     {/* Card Number Badge */}
                     {!card.imageFront && card.cardNumber && (
-                      <div className="flex-shrink-0 w-16 h-16 bg-footy-green text-white rounded-lg flex items-center justify-center font-black text-lg">
+                      <div className="flex-shrink-0 w-16 h-16 bg-3pt-green text-white rounded-lg flex items-center justify-center font-black text-lg">
                         {card.cardNumber}
                       </div>
                     )}
@@ -242,7 +242,7 @@ export default function ParallelPage() {
                         {card.cardNumber && <span>#{card.cardNumber}</span>}
                         {card.team && <span className="ml-2">• {card.team}</span>}
                         {card.variant && <span className="ml-2 text-purple-600">• {formatParallelName(card.variant)}</span>}
-                        {card.parallelType && <span className="ml-2 text-footy-orange">• {formatParallelName(card.parallelType.replace(/\s*–\s*/g, ' '))}</span>}
+                        {card.parallelType && <span className="ml-2 text-3pt-orange">• {formatParallelName(card.parallelType.replace(/\s*–\s*/g, ' '))}</span>}
                       </div>
                     </div>
 

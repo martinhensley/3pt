@@ -359,7 +359,7 @@ export default function CreatePostPage() {
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white text-gray-900"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-3pt-orange bg-white text-gray-900"
               placeholder="Enter post title"
               required
             />
@@ -374,7 +374,7 @@ export default function CreatePostPage() {
               value={excerpt}
               onChange={(e) => setExcerpt(e.target.value)}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white text-gray-900"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-3pt-orange bg-white text-gray-900"
               placeholder="Brief summary of the post"
               required
             />
@@ -408,7 +408,7 @@ export default function CreatePostPage() {
               multiple
               accept=".jpg,.jpeg,.png,.webp,.gif"
               onChange={handleImageFileChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-footy-orange bg-white text-gray-900"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-3pt-orange bg-white text-gray-900"
             />
             {imageFiles.length > 0 && (
               <div className="mt-3 space-y-2">
@@ -450,7 +450,7 @@ export default function CreatePostPage() {
               id="published"
               checked={published}
               onChange={(e) => setPublished(e.target.checked)}
-              className="w-4 h-4 text-footy-orange focus:ring-footy-orange border-gray-300 rounded"
+              className="w-4 h-4 text-3pt-orange focus:ring-3pt-orange border-gray-300 rounded"
             />
             <label htmlFor="published" className="text-sm font-semibold text-gray-900">
               Publish immediately
@@ -461,7 +461,7 @@ export default function CreatePostPage() {
           <button
             onClick={handleSubmit}
             disabled={loading || !title.trim() || !content.trim() || !excerpt.trim()}
-            className="w-full bg-gradient-to-r from-footy-green to-green-700 text-white font-bold py-3 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="w-full bg-gradient-to-r from-3pt-green to-green-700 text-white font-bold py-3 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {loading ? "Creating Post..." : "Create Post"}
           </button>

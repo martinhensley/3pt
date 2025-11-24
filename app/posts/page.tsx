@@ -55,7 +55,7 @@ export default function PostsIndex() {
       {posts.length === 0 ? (
         <div className="text-center py-20">
           <div className="bg-white rounded-lg shadow-lg p-12 max-w-2xl mx-auto transition-colors duration-300">
-            <h2 className="text-3xl font-bold text-footy-green mb-4">
+            <h2 className="text-3xl font-bold text-3pt-green mb-4">
               No Posts Yet
             </h2>
             <p className="text-gray-600">
@@ -103,7 +103,7 @@ export default function PostsIndex() {
                     </time>
                   </div>
 
-                  <h2 className={`font-bold text-footy-green mb-3 ${
+                  <h2 className={`font-bold text-3pt-green mb-3 ${
                     post.images[0] ? "text-xl line-clamp-2" : "text-2xl line-clamp-4"
                   }`}>
                     {post.title}
@@ -115,7 +115,7 @@ export default function PostsIndex() {
                     }`}>{post.excerpt}</p>
                   )}
 
-                  <div className="mt-auto text-footy-orange font-semibold">
+                  <div className="mt-auto text-3pt-orange font-semibold">
                     Read more →
                   </div>
                 </div>

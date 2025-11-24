@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  --color-footy-green: #005031;
-  --color-footy-orange: #F47322;
-  --color-footy-white: #FFFFFF;
+  --color-3pt-green: #005031;
+  --color-3pt-orange: #F47322;
+  --color-3pt-white: #FFFFFF;
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -11,9 +11,9 @@
 }
 
 :root {
-  --footy-green: #005031;
-  --footy-orange: #F47322;
-  --footy-white: #FFFFFF;
+  --3pt-green: #005031;
+  --3pt-orange: #F47322;
+  --3pt-white: #FFFFFF;
 }
 
 html {

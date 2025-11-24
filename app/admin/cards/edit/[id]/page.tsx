@@ -25,7 +25,7 @@ interface Card {
   hasMemorabilia: boolean;
   specialFeatures: string[];
   colorVariant: string | null;
-  footyNotes: string | null;
+  notes: string | null;
   imageFront: string | null;
   imageBack: string | null;
   set: {
@@ -72,7 +72,7 @@ export default function EditCardPage() {
   const [hasAutograph, setHasAutograph] = useState(false);
   const [hasMemorabilia, setHasMemorabilia] = useState(false);
   const [colorVariant, setColorVariant] = useState("");
-  const [footyNotes, setFootyNotes] = useState("");
+  const [notes, setNotes] = useState("");
   const [newFrontImage, setNewFrontImage] = useState<File | null>(null);
   const [newBackImage, setNewBackImage] = useState<File | null>(null);
   const [removeFrontImage, setRemoveFrontImage] = useState(false);
@@ -112,7 +112,7 @@ export default function EditCardPage() {
         setHasAutograph(data.hasAutograph || false);
         setHasMemorabilia(data.hasMemorabilia || false);
         setColorVariant(data.colorVariant || "");
-        setFootyNotes(data.footyNotes || "");
+        setNotes(data.notes || "");
       } else {
         setMessage({ type: "error", text: "Card not found" });
       }
@@ -175,7 +175,7 @@ export default function EditCardPage() {
         hasAutograph,
         hasMemorabilia,
         colorVariant: colorVariant || null,
-        footyNotes,
+        notes,
       };
 
       // Handle front image
@@ -416,7 +416,7 @@ export default function EditCardPage() {
                       type="checkbox"
                       checked={isNumbered}
                       onChange={(e) => setIsNumbered(e.target.checked)}
-                      className="w-4 h-4 text-footy-green border-gray-300 rounded focus:ring-footy-green"
+                      className="w-4 h-4 text-3pt-green border-gray-300 rounded focus:ring-3pt-green"
                     />
                     <span className="text-sm font-semibold text-gray-900">Is Numbered</span>
                   </label>
@@ -473,7 +473,7 @@ export default function EditCardPage() {
                     type="checkbox"
                     checked={hasAutograph}
                     onChange={(e) => setHasAutograph(e.target.checked)}
-                    className="w-4 h-4 text-footy-green border-gray-300 rounded focus:ring-footy-green"
+                    className="w-4 h-4 text-3pt-green border-gray-300 rounded focus:ring-3pt-green"
                   />
                   <span className="text-sm font-semibold text-gray-900">Has Autograph</span>
                 </label>
@@ -483,7 +483,7 @@ export default function EditCardPage() {
                     type="checkbox"
                     checked={hasMemorabilia}
                     onChange={(e) => setHasMemorabilia(e.target.checked)}
-                    className="w-4 h-4 text-footy-green border-gray-300 rounded focus:ring-footy-green"
+                    className="w-4 h-4 text-3pt-green border-gray-300 rounded focus:ring-3pt-green"
                   />
                   <span className="text-sm font-semibold text-gray-900">Has Memorabilia</span>
                 </label>
@@ -496,8 +496,8 @@ export default function EditCardPage() {
                 Internal Notes
               </label>
               <textarea
-                value={footyNotes}
-                onChange={(e) => setFootyNotes(e.target.value)}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
                 rows={4}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
                 placeholder="Add any internal notes about this card..."
@@ -556,7 +556,7 @@ export default function EditCardPage() {
                         />
                         <label
                           htmlFor="front-image-upload"
-                          className="cursor-pointer inline-block px-4 py-2 bg-footy-green text-white rounded-lg hover:bg-green-700"
+                          className="cursor-pointer inline-block px-4 py-2 bg-3pt-green text-white rounded-lg hover:bg-green-700"
                         >
                           Upload Front Image
                         </label>
@@ -612,7 +612,7 @@ export default function EditCardPage() {
                         />
                         <label
                           htmlFor="back-image-upload"
-                          className="cursor-pointer inline-block px-4 py-2 bg-footy-green text-white rounded-lg hover:bg-green-700"
+                          className="cursor-pointer inline-block px-4 py-2 bg-3pt-green text-white rounded-lg hover:bg-green-700"
                         >
                           Upload Back Image
                         </label>
@@ -628,7 +628,7 @@ export default function EditCardPage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="px-6 py-2 bg-footy-green hover:bg-green-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2 bg-3pt-green hover:bg-green-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {saving ? "Saving..." : "Save Changes"}
               </button>

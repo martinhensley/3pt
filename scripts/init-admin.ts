@@ -7,8 +7,8 @@ import { randomUUID } from 'crypto';
 config();
 
 async function main() {
-  const username = 'footy';
-  const email = 'admin@footylimited.com';
+  const username = '3pt';
+  const email = '3pt@3pt.bot';
   const password = 'test2222';
 
   const client = new Client({

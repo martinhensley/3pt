@@ -122,7 +122,7 @@ export default function CardImagesLibraryPage() {
       <div className="mb-8">
         <button
           onClick={() => router.push("/admin")}
-          className="text-footy-green hover:text-green-700 mb-4 inline-block"
+          className="text-3pt-green hover:text-green-700 mb-4 inline-block"
         >
           ← Back to Admin
         </button>
@@ -154,13 +154,13 @@ export default function CardImagesLibraryPage() {
               placeholder="Search by player name, card number, variant, or caption..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green"
             />
 
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green"
             >
               <option value="createdAt">Upload Date</option>
               <option value="order">Order</option>
@@ -169,7 +169,7 @@ export default function CardImagesLibraryPage() {
             <select
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green"
             >
               <option value="desc">Descending</option>
               <option value="asc">Ascending</option>
@@ -180,7 +180,7 @@ export default function CardImagesLibraryPage() {
         {/* Images Grid */}
         {loading ? (
           <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-3pt-green"></div>
             <p className="mt-4 text-gray-600">Loading card images...</p>
           </div>
         ) : images.length === 0 ? (

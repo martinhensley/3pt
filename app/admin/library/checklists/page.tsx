@@ -130,7 +130,7 @@ export default function ChecklistsLibraryPage() {
       <div className="mb-8">
         <button
           onClick={() => router.push("/admin")}
-          className="text-footy-green hover:text-green-700 mb-4 inline-block"
+          className="text-3pt-green hover:text-green-700 mb-4 inline-block"
         >
           ← Back to Admin
         </button>
@@ -162,13 +162,13 @@ export default function ChecklistsLibraryPage() {
               placeholder="Search checklists..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green"
             />
 
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green"
             >
               <option value="uploadedAt">Upload Date</option>
               <option value="name">Name</option>
@@ -177,7 +177,7 @@ export default function ChecklistsLibraryPage() {
             <select
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-footy-green"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green"
             >
               <option value="desc">Descending</option>
               <option value="asc">Ascending</option>
@@ -188,7 +188,7 @@ export default function ChecklistsLibraryPage() {
         {/* Checklists Grid */}
         {loading ? (
           <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green"></div>
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-3pt-green"></div>
             <p className="mt-4 text-gray-600">Loading checklists...</p>
           </div>
         ) : checklists.length === 0 ? (
@@ -238,7 +238,7 @@ export default function ChecklistsLibraryPage() {
                       href={checklist.fileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 text-center bg-footy-green text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm"
+                      className="flex-1 text-center bg-3pt-green text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm"
                     >
                       Download
                     </a>

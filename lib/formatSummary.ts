@@ -20,7 +20,7 @@ export function formatSummaryWithHeader(
     year: 'numeric'
   }).format(dateObj);
 
-  const header = `footy's summary ${formattedDate}`;
+  const header = `3pt's summary ${formattedDate}`;
 
   return `${header}\n\n${summary}`;
 }
@@ -33,7 +33,7 @@ export function formatSummaryWithHeader(
 export function getSummaryHeader(
   postDate?: Date | string
 ): string {
-  if (!postDate) return 'footy\'s summary';
+  if (!postDate) return '3pt\'s summary';
 
   const dateObj = typeof postDate === 'string' ? new Date(postDate) : postDate;
 
@@ -43,5 +43,5 @@ export function getSummaryHeader(
     year: 'numeric'
   }).format(dateObj);
 
-  return `footy's summary ${formattedDate}`;
+  return `3pt's summary ${formattedDate}`;
 }

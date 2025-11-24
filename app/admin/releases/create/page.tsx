@@ -381,10 +381,10 @@ export default function CreateReleasePage() {
                   <div className="space-y-3">
                     <h4 className="text-md font-semibold">Source Documents Used for Analysis</h4>
                     {documentFiles.map((file, idx) => (
-                      <div key={idx} className="border-2 border-footy-green/30 rounded-lg p-4 bg-footy-green/5">
+                      <div key={idx} className="border-2 border-3pt-green/30 rounded-lg p-4 bg-3pt-green/5">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <svg className="w-8 h-8 text-footy-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-8 h-8 text-3pt-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                             <div>
@@ -397,7 +397,7 @@ export default function CreateReleasePage() {
                               href={documentFileUrls[idx]}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="px-4 py-2 bg-footy-orange text-white text-sm rounded-md hover:bg-footy-orange/90"
+                              className="px-4 py-2 bg-3pt-orange text-white text-sm rounded-md hover:bg-3pt-orange/90"
                             >
                               View {file.type.includes('pdf') ? 'PDF' : 'Image'}
                             </a>

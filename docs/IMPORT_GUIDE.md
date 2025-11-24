@@ -1,6 +1,6 @@
 # Data Import Guide
 
-Complete guide for importing trading card data into Footy.bot.
+Complete guide for importing trading card data into 3pt.bot.
 
 ## Table of Contents
 - [Checklist Upload Requirement](#checklist-upload-requirement)

@@ -79,7 +79,7 @@ const cardAnalysisSchema = z.object({
   cardNumber: z.string().optional().describe("Card number"),
   variant: z.string().optional().describe("Any variant info (parallel, refractor, etc.)"),
   features: z.array(z.string()).optional().describe("Notable features like autograph, jersey piece, serial numbering, etc."),
-  content: z.string().describe("A detailed, engaging blog post (300-500 words) written as Footy - a passionate Southern soccer fan who's absolutely obsessed with the beautiful game and collecting cards. Footy spent extended time in the British Commonwealth and attended the London School of Economics, giving him a unique blend of Southern American charm with proper football knowledge and international perspective. Write with Southern charm (use 'y'all,' 'reckon,' 'mighty fine,' 'bless your heart'), occasionally reference your time abroad or LSE experience when relevant, show genuine excitement about the player and card, use soccer metaphors, and be conversational like chatting with a buddy at the card shop. Discuss the card, player significance, set details, and collectibility. Use HTML formatting with <p> tags, <strong> for emphasis, and <ul>/<li> for lists."),
+  content: z.string().describe("A detailed, informative blog post (300-500 words) about this basketball card. Cover the player's significance, card details, set information, and collectibility. Write in a professional but accessible tone. Use HTML formatting with <p> tags, <strong> for emphasis, and <ul>/<li> for lists."),
   excerpt: z.string().describe("A brief 1-5 sentence summary for the post preview"),
 });
 
@@ -92,7 +92,7 @@ const setAnalysisSchema = z.object({
   subsets: z.array(z.string()).optional().describe("List of subsets or insert sets"),
   features: z.array(z.string()).optional().describe("Notable features like autographs, memorabilia cards, parallels, etc."),
   notableCards: z.array(z.string()).optional().describe("Notable players or chase cards in the set"),
-  content: z.string().describe("A comprehensive, engaging blog post (400-600 words) written as Footy - a passionate Southern soccer fan who absolutely loves the beautiful game and collecting cards. Footy spent extended time in the British Commonwealth and attended the London School of Economics, giving him a unique blend of Southern American charm with proper football knowledge and international perspective. Write with Southern charm and warmth (use 'y'all,' 'reckon,' 'mighty fine,' 'I tell you what'), occasionally reference your time abroad or LSE experience when relevant, get genuinely excited about the set and players, use soccer metaphors, and be conversational like chatting with a buddy at the card shop. Discuss the set, its place in the hobby, key subsets, notable cards, and why collectors should be interested. Use HTML formatting with <p> tags, <strong> for emphasis, <h3> for subset headings, and <ul>/<li> for lists."),
+  content: z.string().describe("A comprehensive, informative blog post (400-600 words) about this basketball card set. Cover the set's place in the hobby, key subsets, notable cards, parallels, and why collectors should be interested. Write in a professional but accessible tone. Use HTML formatting with <p> tags, <strong> for emphasis, <h3> for subset headings, and <ul>/<li> for lists."),
   excerpt: z.string().describe("A brief 1-5 sentence summary for the post preview"),
 });
 
@@ -124,7 +124,7 @@ export async function analyzeCardImages(
           ...images,
           {
             type: "text",
-            text: `Analyze this soccer/football card${backImageBase64 ? " (front and back images provided)" : ""}. Extract all visible details and create an engaging blog post about the card. Focus on what makes this card special for collectors and fans.`,
+            text: `Analyze this basketball card${backImageBase64 ? " (front and back images provided)" : ""}. Extract all visible details and create an engaging blog post about the card. Focus on what makes this card special for collectors and fans.`,
           },
         ],
       },
@@ -162,7 +162,7 @@ export async function analyzeSetDocuments(
           ...images,
           {
             type: "text",
-            text: `Analyze this soccer/football card set checklist${sellSheetImageBase64 ? " and sell sheet" : ""}. Extract all details about the set and create an engaging blog post. Focus on what makes this set appealing to collectors and its significance in the soccer card market.`,
+            text: `Analyze this basketball card set checklist${sellSheetImageBase64 ? " and sell sheet" : ""}. Extract all details about the set and create an engaging blog post. Focus on what makes this set appealing to collectors and its significance in the basketball card market.`,
           },
         ],
       },
@@ -226,7 +226,7 @@ const setAnalysisWithCardsSchema = z.object({
   subsets: z.array(z.string()).optional().describe("Subsets or insert sets"),
   features: z.array(z.string()).optional().describe("Notable features"),
   notableCards: z.array(z.string()).optional().describe("Notable players or chase cards"),
-  content: z.string().describe("Blog post content with HTML formatting - written as Footy, a passionate Southern soccer fan with unbridled enthusiasm for the beautiful game. Footy spent extended time in the British Commonwealth and attended the London School of Economics, giving him a unique blend of Southern American charm with proper football knowledge and international perspective. Use Southern phrases like 'y'all,' 'reckon,' 'mighty fine,' occasionally reference your time abroad or LSE experience when relevant, be conversational like chatting at the card shop, get genuinely excited about players and cards, and use soccer metaphors."),
+  content: z.string().describe("Blog post content with HTML formatting. Write in a professional but accessible tone, covering the set details, notable cards, and collectibility factors."),
   excerpt: z.string().describe("Brief summary"),
   cards: z.array(
     z.object({
@@ -289,17 +289,17 @@ export async function analyzeReleaseDocuments(
   // Add instruction text
   contentParts.push({
     type: "text",
-    text: `Analyze these documents about a soccer/football card release. Extract structured information about the manufacturer, release name, year, sets included, and features.
+    text: `Analyze these documents about a basketball card release. Extract structured information about the manufacturer, release name, year, sets included, and features.
 
 CRITICAL - MANUFACTURER IDENTIFICATION:
 - The MANUFACTURER is the parent company that produces the cards (e.g., Panini, Topps, Upper Deck, Leaf)
 - Product lines like "Donruss", "Select", "Prizm", "Chrome" are NOT manufacturers - they are PRODUCT LINES
 - Examples:
-  * "Donruss Soccer" → Manufacturer: "Panini", Release: "Donruss Soccer"
+  * "Donruss Basketball" → Manufacturer: "Panini", Release: "Donruss Basketball"
   * "Topps Chrome" → Manufacturer: "Topps", Release: "Chrome"
   * "Upper Deck SP Authentic" → Manufacturer: "Upper Deck", Release: "SP Authentic"
   * "Leaf Metal" → Manufacturer: "Leaf", Release: "Metal"
-- If uncertain, common soccer card manufacturers are: Panini, Topps, Upper Deck, Leaf, Futera
+- If uncertain, common basketball card manufacturers are: Panini, Topps, Upper Deck, Leaf
 
 IMPORTANT - YEAR FORMAT:
 - Use YYYY-YY format (e.g., "2024-25") for seasons spanning two calendar years
@@ -314,19 +314,14 @@ IMPORTANT - CARD EXTRACTION:
 - This works for both vintage releases (1 base set with checklist) and modern releases (multiple sets, some with checklists)
 
 You MUST also generate blog post content with the following requirements:
-- **Title**: Use the exact format "{Manufacturer} {ReleaseName} {Year}" (e.g., "Panini Select Premier League 2023-24")
+- **Title**: Use the exact format "{Manufacturer} {ReleaseName} {Year}" (e.g., "Panini Select Basketball 2024-25")
 - **Description**: Write a concise 1-5 sentence summary that captures the essence of this release for collectors
-- **Content**: Write as Footy - a passionate, Southern-accented soccer fan and experienced sports card collector who's absolutely obsessed with the beautiful game. Your content should:
+- **Content**: Write in a professional but accessible tone. Your content should:
   * Be 600-1000 words (comprehensive and detailed)
   * Use proper HTML formatting with <p> tags for paragraphs
   * Use <strong> or <em> for emphasis on key features
   * Use <h3> for section headings for EACH set included in the release
   * Use <ul> and <li> for listing features, parallels, or notable cards
-  * Write with Southern charm and warmth - use phrases like "y'all," "bless your heart," "mighty fine," "reckon," and "I tell you what"
-  * Show unbridled enthusiasm for soccer - this is THE beautiful game we're talking about!
-  * Get genuinely excited about the cards - like a kid in a candy store
-  * Be conversational and friendly, like chatting with a buddy at the card shop
-  * Include your deep knowledge about the sport and the hobby, but keep it accessible and fun
 
   **CRITICAL - SET INFORMATION REQUIREMENTS**:
   * You MUST include a dedicated section for EVERY set in the release
@@ -337,7 +332,7 @@ You MUST also generate blog post content with the following requirements:
     - List of parallels/variations using <ul> and <li> tags
     - Notable features or chase cards
     - Rarity information (print runs, numbered cards, etc.)
-  * Present set data in creative, engaging ways:
+  * Present set data in clear, informative ways:
     - Use comparisons ("twice as rare as last year's Gold parallel")
     - Add context ("only 99 copies exist worldwide")
     - Highlight scarcity ("limited to just 10 copies")
@@ -353,17 +348,14 @@ You MUST also generate blog post content with the following requirements:
   * Set-by-set breakdown: Dedicated section for each set with full details
   * Closing paragraph: Overall significance and collectability
 
-  * Explain WHY this release matters to collectors with genuine passion
-  * Reference player significance or historical context when relevant, showing your soccer knowledge
-  * Sound authentic - like you're a Southern buddy at the card shop who lives and breathes soccer
-  * Throw in soccer metaphors and comparisons ("rarer than a clean sheet for [struggling team]")
-  * Celebrate the players like they're heroes of the beautiful game
+  * Explain why this release matters to collectors
+  * Reference player significance or historical context when relevant
 
 Extract the data in this structure:
 - manufacturer: The parent company (e.g., Panini, Topps, Upper Deck, Leaf) - NOT the product line
-- releaseName: Name of the release/product line (e.g., "Donruss Soccer", "Select", "Prizm")
+- releaseName: Name of the release/product line (e.g., "Donruss Basketball", "Select", "Prizm")
 - year: Year or season in YYYY or YYYY-YY format (e.g., "2024" or "2024-25")
-- slug: URL-friendly slug in format: year-manufacturer-release (lowercase, hyphenated, e.g., "2024-25-panini-donruss-soccer")
+- slug: URL-friendly slug in format: year-manufacturer-release (lowercase, hyphenated, e.g., "2024-25-panini-donruss-basketball")
 - sets: Array of sets, each with:
   - name: Set name
   - description: Optional description
@@ -441,7 +433,7 @@ export async function analyzeSetDocumentsWithCards(
     }
   }
 
-  let instruction = `Analyze these documents about a soccer/football card set. Extract the set name, details, and features.`;
+  let instruction = `Analyze these documents about a basketball card set. Extract the set name, details, and features.`;
 
   if (releaseContext) {
     instruction += ` This set is part of the following release: ${releaseContext}.`;
@@ -492,7 +484,7 @@ export async function analyzeCardWithContext(
     });
   }
 
-  let instruction = `Analyze this soccer/football card${backImageBase64 ? " (front and back images provided)" : ""}. Extract all visible details and create an engaging blog post about the card.`;
+  let instruction = `Analyze this basketball card${backImageBase64 ? " (front and back images provided)" : ""}. Extract all visible details and create an engaging blog post about the card.`;
 
   if (setContext || releaseContext) {
     instruction += ` Context:`;

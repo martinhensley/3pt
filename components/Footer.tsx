@@ -8,13 +8,13 @@ interface FooterProps {
 
 export default function Footer({ rounded = true }: FooterProps) {
   return (
-    <footer className={`bg-gradient-to-r from-footy-green to-green-700 text-white shadow-lg ${rounded ? 'rounded-xl' : ''}`}>
+    <footer className={`bg-gradient-to-r from-3pt-green to-green-700 text-white shadow-lg ${rounded ? 'rounded-xl' : ''}`}>
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* About Section */}
           <div>
             <h3 className="text-lg font-bold font-orbitron mb-4">
-              <span className="text-white">3pt</span><span className="text-footy-orange">.bot</span>
+              <span className="text-white">3pt</span><span className="text-3pt-orange">.bot</span>
             </h3>
             <p className="text-sm text-green-100">
               The ultimate resource for basketball cards, comps, and collection management.
@@ -120,7 +120,7 @@ export default function Footer({ rounded = true }: FooterProps) {
         {/* Bottom Bar */}
         <div className="border-t border-green-600 pt-6 text-center">
           <p className="text-sm text-green-100">
-            <span className="text-white font-orbitron">3pt</span><span className="text-footy-orange font-orbitron">.bot</span> © 2024-{new Date().getFullYear()} | All rights reserved
+            <span className="text-white font-orbitron">3pt</span><span className="text-3pt-orange font-orbitron">.bot</span> © 2024-{new Date().getFullYear()} | All rights reserved
           </p>
         </div>
       </div>

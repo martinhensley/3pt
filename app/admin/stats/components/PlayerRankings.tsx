@@ -94,12 +94,12 @@ export default function PlayerRankings({ data }: PlayerRankingsProps) {
               className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
             >
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-footy-green text-white font-semibold text-sm">
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-3pt-green text-white font-semibold text-sm">
                   {index + 1}
                 </div>
                 <span className="font-medium text-gray-900">{player.playerName}</span>
               </div>
-              <span className="text-lg font-bold text-footy-green">
+              <span className="text-lg font-bold text-3pt-green">
                 {player.cardCount.toLocaleString()}
               </span>
             </div>

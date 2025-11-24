@@ -206,7 +206,7 @@ npx prisma generate
 │   ├── ebay.ts             # eBay API client
 │   ├── extractKeywords.ts  # Keyword extraction
 │   ├── formatters.ts       # Display formatting utilities
-│   ├── genkit.ts           # Anthropic SDK AI functions
+│   ├── ai.ts               # Anthropic SDK AI functions
 │   ├── neon-auth.ts        # Neon database auth
 │   ├── prisma.ts           # Database client
 │   ├── setUtils.ts         # Set sorting and grouping utilities

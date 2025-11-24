@@ -437,7 +437,7 @@ Individual cards with variants, serials, and metadata.
 | `detectedText` | String | | | - | Raw OCR text for reference |
 | `imageFront` | String | | | - | Front image URL |
 | `imageBack` | String | | | - | Back image URL |
-| `footyNotes` | String (Text) | | | - | Internal admin notes |
+| `notes` | String (Text) | | | - | Internal admin notes |
 | `setId` | String | ✓ | | - | Foreign key to Set |
 | `createdAt` | DateTime | ✓ | | `now()` | Created timestamp |
 | `updatedAt` | DateTime | ✓ | | `now()` | Last updated timestamp |
@@ -472,7 +472,7 @@ model Card {
   detectedText          String?
   imageFront            String?
   imageBack             String?
-  footyNotes            String?  @db.Text
+  notes            String?  @db.Text
   setId                 String
   set                   Set      @relation(fields: [setId], references: [id], onDelete: Cascade)
   createdAt             DateTime @default(now())

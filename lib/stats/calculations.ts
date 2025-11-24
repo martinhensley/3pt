@@ -184,8 +184,8 @@ export function getRarityColor(tier: string): string {
  */
 export function getSetTypeColor(type: string): string {
   const colors: Record<string, string> = {
-    'Base': '#005031',         // footy-green
-    'Autograph': '#F47322',    // footy-orange
+    'Base': '#005031',         // 3pt-green
+    'Autograph': '#F47322',    // 3pt-orange
     'Memorabilia': '#3b82f6',  // blue-500
     'Insert': '#8b5cf6',       // violet-500
   };

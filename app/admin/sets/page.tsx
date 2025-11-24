@@ -200,7 +200,7 @@ export default function ManageSetsPage() {
             />
             <Link
               href="/admin/sets/create"
-              className="px-6 py-2 bg-footy-green hover:bg-green-700 text-white rounded-lg transition-colors flex items-center gap-2"
+              className="px-6 py-2 bg-3pt-green hover:bg-green-700 text-white rounded-lg transition-colors flex items-center gap-2"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -230,7 +230,7 @@ export default function ManageSetsPage() {
                 placeholder="Search sets by name, release, or manufacturer..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-footy-green focus:border-transparent"
+                className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-3pt-green focus:border-transparent"
               />
               <svg
                 className="absolute left-3 top-3.5 w-5 h-5 text-gray-400"

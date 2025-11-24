@@ -53,8 +53,8 @@ export default function EbayAdHorizontal({
 
   if (loading) {
     return (
-      <div className="bg-white border-2 border-footy-gold rounded-lg shadow-lg p-4 lg:p-6 my-8">
-        <p className="text-sm text-footy-dark-green font-bold mb-6 text-center uppercase tracking-wide">
+      <div className="bg-white border-2 border-3pt-gold rounded-lg shadow-lg p-4 lg:p-6 my-8">
+        <p className="text-sm text-3pt-dark-green font-bold mb-6 text-center uppercase tracking-wide">
           {title}
         </p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -76,8 +76,8 @@ export default function EbayAdHorizontal({
   }
 
   return (
-    <div className="bg-white border-2 border-footy-gold rounded-lg shadow-lg p-4 lg:p-6 my-8">
-      <p className="text-sm text-footy-dark-green font-bold mb-6 text-center uppercase tracking-wide">
+    <div className="bg-white border-2 border-3pt-gold rounded-lg shadow-lg p-4 lg:p-6 my-8">
+      <p className="text-sm text-3pt-dark-green font-bold mb-6 text-center uppercase tracking-wide">
         {title}
       </p>
 
@@ -88,7 +88,7 @@ export default function EbayAdHorizontal({
             href={product.itemAffiliateWebUrl}
             target="_blank"
             rel="noopener noreferrer sponsored"
-            className="block bg-gray-50 rounded-lg border-2 border-gray-200 hover:border-footy-gold hover:shadow-md transition-all duration-200 overflow-hidden group"
+            className="block bg-gray-50 rounded-lg border-2 border-gray-200 hover:border-3pt-gold hover:shadow-md transition-all duration-200 overflow-hidden group"
           >
             <div className="relative w-full h-40 bg-white">
               {product.image ? (
@@ -111,7 +111,7 @@ export default function EbayAdHorizontal({
               <p className="text-xs text-gray-900 font-semibold line-clamp-2 mb-2 leading-tight min-h-[32px]">
                 {product.title}
               </p>
-              <p className="text-base font-bold text-footy-dark-green">
+              <p className="text-base font-bold text-3pt-dark-green">
                 {new Intl.NumberFormat("en-US", {
                   style: "currency",
                   currency: product.currency,

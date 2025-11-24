@@ -62,7 +62,7 @@ export default function AdminStatsPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-footy-green mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-3pt-green mx-auto mb-4"></div>
           <p className="text-gray-600">Loading statistics...</p>
         </div>
       </div>
@@ -77,7 +77,7 @@ export default function AdminStatsPage() {
           <p className="text-gray-600 mb-4">You need admin privileges to view this page.</p>
           <button
             onClick={() => router.push('/admin')}
-            className="px-4 py-2 bg-footy-green text-white rounded hover:bg-footy-green/90"
+            className="px-4 py-2 bg-3pt-green text-white rounded hover:bg-3pt-green/90"
           >
             Return to Admin
           </button>
@@ -94,7 +94,7 @@ export default function AdminStatsPage() {
           <p className="text-gray-600 mb-4">{error}</p>
           <button
             onClick={fetchStats}
-            className="px-4 py-2 bg-footy-green text-white rounded hover:bg-footy-green/90"
+            className="px-4 py-2 bg-3pt-green text-white rounded hover:bg-3pt-green/90"
           >
             Try Again
           </button>
@@ -132,7 +132,7 @@ export default function AdminStatsPage() {
               </button>
               <button
                 onClick={() => router.push('/admin')}
-                className="px-4 py-2 bg-footy-green text-white rounded-lg hover:bg-footy-green/90"
+                className="px-4 py-2 bg-3pt-green text-white rounded-lg hover:bg-3pt-green/90"
               >
                 Back to Admin
               </button>
@@ -147,7 +147,7 @@ export default function AdminStatsPage() {
                 onClick={() => setActiveTab(tab.key)}
                 className={`px-4 py-3 font-medium transition-colors flex items-center gap-2 ${
                   activeTab === tab.key
-                    ? 'text-footy-green border-b-2 border-footy-green'
+                    ? 'text-3pt-green border-b-2 border-3pt-green'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >

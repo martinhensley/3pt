@@ -294,12 +294,12 @@ export default function ReleasePage() {
     dateModified: release.createdAt,
     author: {
       "@type": "Organization",
-      name: "Footy Bot",
+      name: "3pt Bot",
       url: "https://www.3pt.bot"
     },
     publisher: {
       "@type": "Organization",
-      name: "Footy Bot",
+      name: "3pt Bot",
       logo: {
         "@type": "ImageObject",
         url: "https://www.3pt.bot/logo.png"
@@ -337,7 +337,7 @@ export default function ReleasePage() {
           <>
 
           {/* Combined Hero with Carousel */}
-          <div className="bg-gradient-to-r from-footy-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white w-full max-w-full">
+          <div className="bg-gradient-to-r from-3pt-green to-green-700 rounded-2xl shadow-2xl overflow-hidden mb-8 text-white w-full max-w-full">
             {/* Hero Header */}
             <div className="p-4 md:p-8 pb-6">
               <div className="space-y-3 min-w-0">
@@ -566,7 +566,7 @@ export default function ReleasePage() {
           {((release.sourceFiles && Array.isArray(release.sourceFiles) && release.sourceFiles.length > 0) ||
             (release.sourceDocuments && release.sourceDocuments.length > 0)) && (
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
-              <div className="bg-gradient-to-r from-footy-green to-green-700 px-6 py-4">
+              <div className="bg-gradient-to-r from-3pt-green to-green-700 px-6 py-4">
                 <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -598,18 +598,18 @@ export default function ReleasePage() {
                       href={doc.blobUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:border-footy-green hover:bg-gray-50 transition-all duration-200 group"
+                      className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:border-3pt-green hover:bg-gray-50 transition-all duration-200 group"
                     >
                       {/* File Icon */}
                       <div className="flex-shrink-0">
-                        <div className="w-12 h-12 bg-gradient-to-br from-footy-green to-green-700 rounded-lg flex items-center justify-center text-white font-bold text-xs group-hover:scale-110 transition-transform duration-200">
+                        <div className="w-12 h-12 bg-gradient-to-br from-3pt-green to-green-700 rounded-lg flex items-center justify-center text-white font-bold text-xs group-hover:scale-110 transition-transform duration-200">
                           {fileExtension}
                         </div>
                       </div>
 
                       {/* Document Info */}
                       <div className="flex-grow min-w-0">
-                        <h3 className="font-semibold text-gray-900 group-hover:text-footy-green transition-colors truncate">
+                        <h3 className="font-semibold text-gray-900 group-hover:text-3pt-green transition-colors truncate">
                           {doc.displayName || 'Unnamed Document'}
                         </h3>
                         <div className="flex items-center gap-2 mt-1 flex-wrap">
@@ -634,7 +634,7 @@ export default function ReleasePage() {
 
                       {/* Download Icon */}
                       <div className="flex-shrink-0">
-                        <svg className="w-5 h-5 text-gray-400 group-hover:text-footy-green transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 text-gray-400 group-hover:text-3pt-green transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                         </svg>
                       </div>

@@ -1,6 +1,6 @@
 # Changelog
 
-Complete history of changes to the Footy.bot project.
+Complete history of changes to the 3pt.bot project.
 
 ---
 

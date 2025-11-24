@@ -184,7 +184,7 @@ export default function CardDetailPage() {
           {/* Card Header with Details */}
           <div className="rounded-2xl shadow-2xl overflow-hidden mb-8">
             {/* Green Header Section */}
-            <div className="bg-gradient-to-r from-footy-green to-green-700 text-white p-8">
+            <div className="bg-gradient-to-r from-3pt-green to-green-700 text-white p-8">
               <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
                 {card.cardNumber && <span className="text-white/90">#{card.cardNumber} </span>}
                 {card.playerName || 'Unknown Player'}
@@ -258,7 +258,7 @@ export default function CardDetailPage() {
               <h2 className="text-2xl font-black text-gray-900 mb-6">Card Images</h2>
               <div className="grid md:grid-cols-2 gap-6">
                 {card.imageFront && (
-                  <div className="relative bg-gray-100 rounded-lg overflow-hidden aspect-[2.5/3.5] border-2 border-footy-green">
+                  <div className="relative bg-gray-100 rounded-lg overflow-hidden aspect-[2.5/3.5] border-2 border-3pt-green">
                     <Image
                       src={card.imageFront}
                       alt={`${card.playerName} front`}
@@ -272,7 +272,7 @@ export default function CardDetailPage() {
                   </div>
                 )}
                 {card.imageBack && (
-                  <div className="relative bg-gray-100 rounded-lg overflow-hidden aspect-[2.5/3.5] border-2 border-footy-green">
+                  <div className="relative bg-gray-100 rounded-lg overflow-hidden aspect-[2.5/3.5] border-2 border-3pt-green">
                     <Image
                       src={card.imageBack}
                       alt={`${card.playerName} back`}
@@ -288,7 +288,7 @@ export default function CardDetailPage() {
                 {card.images.map((image) => (
                   <div
                     key={image.id}
-                    className="relative bg-gray-100 rounded-lg overflow-hidden aspect-[2.5/3.5] border-2 border-footy-green"
+                    className="relative bg-gray-100 rounded-lg overflow-hidden aspect-[2.5/3.5] border-2 border-3pt-green"
                   >
                     <Image
                       src={image.url}

@@ -9,7 +9,7 @@ config();
 async function main() {
   const username = '3pt';
   const email = '3pt@3pt.bot';
-  const password = 'test2222'; // Same default password as footy user
+  const password = 'test2222'; // Default password for development
 
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
