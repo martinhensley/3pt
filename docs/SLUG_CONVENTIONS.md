@@ -1,6 +1,6 @@
 # URL Slug Conventions
 
-Complete guide for generating and formatting URL slugs in the Footy.bot application.
+Complete guide for generating and formatting URL slugs in the 3pt.bot application.
 
 ## Table of Contents
 - [Card Slugs](#card-slugs)

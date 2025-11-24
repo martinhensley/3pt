@@ -1,6 +1,6 @@
 # Parallel Set Architecture
 
-Complete guide for the simplified independent parallel set architecture in Footy.bot.
+Complete guide for the simplified independent parallel set architecture in 3pt.bot.
 
 ## Table of Contents
 - [Overview](#overview)

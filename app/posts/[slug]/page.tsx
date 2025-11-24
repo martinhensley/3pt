@@ -75,12 +75,12 @@ export default function PostPage() {
     dateModified: post.createdAt,
     author: {
       "@type": "Organization",
-      name: "Footy Bot",
+      name: "3pt Bot",
       url: "https://www.3pt.bot"
     },
     publisher: {
       "@type": "Organization",
-      name: "Footy Bot",
+      name: "3pt Bot",
       logo: {
         "@type": "ImageObject",
         url: "https://www.3pt.bot/logo.png"

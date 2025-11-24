@@ -1,6 +1,6 @@
 # AI Integration Guide
 
-Complete guide for implementing AI functionality using the Anthropic SDK in the Footy.bot application.
+Complete guide for implementing AI functionality using the Anthropic SDK in the 3pt.bot application.
 
 ## Table of Contents
 - [Overview](#overview)

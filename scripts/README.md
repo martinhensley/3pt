@@ -1,6 +1,6 @@
 # Scripts Directory
 
-This directory contains utility scripts for managing the Footy.bot database and imports.
+This directory contains utility scripts for managing the 3pt.bot database and imports.
 
 ## 📁 Folder Structure
 

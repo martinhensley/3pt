@@ -1,6 +1,6 @@
 # Frontend Patterns Guide
 
-Complete guide for implementing standardized UI patterns in the Footy.bot application.
+Complete guide for implementing standardized UI patterns in the 3pt.bot application.
 
 ## Table of Contents
 - [Standardized Page Layout](#standardized-page-layout)

@@ -26,7 +26,7 @@ async function setupNeonAuth() {
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         last_login TIMESTAMP WITH TIME ZONE,
         is_active BOOLEAN DEFAULT TRUE,
-        role TEXT DEFAULT 'admin'
+        role TEXT DEFAULT '3pt'
       )
     `);
     console.log('Created admin_users table');
@@ -73,7 +73,7 @@ async function setupNeonAuth() {
     // Check if user already exists
     const existingUser = await client.query(
       'SELECT id FROM neon_auth.admin_users WHERE username = $1 OR email = $2',
-      ['footy', 'footy@qb1.bot']
+      ['3pt', '3pt@3pt.bot']
     );
 
     if (existingUser.rows.length > 0) {
@@ -82,23 +82,23 @@ async function setupNeonAuth() {
         `UPDATE neon_auth.admin_users
          SET password_hash = $1, email = $2, updated_at = CURRENT_TIMESTAMP
          WHERE username = $3`,
-        [passwordHash, 'footy@qb1.bot', 'footy']
+        [passwordHash, '3pt@3pt.bot', '3pt']
       );
-      console.log('Updated existing admin user: footy');
+      console.log('Updated existing admin user: 3pt');
     } else {
       // Create new admin user
       await client.query(
         `INSERT INTO neon_auth.admin_users (id, username, email, password_hash, is_active, role)
          VALUES ($1, $2, $3, $4, $5, $6)`,
-        [userId, 'footy', 'footy@qb1.bot', passwordHash, true, 'admin']
+        [userId, '3pt', '3pt@3pt.bot', passwordHash, true, '3pt']
       );
-      console.log('Created new admin user: footy');
+      console.log('Created new admin user: 3pt');
     }
 
     console.log('\n=================================');
     console.log('Admin User Credentials:');
-    console.log('Username: footy');
-    console.log('Email: footy@qb1.bot');
+    console.log('Username: 3pt');
+    console.log('Email: 3pt@3pt.bot');
     console.log(`Password: ${strongPassword}`);
     console.log('=================================\n');
     console.log('IMPORTANT: Save this password securely!');
