@@ -202,7 +202,7 @@ export async function POST(request: Request) {
 
 ```typescript
 // scripts/import-release.ts
-import { analyzeRelease } from '@/lib/genkit';
+import { analyzeRelease } from '@/lib/ai';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();

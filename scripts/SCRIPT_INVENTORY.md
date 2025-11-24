@@ -16,7 +16,6 @@ This document lists all utility scripts in the codebase.
 ### Root Directory
 
 **Configuration:**
-- `genkit.config.ts` - Genkit AI framework configuration
 - `next.config.ts` - Next.js configuration
 - `next-env.d.ts` - TypeScript definitions for Next.js
 
