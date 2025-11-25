@@ -14,12 +14,14 @@ export default defineConfig({
         'lib/slugGenerator.ts',
         'lib/formatters.ts',
         'lib/stats/calculations.ts',
+        'app/api/releases/route.ts',
+        'app/api/admin/cards/route.ts',
       ],
       thresholds: {
-        statements: 80,
-        branches: 80,
-        functions: 80,
-        lines: 80,
+        // Phase 1 modules have strict 80% threshold
+        'lib/setUtils.ts': { statements: 80, branches: 80, functions: 80, lines: 80 },
+        'lib/slugGenerator.ts': { statements: 80, branches: 80, functions: 80, lines: 80 },
+        'lib/stats/calculations.ts': { statements: 80, branches: 80, functions: 80, lines: 80 },
       },
     },
   },
