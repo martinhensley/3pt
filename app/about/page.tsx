@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { getLibraryStats } from "@/lib/database";
 
 export const metadata: Metadata = {
   title: "About Us - 3pt.bot",
@@ -13,7 +14,19 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AboutPage() {
+function formatNumber(num: number): string {
+  if (num >= 1000000) {
+    return `${(num / 1000000).toFixed(1)}M+`;
+  }
+  if (num >= 1000) {
+    return `${(num / 1000).toFixed(0)}K+`;
+  }
+  return `${num.toLocaleString()}`;
+}
+
+export default async function AboutPage() {
+  const stats = await getLibraryStats();
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-6 w-full pt-6">
@@ -21,16 +34,6 @@ export default function AboutPage() {
       </div>
 
       <main className="flex-grow max-w-4xl mx-auto px-6 py-12">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold font-orbitron text-gray-900 mb-4">
-            About <span className="text-3pt-green">3pt</span><span className="text-3pt-orange">.bot</span>
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Your comprehensive companion for basketball card collecting, powered by passion for the game.
-          </p>
-        </div>
-
         {/* Main Content */}
         <div className="bg-white rounded-xl shadow-lg p-8 md:p-12 space-y-8">
           {/* Mission Section */}
@@ -39,63 +42,8 @@ export default function AboutPage() {
               <span className="text-3pt-green mr-2">🏀</span>
               Our Mission
             </h2>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              At <span className="font-orbitron">3pt<span className="text-3pt-orange">.bot</span></span>, we&apos;re on a mission to build the most comprehensive and accessible basketball card database in the world. Whether you&apos;re a seasoned collector or just getting started, we provide the tools and information you need to track, value, and enjoy your collection.
-            </p>
             <p className="text-gray-700 leading-relaxed">
-              We believe that every card tells a story—from rookie sensations to legendary moments on the court. Our goal is to help collectors discover, understand, and celebrate these stories.
-            </p>
-          </section>
-
-          {/* What We Offer Section */}
-          <section>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-              <span className="text-3pt-orange mr-2">🎯</span>
-              What We Offer
-            </h2>
-            <ul className="space-y-4">
-              <li className="flex items-start">
-                <span className="text-3pt-green font-bold mr-3 mt-1">•</span>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Comprehensive Card Database</h3>
-                  <p className="text-gray-700">Browse thousands of basketball cards from Panini, Topps, and more, with detailed information about players, sets, and releases.</p>
-                </div>
-              </li>
-              <li className="flex items-start">
-                <span className="text-3pt-green font-bold mr-3 mt-1">•</span>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Release Information</h3>
-                  <p className="text-gray-700">Stay up-to-date with the latest card releases, including set details, checklists, and product information.</p>
-                </div>
-              </li>
-              <li className="flex items-start">
-                <span className="text-3pt-green font-bold mr-3 mt-1">•</span>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Educational Content</h3>
-                  <p className="text-gray-700">Learn about the hobby through our blog posts, set reviews, and collecting guides written by passionate fans.</p>
-                </div>
-              </li>
-              <li className="flex items-start">
-                <span className="text-3pt-green font-bold mr-3 mt-1">•</span>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Market Insights</h3>
-                  <p className="text-gray-700">Access curated eBay listings to help you understand current market values and find cards for your collection.</p>
-                </div>
-              </li>
-            </ul>
-          </section>
-
-          {/* Our Story Section */}
-          <section>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-              <span className="text-3pt-green mr-2">📖</span>
-              Our Story
-            </h2>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              <span className="font-orbitron">3pt<span className="text-3pt-orange">.bot</span></span> was born from a simple need: a better way to track and discover basketball cards. As collectors ourselves, we found existing resources fragmented and difficult to navigate. We wanted a single destination where the basketball community could come together to celebrate the hobby.
-            </p>
-            <p className="text-gray-700 leading-relaxed">
-              What started as a passion project has grown into a comprehensive platform serving collectors worldwide. We&apos;re constantly expanding our database, improving our tools, and listening to our community to make <span className="font-orbitron">3pt<span className="text-3pt-orange">.bot</span></span> the best it can be.
+              At <span className="font-orbitron">3pt<span className="text-3pt-orange">.bot</span></span>, we&apos;re on a mission to build the most comprehensive basketball card database in the world. Whether you&apos;re a seasoned collector or just getting started, we provide the tools and information you need to track, value, and enjoy your collection.
             </p>
           </section>
 
@@ -113,31 +61,32 @@ export default function AboutPage() {
             </p>
           </section>
 
-          {/* Community Section */}
+          {/* Mailing List Section */}
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-              <span className="text-3pt-green mr-2">🤝</span>
-              Join Our Community
+              <span className="text-3pt-green mr-2">📬</span>
+              Join Our Mailing List
             </h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              Whether you&apos;re chasing rookie autographs, building rainbow parallels, or just love the thrill of the rip, <span className="font-orbitron">3pt<span className="text-3pt-orange">.bot</span></span> is here for you. We&apos;re building more than just a database—we&apos;re building a community.
+              Stay up-to-date with the latest releases, set reviews, and collecting tips delivered straight to your inbox.
             </p>
-            <div className="bg-gradient-to-r from-3pt-green to-green-600 text-white rounded-lg p-6 text-center">
-              <p className="font-semibold mb-3">Ready to start your basketball card journey?</p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Link
-                  href="/cards"
-                  className="bg-white text-3pt-green px-6 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+            <div className="bg-gradient-to-r from-3pt-green to-green-600 text-white rounded-lg p-6">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <input
+                  type="email"
+                  placeholder="Enter your email address"
+                  className="flex-grow px-4 py-3 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-3pt-orange bg-gradient-to-r from-white to-gray-100"
+                />
+                <button
+                  type="button"
+                  className="bg-3pt-orange text-white px-6 py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors whitespace-nowrap"
                 >
-                  Browse Cards
-                </Link>
-                <Link
-                  href="/releases"
-                  className="bg-3pt-orange text-white px-6 py-2 rounded-lg font-semibold hover:bg-orange-600 transition-colors"
-                >
-                  View Releases
-                </Link>
+                  Subscribe
+                </button>
               </div>
+              <p className="text-sm text-white/80 mt-3">
+                Unsubscribe at any time.
+              </p>
             </div>
           </section>
 
@@ -150,11 +99,8 @@ export default function AboutPage() {
             <p className="text-gray-700 leading-relaxed mb-4">
               Have questions, suggestions, or feedback? We&apos;d love to hear from you! We&apos;re constantly working to improve <span className="font-orbitron">3pt<span className="text-3pt-orange">.bot</span></span> and your input helps shape the future of our platform.
             </p>
-            <p className="text-gray-700 leading-relaxed mb-4">
+            <p className="text-gray-700 leading-relaxed">
               You can reach us through any of our social media platforms listed in the footer below, including Twitter, Facebook, Instagram, and YouTube.
-            </p>
-            <p className="text-gray-700 leading-relaxed text-sm text-gray-600">
-              While we&apos;re a growing platform and may not be able to respond to every message immediately, we read and consider all feedback as we continue to develop new features and expand our database.
             </p>
           </section>
         </div>
@@ -162,20 +108,20 @@ export default function AboutPage() {
         {/* Stats Section */}
         <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6">
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <div className="text-3xl font-bold text-3pt-green mb-2">1000+</div>
+            <div className="text-3xl font-bold text-3pt-green mb-2">{formatNumber(stats.cards)}</div>
             <div className="text-sm text-gray-600">Cards Cataloged</div>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <div className="text-3xl font-bold text-3pt-green mb-2">50+</div>
+            <div className="text-3xl font-bold text-3pt-green mb-2">{formatNumber(stats.sets)}</div>
             <div className="text-sm text-gray-600">Sets Documented</div>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <div className="text-3xl font-bold text-3pt-green mb-2">100+</div>
+            <div className="text-3xl font-bold text-3pt-green mb-2">{formatNumber(stats.players)}</div>
             <div className="text-sm text-gray-600">Players Featured</div>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <div className="text-3xl font-bold text-3pt-green mb-2">∞</div>
-            <div className="text-sm text-gray-600">Passion for the Game</div>
+            <div className="text-3xl font-bold text-3pt-green mb-2">{formatNumber(stats.releases)}</div>
+            <div className="text-sm text-gray-600">Releases Tracked</div>
           </div>
         </div>
       </main>
