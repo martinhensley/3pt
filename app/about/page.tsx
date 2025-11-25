@@ -85,7 +85,7 @@ export default async function AboutPage() {
                 </button>
               </div>
               <p className="text-sm text-white/80 mt-3">
-                Unsubscribe at any time.
+                Get access to our top 10 daily and weekly reports!
               </p>
             </div>
           </section>
