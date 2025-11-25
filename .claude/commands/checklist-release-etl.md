@@ -76,7 +76,7 @@ Expected data structure:
 
 ## Step 4: Transform & Generate Import Script
 
-Create a TypeScript script at `/scripts/{year}-{release}/import-{section}.ts` with:
+Create a TypeScript script at `/scripts/etl/{year}-{release}/import-{section}.ts` with:
 
 1. **Import statements**:
 ```typescript
@@ -168,10 +168,10 @@ async function importData() {
 
 Show instructions:
 ```
-✅ Import script created: /scripts/2024-25-donruss-soccer/import-base.ts
+✅ Import script created: /scripts/etl/2024-25-donruss-soccer/import-base.ts
 
 To import this data, run:
-  npx tsx scripts/2024-25-donruss-soccer/import-base.ts
+  npx tsx scripts/etl/2024-25-donruss-soccer/import-base.ts
 
 The script will:
   - Create/update the release record
@@ -260,7 +260,7 @@ Before generating script, verify:
 - `/docs/IMPORT_GUIDE.md` - Import documentation
 - `/docs/SLUG_CONVENTIONS.md` - Slug rules
 - `/docs/PARALLEL_ARCHITECTURE.md` - Parallel set architecture
-- `/scripts/2024-25-panini-donruss-soccer/` - Example import
+- `/scripts/etl/` - Release-specific ETL import scripts
 
 # Tips
 
