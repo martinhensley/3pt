@@ -119,7 +119,7 @@ export function parseChecklistText(text: string): ParsedSet {
 
   return {
     setName,
-    totalCards,
+    expectedCardCount,
     baseSetPrintRun,
     parallels,
     baseCards,
