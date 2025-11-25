@@ -12,27 +12,19 @@ This document lists all utility scripts in the codebase.
 
 **Utility Scripts:**
 - `delete-all-data.ts` - Complete database and blob storage reset
+- `delete-all-releases.ts` - Delete all releases (keeps manufacturers)
+- `approve-all-releases.ts` - Batch approve all releases
+- `purge-blob-store.ts` - Purge all blobs from storage
+- `cleanup-orphaned-blobs.ts` - Clean up orphaned blob files
 
-### Root Directory
+### `/scripts/etl` Directory
 
-**Configuration:**
-- `next.config.ts` - Next.js configuration
-- `next-env.d.ts` - TypeScript definitions for Next.js
-
-## Deleted Scripts
-
-All one-off migration, fix, check, and debugging scripts have been deleted to keep the codebase clean. This includes:
-- Migration scripts (source documents, images, parallel slugs, etc.)
-- One-off fix scripts (Donruss structure, Equinox parallels, etc.)
-- Check/debug scripts (database state, image table, post table, etc.)
-- Import scripts (Donruss, PDF checklist)
-- Generation scripts (release descriptions)
-- Analysis scripts (autograph counts)
-
-These scripts served their purpose and are no longer needed. The codebase now only contains:
-1. Essential setup scripts for initial auth configuration
-2. The database reset utility for development workflow
-3. Required configuration files
+Release-specific ETL scripts are organized by release:
+- `2016-17-panini-absolute-basketball/` - Autographs and memorabilia imports
+- `2016-17-panini-aficionado-basketball/` - Full checklist import with classification
+- `2016-17-panini-donruss-basketball/` - Base, autograph, and memorabilia imports
+- `2016-17-panini-donruss-optic-basketball/` - Optic parallel imports
+- `2016-panini-contenders-draft-picks/` - Contenders import with fixes
 
 ## Last Updated
-November 12, 2025
+November 25, 2025
