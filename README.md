@@ -155,8 +155,11 @@ npx prisma generate
 ```
 3pt/
 ├── .claude/
-│   ├── CLAUDE.md           # Development documentation & patterns
-│   └── skills/             # Claude Code skills directory
+│   ├── claude.md           # Claude Code configuration
+│   ├── commands/           # Custom slash commands
+│   │   └── checklist-release-etl.md
+│   └── skills/             # Claude Code skills
+│       └── checklist-release-etl/
 ├── app/
 │   ├── admin/              # Admin portal
 │   │   ├── activity/       # Activity history
@@ -199,6 +202,14 @@ npx prisma generate
 │   ├── Footer.tsx          # Site footer
 │   ├── Header.tsx          # Site header (standardized)
 │   └── MultiFileUpload.tsx # Multi-file upload component
+├── docs/                   # Project documentation
+│   ├── API.md              # REST API documentation
+│   ├── AI_INTEGRATION.md   # Anthropic SDK usage
+│   ├── DATABASE.md         # Complete schema reference
+│   ├── FRONTEND_PATTERNS.md # UI patterns
+│   ├── IMPORT_GUIDE.md     # Data import workflows
+│   ├── PARALLEL_ARCHITECTURE.md # Set relationships
+│   └── SLUG_CONVENTIONS.md # URL formatting
 ├── lib/
 │   ├── auth.ts             # NextAuth config
 │   ├── checklistParser.ts  # Excel checklist parser
@@ -213,7 +224,11 @@ npx prisma generate
 │   └── slugGenerator.ts    # URL slug generation
 ├── prisma/
 │   └── schema.prisma       # Database schema
-├── scripts/                # Data import/migration scripts
+├── scripts/
+│   ├── etl/                # Release ETL import scripts
+│   │   └── {release-name}/ # Per-release import folders
+│   └── *.ts                # Utility and migration scripts
+├── CLAUDE.md               # Development documentation & patterns
 └── public/
     └── uploads/            # Uploaded files
 ```
@@ -272,7 +287,7 @@ All public-facing pages follow a **standardized three-column layout** to ensure 
 - `/sets/[slug]` - Set detail pages (parent sets and parallel sets use same route)
 - `/cards/[slug]` - Card detail pages
 
-**See `.claude/CLAUDE.md` for detailed documentation.**
+**See `CLAUDE.md` for detailed development documentation.**
 
 ## Database Schema
 
