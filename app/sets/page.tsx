@@ -294,7 +294,7 @@ export default function SetsIndexPage() {
                     </label>
                     <select
                       value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value as any)}
+                      onChange={(e) => setSortBy(e.target.value as "name" | "year" | "cardCount" | "release")}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green bg-white text-gray-900"
                     >
                       <option value="year">Year</option>
@@ -311,7 +311,7 @@ export default function SetsIndexPage() {
                     </label>
                     <select
                       value={sortOrder}
-                      onChange={(e) => setSortOrder(e.target.value as any)}
+                      onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-3pt-green bg-white text-gray-900"
                     >
                       <option value="desc">Descending</option>

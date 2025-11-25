@@ -8,10 +8,27 @@
 
 import { del } from '@vercel/blob';
 
+interface SourceFile {
+  url?: string;
+}
+
+interface ImageRecord {
+  url?: string;
+}
+
+interface BlobEntity {
+  blobUrl?: string;
+  url?: string;
+  imageFront?: string;
+  imageBack?: string;
+  sourceFiles?: SourceFile[];
+  images?: ImageRecord[];
+}
+
 /**
  * Extract blob URLs from various database entities
  */
-export function extractBlobUrls(entity: any): string[] {
+export function extractBlobUrls(entity: BlobEntity): string[] {
   const urls: string[] = [];
 
   // Direct blob URL fields
@@ -32,7 +49,7 @@ export function extractBlobUrls(entity: any): string[] {
 
   // Source files (JSON field)
   if (entity.sourceFiles && Array.isArray(entity.sourceFiles)) {
-    entity.sourceFiles.forEach((file: any) => {
+    entity.sourceFiles.forEach((file: SourceFile) => {
       if (file.url && typeof file.url === 'string' && file.url.includes('blob.vercel-storage.com')) {
         urls.push(file.url);
       }
@@ -41,7 +58,7 @@ export function extractBlobUrls(entity: any): string[] {
 
   // Images array
   if (entity.images && Array.isArray(entity.images)) {
-    entity.images.forEach((image: any) => {
+    entity.images.forEach((image: ImageRecord) => {
       if (image.url && typeof image.url === 'string' && image.url.includes('blob.vercel-storage.com')) {
         urls.push(image.url);
       }
@@ -87,7 +104,7 @@ export async function deleteBlobs(urls: string[]): Promise<{ deleted: number; fa
 /**
  * Delete all blobs associated with a database entity
  */
-export async function deleteBlobsForEntity(entity: any): Promise<{ deleted: number; failed: number }> {
+export async function deleteBlobsForEntity(entity: BlobEntity): Promise<{ deleted: number; failed: number }> {
   const urls = extractBlobUrls(entity);
 
   if (urls.length === 0) {
@@ -121,7 +138,7 @@ export async function cleanupImage(image: { url?: string }): Promise<boolean> {
  * Delete blobs before removing a Release (including all associated images and source files)
  */
 export async function cleanupRelease(release: {
-  sourceFiles?: any[];
+  sourceFiles?: SourceFile[];
   images?: Array<{ url?: string }>;
   sourceDocuments?: Array<{ blobUrl?: string }>;
 }): Promise<{ deleted: number; failed: number }> {
@@ -129,7 +146,7 @@ export async function cleanupRelease(release: {
 
   // Collect URLs from sourceFiles
   if (release.sourceFiles && Array.isArray(release.sourceFiles)) {
-    release.sourceFiles.forEach((file: any) => {
+    release.sourceFiles.forEach((file: SourceFile) => {
       if (file.url && file.url.includes('blob.vercel-storage.com')) {
         urls.push(file.url);
       }

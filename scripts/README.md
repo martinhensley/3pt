@@ -38,8 +38,9 @@ scripts/
 ├── init-admin.ts                   # Initialize admin user
 ├── delete-all-data.ts              # Delete ALL database data
 ├── delete-all-releases.ts          # Delete all releases
-├── update-donruss-postdate.ts      # Update specific release fields
-└── migrate-description-to-review.ts # Schema migrations
+├── approve-all-releases.ts         # Batch approve all releases
+├── purge-blob-store.ts             # Purge all blobs from storage
+└── cleanup-orphaned-blobs.ts       # Clean up orphaned blob files
 ```
 
 ## 🎯 Benefits of Release-Specific Folders
@@ -175,15 +176,20 @@ See each folder's README/IMPORT-SUMMARY.md for full details.
 **Usage:** Clean slate for testing imports
 **Type:** Utility - Dangerous
 
-### update-donruss-postdate.ts
-**Purpose:** Update postDate field for Donruss release
-**Usage:** One-off migration script
-**Type:** Migration
+### approve-all-releases.ts
+**Purpose:** Batch approve all releases
+**Usage:** Quick approval of all pending releases
+**Type:** Utility
 
-### migrate-description-to-review.ts
-**Purpose:** Migrate description field to review field
-**Usage:** One-off schema migration
-**Type:** Migration
+### purge-blob-store.ts
+**Purpose:** Purge all blobs from storage
+**Usage:** Complete blob storage reset
+**Type:** Utility - Dangerous
+
+### cleanup-orphaned-blobs.ts
+**Purpose:** Clean up orphaned blob files
+**Usage:** Remove blobs not referenced in database
+**Type:** Utility
 
 ## 📖 Best Practices
 
