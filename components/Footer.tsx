@@ -21,9 +21,9 @@ export default function Footer({ rounded = true }: FooterProps) {
             </p>
           </div>
 
-          {/* Card Library */}
+          {/* Resources */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Card Library</h3>
+            <h3 className="text-lg font-semibold mb-4">Resources</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/cards" className="text-green-100 hover:text-white transition-colors">
@@ -31,35 +31,13 @@ export default function Footer({ rounded = true }: FooterProps) {
                 </Link>
               </li>
               <li>
-                <Link href="/checklists" className="text-green-100 hover:text-white transition-colors">
-                  Checklists
+                <Link href="/comps" className="text-green-100 hover:text-white transition-colors">
+                  Comps
                 </Link>
               </li>
               <li>
-                <Link href="/releases" className="text-green-100 hover:text-white transition-colors">
-                  Releases
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Resources */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Resources</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/about" className="text-green-100 hover:text-white transition-colors">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link href="/privacy" className="text-green-100 hover:text-white transition-colors">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link href="/terms" className="text-green-100 hover:text-white transition-colors">
-                  Terms of Service
+                <Link href="/collection" className="text-green-100 hover:text-white transition-colors">
+                  Collection Management
                 </Link>
               </li>
             </ul>
