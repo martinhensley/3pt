@@ -71,9 +71,10 @@ export function generateSetSlug(
     // Build the parts for a parallel set slug
     const parts = [year, releaseName, processedSetName, cleanParallel, 'parallel'];
 
-    // Add print run if provided (including 1 for 1/1 cards)
+    // Add print run if provided
+    // For 1/1 sets, use "1-of-1" instead of just "1"
     if (printRun) {
-      parts.push(printRun.toString());
+      parts.push(printRun === 1 ? '1-of-1' : printRun.toString());
     }
 
     return parts
@@ -162,7 +163,8 @@ export function generateCardSlug(
     playerName,
     processedVariant,
     // Only add print run if it's not already at the end of the variant
-    (printRun && !variantEndsWithPrintRun) ? printRun.toString() : null
+    // For 1/1 cards, use "1-of-1" instead of just "1"
+    (printRun && !variantEndsWithPrintRun) ? (printRun === 1 ? '1-of-1' : printRun.toString()) : null
   ].filter(Boolean);
 
   return parts

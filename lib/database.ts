@@ -461,12 +461,17 @@ export async function setExists(
  * Get library statistics
  */
 export async function getLibraryStats() {
-  const [manufacturerCount, releaseCount, setCount, cardCount] =
+  const [manufacturerCount, releaseCount, setCount, cardCount, uniquePlayers] =
     await Promise.all([
       prisma.manufacturer.count(),
       prisma.release.count(),
       prisma.set.count(),
       prisma.card.count(),
+      prisma.card.findMany({
+        where: { playerName: { not: null } },
+        select: { playerName: true },
+        distinct: ["playerName"],
+      }),
     ]);
 
   return {
@@ -474,5 +479,6 @@ export async function getLibraryStats() {
     releases: releaseCount,
     sets: setCount,
     cards: cardCount,
+    players: uniquePlayers.length,
   };
 }

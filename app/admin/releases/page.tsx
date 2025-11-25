@@ -39,8 +39,8 @@ export default function ManageReleasesPage() {
   const [loading, setLoading] = useState(true);
   const [manufacturerFilter, setManufacturerFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [sortBy, setSortBy] = useState<"name" | "year" | "created">("name");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [sortBy, setSortBy] = useState<"name" | "year" | "created" | "releaseDate">("releaseDate");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
@@ -155,6 +155,12 @@ export default function ManageReleasesPage() {
         case "created":
           comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
           break;
+        case "releaseDate":
+          // Use releaseDate if available, otherwise fall back to createdAt
+          const aDate = a.releaseDate ? new Date(a.releaseDate).getTime() : new Date(a.createdAt).getTime();
+          const bDate = b.releaseDate ? new Date(b.releaseDate).getTime() : new Date(b.createdAt).getTime();
+          comparison = aDate - bDate;
+          break;
       }
 
       return sortOrder === "asc" ? comparison : -comparison;
@@ -225,9 +231,10 @@ export default function ManageReleasesPage() {
 
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as "name" | "year" | "created")}
+                onChange={(e) => setSortBy(e.target.value as "name" | "year" | "created" | "releaseDate")}
                 className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
               >
+                <option value="releaseDate">Sort by Release Date</option>
                 <option value="name">Sort by Name</option>
                 <option value="year">Sort by Year</option>
                 <option value="created">Sort by Created Date</option>
@@ -247,7 +254,9 @@ export default function ManageReleasesPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 )}
-                {sortOrder === "asc" ? "A-Z" : "Z-A"}
+                {sortBy === "name" || sortBy === "year"
+                  ? (sortOrder === "asc" ? "A-Z" : "Z-A")
+                  : (sortOrder === "asc" ? "Oldest" : "Newest")}
               </button>
 
               <div className="flex-grow"></div>
