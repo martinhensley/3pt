@@ -105,7 +105,7 @@ model Card {
   imageBack             String?  // Back image URL
 
   // Admin notes
-  notes            String?  @db.Text // Internal notes about this card
+  notes                 String?  @db.Text // Internal notes about this card
 
   // Basketball-specific fields
   position              String?  // Player position (PG, SG, SF, PF, C)
