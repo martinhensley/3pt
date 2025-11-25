@@ -57,11 +57,6 @@ export default function Footer({ rounded = true }: FooterProps) {
                   Terms of Use
                 </Link>
               </li>
-              <li>
-                <Link href="/privacy" className="text-green-100 hover:text-white transition-colors">
-                  Privacy Policy
-                </Link>
-              </li>
             </ul>
           </div>
 
