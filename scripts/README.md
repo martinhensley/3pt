@@ -4,30 +4,29 @@ This directory contains utility scripts for managing the 3pt.bot database and im
 
 ## 📁 Folder Structure
 
-### Release-Specific Scripts
-Scripts for importing data for specific releases are organized into release-specific folders:
+### Release-Specific ETL Scripts
+Scripts for importing data for specific releases are organized into the `etl/` subfolder:
 
 ```
 scripts/
-├── {year}-{manufacturer}-{release}/
-│   ├── README.md                    # Release-specific documentation
-│   ├── import-*.ts                  # Primary import script(s)
-│   ├── fix-*.ts                     # Post-import fixes
-│   ├── delete-*.ts                  # Cleanup utilities
-│   ├── verify-*.ts                  # Verification scripts
-│   └── check-*.ts                   # Diagnostic tools
+├── etl/                             # Release-specific ETL scripts
+│   └── {year}-{manufacturer}-{release}/
+│       ├── README.md                # Release-specific documentation
+│       ├── import-*.ts              # Primary import script(s)
+│       ├── fix-*.ts                 # Post-import fixes
+│       ├── delete-*.ts              # Cleanup utilities
+│       ├── verify-*.ts              # Verification scripts
+│       └── check-*.ts               # Diagnostic tools
 ```
 
 **Example:**
 ```
-scripts/2024-25-panini-donruss-soccer/
+scripts/etl/2016-17-panini-donruss-basketball/
 ├── README.md
-├── import-donruss-from-excel.ts
-├── fix-rated-rookies.ts
-├── delete-donruss-data.ts
-├── verify-donruss-import.ts
-├── final-verification.ts
-└── check-rated-rookies.ts
+├── import-donruss-basketball-2016.ts
+├── import-autographs-complete.ts
+├── import-memorabilia-complete.ts
+└── 2016-17-Panini-Donruss-Basketball-Checklist.csv
 ```
 
 ### General Utilities
@@ -112,7 +111,7 @@ Use descriptive, action-oriented names:
 
 ### 1. Create Release Folder
 ```bash
-mkdir scripts/{year}-{manufacturer}-{release}
+mkdir scripts/etl/{year}-{manufacturer}-{release}
 ```
 
 ### 2. Develop Import Scripts
@@ -133,7 +132,7 @@ Create `README.md` documenting:
 ### 4. Run Import
 ```bash
 # Run from project root
-npx tsx scripts/{release-folder}/import-*.ts
+npx tsx scripts/etl/{release-folder}/import-*.ts
 ```
 
 ### 5. Archive
@@ -144,17 +143,15 @@ Keep the folder for:
 
 ## 📚 Existing Release Folders
 
-### 2024-25 Panini Donruss Soccer
-**Path:** `/scripts/2024-25-panini-donruss-soccer/`
-**Status:** ✅ Complete
-**Source:** Excel file (Master worksheet)
-**Results:** 147 sets, 872 cards
-**Special Cases:**
-- Rated Rookies merged into Base/Optic
-- Base Optic renamed to Optic
-- Parent-child parallel architecture
+Release ETL scripts are located in `/scripts/etl/`:
 
-See folder's README for full details.
+- `2016-17-panini-absolute-basketball` - Autographs and memorabilia imports
+- `2016-17-panini-aficionado-basketball` - Full checklist import with classification
+- `2016-17-panini-donruss-basketball` - Base, autograph, and memorabilia imports
+- `2016-17-panini-donruss-optic-basketball` - Optic parallel imports
+- `2016-panini-contenders-draft-picks` - Contenders import with fixes
+
+See each folder's README/IMPORT-SUMMARY.md for full details.
 
 ## 🛠️ General Utility Scripts
 
@@ -191,14 +188,14 @@ See folder's README for full details.
 ## 📖 Best Practices
 
 ### DO:
-✅ Create a release folder for each new import
+✅ Create a release folder in `/scripts/etl/` for each new import
 ✅ Document special cases in the README
 ✅ Include verification scripts
 ✅ Test with a subset before full import
 ✅ Keep cleanup utilities for re-imports
 
 ### DON'T:
-❌ Put release-specific scripts in root `/scripts`
+❌ Put release-specific scripts in root `/scripts` (use `/scripts/etl/`)
 ❌ Hardcode file paths without documentation
 ❌ Skip verification steps
 ❌ Delete scripts after successful import (keep for reference)
@@ -208,12 +205,12 @@ See folder's README for full details.
 
 ### For a Specific Release
 ```bash
-ls scripts/{year}-{manufacturer}-{release}/
+ls scripts/etl/{year}-{manufacturer}-{release}/
 ```
 
 ### For All Releases
 ```bash
-ls -d scripts/*/
+ls -d scripts/etl/*/
 ```
 
 ### For General Utilities
@@ -225,8 +222,8 @@ ls scripts/*.ts
 
 When adding a new release import:
 
-1. Create release folder: `scripts/{release-slug}/`
-2. Copy template from similar release (e.g., Donruss Soccer)
+1. Create release folder: `scripts/etl/{release-slug}/`
+2. Copy template from similar release (e.g., `2016-17-panini-donruss-basketball`)
 3. Update all release-specific values
 4. Create comprehensive README
 5. Test thoroughly before full import
@@ -234,4 +231,4 @@ When adding a new release import:
 
 ---
 
-**Last Updated:** November 14, 2025
+**Last Updated:** November 25, 2025
