@@ -14,7 +14,7 @@ export default function QuillEditor({
   placeholder = "Start writing...",
 }: QuillEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
-  const quillRef = useRef<any>(null);
+  const quillRef = useRef<InstanceType<typeof import('quill').default> | null>(null);
   const isInitializedRef = useRef(false);
 
   useEffect(() => {
