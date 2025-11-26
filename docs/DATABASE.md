@@ -165,16 +165,8 @@ Product releases (e.g., "2024-25 Panini Obsidian Soccer").
 | `name` | String | ✓ | | - | Release name (e.g., "Obsidian Soccer") |
 | `year` | String | | | - | Release year or season (e.g., "2024-25") |
 | `slug` | String | ✓ | ✓ | - | URL slug (auto-generated, e.g., "2024-25-panini-obsidian-soccer") |
-| `description` | String | | | - | **DEPRECATED:** Use `summary` instead |
 | `summary` | String (Text) | | | - | AI-generated summary of the release |
-| `summaryDate` | DateTime | | | - | When summary was generated/updated |
 | `releaseDate` | String | | | - | Free-form release date (e.g., "May 4, 2025" or "1978") |
-| `postDate` | DateTime | | | - | Date for chronological ordering (auto-populated or manual) |
-| `isApproved` | Boolean | ✓ | | `false` | Approval flag for public visibility |
-| `approvedAt` | DateTime | | | - | Approval timestamp |
-| `approvedBy` | String | | | - | Email of admin who approved |
-| `sellSheetText` | String (Text) | | | - | Extracted text from sell sheets for AI analysis |
-| `sourceFiles` | Json | | | - | Array of `{url, type, filename}` for uploaded files |
 | `manufacturerId` | String | ✓ | | - | Foreign key to Manufacturer |
 | `createdAt` | DateTime | ✓ | | `now()` | Created timestamp |
 | `updatedAt` | DateTime | ✓ | | `now()` | Last updated timestamp |
@@ -193,16 +185,8 @@ model Release {
   name           String
   year           String?
   slug           String          @unique
-  description    String?         @db.Text // Legacy field
   summary        String?         @db.Text
-  summaryDate    DateTime?
   releaseDate    String?
-  postDate       DateTime?
-  isApproved     Boolean         @default(false)
-  approvedAt     DateTime?
-  approvedBy     String?
-  sellSheetText  String?         @db.Text
-  sourceFiles    Json?
   manufacturerId String
   manufacturer   Manufacturer    @relation(fields: [manufacturerId], references: [id], onDelete: Cascade)
   createdAt      DateTime        @default(now())
@@ -216,45 +200,31 @@ model Release {
 
 **Field Notes:**
 
-**Release Date Fields:**
 - `releaseDate` (String): Free-form date for display (e.g., "May 4, 2025", "Spring 2025", "1978")
-- `postDate` (DateTime): Structured date for sorting and filtering (auto-populated from `releaseDate` or manually set)
-- `summaryDate` (DateTime): When AI-generated summary was created/updated
-
-**Approval Workflow:**
-Only releases with `isApproved = true` are shown on public pages. This allows admins to:
-- Build release data privately before making it public
-- Schedule releases for future publication
-- Review content before exposing it to users
+- `summary` (String): AI-generated description based on source materials
+- All releases are publicly visible (no approval workflow)
 
 **Usage Examples:**
 ```typescript
-// Create release with approval
+// Create release
 const release = await prisma.release.create({
   data: {
     name: "Obsidian Soccer",
     year: "2024-25",
     slug: "2024-25-panini-obsidian-soccer",
     releaseDate: "May 4, 2025",
-    postDate: new Date("2025-05-04"),
-    manufacturerId: manufacturer.id,
-    isApproved: true,
-    approvedBy: "admin@3pt.bot",
-    approvedAt: new Date()
+    manufacturerId: manufacturer.id
   }
 });
 
-// Fetch approved releases only (public view)
+// Fetch all releases
 const releases = await prisma.release.findMany({
-  where: { isApproved: true },
   include: {
     manufacturer: true,
-    sets: {
-      where: { parentSetId: null } // Parent sets only
-    },
-    images: true
+    sets: true,
+    images: { where: { type: 'RELEASE' }, orderBy: { order: 'asc' } }
   },
-  orderBy: { postDate: 'desc' }
+  orderBy: { createdAt: 'desc' }
 });
 
 // Fetch single release with full data
@@ -263,11 +233,7 @@ const release = await prisma.release.findUnique({
   include: {
     manufacturer: true,
     sets: {
-      where: { parentSetId: null },
-      include: {
-        parallelSets: true,
-        _count: { select: { cards: true } }
-      }
+      include: { _count: { select: { cards: true } } }
     },
     images: { orderBy: { order: 'asc' } },
     sourceDocuments: true
@@ -289,23 +255,18 @@ Card sets within releases (Base, Insert, Autograph, Memorabilia).
 | `name` | String | ✓ | | - | Set name (e.g., "Obsidian Base", "Electric Etch Orange") |
 | `slug` | String | ✓ | ✓ | - | URL slug (auto-generated) |
 | `type` | SetType | ✓ | | `Base` | Set type enum (Base, Insert, Autograph, Memorabilia) |
-| `isBaseSet` | Boolean | ✓ | | `false` | **DEPRECATED:** Use `type` instead |
 | `releaseId` | String | ✓ | | - | Foreign key to Release |
-| `totalCards` | String | | | - | Total cards in set (e.g., "200", "varies") |
+| `expectedCardCount` | Int | | | - | Official/expected number of cards from manufacturer's checklist |
 | `printRun` | Int | | | - | Standard print run for all cards (e.g., 99 for "/99" parallels) |
 | `description` | String | | | - | Optional set description |
-| `sourceText` | String (Text) | | | - | Original checklist text (parent sets only) |
-| `parallels` | Json | | | - | **DEPRECATED:** Use `parallelSets` relation instead |
-| `parentSetId` | String | | | - | Foreign key to parent set (null for parent sets) |
-| `hasVariableChecklist` | Boolean | ✓ | | `false` | True if parallels have different checklists |
-| `mirrorsParentChecklist` | Boolean | ✓ | | `true` | True if parallel cards mirror parent's checklist |
+| `sourceText` | String (Text) | | | - | Original checklist text for reference |
+| `isParallel` | Boolean | ✓ | | `false` | True if this is a parallel set (identified by naming convention) |
+| `baseSetSlug` | String | | | - | Reference to the base set's slug (for parallels only) |
 | `createdAt` | DateTime | ✓ | | `now()` | Created timestamp |
 | `updatedAt` | DateTime | ✓ | | `now()` | Last updated timestamp |
 
 **Relationships:**
 - Belongs to: `Release` (many-to-one)
-- Belongs to: `Set` (many-to-one, self-referential for parallels)
-- Has many: `Set[]` (one-to-many, self-referential for parallels)
 - Has many: `Card[]` (one-to-many)
 - Has many: `Post[]` (one-to-many, optional reference)
 - Has many: `Image[]` (one-to-many)
@@ -313,28 +274,23 @@ Card sets within releases (Base, Insert, Autograph, Memorabilia).
 **Prisma Schema:**
 ```prisma
 model Set {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String   @unique
-  type        SetType  @default(Base)
-  isBaseSet   Boolean  @default(false) // Deprecated
-  releaseId   String
-  release     Release  @relation(fields: [releaseId], references: [id], onDelete: Cascade)
-  totalCards  String?
-  printRun    Int?
-  description String?
-  sourceText  String?  @db.Text
-  parallels   Json?    // DEPRECATED
-  parentSetId String?
-  parentSet   Set?     @relation("ParallelSets", fields: [parentSetId], references: [id], onDelete: Cascade)
-  parallelSets Set[]   @relation("ParallelSets")
-  hasVariableChecklist Boolean @default(false)
-  mirrorsParentChecklist Boolean @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  cards       Card[]
-  posts       Post[]
-  images      Image[]
+  id                String   @id @default(cuid())
+  name              String
+  slug              String   @unique
+  type              SetType  @default(Base)
+  releaseId         String
+  release           Release  @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  expectedCardCount Int?
+  printRun          Int?
+  description       String?
+  sourceText        String?  @db.Text
+  isParallel        Boolean  @default(false)
+  baseSetSlug       String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  cards             Card[]
+  posts             Post[]
+  images            Image[]
 }
 ```
 
@@ -348,58 +304,60 @@ model Set {
 
 **Print Run Fields:**
 - `printRun`: Standard print run for all cards in set (e.g., 99 for "/99" parallels)
-- `totalCards`: Display string for total cards (can be "varies" or "or fewer")
+- `expectedCardCount`: Official card count from manufacturer's checklist
 - For individual card print runs, use `Card.printRun` instead
 
-**Parent-Child Parallel Architecture:**
-See [Parent-Child Parallel Sets](#parent-child-parallel-sets) section below for detailed explanation.
+**Independent Parallel Architecture:**
+All sets are standalone entities. Parallels are identified by naming convention (slug contains `-parallel`).
+See [Parallel Architecture Guide](/docs/PARALLEL_ARCHITECTURE.md) for detailed explanation.
 
 **Usage Examples:**
 ```typescript
-// Create parent set with cards
-const parentSet = await prisma.set.create({
+// Create base set with cards
+const baseSet = await prisma.set.create({
   data: {
     name: "Obsidian Base",
-    slug: "2024-25-obsidian-soccer-obsidian-base",
+    slug: "2024-25-obsidian-soccer-base-obsidian-base",
     type: "Base",
     releaseId: release.id,
-    totalCards: "145",
+    expectedCardCount: 145,
+    isParallel: false,
     cards: {
       create: [
-        {
-          playerName: "Jude Bellingham",
-          cardNumber: "1",
-          printRun: 145
-        }
+        { playerName: "Jude Bellingham", cardNumber: "1" },
+        { playerName: "Kylian Mbappe", cardNumber: "2" }
         // ... more cards
       ]
     }
   }
 });
 
-// Create parallel set (references parent's cards)
+// Create parallel set (independent, with its own cards)
 const parallelSet = await prisma.set.create({
   data: {
     name: "Electric Etch Orange",
-    slug: "2024-25-obsidian-soccer-obsidian-base-electric-etch-orange-149",
+    slug: "2024-25-obsidian-soccer-base-obsidian-base-electric-etch-orange-parallel-149",
     type: "Base",
     releaseId: release.id,
-    parentSetId: parentSet.id,
     printRun: 149,
-    mirrorsParentChecklist: true
+    isParallel: true,
+    baseSetSlug: "2024-25-obsidian-soccer-base-obsidian-base",
+    cards: {
+      create: [
+        { playerName: "Jude Bellingham", cardNumber: "1", printRun: 149 },
+        { playerName: "Kylian Mbappe", cardNumber: "2", printRun: 149 }
+        // ... same cards as base, with parallel-specific data
+      ]
+    }
   }
 });
 
-// Fetch set with parallel info
+// Fetch set with cards
 const set = await prisma.set.findUnique({
-  where: { slug: "2024-25-obsidian-soccer-obsidian-base" },
+  where: { slug: "2024-25-obsidian-soccer-base-obsidian-base" },
   include: {
-    release: {
-      include: { manufacturer: true }
-    },
-    parallelSets: true, // Child parallels
-    parentSet: true,    // Parent info (if this is a parallel)
-    cards: true,
+    release: { include: { manufacturer: true } },
+    cards: { orderBy: { cardNumber: 'asc' } },
     _count: { select: { cards: true } }
   }
 });
@@ -738,15 +696,12 @@ Reference documents (sell sheets, checklists, PDFs) used for content creation.
 | `displayName` | String | ✓ | | - | User-friendly name (editable) |
 | `blobUrl` | String | ✓ | | - | Vercel Blob storage URL |
 | `mimeType` | String | ✓ | | - | MIME type (e.g., "application/pdf") |
-| `fileSize` | Int | ✓ | | - | File size in bytes |
 | `documentType` | DocumentType | ✓ | | - | Type enum (SELL_SHEET, CHECKLIST, etc.) |
 | `entityType` | SourceDocumentEntityType | ✓ | | - | Entity type enum (RELEASE, POST) |
 | `tags` | String[] | ✓ | | `[]` | Searchable tags |
 | `extractedText` | String (Text) | | | - | OCR/extracted text for search |
 | `uploadedById` | String | ✓ | | - | References `neon_auth.admin_users.id` |
 | `uploadedAt` | DateTime | ✓ | | `now()` | Upload timestamp |
-| `lastUsedAt` | DateTime | | | - | Last usage timestamp |
-| `usageCount` | Int | ✓ | | `0` | Usage counter |
 | `usageContext` | String | | | - | Usage context notes |
 | `description` | String (Text) | | | - | Admin notes about document |
 | `releaseId` | String | | | - | Foreign key to Release (only set if entityType=RELEASE) |
@@ -766,15 +721,12 @@ model SourceDocument {
   displayName     String
   blobUrl         String
   mimeType        String
-  fileSize        Int
   documentType    DocumentType
   entityType      SourceDocumentEntityType
   tags            String[]
   extractedText   String?      @db.Text
   uploadedById    String
   uploadedAt      DateTime     @default(now())
-  lastUsedAt      DateTime?
-  usageCount      Int          @default(0)
   usageContext    String?
   description     String?      @db.Text
   createdAt       DateTime     @default(now())
@@ -795,22 +747,11 @@ const doc = await prisma.sourceDocument.create({
     displayName: "Obsidian Soccer Sell Sheet",
     blobUrl: blobUrl,
     mimeType: "application/pdf",
-    fileSize: 1024000,
     documentType: "SELL_SHEET",
     entityType: "RELEASE",
     releaseId: release.id,
     tags: ["2024-25", "Panini", "Obsidian"],
     uploadedById: "admin-user-id"
-  }
-});
-
-// Track usage
-await prisma.sourceDocument.update({
-  where: { id: doc.id },
-  data: {
-    lastUsedAt: new Date(),
-    usageCount: { increment: 1 },
-    usageContext: "Used for release review generation"
   }
 });
 ```
@@ -949,83 +890,62 @@ Panini
 
 ---
 
-### Parent-Child Parallel Sets
+### Independent Parallel Architecture
 
-Parallel sets use a **parent-child architecture** to avoid duplicating card data.
+All sets are **standalone entities** with their own cards. Parallels are identified by naming convention.
 
 **Key Concepts:**
 
-1. **Parent Sets** (`parentSetId = null`)
-   - Contain the actual card checklist
+1. **Base Sets** (`isParallel = false`)
+   - Standard sets with their own card checklist
    - Example: "Obsidian Base" with 145 cards
 
-2. **Child Parallel Sets** (`parentSetId` points to parent)
-   - Reference the parent's cards
-   - Store parallel-specific metadata (name, printRun)
-   - Cards array is empty (not duplicated)
-   - Example: "Electric Etch Orange /149" references "Obsidian Base" cards
+2. **Parallel Sets** (`isParallel = true`)
+   - Identified by `-parallel` in slug
+   - Store their own cards (duplicated from base)
+   - Reference base set via `baseSetSlug` for grouping
+   - Example: "Electric Etch Orange /149" has same cards as base
 
 **Database Structure:**
 
 ```typescript
-// Parent set
-const parentSet = {
+// Base set
+const baseSet = {
   id: 'abc123',
   name: 'Obsidian Base',
-  slug: '2024-25-obsidian-soccer-obsidian-base',
+  slug: '2024-25-obsidian-soccer-base-obsidian-base',
   type: 'Base',
-  parentSetId: null,          // null = parent set
-  parallelSets: [child1, child2, ...], // Array of child parallels
+  isParallel: false,
+  baseSetSlug: null,
   cards: [card1, card2, ...]   // Cards stored here
 };
 
-// Child parallel set
+// Parallel set (independent)
 const parallelSet = {
   id: 'xyz789',
   name: 'Electric Etch Orange',
-  slug: '2024-25-obsidian-soccer-obsidian-base-electric-etch-orange-149',
+  slug: '2024-25-obsidian-soccer-base-obsidian-base-electric-etch-orange-parallel-149',
   type: 'Base',
-  parentSetId: 'abc123',      // Points to parent
+  isParallel: true,
+  baseSetSlug: '2024-25-obsidian-soccer-base-obsidian-base',
   printRun: 149,
-  parallelSets: [],           // Parallels don't have children
-  cards: []                   // Empty - references parent's cards
+  cards: [card1, card2, ...]   // Own cards (duplicated)
 };
 ```
 
 **Benefits:**
-- **Storage Efficiency:** Cards not duplicated across parallels
-- **Consistency:** Single source of truth for card data
-- **Maintainability:** Update cards once, reflects across all parallels
-- **Query Performance:** Simpler joins, fewer records
+- **Simplicity:** No complex parent-child relationships
+- **Independence:** Each set fully self-contained
+- **Flexibility:** Parallels can have different card lists if needed
+- **Query Performance:** Simple queries without joins
 
-**Query Pattern:**
+**Set Sorting:**
+Sets are sorted to group parallels with their base sets:
+1. Non-parallels first (alphabetical)
+2. Unnumbered parallels next
+3. Numbered parallels (highest to lowest print run)
 
-```typescript
-// Fetch set with parallel support
-const set = await prisma.set.findUnique({
-  where: { slug: params.slug },
-  include: {
-    release: { include: { manufacturer: true } },
-    cards: true,              // Cards (if parent)
-    parallelSets: true,       // Child parallels (if parent)
-    parentSet: {              // Parent info (if parallel)
-      include: { cards: true } // Parent's cards (if this is parallel)
-    }
-  }
-});
-
-// Display cards: use parent's cards if this is a parallel
-const cardsToDisplay = set.parentSetId
-  ? set.parentSet.cards
-  : set.cards;
-```
-
-**Edge Cases:**
-
-1. **Sets with no parallels:** Create only parent set, no children
-2. **Variable parallels:** Some parallels have player-specific print runs (stored as separate cards)
-3. **Cascading deletes:** Deleting parent cascades to children (Prisma `onDelete: Cascade`)
-4. **Orphaned parallels:** Foreign key constraint ensures valid `parentSetId`
+See [Parallel Architecture Guide](/docs/PARALLEL_ARCHITECTURE.md) for implementation details.
 
 ---
 
@@ -1089,7 +1009,6 @@ All relationships use cascading deletes to maintain referential integrity:
 | Release | SourceDocument | CASCADE |
 | Set | Card | CASCADE |
 | Set | Image | CASCADE |
-| Set (Parent) | Set (Parallel) | CASCADE |
 | Card | Image | CASCADE |
 | Post | Image | CASCADE |
 | Post | SourceDocument | CASCADE |
@@ -1103,7 +1022,7 @@ Deleting a Release automatically deletes:
 
 **Important Notes:**
 - Post references to Release/Set/Card are **optional** and do NOT cascade (posts remain if referenced entity is deleted)
-- Parallel sets cascade delete when parent is deleted
+- Each set is independent, deleting a base set does NOT delete related parallel sets
 
 ---
 
@@ -1136,8 +1055,7 @@ All slugs are auto-generated using `/lib/slugGenerator.ts` functions. See [URL S
 **At Application Level:**
 - Slug uniqueness checked before creation
 - Print run validation (must be positive integer)
-- Date parsing for `releaseDate` → `postDate` conversion
-- File size limits for uploads (enforced in API routes)
+- File upload limits (enforced in API routes)
 - Admin authentication for write operations
 
 ---
@@ -1152,9 +1070,7 @@ const release = await prisma.release.findUnique({
   include: {
     manufacturer: true,
     sets: {
-      where: { parentSetId: null }, // Parent sets only
       include: {
-        parallelSets: true,          // Include child parallels
         _count: { select: { cards: true } }
       },
       orderBy: { name: 'asc' }
@@ -1172,7 +1088,7 @@ const release = await prisma.release.findUnique({
 
 ---
 
-### Fetch Set with Parallel Info
+### Fetch Set with Cards
 
 ```typescript
 const set = await prisma.set.findUnique({
@@ -1181,15 +1097,8 @@ const set = await prisma.set.findUnique({
     release: {
       include: { manufacturer: true }
     },
-    cards: true,              // Cards (if parent)
-    parallelSets: {           // Child parallels (if parent)
-      orderBy: { printRun: 'asc' }
-    },
-    parentSet: {              // Parent info (if parallel)
-      include: {
-        cards: true,          // Parent's cards
-        parallelSets: true    // All parallels (siblings)
-      }
+    cards: {
+      orderBy: { cardNumber: 'asc' }
     },
     images: {
       where: { type: 'SET' },
@@ -1197,11 +1106,6 @@ const set = await prisma.set.findUnique({
     }
   }
 });
-
-// Determine which cards to display
-const cardsToDisplay = set.parentSetId
-  ? set.parentSet.cards
-  : set.cards;
 ```
 
 ---
@@ -1216,8 +1120,7 @@ const card = await prisma.card.findUnique({
       include: {
         release: {
           include: { manufacturer: true }
-        },
-        parentSet: true // If card's set is a parallel
+        }
       }
     },
     images: {
@@ -1253,7 +1156,7 @@ const cards = await prisma.card.findMany({
     }
   },
   orderBy: [
-    { set: { release: { postDate: 'desc' } } },
+    { set: { release: { createdAt: 'desc' } } },
     { cardNumber: 'asc' }
   ]
 });
@@ -1261,24 +1164,23 @@ const cards = await prisma.card.findMany({
 
 ---
 
-### Fetch Approved Releases Only (Public View)
+### Fetch All Releases
 
 ```typescript
 const releases = await prisma.release.findMany({
-  where: {
-    isApproved: true
-  },
   include: {
     manufacturer: true,
     sets: {
-      where: { parentSetId: null }
+      include: {
+        _count: { select: { cards: true } }
+      }
     },
     images: {
       where: { type: 'RELEASE' },
       orderBy: { order: 'asc' }
     }
   },
-  orderBy: { postDate: 'desc' }
+  orderBy: { createdAt: 'desc' }
 });
 ```
 
@@ -1334,22 +1236,27 @@ npx prisma generate
 
 ---
 
-### Deprecated Fields
+### Removed Fields (November 2025)
 
-**Current Deprecated Fields:**
+The following fields were removed from the schema as part of simplification:
 
-| Model | Field | Replacement | Migration Plan |
-|-------|-------|-------------|----------------|
-| Release | `description` | `review` | Keep for backward compatibility, use `review` for new data |
-| Set | `isBaseSet` | `type` | Keep for backward compatibility, use `type` for all logic |
-| Set | `parallels` (Json) | `parallelSets` relation | Migrate to parent-child architecture, remove field in future version |
+**Release Model:**
+- `sourceFiles` (Json) - Use `SourceDocument` table instead
+- `description` - Use `summary` instead
+- `isApproved`, `approvedAt`, `approvedBy` - All releases now public
+- `postDate`, `summaryDate` - Simplified date handling
+- `sellSheetText` - Use `SourceDocument.extractedText` instead
 
-**Handling Deprecated Fields:**
-- DO NOT use in new code
-- DO NOT delete until all data migrated
-- Mark with comments in schema: `// DEPRECATED: use X instead`
-- Update documentation to reflect preferred approach
-- Plan removal in future major version
+**Set Model:**
+- `parallels` (Json) - Replaced with independent parallel architecture
+- `parentSetId`, `parentSet`, `parallelSets` - Removed parent-child relationships
+- `hasVariableChecklist`, `mirrorsParentChecklist` - No longer needed
+- `isBaseSet` - Use `type` enum instead
+- `totalCards` - Use `expectedCardCount` instead
+
+**SourceDocument Model:**
+- `fileSize` - No longer tracked
+- `lastUsedAt`, `usageCount` - Usage tracking removed
 
 ---
 
@@ -1362,4 +1269,4 @@ npx prisma generate
 
 ---
 
-*Last Updated: 2025-11-14*
+*Last Updated: 2025-11-26*

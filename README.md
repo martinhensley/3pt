@@ -32,7 +32,7 @@ A basketball card AI and Data Platform
 - **Smart Set Sorting**: Automatic grouping of sets with their parallels (Base/Optic first, then alphabetical by base name)
 - **Complete Checklists**: Major releases from Panini, Topps, and other manufacturers
 - **Card Database**: Comprehensive card database with images and metadata
-- **Release Management**: Approval workflow, reviews, source document tracking
+- **Release Management**: Reviews and source document tracking
 
 ### AI Integration
 - **Card Identification**: Analyze card images to identify player, set, variant, and print run
@@ -313,7 +313,6 @@ Manufacturer → Release → Set → Card
 
 - **Independent Parallel Architecture**: Each set (base and parallel) stores its own cards with simplified architecture
 - **Intelligent Set Sorting**: Automatic grouping by base name with smart sorting (unnumbered first, then numbered highest to lowest)
-- **Approval Workflow**: Releases require approval (`isApproved`) before public visibility
 - **Content Linking**: Posts, Images, and SourceDocuments use direct foreign keys with type discriminators
 - **Cascading Deletes**: Hierarchical relationships maintain referential integrity
 - **AI Metadata**: Cards store detection confidence, methods, and OCR text for Claude AI operations
@@ -325,10 +324,10 @@ Manufacturer → Release → Set → Card
 Includes:
 - Detailed field descriptions for all models
 - Enum definitions (SetType, ImageType, PostType, etc.)
-- Parent-child parallel architecture explained
+- Independent parallel architecture explained
 - Common query patterns with TypeScript/Prisma examples
 - Data integrity rules and cascading deletes
-- Migration guide and deprecated fields
+- Migration guide and removed fields history
 - Relationship diagrams and entity descriptions
 
 ## API Reference
@@ -378,7 +377,7 @@ Includes:
 - **TypeScript-first**: Strongly typed request/response interfaces
 - **AI-Powered**: Claude Sonnet 4 for card identification and content generation
 - **Cascading Operations**: Deletes cascade through relationships (Release → Sets → Cards)
-- **Efficient Parallels**: Cards stored once on parent sets, referenced by parallel sets
+- **Independent Parallels**: Each set stores its own cards for simplicity
 
 ## Environment Variables
 

@@ -316,13 +316,10 @@ When implementing sets with this architecture:
 No complex parent-child relationships to manage. Each set is self-contained and independent.
 
 ```typescript
-// ✅ Simple: Just fetch the set
-const set = await prisma.set.findUnique({ where: { slug } });
-
-// ❌ Complex: Would need to fetch parent and all children
+// ✅ Simple: Just fetch the set with its cards
 const set = await prisma.set.findUnique({
   where: { slug },
-  include: { parentSet: true, parallelSets: true }
+  include: { cards: true }
 });
 ```
 
@@ -377,4 +374,4 @@ Parallels are explicitly identified in URLs, making it obvious what type of set 
 
 ---
 
-*Last Updated: November 17, 2025*
+*Last Updated: November 26, 2025*

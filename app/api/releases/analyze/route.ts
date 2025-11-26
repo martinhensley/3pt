@@ -130,15 +130,6 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Prepare sourceFiles array from uploaded files
-      const sourceFiles = urlsToProcess.length > 0
-        ? urlsToProcess.map(url => ({
-            url: url,
-            type: mimeType || 'application/pdf',
-            filename: url.split('/').pop() || 'document',
-          }))
-        : null;
-
       // Use the manually edited release date if provided, otherwise use the one from analysis
       const finalReleaseDate = releaseDate || releaseInfo.releaseDate || null;
 
@@ -156,7 +147,6 @@ export async function POST(request: NextRequest) {
           slug: releaseInfo.slug,
           summary: descriptionResult.description,
           releaseDate: finalReleaseDate,
-          sourceFiles: sourceFiles || undefined,
           ...(createdAtDate && { createdAt: createdAtDate }),
         },
       });
@@ -201,7 +191,6 @@ export async function POST(request: NextRequest) {
                 displayName: displayName,
                 blobUrl: url,
                 mimeType: mimeType || 'application/octet-stream',
-                fileSize: 0, // We don't have size info at this point
                 documentType: documentType as any,
                 entityType: 'RELEASE',
                 tags: [releaseInfo.year, releaseInfo.manufacturer, releaseInfo.releaseName],

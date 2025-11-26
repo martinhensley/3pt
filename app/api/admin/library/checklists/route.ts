@@ -93,7 +93,6 @@ export async function GET(request: NextRequest) {
         id: checklist.id,
         name: checklist.displayName,
         fileUrl: checklist.blobUrl,
-        fileSize: checklist.fileSize,
         mimeType: checklist.mimeType,
         uploadedAt: checklist.uploadedAt.toISOString(),
         set: {

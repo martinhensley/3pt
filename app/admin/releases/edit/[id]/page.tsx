@@ -42,15 +42,12 @@ interface SourceDocument {
   displayName: string;
   blobUrl: string;
   mimeType: string;
-  fileSize: number;
   documentType: 'SELL_SHEET' | 'CHECKLIST' | 'PRESS_RELEASE' | 'PRICE_GUIDE' | 'IMAGE' | 'OTHER';
   entityType: 'RELEASE' | 'POST';
   description: string | null;
   usageContext: string | null;
   uploadedAt: string;
   uploadedById: string;
-  lastUsedAt: string | null;
-  usageCount: number;
 }
 
 interface Release {
@@ -59,7 +56,6 @@ interface Release {
   year: string;
   releaseDate: string | null;
   summary: string | null;
-  sourceFiles: SourceFile[] | null;
   sourceDocuments?: SourceDocument[];
   manufacturerId: string;
   manufacturer: {
@@ -111,7 +107,6 @@ export default function EditReleasePage() {
   const [uploadingFile, setUploadingFile] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
   const [reviewFile, setReviewFile] = useState<File | null>(null);
-  const [sourceFiles, setSourceFiles] = useState<SourceFile[]>([]);
 
   // Release data
   const [release, setRelease] = useState<Release | null>(null);
@@ -152,7 +147,6 @@ export default function EditReleasePage() {
       setEditedYear(data.year);
       setEditedReleaseDate(data.releaseDate || "");
       setEditedReview(data.summary || "");
-      setSourceFiles((data.sourceFiles as SourceFile[]) || []);
 
       // Transform sets data - only show parent sets at top level
       // Child parallel sets are nested under their parent's parallelSets array
@@ -1132,8 +1126,6 @@ export default function EditReleasePage() {
         });
 
         if (uploadResponse.ok) {
-          const fileData = await uploadResponse.json();
-          setSourceFiles([...sourceFiles, fileData]);
           setReviewFile(null); // Clear the file input
         }
       }
@@ -1204,11 +1196,6 @@ export default function EditReleasePage() {
         throw new Error("Failed to upload file");
       }
 
-      const fileData = await response.json();
-
-      // Add to sourceFiles array
-      setSourceFiles([...sourceFiles, fileData]);
-
       setMessage({ type: "success", text: `File "${file.name}" uploaded successfully` });
       setTimeout(() => setMessage(null), 3000);
     } catch (error) {
@@ -1235,9 +1222,6 @@ export default function EditReleasePage() {
       if (!response.ok) {
         throw new Error("Failed to delete file");
       }
-
-      // Remove from sourceFiles array
-      setSourceFiles(sourceFiles.filter(f => f.url !== fileUrl));
 
       setMessage({ type: "success", text: "File deleted successfully" });
       setTimeout(() => setMessage(null), 3000);
@@ -1337,7 +1321,6 @@ export default function EditReleasePage() {
             year: editedYear,
             releaseDate: editedReleaseDate || null,
             summary: editedReview || null,
-            sourceFiles: release.sourceFiles || null,
           }),
         });
 
@@ -1772,7 +1755,6 @@ export default function EditReleasePage() {
                 <div className="border border-gray-200 rounded-lg divide-y divide-gray-200 bg-gradient-to-br from-green-50 to-orange-50">
                   {release.sourceDocuments.map((doc) => {
                     // sourceDocuments is directly an array of SourceDocument entities
-                    const fileSizeMB = doc.fileSize ? (doc.fileSize / (1024 * 1024)).toFixed(2) : 'Unknown';
                     const fileExtension = doc.filename?.split('.').pop()?.toUpperCase() || 'FILE';
 
                     // Document type badge colors
@@ -1803,7 +1785,6 @@ export default function EditReleasePage() {
                               <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${colors.bg} ${colors.text}`}>
                                 {doc.documentType?.replace(/_/g, ' ') || 'UNKNOWN'}
                               </span>
-                              <span className="text-xs text-gray-500">{fileSizeMB} MB</span>
                               {doc.usageContext && (
                                 <span className="text-xs text-gray-500 italic truncate">• {doc.usageContext}</span>
                               )}

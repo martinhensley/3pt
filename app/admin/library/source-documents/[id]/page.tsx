@@ -26,15 +26,12 @@ interface SourceDocument {
   displayName: string;
   blobUrl: string;
   mimeType: string;
-  fileSize: number;
   documentType: DocumentType;
   tags: string[];
   extractedText: string | null;
   description: string | null;
   uploadedById: string;
   uploadedAt: string;
-  lastUsedAt: string | null;
-  usageCount: number;
   usedIn: {
     releases: UsedInRelease[];
     posts: UsedInPost[];
@@ -144,13 +141,6 @@ export default function SourceDocumentDetailPage() {
       setError("Failed to delete document");
       console.error(err);
     }
-  };
-
-  // Format file size
-  const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) return bytes + " B";
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
-    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
   };
 
   // Get color for document type
@@ -383,10 +373,6 @@ export default function SourceDocumentDetailPage() {
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Details</h2>
               <dl className="space-y-3 text-sm">
                 <div>
-                  <dt className="text-gray-600">File Size</dt>
-                  <dd className="font-semibold text-gray-900">{formatFileSize(document.fileSize)}</dd>
-                </div>
-                <div>
                   <dt className="text-gray-600">File Type</dt>
                   <dd className="font-semibold text-gray-900">{document.mimeType}</dd>
                 </div>
@@ -400,18 +386,6 @@ export default function SourceDocumentDetailPage() {
                   <dt className="text-gray-600">Uploaded By</dt>
                   <dd className="font-semibold text-gray-900">{document.uploadedById}</dd>
                 </div>
-                <div>
-                  <dt className="text-gray-600">Usage Count</dt>
-                  <dd className="font-semibold text-gray-900">{document.usageCount} times</dd>
-                </div>
-                {document.lastUsedAt && (
-                  <div>
-                    <dt className="text-gray-600">Last Used</dt>
-                    <dd className="font-semibold text-gray-900">
-                      {new Date(document.lastUsedAt).toLocaleString()}
-                    </dd>
-                  </div>
-                )}
               </dl>
             </div>
 

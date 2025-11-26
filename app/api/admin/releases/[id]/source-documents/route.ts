@@ -120,7 +120,6 @@ export async function POST(
         displayName,
         blobUrl: blob.url,
         mimeType: file.type,
-        fileSize: file.size,
         documentType: documentType as any,
         entityType: 'RELEASE',
         tags: [],
@@ -138,7 +137,6 @@ export async function POST(
         displayName: document.displayName,
         blobUrl: document.blobUrl,
         documentType: document.documentType,
-        fileSize: document.fileSize,
         mimeType: document.mimeType,
       },
     });

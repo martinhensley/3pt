@@ -57,12 +57,9 @@ export async function GET(request: NextRequest) {
         displayName: true,
         blobUrl: true,
         mimeType: true,
-        fileSize: true,
         documentType: true,
         tags: true,
         uploadedAt: true,
-        usageCount: true,
-        lastUsedAt: true,
       },
     });
 
@@ -186,7 +183,6 @@ export async function POST(request: NextRequest) {
         displayName: displayName || file.name.replace(/\.[^/.]+$/, ''),
         blobUrl: blob.url,
         mimeType: file.type,
-        fileSize: file.size,
         documentType,
         tags,
         extractedText,
@@ -203,7 +199,6 @@ export async function POST(request: NextRequest) {
         displayName: document.displayName,
         blobUrl: document.blobUrl,
         documentType: document.documentType,
-        fileSize: document.fileSize,
         mimeType: document.mimeType,
       },
     });

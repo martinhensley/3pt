@@ -112,15 +112,6 @@ export async function POST(
       });
     }
 
-    // Update document usage stats
-    await prisma.sourceDocument.update({
-      where: { id },
-      data: {
-        usageCount: { increment: 1 },
-        lastUsedAt: new Date(),
-      },
-    });
-
     return NextResponse.json({
       success: true,
       message: 'Document linked successfully',
@@ -182,14 +173,6 @@ export async function DELETE(
         },
       });
     }
-
-    // Update document usage stats
-    await prisma.sourceDocument.update({
-      where: { id },
-      data: {
-        usageCount: { decrement: 1 },
-      },
-    });
 
     return NextResponse.json({
       success: true,

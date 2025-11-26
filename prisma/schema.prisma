@@ -25,7 +25,6 @@ model Release {
   slug           String          @unique
   summary        String?         @db.Text // AI-generated summary of the release based on source materials
   releaseDate    String?         // Official release date as free-form string (e.g., "May 4, 2025" or "1978")
-  sourceFiles    Json?           // Array of {url: string, type: string, filename: string} for uploaded PDFs/images
 
   manufacturerId String
   manufacturer   Manufacturer    @relation(fields: [manufacturerId], references: [id], onDelete: Cascade)
@@ -185,7 +184,6 @@ model SourceDocument {
   displayName     String       // User-friendly name (editable)
   blobUrl         String       // Vercel Blob storage URL
   mimeType        String       // e.g., "application/pdf", "image/jpeg"
-  fileSize        Int          // Size in bytes
 
   // Classification
   documentType    DocumentType // SELL_SHEET, CHECKLIST, PRESS_RELEASE, etc.
@@ -198,8 +196,6 @@ model SourceDocument {
   // Metadata
   uploadedById    String       // References neon_auth.admin_users.id
   uploadedAt      DateTime     @default(now())
-  lastUsedAt      DateTime?    // Last time doc was linked to content
-  usageCount      Int          @default(0) // How many times it's been used
   usageContext    String?      // e.g., "Used for set descriptions"
 
   // Notes

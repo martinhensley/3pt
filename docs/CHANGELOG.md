@@ -4,6 +4,49 @@ Complete history of changes to the 3pt.bot project.
 
 ---
 
+## November 26, 2025 - Schema Simplification & Independent Parallel Architecture
+
+**Major Schema Changes:**
+
+Simplified the database schema by removing deprecated fields and adopting an independent parallel architecture where each set stores its own cards.
+
+**Release Model Changes (Removed Fields):**
+- `sourceFiles` - Replaced by SourceDocument table
+- `description` - Removed (unused)
+- `isApproved`, `approvedAt`, `approvedBy` - Removed approval workflow (all releases now public)
+- `postDate`, `summaryDate`, `sellSheetText` - Removed (unused)
+
+**Set Model Changes:**
+- Removed `parallels`, `parentSetId`, `parentSet`, `parallelSets` - No more parent-child relationships
+- Removed `hasVariableChecklist`, `mirrorsParentChecklist`, `isBaseSet` - Simplified architecture
+- Removed `totalCards` - Replaced by `expectedCardCount`
+- `isParallel` and `baseSetSlug` now used to identify parallels by naming convention
+
+**SourceDocument Model Changes (Removed Fields):**
+- `fileSize` - Removed (unused)
+- `lastUsedAt`, `usageCount` - Removed tracking fields
+
+**Architecture Changes:**
+- All sets are now standalone entities with their own cards
+- Parallels identified by naming convention (`-parallel` in slug)
+- No parent-child relationships between sets
+- Simpler data model with cards duplicated for independence
+- Smart ordering: non-parallels first, unnumbered parallels, numbered parallels (highest to lowest)
+
+**Documentation Updated:**
+- DATABASE.md - Complete schema reference
+- API.md - REST API documentation
+- PARALLEL_ARCHITECTURE.md - Architecture guide
+- .claude/CLAUDE.md and CLAUDE.md - Development docs
+- README.md - Project overview
+
+**Files Modified:**
+1. `prisma/schema.prisma` - Removed deprecated fields
+2. `app/api/releases/route.ts` - Removed sourceFiles references
+3. All documentation files updated to reflect schema changes
+
+---
+
 ## November 14, 2025 - Enhanced Set Sorting & Donruss Soccer Import
 
 **Changes:**
@@ -204,4 +247,4 @@ Group Structure:
 
 ---
 
-*Last Updated: November 17, 2025*
+*Last Updated: November 26, 2025*

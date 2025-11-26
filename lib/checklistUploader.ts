@@ -67,7 +67,6 @@ export async function uploadChecklistToRelease(
         displayName: finalDisplayName,
         blobUrl: blob.url,
         mimeType,
-        fileSize: fileBuffer.length,
         documentType: 'CHECKLIST',
         entityType: 'RELEASE',
         tags: [],

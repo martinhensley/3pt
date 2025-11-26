@@ -11,12 +11,9 @@ interface SourceDocument {
   displayName: string;
   blobUrl: string;
   mimeType: string;
-  fileSize: number;
   documentType: DocumentType;
   tags: string[];
   uploadedAt: string;
-  usageCount: number;
-  lastUsedAt: string | null;
 }
 
 interface PaginationInfo {
@@ -127,13 +124,6 @@ export default function SourceDocumentsPage() {
     }
   };
 
-  // Format file size
-  const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) return bytes + " B";
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
-    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
-  };
-
   // Get icon for file type
   const getFileIcon = (mimeType: string) => {
     if (mimeType.includes("pdf")) return "📄";
@@ -217,7 +207,6 @@ export default function SourceDocumentsPage() {
             >
               <option value="uploadedAt">Upload Date</option>
               <option value="displayName">Name</option>
-              <option value="usageCount">Usage Count</option>
             </select>
 
             <select
@@ -264,8 +253,6 @@ export default function SourceDocumentsPage() {
                     {doc.displayName}
                   </h3>
 
-                  <p className="text-sm text-gray-500 mb-4">{formatFileSize(doc.fileSize)}</p>
-
                   {doc.tags.length > 0 && (
                     <div className="flex flex-wrap gap-2 mb-4">
                       {doc.tags.slice(0, 3).map((tag, idx) => (
@@ -285,7 +272,6 @@ export default function SourceDocumentsPage() {
                   )}
 
                   <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
-                    <span>{doc.usageCount} uses</span>
                     <span>{new Date(doc.uploadedAt).toLocaleDateString()}</span>
                   </div>
 

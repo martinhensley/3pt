@@ -72,12 +72,8 @@ type ReleaseResponse = {
   name: string;
   year: string;
   slug: string;
-  description: string | null; // Legacy field
   summary: string | null;
-  summaryDate: Date | null;
   releaseDate: string | null;
-  postDate: Date | null;
-  isApproved: boolean;
   manufacturer: {
     id: string;
     name: string;
@@ -99,12 +95,8 @@ curl -X GET "http://localhost:3000/api/releases?slug=2024-25-panini-obsidian-soc
   "name": "Obsidian Soccer",
   "year": "2024-25",
   "slug": "2024-25-panini-obsidian-soccer",
-  "description": null,
-  "review": "Panini's Obsidian Soccer delivers premium card stock...",
-  "summaryDate": "2025-01-15T00:00:00.000Z",
+  "summary": "Panini's Obsidian Soccer delivers premium card stock...",
   "releaseDate": "December 2024",
-  "postDate": "2024-12-01T00:00:00.000Z",
-  "isApproved": true,
   "manufacturer": {
     "id": "cm3xyz789",
     "name": "Panini"
@@ -128,8 +120,7 @@ Create new release.
   name: string;
   year: string;
   manufacturerId: string;
-  description?: string;
-  review?: string;
+  summary?: string;
   releaseDate?: string;
 }
 ```
@@ -153,7 +144,6 @@ curl -X POST "http://localhost:3000/api/releases" \
   "name": "Chrome Soccer",
   "year": "2024-25",
   "slug": "2024-25-panini-chrome-soccer",
-  "isApproved": false,
   "createdAt": "2025-01-15T10:30:00.000Z"
 }
 ```
@@ -172,10 +162,8 @@ Update existing release.
   id: string;
   name?: string;
   year?: string;
-  description?: string;
-  review?: string;
+  summary?: string;
   releaseDate?: string;
-  postDate?: Date;
 }
 ```
 
@@ -185,8 +173,8 @@ curl -X PUT "http://localhost:3000/api/releases" \
   -H "Content-Type: application/json" \
   -d '{
     "id": "cm3abc123",
-    "review": "Updated review text...",
-    "summaryDate": "2025-01-20T00:00:00.000Z"
+    "summary": "Updated summary text...",
+    "releaseDate": "January 2025"
   }'
 ```
 
@@ -216,48 +204,13 @@ curl -X DELETE "http://localhost:3000/api/releases?id=cm3abc123"
 
 ---
 
-### POST /api/releases/approve
-
-Approve release for public viewing.
-
-**Authentication:** Required
-
-**Request Body:**
-```typescript
-{
-  releaseId: string;
-}
-```
-
-**Example Request:**
-```bash
-curl -X POST "http://localhost:3000/api/releases/approve" \
-  -H "Content-Type: application/json" \
-  -d '{"releaseId": "cm3abc123"}'
-```
-
-**Example Response:**
-```json
-{
-  "success": true,
-  "release": {
-    "id": "cm3abc123",
-    "isApproved": true,
-    "approvedAt": "2025-01-15T10:30:00.000Z",
-    "approvedBy": "admin@3pt.bot"
-  }
-}
-```
-
----
-
 ## Sets API
 
 Manage card sets and parallel variations.
 
 ### GET /api/sets
 
-Fetch set by slug with cards, release, and parallel relationships.
+Fetch set by slug with cards and release. Uses independent parallel architecture where each set stores its own cards.
 
 **Query Parameters:**
 - `slug` (string) - Set slug
@@ -271,10 +224,10 @@ type SetResponse = {
   name: string;
   slug: string;
   type: 'Base' | 'Autograph' | 'Memorabilia' | 'Insert';
-  totalCards: string | null;
+  isParallel: boolean;
+  baseSetSlug: string | null;
   printRun: number | null;
-  description: string | null;
-  parentSetId: string | null;
+  expectedCardCount: number | null;
   release: {
     id: string;
     name: string;
@@ -283,8 +236,6 @@ type SetResponse = {
     manufacturer: { name: string };
   };
   cards: Card[];
-  parallelSets: Set[];
-  parentSet?: Set;
 };
 ```
 
@@ -300,10 +251,10 @@ curl -X GET "http://localhost:3000/api/sets?slug=2024-25-obsidian-soccer-obsidia
   "name": "Obsidian Base",
   "slug": "2024-25-obsidian-soccer-obsidian-base",
   "type": "Base",
-  "totalCards": "200",
+  "isParallel": false,
+  "baseSetSlug": null,
   "printRun": null,
-  "description": "Base set featuring top players",
-  "parentSetId": null,
+  "expectedCardCount": 200,
   "release": {
     "id": "cm3rel123",
     "name": "Obsidian Soccer",
@@ -311,15 +262,7 @@ curl -X GET "http://localhost:3000/api/sets?slug=2024-25-obsidian-soccer-obsidia
     "slug": "2024-25-panini-obsidian-soccer",
     "manufacturer": { "name": "Panini" }
   },
-  "cards": [...],
-  "parallelSets": [
-    {
-      "id": "cm3par123",
-      "name": "Electric Etch Orange",
-      "slug": "2024-25-obsidian-soccer-obsidian-base-electric-etch-orange-8",
-      "printRun": 8
-    }
-  ]
+  "cards": [...]
 }
 ```
 
@@ -337,10 +280,10 @@ Create new set.
   name: string;
   type: 'Base' | 'Autograph' | 'Memorabilia' | 'Insert';
   releaseId: string;
-  totalCards?: string;
+  isParallel?: boolean;
+  baseSetSlug?: string; // Reference to base set (for parallels)
   printRun?: number;
-  description?: string;
-  parentSetId?: string; // For parallel sets
+  expectedCardCount?: number;
 }
 ```
 
@@ -352,7 +295,7 @@ curl -X POST "http://localhost:3000/api/sets" \
     "name": "Rookie Kings",
     "type": "Insert",
     "releaseId": "cm3rel123",
-    "totalCards": "50"
+    "expectedCardCount": 50
   }'
 ```
 
@@ -376,8 +319,8 @@ Update existing set.
   id: string;
   name?: string;
   type?: 'Base' | 'Autograph' | 'Memorabilia' | 'Insert';
-  totalCards?: string;
-  description?: string;
+  printRun?: number;
+  expectedCardCount?: number;
 }
 ```
 
@@ -867,8 +810,9 @@ curl -X GET "http://localhost:3000/api/checklists?manufacturer=Panini&type=Base"
     "name": "Obsidian Base",
     "slug": "2024-25-obsidian-soccer-obsidian-base",
     "type": "Base",
-    "totalCards": "200",
+    "isParallel": false,
     "printRun": null,
+    "expectedCardCount": 200,
     "release": {
       "name": "Obsidian Soccer",
       "year": "2024-25",
@@ -1243,19 +1187,20 @@ The API auto-generates URL-friendly slugs for all entities.
 
 ---
 
-## Parent-Child Parallel Architecture
+## Independent Parallel Architecture
 
-Sets use a parent-child model for parallel variations. See the **[Database Reference: Parent-Child Parallel Sets](./DATABASE.md#parent-child-parallel-sets)** for complete documentation including:
+Sets use an independent model for parallel variations where each set stores its own cards. See the **[Parallel Architecture Guide](./PARALLEL_ARCHITECTURE.md)** for complete documentation including:
 
 - Architecture overview and benefits
-- Database structure and relationships
+- Database structure and naming conventions
 - Query patterns with Prisma examples
-- Edge cases and cascading behavior
+- Sorting and display logic
 
 **Quick Summary:**
-- **Parent Sets:** Contain the actual card checklist
-- **Child Parallel Sets:** Reference parent's cards (cards not duplicated)
-- **Storage Efficiency:** Single source of truth for card data
+- **All sets are standalone entities** with their own cards
+- **Parallels identified by naming convention**: Sets with `-parallel` in slug
+- **No parent-child relationships**: Each set is independent
+- **Simpler data model**: Cards duplicated for independence, easier maintenance
 
 ---
 
@@ -1269,10 +1214,16 @@ Currently no rate limiting is enforced. Future versions may implement:
 
 ## Changelog
 
+### Version 1.1 (November 2025)
+- Simplified Release model (removed approval workflow fields)
+- Independent parallel set architecture (replaced parent-child model)
+- Removed deprecated fields: `isApproved`, `approvedAt`, `approvedBy`, `postDate`, `summaryDate`, `sellSheetText`, `description` from Release
+- Removed deprecated fields: `parentSetId`, `parallelSets`, `parentSet`, `totalCards` from Set
+- Added `isParallel`, `baseSetSlug`, `expectedCardCount` to Set
+
 ### Version 1.0 (January 2025)
 - Initial API release
 - Claude Sonnet 4 AI integration
-- Parent-child parallel set architecture
 - Comprehensive admin APIs
 - Public checklist browser
 

@@ -8,7 +8,6 @@ interface Checklist {
   id: string;
   name: string;
   fileUrl: string;
-  fileSize: number;
   mimeType: string;
   uploadedAt: string;
   set: {
@@ -108,13 +107,6 @@ export default function ChecklistsLibraryPage() {
 
     return () => clearTimeout(timer);
   }, [search]);
-
-  // Format file size
-  const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) return bytes + " B";
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
-    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
-  };
 
   // Get icon for file type
   const getFileIcon = (mimeType: string) => {
@@ -226,8 +218,6 @@ export default function ChecklistsLibraryPage() {
                       <span className="font-semibold">Set:</span> {checklist.set.name}
                     </p>
                   </div>
-
-                  <p className="text-sm text-gray-500 mb-4">{formatFileSize(checklist.fileSize)}</p>
 
                   <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
                     <span>{new Date(checklist.uploadedAt).toLocaleDateString()}</span>

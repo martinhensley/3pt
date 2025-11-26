@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { upload } from '@vercel/blob/client';
 import AdminLayout from '@/components/AdminLayout';
 
 export default function CreateReleasePage() {
@@ -63,26 +64,25 @@ export default function CreateReleasePage() {
       setAnalyzing(true);
       setError(null);
 
-      // Step 1: Upload all files to blob storage
+      // Step 1: Upload all files to blob storage using client-side upload
+      // This bypasses serverless function size limits by uploading directly to Vercel Blob
       console.log(`Uploading ${files.length} file(s) to blob storage...`);
       const uploadedUrls: string[] = [];
 
       for (const file of files) {
-        const formData = new FormData();
-        formData.append('file', file);
+        try {
+          // Use client-side upload for large files (up to 50MB)
+          const blob = await upload(file.name, file, {
+            access: 'public',
+            handleUploadUrl: '/api/upload/client-token',
+          });
 
-        const uploadResponse = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (!uploadResponse.ok) {
-          throw new Error(`Failed to upload file: ${file.name}`);
+          uploadedUrls.push(blob.url);
+          console.log(`File uploaded (${uploadedUrls.length}/${files.length}):`, blob.url);
+        } catch (uploadError) {
+          console.error('Upload error:', uploadError);
+          throw new Error(`Failed to upload file: ${file.name} - ${uploadError instanceof Error ? uploadError.message : 'Unknown error'}`);
         }
-
-        const { url: fileUrl } = await uploadResponse.json();
-        uploadedUrls.push(fileUrl);
-        console.log(`File uploaded (${uploadedUrls.length}/${files.length}):`, fileUrl);
       }
 
       // Store all uploaded file URLs
@@ -144,20 +144,16 @@ export default function CreateReleasePage() {
 
         const urls: string[] = [];
         for (const file of files) {
-          const formData = new FormData();
-          formData.append('file', file);
-
-          const response = await fetch('/api/upload', {
-            method: 'POST',
-            body: formData,
-          });
-
-          if (!response.ok) {
-            throw new Error(`Failed to upload ${file.name}`);
+          try {
+            // Use client-side upload for images
+            const blob = await upload(file.name, file, {
+              access: 'public',
+              handleUploadUrl: '/api/upload/client-token',
+            });
+            urls.push(blob.url);
+          } catch (uploadError) {
+            throw new Error(`Failed to upload ${file.name}: ${uploadError instanceof Error ? uploadError.message : 'Unknown error'}`);
           }
-
-          const { url } = await response.json();
-          urls.push(url);
         }
 
         // Append to existing uploaded images

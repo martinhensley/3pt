@@ -50,7 +50,6 @@ interface SourceDocument {
   displayName: string;
   blobUrl: string;
   mimeType: string;
-  fileSize: number;
   documentType: 'SELL_SHEET' | 'CHECKLIST' | 'PRESS_RELEASE' | 'PRICE_GUIDE' | 'IMAGE' | 'OTHER';
   description: string | null;
   uploadedAt: string;
@@ -62,18 +61,11 @@ interface ReleaseSourceDocument {
   displayName: string;
   blobUrl: string;
   mimeType: string;
-  fileSize: number;
   documentType: 'SELL_SHEET' | 'CHECKLIST' | 'PRESS_RELEASE' | 'PRICE_GUIDE' | 'IMAGE' | 'OTHER';
   entityType: 'RELEASE' | 'POST';
   description: string | null;
   usageContext: string | null;
   uploadedAt: string;
-}
-
-interface SourceFile {
-  url: string;
-  type: string;
-  filename: string;
 }
 
 interface Release {
@@ -90,7 +82,6 @@ interface Release {
   images: Image[];
   sets: CardSet[];
   sourceDocuments?: ReleaseSourceDocument[];
-  sourceFiles?: SourceFile[] | null; // JSON field - can be array or null
 }
 
 interface CarouselImage {
@@ -569,8 +560,7 @@ export default function ReleasePage() {
           </div>
 
           {/* Source Documents Section */}
-          {((release.sourceFiles && Array.isArray(release.sourceFiles) && release.sourceFiles.length > 0) ||
-            (release.sourceDocuments && release.sourceDocuments.length > 0)) && (
+          {release.sourceDocuments && release.sourceDocuments.length > 0 && (
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
               <div className="bg-gradient-to-r from-3pt-green to-green-700 px-6 py-4">
                 <h2 className="text-2xl font-bold text-white flex items-center gap-2">
@@ -581,82 +571,12 @@ export default function ReleasePage() {
                 </h2>
               </div>
               <div className="p-6 space-y-3">
-                {/* Display sourceFiles (JSON field) - exclude image files */}
-                {release.sourceFiles && Array.isArray(release.sourceFiles) && release.sourceFiles
-                  .filter((file) => {
-                    // Exclude image files
-                    const isImage = file.type?.startsWith('image/') || /\.(jpg|jpeg|png|gif|webp)$/i.test(file.filename || '');
-                    return !isImage;
-                  })
-                  .map((file, idx) => {
-                  const fileExtension = file.filename?.split('.').pop()?.toUpperCase() || 'FILE';
-
-                  // Determine document type from filename or mime type
-                  const isCSV = file.type === 'text/csv' || file.filename?.toLowerCase().endsWith('.csv');
-                  const isPDF = file.type === 'application/pdf' || file.filename?.toLowerCase().endsWith('.pdf');
-                  const isExcel = file.type?.includes('spreadsheet') || /\.(xlsx?|xls)$/i.test(file.filename || '');
-
-                  const docType = isCSV || isExcel ? 'CHECKLIST' : isPDF ? 'SELL_SHEET' : 'OTHER';
-
-                  const typeColors: Record<string, { bg: string; text: string }> = {
-                    SELL_SHEET: { bg: 'bg-blue-100', text: 'text-blue-800' },
-                    CHECKLIST: { bg: 'bg-green-100', text: 'text-green-800' },
-                    OTHER: { bg: 'bg-gray-100', text: 'text-gray-800' },
-                  };
-                  const colors = typeColors[docType] || typeColors.OTHER;
-
-                  // PDFs open in new tab, CSVs/Excel download
-                  const shouldDownload = isCSV || isExcel;
-
-                  return (
-                    <a
-                      key={`sf-${idx}`}
-                      href={file.url}
-                      {...(shouldDownload ? { download: file.filename } : { target: "_blank", rel: "noopener noreferrer" })}
-                      className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:border-3pt-green hover:bg-gray-50 transition-all duration-200 group"
-                    >
-                      {/* File Icon */}
-                      <div className="flex-shrink-0">
-                        <div className="w-12 h-12 bg-gradient-to-br from-3pt-green to-green-700 rounded-lg flex items-center justify-center text-white font-bold text-xs group-hover:scale-110 transition-transform duration-200">
-                          {fileExtension}
-                        </div>
-                      </div>
-
-                      {/* Document Info */}
-                      <div className="flex-grow min-w-0">
-                        <h3 className="font-semibold text-gray-900 group-hover:text-3pt-green transition-colors truncate">
-                          {file.filename || 'Unnamed File'}
-                        </h3>
-                        <div className="flex items-center gap-2 mt-1 flex-wrap">
-                          <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${colors.bg} ${colors.text}`}>
-                            {docType.replace(/_/g, ' ')}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Download Icon for CSV/Excel, External Link for PDFs */}
-                      <div className="flex-shrink-0">
-                        {shouldDownload ? (
-                          <svg className="w-5 h-5 text-gray-400 group-hover:text-3pt-green transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                          </svg>
-                        ) : (
-                          <svg className="w-5 h-5 text-gray-400 group-hover:text-3pt-green transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                          </svg>
-                        )}
-                      </div>
-                    </a>
-                  );
-                })}
-
                 {/* Display sourceDocuments from Document Library - exclude IMAGE type */}
                 {release.sourceDocuments && release.sourceDocuments
                   .filter((doc) => doc.documentType !== 'IMAGE')
                   .map((doc) => {
                   // sourceDocuments is directly an array of SourceDocument entities
                   const fileExtension = doc.filename?.split('.').pop()?.toUpperCase() || 'FILE';
-                  const fileSizeMB = doc.fileSize ? (doc.fileSize / (1024 * 1024)).toFixed(2) : 'Unknown';
 
                   // Determine if this should download or open in new tab
                   const isChecklistDoc = doc.documentType === 'CHECKLIST' ||
@@ -697,11 +617,6 @@ export default function ReleasePage() {
                           <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${colors.bg} ${colors.text}`}>
                             {doc.documentType?.replace(/_/g, ' ') || 'UNKNOWN'}
                           </span>
-                          {doc.fileSize > 0 && (
-                            <span className="text-sm text-gray-500">
-                              {fileSizeMB} MB
-                            </span>
-                          )}
                           {doc.usageContext && (
                             <span className="text-sm text-gray-500 italic truncate">
                               • {doc.usageContext}

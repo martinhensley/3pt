@@ -24,7 +24,7 @@ npx prisma generate      # Regenerate Prisma client after schema changes
 Manufacturer → Release → Set → Card
 ```
 
-Releases require admin approval (`isApproved`) before public visibility. Sets have four types: Base, Autograph, Memorabilia, Insert.
+All releases are public. Sets have four types: Base, Autograph, Memorabilia, Insert.
 
 ### Parallel Set Architecture
 

@@ -154,8 +154,8 @@ Parallel:       {year}-{release}-{setname}-{variant}-parallel[-{printrun}]
 
 ```
 Manufacturer
-  └── Release (year, name, slug, description, releaseDate, sourceFiles)
-       └── Set (name, slug, type, isParallel, baseSetSlug, printRun)
+  └── Release (year, name, slug, summary, releaseDate)
+       └── Set (name, slug, type, isParallel, baseSetSlug, printRun, expectedCardCount)
             └── Card (playerName, team, cardNumber, variant, printRun, slug)
 ```
 
@@ -163,12 +163,13 @@ Manufacturer
 
 ```prisma
 model Set {
-  slug        String   @unique  // URL-friendly slug
-  type        SetType            // Base, Autograph, Memorabilia, Insert
-  isParallel  Boolean            // true for parallel sets
-  baseSetSlug String?            // Reference to base set slug (for parallels)
-  printRun    Int?               // Standard print run for all cards in set
-  cards       Card[]
+  slug              String   @unique  // URL-friendly slug
+  type              SetType           // Base, Autograph, Memorabilia, Insert
+  isParallel        Boolean           // true for parallel sets
+  baseSetSlug       String?           // Reference to base set slug (for parallels)
+  printRun          Int?              // Standard print run for all cards in set
+  expectedCardCount Int?              // Official card count from checklist
+  cards             Card[]
 }
 ```
 
@@ -266,41 +267,24 @@ Before committing changes to page layouts:
 
 ## Recent Changes
 
+### November 26, 2025 - Schema Simplification
+
+**Removed Fields:**
+- Release: `sourceFiles`, `description`, `isApproved`, `approvedAt`, `approvedBy`, `postDate`, `summaryDate`, `sellSheetText`
+- Set: `parallels`, `parentSetId`, `hasVariableChecklist`, `mirrorsParentChecklist`, `isBaseSet`, `totalCards`
+- SourceDocument: `fileSize`, `lastUsedAt`, `usageCount`
+
+**Key Changes:**
+- All releases are now public (no approval workflow)
+- Independent parallel architecture (no parent-child relationships)
+- Use `SourceDocument` table instead of `sourceFiles` JSON
+- Use `expectedCardCount` instead of `totalCards`
+
 ### November 17, 2025 - Documentation Reorganization
 
-**Changes:**
 - Reorganized documentation into dedicated guides in `/docs/`
 - Created 7 new comprehensive documentation files
-- Streamlined CLAUDE.md to ~450 lines (68% reduction from 1,409 lines)
-- Updated /docs/README.md as central navigation hub
-
-**New Documentation Files:**
-- `/docs/AI_INTEGRATION.md` - Complete AI integration guide
-- `/docs/FRONTEND_PATTERNS.md` - UI patterns and layout guide
-- `/docs/SLUG_CONVENTIONS.md` - URL slug formatting rules
-- `/docs/PARALLEL_ARCHITECTURE.md` - Parallel set architecture
-- `/docs/IMPORT_GUIDE.md` - Data import workflows
-- `/docs/DONRUSS_GUIDE.md` - Donruss-specific handling
-- `/docs/CHANGELOG.md` - Complete project history
-
-**Benefits:**
-- Much more scannable primary documentation
-- Detailed guides in logical locations
-- Historical changes archived separately
-- Easier to find specific information
-
-### November 14, 2025 - Enhanced Set Sorting & Donruss Soccer Import
-
-- Implemented comprehensive set sorting that groups sets with their parallels
-- Imported 2024-25 Panini Donruss Soccer: 116 sets with 8,947 cards
-- Fixed Optic parallel print runs to match official specifications
-- Enhanced `sortSetsGrouped` to work with all set types
-
-**Files Modified:**
-1. `/lib/setUtils.ts` - Enhanced sorting functions
-2. `/app/releases/[slug]/page.tsx` - Applied enhanced sorting
-3. `/scripts/import-donruss-soccer-2024.ts` - Main import script
-4. `/scripts/fix-optic-print-runs.ts` - Print run corrections
+- Streamlined CLAUDE.md to ~450 lines
 
 **📚 Full history:** [Changelog](/docs/CHANGELOG.md)
 
@@ -338,4 +322,4 @@ Before committing changes to page layouts:
 
 ---
 
-*Last Updated: November 17, 2025*
+*Last Updated: November 26, 2025*
