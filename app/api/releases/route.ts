@@ -26,7 +26,6 @@ export async function GET(request: NextRequest) {
           year: true,
           releaseDate: true,
           summary: true,
-          postDate: true,
           sourceFiles: true,
           manufacturerId: true,
           createdAt: true,
@@ -144,10 +143,7 @@ export async function GET(request: NextRequest) {
             }
           },
         },
-        orderBy: [
-          { postDate: 'desc' }, // Sort by postDate first (newest to oldest)
-          { createdAt: 'desc' } // Fall back to createdAt if postDate is null
-        ]
+        orderBy: { createdAt: 'desc' }
       });
 
       return NextResponse.json(releases);
@@ -169,7 +165,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, name, year, releaseDate, summary, sourceFiles, postDate } = body;
+    const { id, name, year, releaseDate, summary, sourceFiles } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -178,14 +174,14 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Auto-populate postDate from releaseDate if not explicitly provided
-    let calculatedPostDate = null;
-    if (postDate) {
-      calculatedPostDate = new Date(postDate);
-    } else if (releaseDate) {
-      // Use parseReleaseDateToPostDate to convert releaseDate string to DateTime
-      const { parseReleaseDateToPostDate } = await import('@/lib/formatters');
-      calculatedPostDate = parseReleaseDateToPostDate(releaseDate);
+    // Parse releaseDate to set createdAt at 4:20pm Mountain Time
+    let newCreatedAt: Date | undefined = undefined;
+    if (releaseDate) {
+      const { parseReleaseDateToCreatedAt } = await import('@/lib/formatters');
+      const parsedDate = parseReleaseDateToCreatedAt(releaseDate);
+      if (parsedDate) {
+        newCreatedAt = parsedDate;
+      }
     }
 
     const release = await prisma.release.update({
@@ -194,9 +190,9 @@ export async function PUT(request: NextRequest) {
         name,
         year,
         releaseDate: releaseDate || null,
-        postDate: calculatedPostDate,
         summary: summary || null,
         sourceFiles: sourceFiles || null,
+        ...(newCreatedAt && { createdAt: newCreatedAt }),
       },
       include: {
         manufacturer: true,

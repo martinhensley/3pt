@@ -76,7 +76,6 @@ interface Release {
   slug: string;
   summary: string | null;
   releaseDate: string | null;
-  postDate: string | null;
   createdAt: string;
   manufacturer: {
     name: string;

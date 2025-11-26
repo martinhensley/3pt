@@ -203,7 +203,6 @@ export const testData = {
     slug: '2024-25-panini-obsidian',
     year: '2024-25',
     releaseDate: '2024-10-15',
-    postDate: new Date('2024-10-15'),
     summary: 'High-end basketball release',
     sourceFiles: [],
     isApproved: true,

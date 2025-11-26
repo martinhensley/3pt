@@ -27,16 +27,13 @@ export async function POST(request: NextRequest) {
 
     let analysis;
 
-    // Store original files and parsed content for database storage
-    let sellSheetText: string | undefined;
+    // Store original files for database storage
     let sourceFiles: Array<{ url: string; type: string; filename?: string }> | undefined;
     let extractedImageUrls: string[] = [];
 
     // If analysisData is provided, use it directly (for creating DB records after analysis)
     if (analysisData) {
       analysis = analysisData;
-      // Get sell sheet data if it was passed through
-      sellSheetText = analysisData.sellSheetText;
       sourceFiles = analysisData.sourceFiles;
       extractedImageUrls = analysisData.extractedImageUrls || [];
     } else {
@@ -50,19 +47,6 @@ export async function POST(request: NextRequest) {
 
       // Parse all documents
       const parsedDocuments = await parseDocuments(files);
-
-      // Combine all parsed text for sell sheet storage
-      sellSheetText = parsedDocuments
-        .map(doc => {
-          if (typeof doc.content === 'string') {
-            return doc.content;
-          } else if (Array.isArray(doc.content)) {
-            // For CSV/table data, convert to readable text
-            return doc.content.map(row => row.join(' | ')).join('\n');
-          }
-          return '';
-        })
-        .join('\n\n---\n\n');
 
       // Store source file references
       sourceFiles = files.map((file: { url: string; type?: string }, index: number) => ({
@@ -78,19 +62,12 @@ export async function POST(request: NextRequest) {
       // Analyze with AI
       analysis = await analyzeReleaseDocuments(parsedDocuments);
 
-      // Attach sell sheet data and extracted images to analysis for potential later use
+      // Attach source files and extracted images to analysis for potential later use
       (analysis as ReleaseAnalysis & {
-        sellSheetText?: string;
-        sourceFiles?: Array<{ url: string; type: string; filename?: string }>;
-        extractedImageUrls?: string[];
-      }).sellSheetText = sellSheetText;
-      (analysis as ReleaseAnalysis & {
-        sellSheetText?: string;
         sourceFiles?: Array<{ url: string; type: string; filename?: string }>;
         extractedImageUrls?: string[];
       }).sourceFiles = sourceFiles;
       (analysis as ReleaseAnalysis & {
-        sellSheetText?: string;
         sourceFiles?: Array<{ url: string; type: string; filename?: string }>;
         extractedImageUrls?: string[];
       }).extractedImageUrls = extractedImageUrls;
@@ -114,7 +91,6 @@ export async function POST(request: NextRequest) {
             slug: analysis.slug,
             summary: analysis.excerpt,
             releaseDate: analysis.releaseDate ? new Date(analysis.releaseDate) : null,
-            sellSheetText,
             sourceFiles,
           },
           analysis.sets.map((set: { name: string; expectedCardCount?: string; features?: string[] }) => ({

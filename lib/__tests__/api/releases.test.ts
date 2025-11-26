@@ -255,9 +255,8 @@ describe('/api/releases', () => {
       );
     });
 
-    it('handles postDate auto-population from releaseDate', async () => {
+    it('handles createdAt auto-population from releaseDate', async () => {
       const mockUpdatedRelease = testData.createRelease({
-        postDate: new Date('2024-10-15'),
         manufacturer: testData.manufacturer,
         images: [],
         sets: [],
@@ -271,7 +270,7 @@ describe('/api/releases', () => {
           id: 'rel-test-id',
           name: 'Test Release',
           releaseDate: '2024-10-15',
-          // No explicit postDate - should be auto-populated
+          // createdAt should be auto-populated from releaseDate at 4:20pm MT
         },
       });
 
@@ -281,7 +280,7 @@ describe('/api/releases', () => {
       expect(mockPrisma.release.update).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            postDate: expect.any(Date),
+            createdAt: expect.any(Date),
           }),
         })
       );

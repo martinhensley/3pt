@@ -122,7 +122,6 @@ async function importDonrussBasketball() {
           slug: releaseSlug,
           releaseDate: 'November 23, 2016',
           manufacturerId: manufacturer.id,
-          postDate: new Date('2016-11-23')
         },
         include: { manufacturer: true }
       });

@@ -60,12 +60,6 @@ export default function Header({ showBackButton = false, rounded = true, showAd 
           >
             Posts
           </Link>
-          <Link
-            href="/releases"
-            className="text-green-100 hover:text-white transition-colors text-sm md:text-base font-medium"
-          >
-            Releases
-          </Link>
         </nav>
       </div>
 

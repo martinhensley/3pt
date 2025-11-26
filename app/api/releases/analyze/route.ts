@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { analyzeReleaseFlow, generateDescriptionFlow } from '@/lib/release-analyzer';
 import { prisma } from '@/lib/prisma';
-import { parseReleaseDateToPostDate } from '@/lib/formatters';
+import { parseReleaseDateToCreatedAt } from '@/lib/formatters';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -142,10 +142,10 @@ export async function POST(request: NextRequest) {
       // Use the manually edited release date if provided, otherwise use the one from analysis
       const finalReleaseDate = releaseDate || releaseInfo.releaseDate || null;
 
-      // Parse releaseDate string to postDate DateTime
-      const postDate = finalReleaseDate
-        ? parseReleaseDateToPostDate(finalReleaseDate)
-        : null;
+      // Parse releaseDate string to createdAt DateTime at 4:20pm MT
+      const createdAtDate = finalReleaseDate
+        ? parseReleaseDateToCreatedAt(finalReleaseDate)
+        : undefined;
 
       // Create release
       const release = await prisma.release.create({
@@ -156,9 +156,8 @@ export async function POST(request: NextRequest) {
           slug: releaseInfo.slug,
           summary: descriptionResult.description,
           releaseDate: finalReleaseDate,
-          postDate: postDate,
-          sellSheetText: sourceText,
           sourceFiles: sourceFiles || undefined,
+          ...(createdAtDate && { createdAt: createdAtDate }),
         },
       });
 
