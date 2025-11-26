@@ -605,11 +605,14 @@ export default function ReleasePage() {
                   };
                   const colors = typeColors[docType] || typeColors.OTHER;
 
+                  // PDFs open in new tab, CSVs/Excel download
+                  const shouldDownload = isCSV || isExcel;
+
                   return (
                     <a
                       key={`sf-${idx}`}
                       href={file.url}
-                      download={file.filename}
+                      {...(shouldDownload ? { download: file.filename } : { target: "_blank", rel: "noopener noreferrer" })}
                       className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:border-3pt-green hover:bg-gray-50 transition-all duration-200 group"
                     >
                       {/* File Icon */}
@@ -631,11 +634,17 @@ export default function ReleasePage() {
                         </div>
                       </div>
 
-                      {/* Download Icon */}
+                      {/* Download Icon for CSV/Excel, External Link for PDFs */}
                       <div className="flex-shrink-0">
-                        <svg className="w-5 h-5 text-gray-400 group-hover:text-3pt-green transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                        </svg>
+                        {shouldDownload ? (
+                          <svg className="w-5 h-5 text-gray-400 group-hover:text-3pt-green transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                          </svg>
+                        ) : (
+                          <svg className="w-5 h-5 text-gray-400 group-hover:text-3pt-green transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        )}
                       </div>
                     </a>
                   );
@@ -648,6 +657,11 @@ export default function ReleasePage() {
                   // sourceDocuments is directly an array of SourceDocument entities
                   const fileExtension = doc.filename?.split('.').pop()?.toUpperCase() || 'FILE';
                   const fileSizeMB = doc.fileSize ? (doc.fileSize / (1024 * 1024)).toFixed(2) : 'Unknown';
+
+                  // Determine if this should download or open in new tab
+                  const isChecklistDoc = doc.documentType === 'CHECKLIST' ||
+                    /\.(csv|xlsx?|xls)$/i.test(doc.filename || '');
+                  const shouldDownloadDoc = isChecklistDoc;
 
                   // Document type badge colors
                   const typeColors: Record<string, { bg: string; text: string }> = {
@@ -664,8 +678,7 @@ export default function ReleasePage() {
                     <a
                       key={doc.id}
                       href={doc.blobUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      {...(shouldDownloadDoc ? { download: doc.filename } : { target: "_blank", rel: "noopener noreferrer" })}
                       className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:border-3pt-green hover:bg-gray-50 transition-all duration-200 group"
                     >
                       {/* File Icon */}
@@ -702,11 +715,17 @@ export default function ReleasePage() {
                         )}
                       </div>
 
-                      {/* Download Icon */}
+                      {/* Download Icon for checklists, External Link for PDFs/others */}
                       <div className="flex-shrink-0">
-                        <svg className="w-5 h-5 text-gray-400 group-hover:text-3pt-green transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
+                        {shouldDownloadDoc ? (
+                          <svg className="w-5 h-5 text-gray-400 group-hover:text-3pt-green transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                          </svg>
+                        ) : (
+                          <svg className="w-5 h-5 text-gray-400 group-hover:text-3pt-green transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        )}
                       </div>
                     </a>
                   );
