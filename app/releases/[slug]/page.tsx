@@ -58,9 +58,16 @@ interface SourceDocument {
 
 interface ReleaseSourceDocument {
   id: string;
-  document: SourceDocument;
+  filename: string;
+  displayName: string;
+  blobUrl: string;
+  mimeType: string;
+  fileSize: number;
+  documentType: 'SELL_SHEET' | 'CHECKLIST' | 'PRESS_RELEASE' | 'PRICE_GUIDE' | 'IMAGE' | 'OTHER';
+  entityType: 'RELEASE' | 'POST';
+  description: string | null;
   usageContext: string | null;
-  linkedAt: string;
+  uploadedAt: string;
 }
 
 interface SourceFile {
@@ -677,9 +684,11 @@ export default function ReleasePage() {
                           <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${colors.bg} ${colors.text}`}>
                             {doc.documentType?.replace(/_/g, ' ') || 'UNKNOWN'}
                           </span>
-                          <span className="text-sm text-gray-500">
-                            {fileSizeMB} MB
-                          </span>
+                          {doc.fileSize > 0 && (
+                            <span className="text-sm text-gray-500">
+                              {fileSizeMB} MB
+                            </span>
+                          )}
                           {doc.usageContext && (
                             <span className="text-sm text-gray-500 italic truncate">
                               • {doc.usageContext}
