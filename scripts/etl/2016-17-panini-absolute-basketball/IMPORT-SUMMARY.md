@@ -210,12 +210,12 @@ async function importSets() {
 - `/.claude/skills/checklist-release-etl.md` - Updated to local-first philosophy
 
 ### Created:
-- `/scripts/2016-17-panini-absolute-basketball/import-autographs.ts`
-- `/scripts/2016-17-panini-absolute-basketball/import-missing-sets.ts`
-- `/scripts/2016-17-panini-absolute-basketball/import-memorabilia.ts`
-- `/scripts/2016-17-panini-absolute-basketball/import-memorabilia-part2.ts`
-- `/scripts/2016-17-panini-absolute-basketball/import-memorabilia-part3.ts`
-- `/scripts/2016-17-panini-absolute-basketball/IMPORT-SUMMARY.md` (this file)
+- `/scripts/etl/2016-17-panini-absolute-basketball/import-autographs.ts`
+- `/scripts/etl/2016-17-panini-absolute-basketball/import-missing-sets.ts`
+- `/scripts/etl/2016-17-panini-absolute-basketball/import-memorabilia.ts`
+- `/scripts/etl/2016-17-panini-absolute-basketball/import-memorabilia-part2.ts`
+- `/scripts/etl/2016-17-panini-absolute-basketball/import-memorabilia-part3.ts`
+- `/scripts/etl/2016-17-panini-absolute-basketball/IMPORT-SUMMARY.md` (this file)
 
 ---
 

@@ -73,10 +73,11 @@ return (
 {year}-{release}-{set}-{cardNumber}-{player}-{printRun}
 ```
 
-**Parallel cards (set name excluded):**
-```
-{year}-{release}-{cardNumber}-{player}-{parallelName}-{printRun}
-```
+**Parallel cards:**
+- Base set parallels (set name excluded): `{year}-{release}-{cardNumber}-{player}-{parallelName}-{printRun}`
+- Insert/Auto/Mem parallels (set name included): `{year}-{release}-{setName}-{cardNumber}-{player}-{parallelName}-{printRun}`
+
+**Why?** Insert/Auto/Mem parallels need the set name to distinguish between different sets (e.g., Kaboom Gold vs. Crusade Gold).
 
 **Exception:** Optic cards KEEP "optic" in slugs.
 

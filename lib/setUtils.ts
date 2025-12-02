@@ -12,7 +12,7 @@ export function isParallelSet(slug: string): boolean {
 
 /**
  * Extract the base set slug from a parallel set slug
- * Example: "2024-25-donruss-soccer-optic-cubic-parallel-99" → "2024-25-donruss-soccer-optic"
+ * Example: "2024-25-donruss-basketball-optic-cubic-parallel-99" → "2024-25-donruss-basketball-optic"
  */
 export function getBaseSetSlug(parallelSlug: string): string {
   if (!isParallelSet(parallelSlug)) {
@@ -41,7 +41,7 @@ export function getBaseSetSlug(parallelSlug: string): string {
 
   // Count segments: typically year (1) + release name (2-3) + base set name (1-2)
   // Let's be conservative and assume at least 4 segments for the base
-  // (e.g., "2024-25-donruss-soccer-optic")
+  // (e.g., "2024-25-donruss-basketball-optic")
 
   // Actually, let's be smarter: look for known set name patterns
   const setNamePatterns = ['base', 'optic', 'rated-rookies', 'kaboom', 'downtown', 'animation',
@@ -74,8 +74,8 @@ export function getBaseSetSlug(parallelSlug: string): string {
 
 /**
  * Extract parallel variant name from a parallel set slug
- * Example: "2024-25-donruss-soccer-optic-cubic-parallel-99" → "cubic"
- * Example: "2024-25-donruss-soccer-optic-blue-cubic-parallel-99" → "blue-cubic"
+ * Example: "2024-25-donruss-basketball-optic-cubic-parallel-99" → "cubic"
+ * Example: "2024-25-donruss-basketball-optic-blue-cubic-parallel-99" → "blue-cubic"
  */
 export function getParallelVariant(parallelSlug: string): string | null {
   if (!isParallelSet(parallelSlug)) {
@@ -93,8 +93,8 @@ export function getParallelVariant(parallelSlug: string): string | null {
 
 /**
  * Extract print run from a parallel set slug
- * Example: "2024-25-donruss-soccer-optic-cubic-parallel-99" → 99
- * Example: "2024-25-donruss-soccer-optic-cubic-parallel" → null
+ * Example: "2024-25-donruss-basketball-optic-cubic-parallel-99" → 99
+ * Example: "2024-25-donruss-basketball-optic-cubic-parallel" → null
  */
 export function getParallelPrintRun(parallelSlug: string): number | null {
   if (!isParallelSet(parallelSlug)) {

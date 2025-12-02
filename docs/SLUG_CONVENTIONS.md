@@ -21,18 +21,22 @@ Complete guide for generating and formatting URL slugs in the 3pt.bot applicatio
 
 **Example:**
 ```
-2024-25-obsidian-soccer-obsidian-base-1-jude-bellingham-145
+2016-17-absolute-basketball-base-133-jamal-mashburn-999
 ```
 
 **Components:**
-- `year`: `2024-25`
-- `release`: `obsidian-soccer`
-- `set`: `obsidian-base`
-- `cardNumber`: `1`
-- `player`: `jude-bellingham`
-- `printRun`: `145`
+- `year`: `2016-17`
+- `release`: `absolute-basketball`
+- `set`: `base`
+- `cardNumber`: `133`
+- `player`: `jamal-mashburn`
+- `printRun`: `999`
 
-### Parallel Card Format
+### Parallel Card Formats
+
+**IMPORTANT**: The slug format varies by set type.
+
+#### Base Set Parallels (Set Name Excluded)
 
 ```
 {year}-{release}-{cardNumber}-{player}-{parallelName}-{printRun}
@@ -40,41 +44,71 @@ Complete guide for generating and formatting URL slugs in the 3pt.bot applicatio
 
 **Example:**
 ```
-2024-25-obsidian-soccer-1-jude-bellingham-electric-etch-marble-flood-8
+2016-17-donruss-optic-basketball-2-jahlil-okafor-green-5
 ```
 
-**Important**: Set name is excluded for parallel cards since the parallel name is more specific.
+**Components:**
+- `year`: `2016-17`
+- `release`: `donruss-optic-basketball`
+- `cardNumber`: `2`
+- `player`: `jahlil-okafor`
+- `parallelName`: `green`
+- `printRun`: `5`
+
+#### Insert/Autograph/Memorabilia Parallels (Set Name Included)
+
+```
+{year}-{release}-{setName}-{cardNumber}-{player}-{parallelName}-{printRun}
+```
+
+**Example:**
+```
+2016-17-donruss-optic-basketball-all-stars-1-kobe-bryant-gold-10
+```
 
 **Components:**
-- `year`: `2024-25`
-- `release`: `obsidian-soccer`
+- `year`: `2016-17`
+- `release`: `donruss-optic-basketball`
+- `setName`: `all-stars`
 - `cardNumber`: `1`
-- `player`: `jude-bellingham`
-- `parallelName`: `electric-etch-marble-flood`
-- `printRun`: `8`
+- `player`: `kobe-bryant`
+- `parallelName`: `gold`
+- `printRun`: `10`
 
 ### Key Rules
 
-#### 1. Parallel Cards Exclude Base Set Name
+#### 1. Parallel Card Set Name Logic
 
-Parallel cards do NOT include the base set name in their slugs to avoid redundancy.
+**Base set parallels** exclude the set name to avoid redundancy:
 
 ```tsx
-// ✅ CORRECT
-2024-25-obsidian-soccer-1-jude-bellingham-electric-etch-green-5
+// ✅ CORRECT - Base parallel (Optic Base Green /5)
+2016-17-donruss-optic-basketball-2-jahlil-okafor-green-5
 
-// ❌ WRONG
-2024-25-obsidian-soccer-obsidian-base-1-jude-bellingham-electric-etch-green-5
+// ❌ WRONG - Don't include "base" for Base parallels
+2016-17-donruss-optic-basketball-base-2-jahlil-okafor-green-5
 ```
+
+**Insert/Autograph/Memorabilia parallels** ALWAYS include the set name for clarity:
+
+```tsx
+// ✅ CORRECT - Insert parallel (All-Stars Gold /10)
+2016-17-donruss-optic-basketball-all-stars-1-kobe-bryant-gold-10
+
+// ❌ WRONG - Missing "all-stars" makes it unclear which set this is
+2016-17-donruss-optic-basketball-1-kobe-bryant-gold-10
+```
+
+**Why?** Without the set name, you can't distinguish between parallels of different Insert sets (e.g., All-Stars Gold vs. Elite Series Gold).
 
 **Exception**: Optic cards KEEP "optic" in slugs because Optic is a distinct product line, not just a parallel.
 
 ```tsx
 // ✅ CORRECT - Base Optic card
-2024-25-donruss-soccer-optic-1-matt-turner
+2016-17-donruss-optic-basketball-1-joel-embiid
 
-// ✅ CORRECT - Optic Argyle parallel
-2024-25-donruss-soccer-optic-1-matt-turner-argyle
+// ✅ CORRECT - Optic Green parallel
+2016-17-donruss-optic-basketball-2-jahlil-okafor-green-5
 ```
 
 #### 2. Print Runs Are Not Duplicated
@@ -82,13 +116,13 @@ Parallel cards do NOT include the base set name in their slugs to avoid redundan
 If the parallel name already ends with the print run, don't add it again.
 
 ```tsx
-// Variant: "Electric Etch Marble Flood 8"
-// Print run: 8
+// Variant: "Green 5"
+// Print run: 5
 // ✅ CORRECT
-2024-25-obsidian-soccer-1-player-electric-etch-marble-flood-8
+2016-17-donruss-optic-basketball-2-jahlil-okafor-green-5
 
 // ❌ WRONG
-2024-25-obsidian-soccer-1-player-electric-etch-marble-flood-8-8
+2016-17-donruss-optic-basketball-2-jahlil-okafor-green-5-5
 ```
 
 #### 3. 1/1 Cards Use Special Formatting
@@ -109,32 +143,32 @@ See [Special Cases](#special-cases) below for 1/1 card formatting.
 
 | Set Type | Prefix | Example |
 |----------|--------|---------|
-| Base | `base` or omit if name contains "base" | `2024-25-obsidian-soccer-obsidian-base` |
-| Autograph | `auto` | `2024-25-obsidian-soccer-auto-dual-jersey-ink` |
-| Memorabilia | `mem` | `2024-25-obsidian-soccer-mem-patch-cards` |
-| Insert | `insert` | `2024-25-obsidian-soccer-insert-equinox` |
-| Other | (no prefix) | `2024-25-obsidian-soccer-special-cards` |
+| Base | `base` or omit if name contains "base" | `2016-17-donruss-basketball-base` |
+| Autograph | `auto` | `2016-17-donruss-basketball-auto-dominator-signatures` |
+| Memorabilia | `mem` | `2016-17-donruss-basketball-mem-jersey-series` |
+| Insert | `insert` | `2016-17-donruss-basketball-insert-elite-series` |
+| Other | (no prefix) | `2016-17-donruss-basketball-special-cards` |
 
 ### Examples
 
 **Base Set:**
 ```
-2024-25-obsidian-soccer-obsidian-base
+2016-17-donruss-basketball-base
 ```
 
 **Insert Set:**
 ```
-2024-25-obsidian-soccer-insert-equinox
+2016-17-donruss-basketball-insert-elite-series
 ```
 
 **Autograph Set:**
 ```
-2024-25-obsidian-soccer-auto-dual-jersey-ink
+2016-17-donruss-basketball-auto-dominator-signatures
 ```
 
 **Parallel Set:**
 ```
-2024-25-obsidian-soccer-obsidian-base-electric-etch-green-5
+2016-17-donruss-optic-basketball-base-green-parallel-5
 ```
 
 ---
@@ -151,7 +185,7 @@ See [Special Cases](#special-cases) below for 1/1 card formatting.
 
 **Standard Release:**
 ```
-2024-25-panini-donruss-soccer
+2016-17-panini-donruss-basketball
 ```
 
 **With Manufacturer:**
@@ -314,22 +348,32 @@ When a parallel name includes a print run indicator (e.g., "Electric Etch Orange
 
 **Location**: `/lib/slugGenerator.ts` - `generateCardSlug()` function
 
-#### Parallel Card Detection
+#### Set Name Inclusion Logic
 
-A card is considered a parallel if:
-- The variant differs from the set name
-- The variant doesn't include "base"
+The set name is excluded ONLY for Base set parallels. For Insert/Autograph/Memorabilia sets, the set name is ALWAYS included.
 
 ```typescript
-const isParallelCard = processedVariant &&
-  processedVariant.toLowerCase() !== setName.toLowerCase() &&
-  !processedVariant.toLowerCase().includes('base');
+let excludeSetName = false;
+
+if (setType === 'Base' || !setType) {
+  // Only for Base sets, check if this is a parallel card
+  const isBaseSetParallel = processedVariant &&
+    processedVariant.toLowerCase() !== setName.toLowerCase() &&
+    !processedVariant.toLowerCase().includes('base');
+
+  excludeSetName = isBaseSetParallel;
+}
+// For Insert, Autograph, Memorabilia, Other - never exclude set name
 ```
 
-**Example:**
-- Variant: `"Electric Etch Marble Flood 8"`
-- Set: `"Obsidian Base"`
-- Result: `true` (is parallel)
+**Examples:**
+
+| Set Type | Variant | Set Name | Excluded? | Result |
+|----------|---------|----------|-----------|--------|
+| Base | "Green" | "Base" | YES | `2016-17-donruss-optic-basketball-2-jahlil-okafor-green-5` |
+| Insert | "Gold" | "All-Stars" | NO | `2016-17-donruss-optic-basketball-all-stars-1-kobe-bryant-gold-10` |
+| Autograph | "Black" | "Dominator Signatures" | NO | `2016-17-donruss-basketball-dominator-signatures-2-kristaps-porzingis-black-1-of-1` |
+| Memorabilia | "Prime" | "Jersey Series" | NO | `2016-17-donruss-basketball-jersey-series-prime-1-jusuf-nurkic-prime-10` |
 
 #### Print Run Deduplication
 
@@ -359,10 +403,18 @@ Converts "1/1" or "1 of 1" to "1-of-1" format and prevents adding extra `-1`.
 #### Code Reference
 
 ```typescript
-// lib/slugGenerator.ts:117-167
-const isParallelCard = processedVariant &&
-  processedVariant.toLowerCase() !== setName.toLowerCase() &&
-  !processedVariant.toLowerCase().includes('base');
+// lib/slugGenerator.ts:141-167
+let excludeSetName = false;
+
+if (setType === 'Base' || !setType) {
+  // Only for Base sets, check if this is a parallel card
+  const isBaseSetParallel = processedVariant &&
+    processedVariant.toLowerCase() !== setName.toLowerCase() &&
+    !processedVariant.toLowerCase().includes('base');
+
+  excludeSetName = isBaseSetParallel;
+}
+// For Insert, Autograph, Memorabilia - never exclude set name
 
 const variantEndsWithPrintRun = processedVariant && printRun && (
   processedVariant.trim().endsWith(` ${printRun}`) ||
@@ -372,7 +424,7 @@ const variantEndsWithPrintRun = processedVariant && printRun && (
 const parts = [
   year,
   releaseName,
-  isParallelCard ? null : setName,  // Exclude setName for parallels
+  excludeSetName ? null : setName,  // Only exclude for Base parallels
   cardNumber,
   playerName,
   processedVariant,
@@ -382,36 +434,93 @@ const parts = [
 
 ### Examples
 
-#### Parallel Card
+#### Base Card (No Parallel)
 
 ```typescript
 generateCardSlug(
   'Panini',
-  'Obsidian Soccer',
-  '2024-25',
-  'Obsidian Base',
-  '1',
-  'Jude Bellingham',
-  'Electric Etch Marble Flood 8',
-  8
+  'Absolute Basketball',
+  '2016-17',
+  'Base',
+  '133',
+  'Jamal Mashburn',
+  null,
+  999,
+  'Base'
 )
-// → 2024-25-obsidian-soccer-1-jude-bellingham-electric-etch-marble-flood-8
+// → 2016-17-absolute-basketball-base-133-jamal-mashburn-999
 ```
 
-#### Base Card
+#### Base Set Parallel (Set Name Excluded)
 
 ```typescript
 generateCardSlug(
   'Panini',
-  'Obsidian Soccer',
-  '2024-25',
-  'Obsidian Base',
-  '1',
-  'Jude Bellingham',
-  null,
-  145
+  'Donruss Optic Basketball',
+  '2016-17',
+  'Base',
+  '2',
+  'Jahlil Okafor',
+  'Green',
+  5,
+  'Base'
 )
-// → 2024-25-obsidian-soccer-obsidian-base-1-jude-bellingham-145
+// → 2016-17-donruss-optic-basketball-2-jahlil-okafor-green-5
+//    Note: "base" is excluded for Base parallels
+```
+
+#### Insert Parallel (Set Name Included)
+
+```typescript
+generateCardSlug(
+  'Panini',
+  'Donruss Optic Basketball',
+  '2016-17',
+  'All-Stars',
+  '1',
+  'Kobe Bryant',
+  'Gold',
+  10,
+  'Insert'
+)
+// → 2016-17-donruss-optic-basketball-all-stars-1-kobe-bryant-gold-10
+//    Note: "all-stars" is included for Insert parallels
+```
+
+#### Autograph Parallel (Set Name Included)
+
+```typescript
+generateCardSlug(
+  'Panini',
+  'Donruss Basketball',
+  '2016-17',
+  'Dominator Signatures',
+  '2',
+  'Kristaps Porzingis',
+  'Black',
+  1,
+  'Autograph'
+)
+// → 2016-17-donruss-basketball-dominator-signatures-2-kristaps-porzingis-black-1-of-1
+//    Note: "dominator-signatures" is included for Autograph parallels
+```
+
+#### Memorabilia Parallel (Set Name Included)
+
+```typescript
+generateCardSlug(
+  'Panini',
+  'Donruss Basketball',
+  '2016-17',
+  'Jersey Series',
+  '1',
+  'Jusuf Nurkic',
+  'Prime',
+  10,
+  'Memorabilia'
+)
+// → 2016-17-donruss-basketball-jersey-series-prime-1-jusuf-nurkic-prime-10
+//    Note: "jersey-series" is included for Memorabilia parallels
 ```
 
 #### 1/1 Card
@@ -419,15 +528,16 @@ generateCardSlug(
 ```typescript
 generateCardSlug(
   'Panini',
-  'Obsidian Soccer',
-  '2024-25',
-  'Obsidian Base',
-  '1',
-  'Jude Bellingham',
-  'Gold Power 1/1',
-  1
+  'Donruss Basketball',
+  '2016-17',
+  'All-Stars',
+  '2',
+  'Larry Bird',
+  'Press Proof Black 1/1',
+  1,
+  'Insert'
 )
-// → 2024-25-obsidian-soccer-1-jude-bellingham-gold-power-1-of-1
+// → 2016-17-donruss-basketball-all-stars-2-larry-bird-press-proof-black-1-of-1
 ```
 
 ---

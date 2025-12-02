@@ -207,7 +207,7 @@ async function downloadFile(url: string): Promise<string> {
   const buffer = Buffer.from(await response.arrayBuffer());
 
   // Create temp directory
-  const tempDir = path.join(tmpdir(), "footy-temp");
+  const tempDir = path.join(tmpdir(), "3pt-temp");
   await mkdir(tempDir, { recursive: true });
 
   // Extract filename from URL or generate one

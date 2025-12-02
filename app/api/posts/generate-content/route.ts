@@ -15,10 +15,10 @@ const anthropic = createAnthropic({
 const postGenerationSchema = z.object({
   title: z.string().describe("An engaging, SEO-friendly title for the blog post"),
   content: z.string().describe(
-    "A comprehensive blog post (400-800 words) written as Footy - a passionate Southern soccer fan who's absolutely obsessed with the beautiful game and collecting cards. " +
-    "Write with Southern charm (use 'y'all,' 'reckon,' 'mighty fine,' 'bless your heart'), show genuine excitement about soccer and cards, use soccer metaphors, and be conversational like chatting with a buddy at the card shop. " +
+    "A comprehensive blog post (400-800 words) written in a professional, engaging style for basketball card collectors. " +
+    "Show genuine expertise and enthusiasm for basketball and the card collecting hobby. " +
     "Use HTML formatting with <p> tags for paragraphs, <strong> or <em> for emphasis, <h3> for section headings, and <ul>/<li> for lists. " +
-    "The content should be informative, engaging, and demonstrate deep knowledge of both soccer and the card collecting hobby."
+    "The content should be informative, insightful, and appeal to collectors at all levels."
   ),
   excerpt: z.string().describe("A concise 1-3 sentence summary for the post preview that captures the essence and hooks readers"),
 });
@@ -83,24 +83,23 @@ export async function POST(request: NextRequest) {
     if (prompt && prompt.trim()) {
       instruction = prompt.trim();
     } else {
-      instruction = "Analyze the provided image(s) and create an engaging blog post about soccer/football cards.";
+      instruction = "Analyze the provided image(s) and create an engaging blog post about basketball cards.";
     }
 
     // Add post type-specific guidance
     const postTypeGuidance: { [key: string]: string } = {
-      NEWS: "This is a NEWS post - focus on breaking news, recent announcements, or timely updates about soccer cards. Be informative and current, covering the latest happenings in the hobby.",
+      NEWS: "This is a NEWS post - focus on breaking news, recent announcements, or timely updates about basketball cards. Be informative and current, covering the latest happenings in the hobby.",
       REVIEW: "This is a REVIEW post - provide an in-depth review of a product, set, or card. Discuss quality, design, value, chase cards, and give your honest opinion about whether collectors should pursue it.",
       GUIDE: "This is a GUIDE post - create an educational, how-to style piece that helps collectors learn something new. Be instructional and thorough, walking readers through the topic step-by-step.",
-      ANALYSIS: "This is an ANALYSIS post - provide deep insights, data-driven observations, or expert commentary on trends, values, or the market. Be analytical while keeping your Southern charm.",
-      GENERAL: "This is a GENERAL post - write in a conversational, blog-style format about anything related to soccer cards and collecting. Be entertaining and engaging.",
+      ANALYSIS: "This is an ANALYSIS post - provide deep insights, data-driven observations, or expert commentary on trends, values, or the market. Be analytical and informative.",
+      GENERAL: "This is a GENERAL post - write in a conversational, blog-style format about anything related to basketball cards and collecting. Be entertaining and engaging.",
     };
 
     instruction += "\n\n" + (postTypeGuidance[postType] || postTypeGuidance.GENERAL);
 
-    instruction += "\n\nYour task is to create a blog post as Footy - a passionate Southern soccer fan who absolutely loves the beautiful game and collecting cards. " +
-      "Footy spent extended time in the British Commonwealth and attended the London School of Economics, which gives him a unique blend of Southern American charm mixed with proper football knowledge and international perspective. " +
-      "Write with Southern charm and warmth (use phrases like 'y'all,' 'reckon,' 'mighty fine,' 'I tell you what'), occasionally reference your time abroad or LSE experience when relevant, " +
-      "show genuine excitement about soccer and cards, use soccer metaphors, and be conversational like chatting with a buddy at the card shop. " +
+    instruction += "\n\nYour task is to create a professional, engaging blog post about basketball cards and collecting. " +
+      "Write with expertise and enthusiasm, demonstrating deep knowledge of basketball and the card collecting hobby. " +
+      "Provide insights, analysis, and useful information that collectors will value. " +
       "The post should be 400-800 words and use proper HTML formatting.";
 
     contentParts.push({

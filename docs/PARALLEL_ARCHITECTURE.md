@@ -33,7 +33,7 @@ The database uses a **simplified independent model** for parallel sets where eac
 const baseSet = {
   id: 'abc123',
   name: 'Optic',
-  slug: '2024-25-donruss-soccer-optic',
+  slug: '2016-17-donruss-basketball-optic',
   type: 'Base',
   isParallel: false,
   baseSetSlug: null,
@@ -48,10 +48,10 @@ const baseSet = {
 const parallelSet = {
   id: 'xyz789',
   name: 'Cubic',
-  slug: '2024-25-donruss-soccer-optic-cubic-parallel-99',
+  slug: '2016-17-donruss-basketball-optic-cubic-parallel-99',
   type: 'Base',
   isParallel: true,
-  baseSetSlug: '2024-25-donruss-soccer-optic',
+  baseSetSlug: '2016-17-donruss-basketball-optic',
   printRun: 99,
   cards: [card1, card2, ...] // Own cards (200 cards)
 };
@@ -82,9 +82,9 @@ const parallelSet = {
 
 **Examples:**
 ```
-2024-25-donruss-soccer-optic
-2024-25-obsidian-soccer-obsidian-base
-2024-25-donruss-soccer-insert-craftsmen
+2016-17-donruss-basketball-optic
+2016-17-donruss-basketball-obsidian-base
+2016-17-donruss-basketball-insert-craftsmen
 ```
 
 ### Parallel Sets (No Print Run)
@@ -95,9 +95,9 @@ const parallelSet = {
 
 **Examples:**
 ```
-2024-25-donruss-soccer-optic-cubic-parallel
-2024-25-donruss-soccer-optic-holo-parallel
-2024-25-obsidian-soccer-obsidian-base-electric-etch-parallel
+2016-17-donruss-basketball-optic-cubic-parallel
+2016-17-donruss-basketball-optic-holo-parallel
+2016-17-donruss-basketball-obsidian-base-electric-etch-parallel
 ```
 
 ### Parallel Sets (With Print Run)
@@ -108,9 +108,9 @@ const parallelSet = {
 
 **Examples:**
 ```
-2024-25-donruss-soccer-optic-blue-cubic-parallel-99
-2024-25-donruss-soccer-optic-red-parallel-299
-2024-25-obsidian-soccer-obsidian-base-electric-etch-green-parallel-5
+2016-17-donruss-basketball-optic-blue-cubic-parallel-99
+2016-17-donruss-basketball-optic-red-parallel-299
+2016-17-donruss-basketball-obsidian-base-electric-etch-green-parallel-5
 ```
 
 ---
@@ -240,10 +240,10 @@ const parallels = await prisma.set.findMany({
 const parallelSet = await prisma.set.create({
   data: {
     name: 'Cubic',
-    slug: '2024-25-donruss-soccer-optic-cubic-parallel-99',
+    slug: '2016-17-donruss-basketball-optic-cubic-parallel-99',
     type: 'Base',
     isParallel: true,
-    baseSetSlug: '2024-25-donruss-soccer-optic',
+    baseSetSlug: '2016-17-donruss-basketball-optic',
     printRun: 99,
     releaseId: release.id
   }
@@ -358,10 +358,10 @@ Parallels are explicitly identified in URLs, making it obvious what type of set 
 
 ```
 // Clear that this is a parallel
-/sets/2024-25-donruss-soccer-optic-red-parallel-299
+/sets/2016-17-donruss-basketball-optic-red-parallel-299
 
 // Clear that this is a base set
-/sets/2024-25-donruss-soccer-optic
+/sets/2016-17-donruss-basketball-optic
 ```
 
 ---

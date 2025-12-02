@@ -144,7 +144,7 @@ function extractBase64(dataUri: string): string {
 function buildScanPrompt(context: ScanContext): string {
   const { release, set, parallel } = context;
 
-  let prompt = `You are analyzing a soccer trading card image.
+  let prompt = `You are analyzing a basketball trading card image.
 
 CONTEXT:
 - Release: ${release.year} ${release.manufacturer} ${release.name}

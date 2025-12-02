@@ -97,7 +97,7 @@ Group Structure:
 **Files Modified:**
 1. `/lib/setUtils.ts` - Enhanced `sortSetsGrouped` and `parseSetName` functions
 2. `/app/releases/[slug]/page.tsx` - Applied enhanced sorting to all set types
-3. `/scripts/import-donruss-soccer-2024.ts` - Main import script
+3. `/scripts/import-donruss-basketball-2024.ts` - Main import script *(Note: Platform was originally basketball-focused)*
 4. `/scripts/fix-optic-print-runs.ts` - Script to correct Optic parallel print runs
 5. `/scripts/fix-complete-donruss-import.ts` - Script to fix 200-card sets
 6. `/scripts/test-sorting-all-types.ts` - Comprehensive sorting validation

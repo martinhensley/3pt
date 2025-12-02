@@ -97,7 +97,7 @@ export default function CardPage() {
       "@id": `https://www.3pt.bot/card/${post.slug}`
     },
     articleSection: "Trading Cards",
-    keywords: "soccer cards, football cards, trading cards, collectibles"
+    keywords: "basketball cards, NBA cards, WNBA cards, trading cards, collectibles"
   };
 
   return (

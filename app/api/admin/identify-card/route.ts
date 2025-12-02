@@ -127,7 +127,7 @@ async function identifyCardSet(
     .join('\n');
 
   // Build the prompt
-  const prompt = `You are analyzing a soccer trading card to identify which set and parallel/variation it belongs to.
+  const prompt = `You are analyzing a basketball trading card to identify which set and parallel/variation it belongs to.
 
 RELEASE CONTEXT:
 - Release: ${release.year || ''} ${release.manufacturer.name} ${release.name}

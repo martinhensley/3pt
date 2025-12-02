@@ -1,7 +1,7 @@
 /**
  * Enhanced Card Analysis with Parallel/Variation Detection
  * Inspired by QB1's enhanced-scan-card-image implementation
- * Focus: Soccer/Football trading card parallel and variation detection
+ * Focus: Basketball trading card parallel and variation detection
  */
 
 import { generateObject } from 'ai';
@@ -84,9 +84,9 @@ const cardFeaturesSchema = z.object({
 });
 
 const enhancedCardSchema = z.object({
-  playerName: z.string().nullable().describe('Player full name (e.g., "Cristiano Ronaldo", "Lionel Messi"). Null if not identifiable.'),
-  team: z.string().nullable().describe('Team name or country (e.g., "Manchester United", "Argentina"). Null if not identifiable.'),
-  cardNumber: z.string().nullable().describe('Card number from the set (e.g., "#10", "CR7"). Null if not found.'),
+  playerName: z.string().nullable().describe('Player full name (e.g., "LeBron James", "Stephen Curry"). Null if not identifiable.'),
+  team: z.string().nullable().describe('Team name (e.g., "Los Angeles Lakers", "Golden State Warriors"). Null if not identifiable.'),
+  cardNumber: z.string().nullable().describe('Card number from the set (e.g., "#23", "1"). Null if not found.'),
   parallelDetection: parallelDetectionSchema,
   features: cardFeaturesSchema,
   overallConfidence: z.number().min(0).max(100).describe('Overall confidence in the analysis (0-100).')
@@ -108,21 +108,22 @@ export async function enhancedCardAnalysis(
     const contextPrompt = buildContextPrompt(setContext, releaseContext);
 
     // Build comprehensive prompt for parallel detection
-    const systemPrompt = `You are an expert in soccer/football trading cards with deep knowledge of:
-- Panini products (Prizm, Select, Mosaic, Donruss, Chronicles, etc.)
-- Topps products (Chrome, Stadium Club, Finest, etc.)
+    const systemPrompt = `You are an expert in basketball trading cards with deep knowledge of:
+- Panini products (Prizm, Select, Mosaic, Donruss, Optic, Court Kings, Chronicles, Immaculate, National Treasures, etc.)
+- Topps products (Chrome, Finest, Stadium Club - historical)
 - Parallel variations and their identifying characteristics
 - Serial numbering patterns
 - Card finishes and refractor types
-- Rookie cards and special inserts
+- Rookie cards (RC designation) and special inserts
 
 ${contextPrompt}
 
-CRITICAL: Pay special attention to parallel/variation detection. Common soccer card parallels include:
-- Prizm variations: Silver, Base, Color Prizms (Red, Blue, Gold, Green, Orange, Purple), Hyper, Fast Break, Choice, Neon, etc.
-- Topps Chrome: Refractor, X-Fractor, Gold Refractor, Blue Refractor, Red Refractor, etc.
-- Mosaic variations: Base Mosaic, Silver Prizm, Color Mosaic, Stained Glass, etc.
-- Select variations: Silver, Tri-Color, Tie-Dye, Zebra, etc.
+CRITICAL: Pay special attention to parallel/variation detection. Common basketball card parallels include:
+- Prizm variations: Base, Silver, Color Prizms (Red, Blue, Gold, Green, Orange, Purple), Hyper, Fast Break, Choice, etc.
+- Select variations: Silver, Tri-Color, Tie-Dye, Zebra, Courtside, Premier Level, etc.
+- Mosaic variations: Base Mosaic, Silver, Color Mosaic, etc.
+- Optic variations: Base, Holo, Purple, Blue, Red, etc.
+- Donruss variations: Base, Rated Rookie, Holo, etc.
 - Numbered parallels: /299, /199, /99, /49, /25, /10, /5, /1
 
 Look for:
@@ -130,7 +131,8 @@ Look for:
 2. Visual patterns (prism effects, refractor patterns, color backgrounds)
 3. Serial numbers (format: "XX/YY" where XX is the card number and YY is the print run)
 4. Color variations from base cards
-5. Special finishes or coatings`;
+5. Special finishes or coatings
+6. RC (Rookie Card) designations`;
 
     // Prepare image content
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -151,7 +153,7 @@ Look for:
     // Add text prompt
     imageContent.push({
       type: 'text',
-      text: `Analyze these soccer/football trading card images and provide detailed information with SPECIAL FOCUS on parallel/variation detection.
+      text: `Analyze these basketball trading card images and provide detailed information with SPECIAL FOCUS on parallel/variation detection.
 
 INSTRUCTIONS:
 1. Examine the card front and back carefully

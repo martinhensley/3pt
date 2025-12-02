@@ -399,8 +399,8 @@ useEffect(() => {
 ```tsx
 // Primary Colors
 const colors = {
-  primaryGreen: '#005031',   // Primary brand color
-  primaryOrange: '#F47322',  // Secondary brand color
+  footyGreen: '#005031',   // Primary brand color
+  footyOrange: '#F47322',  // Secondary brand color
 
   // Backgrounds
   bgGradient: 'from-gray-50 via-white to-gray-50',

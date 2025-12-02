@@ -270,7 +270,7 @@ export default function CreatePostPage() {
                 onChange={(e) => setAiPrompt(e.target.value)}
                 rows={3}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 bg-white text-gray-900"
-                placeholder="Describe the post you want to create (e.g., 'Write about Panini Prizm 2024 soccer cards featuring Messi')"
+                placeholder="Describe the post you want to create (e.g., 'Write about Panini Prizm 2024 basketball cards featuring LeBron James')"
                 disabled={generatingContent}
               />
             </div>

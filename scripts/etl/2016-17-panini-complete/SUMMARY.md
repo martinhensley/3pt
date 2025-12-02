@@ -66,7 +66,7 @@ The release **EXISTS** in the database:
 
 ### Import Script
 
-**Location**: `/Users/mh/3pt/scripts/2016-17-panini-complete/import-complete.ts`
+**Location**: `/Users/mh/3pt/scripts/etl/2016-17-panini-complete/import-complete.ts`
 
 #### Key Features
 
@@ -202,18 +202,18 @@ Expected output:
 
 ## Files Created
 
-1. **Import Script**: `/Users/mh/3pt/scripts/2016-17-panini-complete/import-complete.ts`
+1. **Import Script**: `/Users/mh/3pt/scripts/etl/2016-17-panini-complete/import-complete.ts`
    - Main import logic with custom CSV parser
    - Handles all 7 sets and 1,720 cards
    - Idempotent with upsert operations
 
-2. **README**: `/Users/mh/3pt/scripts/2016-17-panini-complete/README.md`
+2. **README**: `/Users/mh/3pt/scripts/etl/2016-17-panini-complete/README.md`
    - Detailed documentation
    - Usage instructions
    - Set descriptions
    - Verification queries
 
-3. **This Summary**: `/Users/mh/3pt/scripts/2016-17-panini-complete/SUMMARY.md`
+3. **This Summary**: `/Users/mh/3pt/scripts/etl/2016-17-panini-complete/SUMMARY.md`
    - Task completion report
    - Checklist analysis
    - Expected results

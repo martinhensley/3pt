@@ -50,7 +50,8 @@ Sets sorted: non-parallels first, then unnumbered parallels, then numbered paral
 
 **Cards:**
 - Base: `{year}-{release}-{set}-{cardNumber}-{player}-{printRun}`
-- Parallel (set name excluded): `{year}-{release}-{cardNumber}-{player}-{parallelName}-{printRun}`
+- Base parallels (set name excluded): `{year}-{release}-{cardNumber}-{player}-{parallelName}-{printRun}`
+- Insert/Auto/Mem parallels (set name included): `{year}-{release}-{setName}-{cardNumber}-{player}-{parallelName}-{printRun}`
 - Exception: Optic cards KEEP "optic" in slugs
 
 **Sets:** `{year}-{release}-{type-prefix}-{setname}[-{parallel}]` (prefixes: base, auto, mem, insert)

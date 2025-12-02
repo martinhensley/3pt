@@ -79,8 +79,8 @@ scripts/
 Format: `{year}-{manufacturer}-{release}`
 
 **Examples:**
-- `2024-25-panini-donruss-basketball`
-- `2024-25-panini-obsidian-basketball`
+- `2024-25-panini-donruss-soccer`
+- `2024-25-panini-obsidian-soccer`
 - `2023-24-topps-chrome-uefa`
 
 **Rules:**

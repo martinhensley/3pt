@@ -178,10 +178,10 @@ export default function ChecklistsPage() {
     <PublicPageLayout
       leftAdQuery="basketball cards checklist"
       leftAdTitle="Card Checklists"
-      rightAdQuery="soccer memorabilia"
-      rightAdTitle="Soccer Memorabilia"
-      horizontalAdQuery="soccer trading cards"
-      horizontalAdTitle="More Soccer Cards"
+      rightAdQuery="basketball memorabilia"
+      rightAdTitle="Basketball Memorabilia"
+      horizontalAdQuery="basketball trading cards"
+      horizontalAdTitle="More Basketball Cards"
       loading={loading}
     >
       {/* Header */}

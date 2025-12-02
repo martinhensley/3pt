@@ -38,9 +38,9 @@ async function main() {
   // 1. Create/find the release
   const release = await prisma.release.create({
     data: {
-      name: 'Obsidian Basketball',
+      name: 'Obsidian Soccer',
       year: '2024-25',
-      slug: '2024-25-panini-obsidian-basketball',
+      slug: '2024-25-panini-obsidian-soccer',
       manufacturerId: manufacturerId
     }
   });
@@ -56,7 +56,7 @@ async function main() {
     await uploadChecklistToRelease(
       checklistPath,
       release.id,
-      '2024-25 Panini Obsidian Basketball Checklist'
+      '2024-25 Panini Obsidian Soccer Checklist'
     );
     console.log('✅ Checklist uploaded successfully\n');
   } else {
@@ -236,9 +236,9 @@ async function main() {
   // Create release
   const release = await prisma.release.create({
     data: {
-      name: 'Obsidian Basketball',
+      name: 'Obsidian Soccer',
       year: '2024-25',
-      slug: '2024-25-panini-obsidian-basketball',
+      slug: '2024-25-panini-obsidian-soccer',
       manufacturerId: manufacturer.id
     }
   });

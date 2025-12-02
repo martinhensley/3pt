@@ -1,6 +1,6 @@
 /**
  * Generate a URL-friendly slug from release information
- * Format: year-manufacturer-name (e.g., "2024-25-panini-donruss-soccer")
+ * Format: year-manufacturer-name (e.g., "2024-25-panini-donruss-basketball")
  */
 export function generateReleaseSlug(manufacturer: string, name: string, year?: string): string {
   const parts = [year, manufacturer, name].filter(Boolean);
@@ -15,10 +15,10 @@ export function generateReleaseSlug(manufacturer: string, name: string, year?: s
  * Generate a URL-friendly slug from set information
  *
  * New simplified format:
- * - Base set: "2024-25-donruss-soccer-base"
- * - Base parallel: "2024-25-donruss-soccer-cubic-parallel" or "2024-25-donruss-soccer-blue-cubic-parallel-99"
- * - Insert set: "2024-25-donruss-soccer-kaboom"
- * - Insert parallel: "2024-25-donruss-soccer-kaboom-gold-parallel-10"
+ * - Base set: "2024-25-donruss-basketball-base"
+ * - Base parallel: "2024-25-donruss-basketball-cubic-parallel" or "2024-25-donruss-basketball-blue-cubic-parallel-99"
+ * - Insert set: "2024-25-donruss-basketball-kaboom"
+ * - Insert parallel: "2024-25-donruss-basketball-kaboom-gold-parallel-10"
  *
  * Parallel naming convention:
  * - Parallels are identified by "-parallel" suffix
@@ -98,13 +98,13 @@ export function generateSetSlug(
  * Generate a URL-friendly slug from card information
  *
  * Format for base cards: year-release-set-cardnumber-playername
- * Example: "2024-25-donruss-soccer-optic-2-malik-tillman"
+ * Example: "2024-25-donruss-basketball-optic-2-lebron-james"
  *
  * Format for base parallel cards: year-release-cardnumber-playername-parallelname
- * Example: "2024-25-donruss-soccer-1-jude-bellingham-pink-velocity-99"
+ * Example: "2024-25-donruss-basketball-1-stephen-curry-pink-velocity-99"
  *
  * Format for insert/auto/mem cards: year-release-set-cardnumber-playername-variant
- * Example: "2024-25-donruss-soccer-beautiful-game-autographs-9-abby-dahlkemper-black-1"
+ * Example: "2024-25-donruss-basketball-beautiful-game-autographs-9-caitlin-clark-black-1"
  *
  * Special handling:
  * - Base set parallels exclude the set name (parallel name is more specific)

@@ -86,6 +86,8 @@ CREATE TABLE "Card" (
     "detectedText" TEXT,
     "imageFront" TEXT,
     "imageBack" TEXT,
+    -- Historical note: 'footyNotes' was part of original basketball platform branding.
+    -- Later renamed to 'notes' in migration 20251125025143_rename_footynotes_to_notes
     "footyNotes" TEXT,
     "position" TEXT,
     "rookieYear" TEXT,

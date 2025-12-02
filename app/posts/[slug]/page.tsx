@@ -91,7 +91,7 @@ export default function PostPage() {
       "@id": `https://www.3pt.bot/posts/${post.slug}`
     },
     articleSection: post.type === "CARD" ? "Trading Cards" : post.type === "SET" ? "Card Sets" : post.type === "RELEASE" ? "New Releases" : "General",
-    keywords: "soccer cards, football cards, trading cards, collectibles"
+    keywords: "basketball cards, NBA cards, WNBA cards, trading cards, collectibles"
   } : null;
 
   return (

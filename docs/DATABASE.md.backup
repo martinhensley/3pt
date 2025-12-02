@@ -1,6 +1,6 @@
 # 3pt.bot Database Reference
 
-Complete database schema documentation for the 3pt.bot basketball card platform.
+Complete database schema documentation for the 3pt.bot soccer card platform.
 
 ## Table of Contents
 
@@ -580,7 +580,7 @@ const post = await prisma.post.create({
     title: "2024-25 Panini Donruss Basketball Review",
     slug: "2016-17-panini-donruss-basketball-review",
     content: "Full review content here...",
-    excerpt: "A comprehensive review of Panini's latest basketball release.",
+    excerpt: "A comprehensive review of Panini's latest soccer release.",
     type: "REVIEW",
     published: true,
     postDate: new Date(),

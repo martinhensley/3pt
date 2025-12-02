@@ -13,14 +13,26 @@ interface ExtractedKeywords {
   teamName: string | null;
 }
 
-// Common soccer teams and leagues
+// NBA, WNBA, and College Basketball Teams and Leagues
 const TEAMS = [
-  'USWNT', 'USMNT', 'Barcelona', 'Real Madrid', 'Manchester United', 'Manchester City',
-  'Liverpool', 'Chelsea', 'Arsenal', 'Tottenham', 'PSG', 'Bayern Munich', 'Juventus',
-  'Inter Milan', 'AC Milan', 'Atletico Madrid', 'Borussia Dortmund', 'Ajax', 'Porto',
-  'Benfica', 'Celtic', 'Rangers', 'LA Galaxy', 'LAFC', 'Atlanta United', 'Seattle Sounders',
-  'Premier League', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1', 'MLS', 'Champions League',
-  'World Cup', 'UEFA', 'FIFA'
+  // NBA Teams (30)
+  'Lakers', 'Celtics', 'Warriors', 'Heat', 'Bulls', 'Knicks', 'Nets', 'Clippers',
+  'Mavericks', 'Nuggets', 'Suns', 'Bucks', 'Sixers', '76ers', 'Raptors', 'Rockets',
+  'Spurs', 'Thunder', 'Trail Blazers', 'Jazz', 'Grizzlies', 'Pelicans', 'Kings',
+  'Hawks', 'Hornets', 'Wizards', 'Pistons', 'Pacers', 'Cavaliers', 'Timberwolves',
+  'Magic',
+
+  // WNBA Teams (12)
+  'Aces', 'Liberty', 'Lynx', 'Storm', 'Sun', 'Wings', 'Mercury', 'Sky', 'Fever',
+  'Sparks', 'Mystics', 'Dream',
+
+  // College Programs (Major)
+  'Duke', 'North Carolina', 'Kentucky', 'Kansas', 'UCLA', 'Villanova', 'UConn',
+  'Michigan State', 'Syracuse', 'Louisville', 'Arizona', 'Florida', 'Michigan',
+  'Gonzaga', 'Indiana', 'Ohio State', 'Tennessee',
+
+  // Leagues and Events
+  'NBA', 'WNBA', 'NCAA', 'March Madness', 'NBA Finals', 'All-Star'
 ];
 
 // Common card brands and series
@@ -93,13 +105,13 @@ export function extractKeywordsFromPost(post: Post): ExtractedKeywords {
   const brand = extractBrand(title + ' ' + excerpt);
 
   // Generate queries based on what we found
-  let primaryQuery = 'soccer cards';
-  let autographQuery = 'soccer autographs';
-  let relatedQuery = 'soccer cards';
+  let primaryQuery = 'basketball cards';
+  let autographQuery = 'basketball autographs';
+  let relatedQuery = 'basketball cards';
 
   // Priority 1: Player-specific queries
   if (playerName) {
-    primaryQuery = `${playerName} soccer cards`;
+    primaryQuery = `${playerName} basketball cards`;
     autographQuery = `${playerName} autograph`;
     relatedQuery = teamName
       ? `${teamName} ${playerName} cards`
@@ -107,13 +119,13 @@ export function extractKeywordsFromPost(post: Post): ExtractedKeywords {
   }
   // Priority 2: Brand/Series queries
   else if (brand && type === 'SET') {
-    primaryQuery = `${brand} soccer cards`;
+    primaryQuery = `${brand} basketball cards`;
     autographQuery = `${brand} autographs`;
-    relatedQuery = `${brand} soccer`;
+    relatedQuery = `${brand} basketball`;
   }
   // Priority 3: Team-based queries
   else if (teamName) {
-    primaryQuery = `${teamName} soccer cards`;
+    primaryQuery = `${teamName} basketball cards`;
     autographQuery = `${teamName} autographs`;
     relatedQuery = `${teamName} memorabilia`;
   }
@@ -132,12 +144,12 @@ export function extractKeywordsFromPost(post: Post): ExtractedKeywords {
  */
 export function getAdTitle(query: string, defaultTitle: string): string {
   // If query contains a player name or specific term, use it
-  if (query !== 'soccer cards' && query !== 'soccer autographs') {
+  if (query !== 'basketball cards' && query !== 'basketball autographs') {
     const words = query.split(' ');
     if (words.length >= 2) {
       // Capitalize first letter of each word
       const capitalizedWords = words
-        .filter(w => !['soccer', 'cards', 'card', 'the'].includes(w.toLowerCase()))
+        .filter(w => !['basketball', 'cards', 'card', 'the'].includes(w.toLowerCase()))
         .map(w => w.charAt(0).toUpperCase() + w.slice(1));
 
       if (capitalizedWords.length > 0) {

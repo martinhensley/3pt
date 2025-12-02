@@ -12,15 +12,15 @@ import {
 describe('setUtils', () => {
   describe('isParallelSet', () => {
     it('returns true for slugs containing "-parallel"', () => {
-      expect(isParallelSet('2024-25-donruss-basketball-optic-cubic-parallel')).toBe(true);
-      expect(isParallelSet('2024-25-donruss-basketball-optic-cubic-parallel-99')).toBe(true);
-      expect(isParallelSet('2024-25-donruss-basketball-base-gold-parallel-10')).toBe(true);
+      expect(isParallelSet('2024-25-donruss-soccer-optic-cubic-parallel')).toBe(true);
+      expect(isParallelSet('2024-25-donruss-soccer-optic-cubic-parallel-99')).toBe(true);
+      expect(isParallelSet('2024-25-donruss-soccer-base-gold-parallel-10')).toBe(true);
     });
 
     it('returns false for base sets without "-parallel"', () => {
-      expect(isParallelSet('2024-25-donruss-basketball-optic')).toBe(false);
-      expect(isParallelSet('2024-25-donruss-basketball-base')).toBe(false);
-      expect(isParallelSet('2024-25-donruss-basketball-kaboom')).toBe(false);
+      expect(isParallelSet('2024-25-donruss-soccer-optic')).toBe(false);
+      expect(isParallelSet('2024-25-donruss-soccer-base')).toBe(false);
+      expect(isParallelSet('2024-25-donruss-soccer-kaboom')).toBe(false);
     });
 
     it('handles edge cases', () => {
@@ -32,18 +32,18 @@ describe('setUtils', () => {
 
   describe('getBaseSetSlug', () => {
     it('returns the same slug for non-parallel sets', () => {
-      expect(getBaseSetSlug('2024-25-donruss-basketball-optic')).toBe('2024-25-donruss-basketball-optic');
-      expect(getBaseSetSlug('2024-25-donruss-basketball-base')).toBe('2024-25-donruss-basketball-base');
+      expect(getBaseSetSlug('2024-25-donruss-soccer-optic')).toBe('2024-25-donruss-soccer-optic');
+      expect(getBaseSetSlug('2024-25-donruss-soccer-base')).toBe('2024-25-donruss-soccer-base');
     });
 
     it('extracts base slug from parallel slugs with known set patterns', () => {
-      expect(getBaseSetSlug('2024-25-donruss-basketball-optic-cubic-parallel-99')).toBe('2024-25-donruss-basketball-optic');
-      expect(getBaseSetSlug('2024-25-donruss-basketball-base-gold-parallel')).toBe('2024-25-donruss-basketball-base');
-      expect(getBaseSetSlug('2024-25-donruss-basketball-kaboom-red-parallel-10')).toBe('2024-25-donruss-basketball-kaboom');
+      expect(getBaseSetSlug('2024-25-donruss-soccer-optic-cubic-parallel-99')).toBe('2024-25-donruss-soccer-optic');
+      expect(getBaseSetSlug('2024-25-donruss-soccer-base-gold-parallel')).toBe('2024-25-donruss-soccer-base');
+      expect(getBaseSetSlug('2024-25-donruss-soccer-kaboom-red-parallel-10')).toBe('2024-25-donruss-soccer-kaboom');
     });
 
     it('handles complex variant names', () => {
-      expect(getBaseSetSlug('2024-25-donruss-basketball-optic-blue-cubic-parallel-99')).toBe('2024-25-donruss-basketball-optic');
+      expect(getBaseSetSlug('2024-25-donruss-soccer-optic-blue-cubic-parallel-99')).toBe('2024-25-donruss-soccer-optic');
     });
 
     it('falls back for unknown set patterns', () => {
@@ -55,23 +55,23 @@ describe('setUtils', () => {
 
   describe('getParallelVariant', () => {
     it('returns null for non-parallel sets', () => {
-      expect(getParallelVariant('2024-25-donruss-basketball-optic')).toBeNull();
-      expect(getParallelVariant('2024-25-donruss-basketball-base')).toBeNull();
+      expect(getParallelVariant('2024-25-donruss-soccer-optic')).toBeNull();
+      expect(getParallelVariant('2024-25-donruss-soccer-base')).toBeNull();
     });
 
     it('extracts variant name from parallel slugs', () => {
-      expect(getParallelVariant('2024-25-donruss-basketball-optic-cubic-parallel-99')).toBe('cubic');
-      expect(getParallelVariant('2024-25-donruss-basketball-optic-blue-cubic-parallel-99')).toBe('blue-cubic');
+      expect(getParallelVariant('2024-25-donruss-soccer-optic-cubic-parallel-99')).toBe('cubic');
+      expect(getParallelVariant('2024-25-donruss-soccer-optic-blue-cubic-parallel-99')).toBe('blue-cubic');
     });
 
     it('handles parallels without print runs', () => {
-      expect(getParallelVariant('2024-25-donruss-basketball-optic-gold-parallel')).toBe('gold');
+      expect(getParallelVariant('2024-25-donruss-soccer-optic-gold-parallel')).toBe('gold');
     });
 
     it('handles edge case of parallel without explicit variant name', () => {
       // When there's no variant name between the set name and "-parallel"
       // Due to string slicing, this returns "-" (the separator between base and parallel)
-      const result = getParallelVariant('2024-25-donruss-basketball-optic-parallel');
+      const result = getParallelVariant('2024-25-donruss-soccer-optic-parallel');
       // This is an edge case - real-world parallels always have a variant name
       expect(result).toBe('-');
     });
@@ -79,35 +79,35 @@ describe('setUtils', () => {
 
   describe('getParallelPrintRun', () => {
     it('returns null for non-parallel sets', () => {
-      expect(getParallelPrintRun('2024-25-donruss-basketball-optic')).toBeNull();
+      expect(getParallelPrintRun('2024-25-donruss-soccer-optic')).toBeNull();
     });
 
     it('extracts print run from parallel slugs', () => {
-      expect(getParallelPrintRun('2024-25-donruss-basketball-optic-cubic-parallel-99')).toBe(99);
-      expect(getParallelPrintRun('2024-25-donruss-basketball-base-gold-parallel-10')).toBe(10);
-      expect(getParallelPrintRun('2024-25-donruss-basketball-base-gold-parallel-1')).toBe(1);
+      expect(getParallelPrintRun('2024-25-donruss-soccer-optic-cubic-parallel-99')).toBe(99);
+      expect(getParallelPrintRun('2024-25-donruss-soccer-base-gold-parallel-10')).toBe(10);
+      expect(getParallelPrintRun('2024-25-donruss-soccer-base-gold-parallel-1')).toBe(1);
     });
 
     it('returns null for parallels without print runs', () => {
-      expect(getParallelPrintRun('2024-25-donruss-basketball-optic-cubic-parallel')).toBeNull();
+      expect(getParallelPrintRun('2024-25-donruss-soccer-optic-cubic-parallel')).toBeNull();
     });
 
     it('returns null for non-numeric values after parallel', () => {
-      expect(getParallelPrintRun('2024-25-donruss-basketball-optic-parallel-abc')).toBeNull();
+      expect(getParallelPrintRun('2024-25-donruss-soccer-optic-parallel-abc')).toBeNull();
     });
   });
 
   describe('sortSets', () => {
     it('places non-parallels before parallels', () => {
       const sets = [
-        { slug: '2024-25-donruss-basketball-optic-cubic-parallel-99' },
-        { slug: '2024-25-donruss-basketball-optic' },
-        { slug: '2024-25-donruss-basketball-base-gold-parallel' },
-        { slug: '2024-25-donruss-basketball-base' },
+        { slug: '2024-25-donruss-soccer-optic-cubic-parallel-99' },
+        { slug: '2024-25-donruss-soccer-optic' },
+        { slug: '2024-25-donruss-soccer-base-gold-parallel' },
+        { slug: '2024-25-donruss-soccer-base' },
       ];
       const sorted = sortSets(sets);
-      expect(sorted[0].slug).toBe('2024-25-donruss-basketball-base');
-      expect(sorted[1].slug).toBe('2024-25-donruss-basketball-optic');
+      expect(sorted[0].slug).toBe('2024-25-donruss-soccer-base');
+      expect(sorted[1].slug).toBe('2024-25-donruss-soccer-optic');
     });
 
     it('sorts non-parallels alphabetically', () => {
@@ -312,19 +312,19 @@ describe('setUtils', () => {
   describe('groupSetsByBase', () => {
     it('groups parallel sets with their base set', () => {
       const sets = [
-        { slug: '2024-25-donruss-basketball-optic' },
-        { slug: '2024-25-donruss-basketball-optic-cubic-parallel-99' },
-        { slug: '2024-25-donruss-basketball-optic-gold-parallel' },
+        { slug: '2024-25-donruss-soccer-optic' },
+        { slug: '2024-25-donruss-soccer-optic-cubic-parallel-99' },
+        { slug: '2024-25-donruss-soccer-optic-gold-parallel' },
       ];
       const groups = groupSetsByBase(sets);
-      expect(groups.get('2024-25-donruss-basketball-optic')?.length).toBe(3);
+      expect(groups.get('2024-25-donruss-soccer-optic')?.length).toBe(3);
     });
 
     it('keeps non-related sets separate', () => {
       const sets = [
-        { slug: '2024-25-donruss-basketball-optic' },
-        { slug: '2024-25-donruss-basketball-base' },
-        { slug: '2024-25-donruss-basketball-kaboom' },
+        { slug: '2024-25-donruss-soccer-optic' },
+        { slug: '2024-25-donruss-soccer-base' },
+        { slug: '2024-25-donruss-soccer-kaboom' },
       ];
       const groups = groupSetsByBase(sets);
       expect(groups.size).toBe(3);
@@ -332,15 +332,15 @@ describe('setUtils', () => {
 
     it('sorts sets within each group', () => {
       const sets = [
-        { slug: '2024-25-donruss-basketball-optic-red-parallel-10' },
-        { slug: '2024-25-donruss-basketball-optic' },
-        { slug: '2024-25-donruss-basketball-optic-gold-parallel-99' },
+        { slug: '2024-25-donruss-soccer-optic-red-parallel-10' },
+        { slug: '2024-25-donruss-soccer-optic' },
+        { slug: '2024-25-donruss-soccer-optic-gold-parallel-99' },
       ];
       const groups = groupSetsByBase(sets);
-      const opticGroup = groups.get('2024-25-donruss-basketball-optic')!;
-      expect(opticGroup[0].slug).toBe('2024-25-donruss-basketball-optic'); // base first
-      expect(opticGroup[1].slug).toBe('2024-25-donruss-basketball-optic-gold-parallel-99'); // 99
-      expect(opticGroup[2].slug).toBe('2024-25-donruss-basketball-optic-red-parallel-10'); // 10
+      const opticGroup = groups.get('2024-25-donruss-soccer-optic')!;
+      expect(opticGroup[0].slug).toBe('2024-25-donruss-soccer-optic'); // base first
+      expect(opticGroup[1].slug).toBe('2024-25-donruss-soccer-optic-gold-parallel-99'); // 99
+      expect(opticGroup[2].slug).toBe('2024-25-donruss-soccer-optic-red-parallel-10'); // 10
     });
 
     it('handles empty array', () => {

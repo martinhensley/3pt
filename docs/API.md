@@ -1,6 +1,6 @@
 # 3pt.bot API Reference
 
-Complete REST API documentation for the 3pt.bot soccer card platform.
+Complete REST API documentation for the 3pt.bot basketball card platform.
 
 ## Table of Contents
 
@@ -21,7 +21,7 @@ Complete REST API documentation for the 3pt.bot soccer card platform.
 
 ## Introduction
 
-The 3pt.bot API provides programmatic access to soccer card data, AI-powered analysis, and content management features.
+The 3pt.bot API provides programmatic access to basketball card data, AI-powered analysis, and content management features.
 
 **Base URL:** `http://localhost:3000` (development) or `https://3pt.bot` (production)
 
@@ -85,18 +85,18 @@ type ReleaseResponse = {
 
 **Example Request:**
 ```bash
-curl -X GET "http://localhost:3000/api/releases?slug=2024-25-panini-obsidian-soccer"
+curl -X GET "http://localhost:3000/api/releases?slug=2016-17-panini-donruss-basketball"
 ```
 
 **Example Response:**
 ```json
 {
   "id": "cm3abc123",
-  "name": "Obsidian Soccer",
-  "year": "2024-25",
-  "slug": "2024-25-panini-obsidian-soccer",
-  "summary": "Panini's Obsidian Soccer delivers premium card stock...",
-  "releaseDate": "December 2024",
+  "name": "Donruss Basketball",
+  "year": "2016-17",
+  "slug": "2016-17-panini-donruss-basketball",
+  "summary": "Panini's Donruss Basketball delivers premium card stock...",
+  "releaseDate": "December 2016",
   "manufacturer": {
     "id": "cm3xyz789",
     "name": "Panini"
@@ -241,15 +241,15 @@ type SetResponse = {
 
 **Example Request:**
 ```bash
-curl -X GET "http://localhost:3000/api/sets?slug=2024-25-obsidian-soccer-obsidian-base"
+curl -X GET "http://localhost:3000/api/sets?slug=2016-17-donruss-basketball-base"
 ```
 
 **Example Response:**
 ```json
 {
   "id": "cm3set123",
-  "name": "Obsidian Base",
-  "slug": "2024-25-obsidian-soccer-obsidian-base",
+  "name": "Base",
+  "slug": "2016-17-donruss-basketball-base",
   "type": "Base",
   "isParallel": false,
   "baseSetSlug": null,
@@ -257,9 +257,9 @@ curl -X GET "http://localhost:3000/api/sets?slug=2024-25-obsidian-soccer-obsidia
   "expectedCardCount": 200,
   "release": {
     "id": "cm3rel123",
-    "name": "Obsidian Soccer",
-    "year": "2024-25",
-    "slug": "2024-25-panini-obsidian-soccer",
+    "name": "Donruss Basketball",
+    "year": "2016-17",
+    "slug": "2016-17-panini-donruss-basketball",
     "manufacturer": { "name": "Panini" }
   },
   "cards": [...]
@@ -388,32 +388,32 @@ type CardResponse = {
 
 **Example Request:**
 ```bash
-curl -X GET "http://localhost:3000/api/cards?slug=2024-25-obsidian-soccer-1-jude-bellingham-electric-etch-orange-8"
+curl -X GET "http://localhost:3000/api/cards?slug=2016-17-donruss-optic-basketball-2-jahlil-okafor-green-5"
 ```
 
 **Example Response:**
 ```json
 {
   "id": "cm3card123",
-  "slug": "2024-25-obsidian-soccer-1-jude-bellingham-electric-etch-orange-8",
-  "playerName": "Jude Bellingham",
-  "team": "Real Madrid",
-  "cardNumber": "1",
-  "variant": "Electric Etch Orange",
-  "parallelType": "Electric Etch Orange",
-  "printRun": 8,
-  "numbered": "/8",
+  "slug": "2016-17-donruss-optic-basketball-2-jahlil-okafor-green-5",
+  "playerName": "Jahlil Okafor",
+  "team": "Philadelphia 76ers",
+  "cardNumber": "2",
+  "variant": "Green",
+  "parallelType": "Green",
+  "printRun": 5,
+  "numbered": "/5",
   "imageFront": "https://blob.vercel-storage.com/card-front-abc123.jpg",
   "imageBack": null,
   "set": {
     "id": "cm3set123",
-    "name": "Obsidian Base",
-    "slug": "2024-25-obsidian-soccer-obsidian-base",
+    "name": "Base Green",
+    "slug": "2016-17-donruss-optic-basketball-base-green-parallel-5",
     "type": "Base",
     "release": {
-      "name": "Obsidian Soccer",
-      "year": "2024-25",
-      "slug": "2024-25-panini-obsidian-soccer",
+      "name": "Donruss Optic Basketball",
+      "year": "2016-17",
+      "slug": "2016-17-panini-donruss-optic-basketball",
       "manufacturer": { "name": "Panini" }
     }
   },
@@ -532,7 +532,7 @@ curl -X GET "http://localhost:3000/api/posts"
   {
     "id": "cm3post123",
     "title": "2024-25 Obsidian Soccer Review",
-    "slug": "2024-25-obsidian-soccer-review",
+    "slug": "2016-17-donruss-basketball-review",
     "content": "Full review content...",
     "excerpt": "Panini's latest Obsidian release...",
     "type": "REVIEW",
@@ -645,7 +645,7 @@ curl -X POST "http://localhost:3000/api/analyze/release" \
   "manufacturer": "Panini",
   "releaseName": "Obsidian Soccer",
   "year": "2024-25",
-  "slug": "2024-25-panini-obsidian-soccer",
+  "slug": "2016-17-panini-donruss-basketball",
   "description": "Premium soccer cards...",
   "sets": [
     {
@@ -808,7 +808,7 @@ curl -X GET "http://localhost:3000/api/checklists?manufacturer=Panini&type=Base"
   {
     "id": "cm3set123",
     "name": "Obsidian Base",
-    "slug": "2024-25-obsidian-soccer-obsidian-base",
+    "slug": "2016-17-donruss-basketball-base",
     "type": "Base",
     "isParallel": false,
     "printRun": null,
@@ -816,7 +816,7 @@ curl -X GET "http://localhost:3000/api/checklists?manufacturer=Panini&type=Base"
     "release": {
       "name": "Obsidian Soccer",
       "year": "2024-25",
-      "slug": "2024-25-panini-obsidian-soccer",
+      "slug": "2016-17-panini-donruss-basketball",
       "manufacturer": {
         "name": "Panini"
       }
@@ -848,7 +848,7 @@ curl -X GET "http://localhost:3000/api/checklists/filters"
   ],
   "releases": [
     {
-      "slug": "2024-25-panini-obsidian-soccer",
+      "slug": "2016-17-panini-donruss-basketball",
       "name": "Obsidian Soccer",
       "year": "2024-25"
     }
@@ -1150,7 +1150,7 @@ The API auto-generates URL-friendly slugs for all entities.
 
 ### Release Slugs
 **Format:** `{year}-{manufacturer}-{name}`
-**Example:** `2024-25-panini-obsidian-soccer`
+**Example:** `2016-17-panini-donruss-basketball`
 
 ### Set Slugs
 **Format:** `{year}-{release}-{type-prefix}-{setname}[-{parallel}]`
@@ -1161,23 +1161,25 @@ The API auto-generates URL-friendly slugs for all entities.
 - Memorabilia: `mem`
 
 **Examples:**
-- Base: `2024-25-obsidian-soccer-obsidian-base`
-- Insert: `2024-25-obsidian-soccer-insert-equinox`
-- Autograph: `2024-25-obsidian-soccer-auto-dual-jersey-ink`
-- Parallel: `2024-25-obsidian-soccer-obsidian-base-electric-etch-green-5`
+- Base: `2016-17-donruss-basketball-base`
+- Insert: `2016-17-donruss-basketball-insert-elite-series`
+- Autograph: `2016-17-donruss-basketball-auto-dominator-signatures`
+- Parallel: `2016-17-donruss-optic-basketball-base-green-parallel-5`
 
 ### Card Slugs
 **Format:** `{year}-{release}-{set}-{cardnumber}-{player}-{parallel}-{printrun}`
 
 **Rules:**
-- Parallel cards exclude base set name from slug
+- Base parallel cards exclude set name from slug
+- Insert/Auto/Mem parallel cards INCLUDE set name for clarity
 - 1/1 cards use "1-of-1" format
-- Print runs appended to slug (e.g., `-8` for /8)
+- Print runs appended to slug (e.g., `-5` for /5)
 
 **Examples:**
-- Base: `2024-25-obsidian-soccer-obsidian-base-1-jude-bellingham-145`
-- Parallel: `2024-25-obsidian-soccer-1-jude-bellingham-electric-etch-orange-8`
-- 1/1: `2024-25-obsidian-soccer-1-jude-bellingham-gold-power-1-of-1`
+- Base: `2016-17-absolute-basketball-base-133-jamal-mashburn-999`
+- Base Parallel: `2016-17-donruss-optic-basketball-2-jahlil-okafor-green-5`
+- Insert Parallel: `2016-17-donruss-optic-basketball-all-stars-1-kobe-bryant-gold-10`
+- 1/1: `2016-17-donruss-basketball-all-stars-2-larry-bird-press-proof-black-1-of-1`
 
 ### Special Handling
 - "Optic Base Set" → "optic" (base removed from slug)

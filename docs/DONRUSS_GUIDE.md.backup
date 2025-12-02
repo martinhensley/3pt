@@ -1,6 +1,6 @@
 # Donruss Product Guide
 
-Special handling guide for Donruss basketball products and Rated Rookies structure.
+Special handling guide for Donruss soccer products and Rated Rookies structure.
 
 ## Table of Contents
 - [Rated Rookies Structure](#rated-rookies-structure)
@@ -24,8 +24,8 @@ Donruss Rated Rookies are **NOT separate sets** - they are the last 25 cards wit
 
 ### Products Affected
 
-This applies to **all Donruss basketball products**:
-- Donruss Basketball (2024-25, 2023-24, etc.)
+This applies to **all Donruss soccer products**:
+- Donruss Soccer (2024-25, 2023-24, etc.)
 - Donruss Road to Qatar (2021-22)
 - Any future Donruss releases
 
@@ -195,11 +195,11 @@ Existing scripts that follow this pattern:
   └── verify-road-to-qatar-import.ts        # Verifies 200-card sets
 ```
 
-### Donruss Basketball (2024-25)
+### Donruss Soccer (2024-25)
 
 ```
 /scripts/donruss-2024-25/
-  ├── import-donruss-basketball-2024.ts         # Main import script
+  ├── import-donruss-soccer-2024.ts         # Main import script
   ├── fix-complete-donruss-import.ts        # Merges all Rated Rookies
   └── verify-donruss-import.ts              # Verification script
 ```

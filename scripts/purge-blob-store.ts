@@ -5,16 +5,24 @@ async function purgeBlobStore() {
   try {
     console.log('Starting blob store purge...');
 
-    // First, get the source document URL for the 2024-25 Panini Donruss Soccer release
+    // Get release slug from command line argument
+    const releaseSlug = process.argv[2];
+
+    if (!releaseSlug) {
+      console.error('Usage: ts-node purge-blob-store.ts <release-slug>');
+      console.error('Example: ts-node purge-blob-store.ts 2016-17-panini-prizm-basketball');
+      process.exit(1);
+    }
+
     const release = await prisma.release.findUnique({
-      where: { slug: '2024-25-panini-donruss-soccer' },
+      where: { slug: releaseSlug },
       include: {
         sourceDocuments: true
       }
     });
 
     if (!release) {
-      console.log('Release not found');
+      console.log(`Release not found: ${releaseSlug}`);
       return;
     }
 

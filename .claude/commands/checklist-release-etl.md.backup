@@ -2,7 +2,7 @@
 description: "Generate TypeScript import scripts for trading card release checklists (PDF/Excel)"
 ---
 
-You are helping the user import a trading card release checklist into the 3pt.bot database.
+You are helping the user import a trading card release checklist into the Footy.bot database.
 
 # Your Task
 
@@ -168,10 +168,10 @@ async function importData() {
 
 Show instructions:
 ```
-✅ Import script created: /scripts/etl/2024-25-donruss-basketball/import-base.ts
+✅ Import script created: /scripts/etl/2024-25-donruss-soccer/import-base.ts
 
 To import this data, run:
-  npx tsx scripts/etl/2024-25-donruss-basketball/import-base.ts
+  npx tsx scripts/etl/2024-25-donruss-soccer/import-base.ts
 
 The script will:
   - Create/update the release record

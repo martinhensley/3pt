@@ -5,7 +5,7 @@ description: "Local-First ETL for trading card releases. Generate TypeScript imp
 
 # Checklist Release ETL
 
-**Local-First ETL**: Generate TypeScript import scripts for trading card releases. Each release gets a dedicated script in `/scripts/{year}-{release}/`.
+**Local-First ETL**: Generate TypeScript import scripts for trading card releases. Each release gets a dedicated script in `/scripts/etl/{year}-{release}/`.
 
 ## Philosophy: One-Off Scripts > Generic Web App
 
@@ -206,23 +206,23 @@ Processing Memorabilia Sets (pages 86-148):
 ❓ Does this look complete? (y/n): y
 
 Step 3: Generate Import Scripts
-Creating scripts in /scripts/2016-17-panini-absolute-basketball/:
+Creating scripts in /scripts/etl/2016-17-panini-absolute-basketball/:
   ✅ import-autographs.ts (15 sets, 453 cards)
   ✅ import-memorabilia.ts (24 sets, 687 cards)
   ✅ import-inserts.ts (1 set, 25 cards)
 
 Step 4: User Runs Scripts Locally
-$ npx tsx scripts/2016-17-panini-absolute-basketball/import-autographs.ts
+$ npx tsx scripts/etl/2016-17-panini-absolute-basketball/import-autographs.ts
   ✅ Imported 15 autograph sets, 453 cards
 
-$ npx tsx scripts/2016-17-panini-absolute-basketball/import-memorabilia.ts
+$ npx tsx scripts/etl/2016-17-panini-absolute-basketball/import-memorabilia.ts
   ✅ Imported 24 memorabilia sets, 687 cards
 
-$ npx tsx scripts/2016-17-panini-absolute-basketball/import-inserts.ts
+$ npx tsx scripts/etl/2016-17-panini-absolute-basketball/import-inserts.ts
   ✅ Imported 1 insert set, 25 cards
 
 ✅ Import Complete!
-  Scripts saved to: /scripts/2016-17-panini-absolute-basketball/
+  Scripts saved to: /scripts/etl/2016-17-panini-absolute-basketball/
   Database: 43 sets, 1,765 cards imported
 ```
 
@@ -422,6 +422,6 @@ await prisma.$transaction(async (tx) => {
 
 - `/lib/slugGenerator.ts` - Slug generation utilities
 - `/lib/checklistUploader.ts` - Blob storage upload
-- `/scripts/2016-17-panini-donruss-basketball/` - Example import
+- `/scripts/etl/2016-17-panini-donruss-basketball/` - Example import
 - `/.claude/CLAUDE.md` - Data import requirements
 - `/prisma/schema.prisma` - Database schema definition

@@ -307,7 +307,7 @@ export default function ReleasePage() {
       "@id": `https://www.3pt.bot/releases/${release.slug}`
     },
     articleSection: "New Releases",
-    keywords: "soccer cards, football cards, trading cards, collectibles"
+    keywords: "basketball cards, NBA cards, WNBA cards, trading cards, collectibles"
   } : null;
 
   return (

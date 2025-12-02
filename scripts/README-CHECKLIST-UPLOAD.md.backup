@@ -26,7 +26,7 @@ This script:
 
 ### Option 2: Integrate into Import Scripts
 
-Add this code to your import script (e.g., `import-donruss-basketball-2024.ts`):
+Add this code to your import script (e.g., `import-donruss-soccer-2024.ts`):
 
 ```typescript
 import { uploadChecklistToRelease, getExistingChecklist } from '../lib/checklistUploader';
@@ -42,7 +42,7 @@ if (!existing) {
   await uploadChecklistToRelease(
     EXCEL_FILE_PATH,
     release.id,
-    'Panini Donruss Basketball 2024-25 Master Checklist'
+    'Panini Donruss Soccer 2024-25 Master Checklist'
   );
   console.log('✅ Checklist uploaded');
 } else {
@@ -90,14 +90,14 @@ Once uploaded, checklists are displayed:
 2. **Edit Release Page** (`/admin/releases/edit/{id}`): In the "Source Documents" section
 3. **Checklists Library** (`/admin/library/checklists`): Searchable list of all checklists
 
-## Example: Donruss Basketball 2024-25
+## Example: Donruss Soccer 2024-25
 
 ```bash
 # 1. Upload the checklist
 npx tsx scripts/upload-donruss-checklist.ts
 
 # 2. View on the release page
-open http://localhost:3000/releases/2024-25-panini-donruss-basketball
+open http://localhost:3000/releases/2024-25-panini-donruss-soccer
 ```
 
 You should now see both:
@@ -107,7 +107,7 @@ You should now see both:
 ## Best Practices
 
 1. **Upload before importing data**: Upload the checklist before running the import script
-2. **Use descriptive names**: Use clear display names like "Panini Donruss Basketball 2024-25 Master Checklist"
+2. **Use descriptive names**: Use clear display names like "Panini Donruss Soccer 2024-25 Master Checklist"
 3. **Don't duplicate**: The utility automatically checks for existing checklists
 4. **Keep original files**: Keep the original Excel files on Desktop for reference
 

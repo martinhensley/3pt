@@ -173,7 +173,7 @@ function scorePlayerName(scanned: string, checklist: string | null): number {
   // One contains the other (handles "Kylian Mbappé" vs "Mbappé")
   if (s.includes(c) || c.includes(s)) return 90;
 
-  // Check last name match (most important for soccer cards)
+  // Check last name match (most important for basketball cards)
   const sLast = s.split(' ').pop() || '';
   const cLast = c.split(' ').pop() || '';
   if (sLast && cLast && sLast === cLast) return 80;
