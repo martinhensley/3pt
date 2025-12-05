@@ -32,17 +32,17 @@ Add this code to your import script (e.g., `import-donruss-basketball-2024.ts`):
 import { uploadChecklistToRelease, getExistingChecklist } from '../lib/checklistUploader';
 
 // At the start of your main() function:
-const EXCEL_FILE_PATH = '/Users/mh/Desktop/2024-25-Donruss-Basketball-Checklist.xlsx';
+const EXCEL_FILE_PATH = '/Users/mh/Desktop/2025-26-Topps-Basketball-Checklist.xlsx';
 
 // After finding the release:
-const existing = await getExistingChecklist(release.id, '2024-25-Donruss-Basketball-Checklist.xlsx');
+const existing = await getExistingChecklist(release.id, '2025-26-Topps-Basketball-Checklist.xlsx');
 
 if (!existing) {
   console.log('\n📤 Uploading checklist to release...');
   await uploadChecklistToRelease(
     EXCEL_FILE_PATH,
     release.id,
-    'Panini Donruss Basketball 2024-25 Master Checklist'
+    'Topps Basketball 2025-26 Master Checklist'
   );
   console.log('✅ Checklist uploaded');
 } else {
@@ -90,14 +90,14 @@ Once uploaded, checklists are displayed:
 2. **Edit Release Page** (`/admin/releases/edit/{id}`): In the "Source Documents" section
 3. **Checklists Library** (`/admin/library/checklists`): Searchable list of all checklists
 
-## Example: Donruss Basketball 2024-25
+## Example: Topps Basketball 2025-26
 
 ```bash
 # 1. Upload the checklist
-npx tsx scripts/upload-donruss-checklist.ts
+npx tsx scripts/upload-topps-checklist.ts
 
 # 2. View on the release page
-open http://localhost:3000/releases/2024-25-panini-donruss-basketball
+open http://localhost:3000/releases/2025-26-topps-basketball
 ```
 
 You should now see both:

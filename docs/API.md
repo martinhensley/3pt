@@ -58,7 +58,7 @@ All other endpoints require an active admin session. Authentication is handled b
 
 ## Releases API
 
-Manage card releases (e.g., "2024-25 Panini Obsidian Basketball").
+Manage card releases (e.g., "2025-26 Topps Basketball").
 
 ### GET /api/releases
 
@@ -132,10 +132,10 @@ Create new release.
 curl -X POST "http://localhost:3000/api/releases" \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Obsidian Basketball",
-    "year": "2024-25",
+    "name": "Topps Basketball",
+    "year": "2025-26",
     "manufacturerId": "cm3xyz789",
-    "releaseDate": "March 2025"
+    "releaseDate": "March 2026"
   }'
 ```
 
@@ -143,9 +143,9 @@ curl -X POST "http://localhost:3000/api/releases" \
 ```json
 {
   "id": "cm3new123",
-  "name": "Obsidian Basketball",
-  "year": "2024-25",
-  "slug": "2024-25-panini-obsidian-basketball",
+  "name": "Topps Basketball",
+  "year": "2025-26",
+  "slug": "2025-26-topps-basketball",
   "createdAt": "2025-01-15T10:30:00.000Z"
 }
 ```
@@ -533,10 +533,10 @@ curl -X GET "http://localhost:3000/api/posts"
 [
   {
     "id": "cm3post123",
-    "title": "2024-25 Obsidian Basketball Review",
-    "slug": "2024-25-obsidian-basketball-review",
+    "title": "2025-26 Topps Basketball Review",
+    "slug": "2025-26-topps-basketball-review",
     "content": "Full review content...",
-    "excerpt": "Panini's latest Obsidian release...",
+    "excerpt": "Topps' latest basketball release...",
     "type": "REVIEW",
     "published": true,
     "postDate": "2025-01-15T00:00:00.000Z",
@@ -637,21 +637,21 @@ Analyze release documents using Claude AI.
 curl -X POST "http://localhost:3000/api/analyze/release" \
   -H "Content-Type: application/json" \
   -d '{
-    "documentText": "2024-25 Panini Obsidian Basketball..."
+    "documentText": "2025-26 Topps Basketball..."
   }'
 ```
 
 **Example Response:**
 ```json
 {
-  "manufacturer": "Panini",
-  "releaseName": "Obsidian Basketball",
-  "year": "2024-25",
-  "slug": "2024-25-panini-obsidian-basketball",
+  "manufacturer": "Topps",
+  "releaseName": "Topps Basketball",
+  "year": "2025-26",
+  "slug": "2025-26-topps-basketball",
   "description": "Premium basketball cards...",
   "sets": [
     {
-      "name": "Obsidian Base",
+      "name": "Base Set",
       "type": "Base",
       "totalCards": "200"
     }
@@ -699,11 +699,11 @@ Analyze card images for identification.
   "playerName": "LeBron James",
   "cardNumber": "1",
   "team": "Los Angeles Lakers",
-  "manufacturer": "Panini",
-  "release": "Obsidian Basketball",
-  "year": "2024-25",
-  "variant": "Electric Etch Orange",
-  "printRun": 8,
+  "manufacturer": "Topps",
+  "release": "Topps Basketball",
+  "year": "2025-26",
+  "variant": "Gold Refractor",
+  "printRun": 50,
   "confidence": 95
 }
 ```
@@ -730,16 +730,16 @@ Generate AI-assisted reviews for releases.
 curl -X POST "http://localhost:3000/api/generate-review" \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "2024-25 Panini Obsidian Basketball",
+    "name": "2025-26 Topps Basketball",
     "sellSheetText": "Product details...",
-    "releaseDate": "December 2024"
+    "releaseDate": "October 2025"
   }'
 ```
 
 **Example Response:**
 ```json
 {
-  "review": "Panini's Obsidian Basketball delivers premium card stock and stunning designs...",
+  "review": "Topps Basketball delivers premium card stock and stunning designs...",
   "summaryDate": "2025-01-15T00:00:00.000Z"
 }
 ```
@@ -809,18 +809,18 @@ curl -X GET "http://localhost:3000/api/checklists?manufacturer=Panini&type=Base"
 [
   {
     "id": "cm3set123",
-    "name": "Obsidian Base",
-    "slug": "2024-25-obsidian-basketball-base",
+    "name": "Base Set",
+    "slug": "2025-26-topps-basketball-base",
     "type": "Base",
     "isParallel": false,
     "printRun": null,
     "expectedCardCount": 200,
     "release": {
-      "name": "Obsidian Basketball",
-      "year": "2024-25",
-      "slug": "2024-25-panini-obsidian-basketball",
+      "name": "Topps Basketball",
+      "year": "2025-26",
+      "slug": "2025-26-topps-basketball",
       "manufacturer": {
-        "name": "Panini"
+        "name": "Topps"
       }
     },
     "_count": {
@@ -850,9 +850,9 @@ curl -X GET "http://localhost:3000/api/checklists/filters"
   ],
   "releases": [
     {
-      "slug": "2024-25-panini-obsidian-basketball",
-      "name": "Obsidian Basketball",
-      "year": "2024-25"
+      "slug": "2025-26-topps-basketball",
+      "name": "Topps Basketball",
+      "year": "2025-26"
     }
   ],
   "types": ["Base", "Insert", "Autograph", "Memorabilia"]
@@ -1015,15 +1015,15 @@ Manage source document library.
 curl -X POST "http://localhost:3000/api/admin/library/source-documents" \
   -H "Content-Type: application/json" \
   -d '{
-    "filename": "obsidian-sellsheet.pdf",
-    "displayName": "Obsidian Basketball Sell Sheet",
+    "filename": "topps-basketball-sellsheet.pdf",
+    "displayName": "Topps Basketball Sell Sheet",
     "blobUrl": "https://blob.vercel-storage.com/...",
     "mimeType": "application/pdf",
     "fileSize": 2048576,
     "documentType": "SELL_SHEET",
     "entityType": "RELEASE",
     "releaseId": "cm3rel123",
-    "tags": ["2024-25", "Panini", "Obsidian"]
+    "tags": ["2025-26", "Topps", "Basketball"]
   }'
 ```
 

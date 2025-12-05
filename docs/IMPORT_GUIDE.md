@@ -38,15 +38,15 @@ async function main() {
   // 1. Create/find the release
   const release = await prisma.release.create({
     data: {
-      name: 'Obsidian Basketball',
-      year: '2024-25',
-      slug: '2024-25-panini-obsidian-basketball',
+      name: 'Topps Basketball',
+      year: '2025-26',
+      slug: '2025-26-topps-basketball',
       manufacturerId: manufacturerId
     }
   });
 
   // 2. Upload the checklist (REQUIRED)
-  const checklistPath = '/Users/mh/Desktop/2024-25-Panini-Obsidian-Basketball-Cards-Checklist.xls';
+  const checklistPath = '/Users/mh/Desktop/2025-26-Topps-Basketball-Checklist.xls';
   const filename = path.basename(checklistPath);
 
   const existing = await getExistingChecklist(release.id, filename);
@@ -56,7 +56,7 @@ async function main() {
     await uploadChecklistToRelease(
       checklistPath,
       release.id,
-      '2024-25 Panini Obsidian Basketball Checklist'
+      '2025-26 Topps Basketball Checklist'
     );
     console.log('✅ Checklist uploaded successfully\n');
   } else {
