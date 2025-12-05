@@ -46,7 +46,7 @@ async function main() {
   });
 
   // 2. Upload the checklist (REQUIRED)
-  const checklistPath = '/Users/mh/Desktop/2024-25-Panini-Obsidian-Soccer-Cards-Checklist.xls';
+  const checklistPath = '/Users/mh/Desktop/2024-25-Panini-Obsidian-Basketball-Cards-Checklist.xls';
   const filename = path.basename(checklistPath);
 
   const existing = await getExistingChecklist(release.id, filename);

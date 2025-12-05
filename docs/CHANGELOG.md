@@ -1,6 +1,10 @@
 # Changelog
 
+*Last Updated: December 5, 2025*
+
 Complete history of changes to the 3pt.bot project.
+
+> **Platform Evolution Note**: Prior to November 2025, this platform was focused on soccer cards. In late November 2025, the platform was comprehensively converted to focus exclusively on basketball cards. Some historical entries below reference the soccer-focused phase of development. See [CONVERSION_SUMMARY.md](../CONVERSION_SUMMARY.md) for complete conversion details.
 
 ---
 

@@ -302,7 +302,7 @@ Manufacturer → Release → Set → Card
 | Entity | Description |
 |--------|-------------|
 | **Manufacturer** | Card manufacturers (Panini, Topps, etc.) |
-| **Release** | Product releases (e.g., "2024-25 Obsidian Soccer") |
+| **Release** | Product releases (e.g., "2024-25 Obsidian Basketball") |
 | **Set** | Card sets within releases (Base, Insert, Auto, Mem) |
 | **Card** | Individual cards with variants and serials |
 | **Post** | Blog posts, reviews, and articles |

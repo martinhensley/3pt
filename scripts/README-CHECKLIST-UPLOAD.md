@@ -32,10 +32,10 @@ Add this code to your import script (e.g., `import-donruss-basketball-2024.ts`):
 import { uploadChecklistToRelease, getExistingChecklist } from '../lib/checklistUploader';
 
 // At the start of your main() function:
-const EXCEL_FILE_PATH = '/Users/mh/Desktop/2024-25-Donruss-Soccer-Checklist.xlsx';
+const EXCEL_FILE_PATH = '/Users/mh/Desktop/2024-25-Donruss-Basketball-Checklist.xlsx';
 
 // After finding the release:
-const existing = await getExistingChecklist(release.id, '2024-25-Donruss-Soccer-Checklist.xlsx');
+const existing = await getExistingChecklist(release.id, '2024-25-Donruss-Basketball-Checklist.xlsx');
 
 if (!existing) {
   console.log('\n📤 Uploading checklist to release...');

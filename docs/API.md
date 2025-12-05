@@ -1,5 +1,7 @@
 # 3pt.bot API Reference
 
+*Last Updated: December 5, 2025*
+
 Complete REST API documentation for the 3pt.bot basketball card platform.
 
 ## Table of Contents
@@ -56,7 +58,7 @@ All other endpoints require an active admin session. Authentication is handled b
 
 ## Releases API
 
-Manage card releases (e.g., "2024-25 Panini Obsidian Soccer").
+Manage card releases (e.g., "2024-25 Panini Obsidian Basketball").
 
 ### GET /api/releases
 
@@ -130,7 +132,7 @@ Create new release.
 curl -X POST "http://localhost:3000/api/releases" \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Chrome Soccer",
+    "name": "Obsidian Basketball",
     "year": "2024-25",
     "manufacturerId": "cm3xyz789",
     "releaseDate": "March 2025"
@@ -141,9 +143,9 @@ curl -X POST "http://localhost:3000/api/releases" \
 ```json
 {
   "id": "cm3new123",
-  "name": "Chrome Soccer",
+  "name": "Obsidian Basketball",
   "year": "2024-25",
-  "slug": "2024-25-panini-chrome-soccer",
+  "slug": "2024-25-panini-obsidian-basketball",
   "createdAt": "2025-01-15T10:30:00.000Z"
 }
 ```
@@ -531,8 +533,8 @@ curl -X GET "http://localhost:3000/api/posts"
 [
   {
     "id": "cm3post123",
-    "title": "2024-25 Obsidian Soccer Review",
-    "slug": "2016-17-donruss-basketball-review",
+    "title": "2024-25 Obsidian Basketball Review",
+    "slug": "2024-25-obsidian-basketball-review",
     "content": "Full review content...",
     "excerpt": "Panini's latest Obsidian release...",
     "type": "REVIEW",
@@ -635,7 +637,7 @@ Analyze release documents using Claude AI.
 curl -X POST "http://localhost:3000/api/analyze/release" \
   -H "Content-Type: application/json" \
   -d '{
-    "documentText": "2024-25 Panini Obsidian Soccer..."
+    "documentText": "2024-25 Panini Obsidian Basketball..."
   }'
 ```
 
@@ -643,10 +645,10 @@ curl -X POST "http://localhost:3000/api/analyze/release" \
 ```json
 {
   "manufacturer": "Panini",
-  "releaseName": "Obsidian Soccer",
+  "releaseName": "Obsidian Basketball",
   "year": "2024-25",
-  "slug": "2016-17-panini-donruss-basketball",
-  "description": "Premium soccer cards...",
+  "slug": "2024-25-panini-obsidian-basketball",
+  "description": "Premium basketball cards...",
   "sets": [
     {
       "name": "Obsidian Base",
@@ -694,11 +696,11 @@ Analyze card images for identification.
 **Example Response:**
 ```json
 {
-  "playerName": "Jude Bellingham",
+  "playerName": "LeBron James",
   "cardNumber": "1",
-  "team": "Real Madrid",
+  "team": "Los Angeles Lakers",
   "manufacturer": "Panini",
-  "release": "Obsidian Soccer",
+  "release": "Obsidian Basketball",
   "year": "2024-25",
   "variant": "Electric Etch Orange",
   "printRun": 8,
@@ -728,7 +730,7 @@ Generate AI-assisted reviews for releases.
 curl -X POST "http://localhost:3000/api/generate-review" \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "2024-25 Panini Obsidian Soccer",
+    "name": "2024-25 Panini Obsidian Basketball",
     "sellSheetText": "Product details...",
     "releaseDate": "December 2024"
   }'
@@ -737,7 +739,7 @@ curl -X POST "http://localhost:3000/api/generate-review" \
 **Example Response:**
 ```json
 {
-  "review": "Panini's Obsidian Soccer delivers premium card stock and stunning designs...",
+  "review": "Panini's Obsidian Basketball delivers premium card stock and stunning designs...",
   "summaryDate": "2025-01-15T00:00:00.000Z"
 }
 ```
@@ -808,15 +810,15 @@ curl -X GET "http://localhost:3000/api/checklists?manufacturer=Panini&type=Base"
   {
     "id": "cm3set123",
     "name": "Obsidian Base",
-    "slug": "2016-17-donruss-basketball-base",
+    "slug": "2024-25-obsidian-basketball-base",
     "type": "Base",
     "isParallel": false,
     "printRun": null,
     "expectedCardCount": 200,
     "release": {
-      "name": "Obsidian Soccer",
+      "name": "Obsidian Basketball",
       "year": "2024-25",
-      "slug": "2016-17-panini-donruss-basketball",
+      "slug": "2024-25-panini-obsidian-basketball",
       "manufacturer": {
         "name": "Panini"
       }
@@ -848,8 +850,8 @@ curl -X GET "http://localhost:3000/api/checklists/filters"
   ],
   "releases": [
     {
-      "slug": "2016-17-panini-donruss-basketball",
-      "name": "Obsidian Soccer",
+      "slug": "2024-25-panini-obsidian-basketball",
+      "name": "Obsidian Basketball",
       "year": "2024-25"
     }
   ],
@@ -1014,7 +1016,7 @@ curl -X POST "http://localhost:3000/api/admin/library/source-documents" \
   -H "Content-Type: application/json" \
   -d '{
     "filename": "obsidian-sellsheet.pdf",
-    "displayName": "Obsidian Soccer Sell Sheet",
+    "displayName": "Obsidian Basketball Sell Sheet",
     "blobUrl": "https://blob.vercel-storage.com/...",
     "mimeType": "application/pdf",
     "fileSize": 2048576,
